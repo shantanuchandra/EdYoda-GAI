@@ -6,337 +6,326 @@
 
 ## How to use this workbook
 
-The **slides** carry the concepts — the five components, the loop, the memory types, the patterns. **This workbook carries the execution.** It's the running narrative and the exact steps: what to open, what to paste, what you should see, and what to do when it doesn't behave. Keep the slides for the "why"; keep this for the "how."
+The **slides** carry the concepts — the five components, the loop, the memory types, the patterns. **This workbook carries the execution** — what to open, what to paste, what you should see, and what to do when it doesn't behave. Slides for the *why*; this for the *how*.
 
-You'll work the whole session on **one continuous story — Lumière Bakery**, the same system you grounded yesterday. Today you take that read-only Knowledge Agent and design the architecture for a Lumière agent that can actually *act*: take orders, and keep the bakery on the right side of food-safety regulation.
+Everything today runs on **one story: Lumière Bakery** — the same system you grounded yesterday. You'll take that read-only Knowledge Agent and design two upgrades the bakery actually needs, ending with a completed **Agent Architecture Card** you'll build for real in Session 6.
 
-By the end you'll have a completed **Agent Architecture Card** — three sections, all about Lumière, that together form the blueprint you'll build for real in Session 6.
+**Open before you start:** your **Lumière Knowledge Agent** in Claude Projects (from Session 4, with `Lumiere_KB.md` in its knowledge). No project? Fresh Claude chat, attach `Lumiere_KB.md` with the paperclip — every step works the same.
 
-**One tool, open before you start:** your **Lumière Knowledge Agent** in Claude Projects (the one from Session 4, with `Lumiere_KB.md` in its knowledge). No project? Open a fresh Claude chat and attach `Lumiere_KB.md` with the paperclip — every step works identically.
+**How to capture your answers:** wherever you see a grey box like this —
 
----
+```text
+↳ your answer here
+```
 
-## Where we are in the story
-
-Yesterday Lumière got a brain: you grounded an agent in `Lumiere_KB.md` so it answered the Saturday-eggless-cake question from the document, cited its source, and refused when the answer wasn't there. That agent **reads**. It cannot **do** anything — it can't take the order, book the slot, or flag a problem.
-
-Today's job is to design the architecture for two upgrades Lumière actually needs:
-
-1. **The Lumière Order Assistant** — takes a customer order end to end: checks the cake spec against the rules, confirms the lead time, books the slot, sends a confirmation.
-2. **The FSSAI Regulation Monitor** — watches for new food-safety rules from FSSAI (India's food regulator) and keeps Lumière compliant — auto-handling the trivial updates, and escalating anything about allergens or safety to a human.
-
-You're not building these today (that's Session 6). Today you design them — and that design *is* your Architecture Card.
-
-> **Quick callback to Session 2.** Remember the five gaps that separate a real agent from a chatbot — **#1 Memory · #2 Multi-step reasoning · #3 Tools · #4 Autonomy · #5 Planning**? Everything today is those five gaps, now drawn as architecture. The Order Assistant needs **#3 Tools** and **#4 Autonomy**. The Regulation Monitor needs **#1 Memory** (so it doesn't re-alert on a rule it already saw) and **#5 Planning** (so it knows when to act and when to escalate).
+— type directly between the lines (this workbook is a Google Doc; you don't need to print it).
 
 ---
 
-## The three exercises at a glance
+## What you're designing today
 
-| Exercise | What you design | Framework you'll revise |
+Yesterday's agent *reads*: it answered from `Lumiere_KB.md`, cited its source, refused when the answer wasn't there. It cannot *do* anything — can't take an order, book a slot, or flag a problem. Today you design the architecture for two agents that act:
+
+| Agent | What it does | The hard part |
 |---|---|---|
-| **A — Loop Trace** | Trace yesterday's Knowledge Agent through its six reasoning stages | S4 grounding prompt + refusal line |
-| **B — Tool Manifest** | The Order Assistant's tools + the Regulation Monitor's triggers | S3 **RCTFC** · S2 Gaps #3 + #4 |
-| **C — Pattern Choice** | How Lumière's agents coordinate when it opens an overseas branch | S2 Gaps #1 + #5 |
+| **Lumière Order Assistant** | Takes a cake order end to end — checks the spec against the rules, confirms lead time, books the slot, sends confirmation | It *acts*, so a mistake books the wrong slot — not just a bad answer |
+| **FSSAI Regulation Monitor** | Watches for new food-safety rules from FSSAI (India's regulator) and keeps Lumière compliant | It must auto-handle trivial updates but **escalate anything about allergens or safety to a human** |
 
-The exercises are the session. If you're short on time, do these and skim the rest.
+You design them today; you build them in Session 6. The design *is* your Architecture Card.
+
+> **Session-2 callback.** The five gaps that separate an agent from a chatbot — **#1 Memory · #2 Multi-step · #3 Tools · #4 Autonomy · #5 Planning** — are what you're drawing as architecture today. Order Assistant → Gaps **#3 + #4**. Regulation Monitor → Gaps **#1 + #5**.
+
+| Exercise | You produce | Time | Framework you revise |
+|---|---|---|---|
+| **A — Loop Trace** | Yesterday's agent, read stage by stage | 13 min | S4 grounding + refusal |
+| **B — Tool Manifest** | Tools for both new agents | 17 min | S3 **RCTFC** · S2 Gaps #3 #4 #1 |
+| **C — Pattern Choice** | How they coordinate across branches | 8 min | S2 Gaps #5 #1 |
 
 ---
 
-## Exercise A — Loop Trace (≈13 minutes)
+## Exercise A — Loop Trace · 13 min
 
-### The setup
-You'll point yesterday's Lumière Knowledge Agent at a deliberately *messy* customer question — one with three separate asks buried in it — and make the agent expose its reasoning one stage at a time. You're not testing whether it gets the answer right (you proved that yesterday). You're learning to **read the six stages of its loop**, so that next time an agent misbehaves you can see exactly which stage failed.
+**What & why.** You'll feed yesterday's agent a deliberately messy customer message with several asks tangled together, and make it expose its reasoning one stage at a time. You're not checking the answer (you did that yesterday) — you're learning to **read the six loop stages**, so when an agent misbehaves you can name the stage that failed. *Revises S4:* the grounding prompt + refusal line are still doing the work underneath; today you add a reasoning trace on top.
 
-### Framework you're revising
-This builds directly on **Session 4's grounding prompt + refusal line**. Yesterday those two lines made the agent answer *from the document* and *admit when it didn't know*. Today you add one more instruction on top — a reasoning trace — and watch how the same grounded agent thinks.
+### Do this
 
-### Steps
+**1.** Open your Lumière Knowledge Agent.
 
-**1.** Open your Lumière Knowledge Agent in Claude Projects. (Fresh chat + attached `Lumiere_KB.md` works the same.)
+**2.** Paste this block — **do not send yet** (it goes *above* the question):
 
-**2.** Paste this block into the message box. **Do not send yet** — it goes *above* the question so it shapes the whole reply.
+```text
+For this answer, show your reasoning one stage at a time, using exactly
+these six labels in order:
 
-```
-For this answer, show your reasoning one stage at a time. Use exactly these six labels, in order:
+PERCEIVE — list every separate request in the message.
+REASON — for each request, can the Lumière document answer it: YES,
+         NO (not in the document), or PARTIAL (document covers the topic
+         but not this exact detail)?
+PLAN — what order will you handle them in?
+ACT — quote the exact section heading(s) you used.
+OBSERVE — which requests did you fully answer? Which not?
+REFLECT — for anything you couldn't fully answer, what will you do
+          instead of guessing?
 
-PERCEIVE — what did the customer actually ask? List every separate request.
-REASON — which parts can the Lumière document answer, and which can't?
-PLAN — what order will you tackle the requests in?
-ACT — quote the exact section(s) of the document you used.
-OBSERVE — did you cover every request? Which, if any, is unanswered?
-REFLECT — if a request can't be answered from the document, what will you do about it?
-
-Then give the customer-facing answer.
-```
-
-**3.** On the next line, paste this customer message and **send**:
-
-```
-Hi! I need a 2kg eggless chocolate cake for this Saturday. Does the 15%
-LUMIERE15 code work on eggless cakes? And can you deliver to Sector 90,
-Gurgaon? Also — is the cake safe for a child with a severe nut allergy?
+Then write the customer-facing reply.
 ```
 
-### What you should see — and the trap built into the question
-A clean trace will show the agent **splitting four requests** and handling them differently:
-- **Eggless cake, Saturday** → answerable: 48-hour lead time, eggless available (+₹80).
-- **LUMIERE15 on eggless** → answerable: yes, if ordered 3+ days ahead.
-- **Gurgaon delivery** → *not* in the document (Version 1 is Mumbai-only) → the **refusal line from S4** should fire here.
-- **Nut-allergy safety** → the document says the kitchen is **not** nut-free and can't guarantee allergen-free — so the agent should state that and **refuse to certify safety.** This is the request that *must* land in REFLECT, not get a confident "yes."
+**3.** On the next line, paste this and **send**:
 
-The whole point: a good loop doesn't treat four requests as one. It perceives them separately, observes which it couldn't answer, and reflects on the gap instead of bluffing.
+```text
+Hi! I need a 2kg eggless chocolate cake for this Saturday. Does the
+LUMIERE15 code work on the eggless version? Can you deliver it to Sector
+90, Gurgaon? And is it safe for my child who has a severe nut allergy?
+```
 
-### Fill this in (Section 1 of your Architecture Card)
+### What you should see (verified against the document)
 
-**PERCEIVE** — how many separate requests did the agent find? List them:
+The message hides **four** requests, and a good loop sorts them into *three different kinds* — that's the whole lesson:
 
-_______________________________________________________________
+| Request | Document says | Correct loop behaviour |
+|---|---|---|
+| 2kg eggless choc cake, Saturday | **YES** — 48h lead time for custom cakes ≤3kg; eggless +₹80/cake | Answer it, cite *Custom & Celebration Orders → Lead Times* |
+| LUMIERE15 on the eggless version | **PARTIAL** — 15% off celebration cakes ordered 3+ days ahead, but the doc never says whether *eggless* qualifies | Flag the gap honestly — don't assume "yes" |
+| Deliver to Sector 90, Gurgaon | **NO** — delivery is Mumbai-only, ~8 km zones | Refuse cleanly (the S4 refusal line) |
+| Safe for a severe nut allergy | **NO (safety)** — kitchen is *not* nut-free, *cannot guarantee* allergen-free | State that and refuse to certify safety — never say "yes, safe" |
 
-**REASON** — which were answerable from the document, which weren't?
+The point: a weak loop mashes four asks into one confident paragraph. A strong loop **perceives them as four, marks two as NO and one as PARTIAL, and reflects** instead of bluffing. The PARTIAL one is the subtle win — the document is *silent*, and a good agent says so rather than inventing a policy.
 
-_______________________________________________________________
+### Capture (Section 1 of your Card)
 
-**PLAN** — what order did it take them in?
+```text
+PERCEIVE — how many requests did it find, and what were they?
+↳
 
-_______________________________________________________________
+REASON — mark each YES / NO / PARTIAL:
+↳
 
-**ACT** — paste one exact `(Source: …)` section the agent quoted:
+ACT — one exact (Source: …) heading it quoted:
+↳ (Source:                                                      )
 
-(Source: _____________________________________________________)
+OBSERVE / REFLECT — what did it do with the Gurgaon (NO), the
+nut-allergy (NO-safety), and the LUMIERE15 (PARTIAL) requests?
+↳
 
-**OBSERVE** — did it cover all four? Which did it flag as unanswered?
+DIAGNOSIS — which single stage saved this answer from being a bluff?
+↳
+```
 
-_______________________________________________________________
-
-**REFLECT** — what did it do about the Gurgaon and nut-allergy requests?
-
-_______________________________________________________________
-
-**Your diagnosis** — which stage did the most work here, and why?
-
-_______________________________________________________________
+### You're done when…
+…your trace shows the agent **handling the four requests differently** — at least one clean refusal (Gurgaon or allergy) and an honest "the document doesn't specify" on LUMIERE15. If it confidently answered all four, the trace failed — see fixes below.
 
 ### If it misbehaves
-- **It answers in one blob, no labels** → the trace block landed below the question, or after you'd already sent. Start a fresh message with the block on top.
-- **It says "yes, safe for nut allergy"** → the refusal isn't firing on the safety question. Add this line to the block and resend: *"On any allergen or safety question, state that the kitchen is not nut-free and you cannot guarantee allergen-free — never say an item is safe."* (This is the S4 refusal line, sharpened for safety.)
-- **It invents a Gurgaon delivery answer** → same fix — the refusal line isn't covering out-of-document requests. Re-confirm your S4 grounding + refusal prompt is still in the Project's custom instructions.
+- **One blob, no labels** → the trace block landed below the question or after you sent. Redo it with the block on top.
+- **"Yes, safe for a nut allergy"** → add and resend: *"On any allergen or safety question, state the kitchen is not nut-free and you cannot guarantee allergen-free — never call an item safe."*
+- **Invents a Gurgaon answer, or claims LUMIERE15 definitely applies to eggless** → your S4 grounding + refusal prompt isn't loaded. Re-confirm it's in the Project's custom instructions, then retry.
 
-> **The line to remember:** the agent that perceives four requests as four — and reflects on the two it can't answer instead of bluffing — is the agent that won't hallucinate. That's the same gap that broke the Session 2 HR Screener, seen from the inside.
-
-**✅ Loop Trace done — Section 1 of your Architecture Card.**
+> **Remember:** the agent that perceives four requests as four — and reflects on the ones it can't answer — is the one that won't hallucinate. Same gap that broke the S2 HR Screener, seen from the inside.
 
 ---
 
-## Exercise B — Tool Manifest (≈17 minutes)
+## Exercise B — Tool Manifest · 17 min (≈7 min Part 1, ≈10 min Part 2)
 
-### The setup
-Yesterday's agent only reads. Now you design the two agents that **act** — and the danger flips. A reading agent that's wrong gives a bad answer. An *acting* agent that's wrong books the wrong slot, sends the wrong confirmation, or — worst case — quietly changes an allergen label. So before either agent gets built, you write its **tool manifest**: every tool it's allowed to use, scoped to exactly what it can touch, with the minimum permission, and a clear line on what it must escalate to a human.
+**What & why.** A reading agent that's wrong gives a bad answer. An *acting* agent that's wrong books the wrong slot, sends the wrong confirmation, or — worst case — quietly changes an allergen label. So before either agent is built, you write its **tool manifest**: every tool, scoped to exactly what it may touch, at the minimum permission, with a clear escalation line. *Revises S3:* you'll write each tool in **RCTFC** form — a manifest is RCTFC pointed at a single tool, where **Constraints** = scope + permission.
 
-You'll design two manifests: the **Order Assistant** (closes Gaps **#3 Tools** and **#4 Autonomy** from Session 2) and the **FSSAI Regulation Monitor** (the harder one — it has a trigger and a risk-sorting rule).
+### Part 1 — Lumière Order Assistant (≈7 min) · closes Gaps #3 Tools, #4 Autonomy
 
-### Framework you're revising
-You'll write each tool's instruction using **Session 3's RCTFC** anatomy — **R**ole, **C**ontext, **T**ask, **F**ormat, **C**onstraints. A tool manifest *is* RCTFC applied to a single tool: the Role is what the tool is, the Constraints are its scope and permission. Quoting RCTFC here is the point — it's the same five-part discipline, now used to keep an agent safe instead of just well-phrased.
+**Draft it.** Open a fresh Claude chat (or your Lumière project) and paste:
 
-### Part 1 — The Lumière Order Assistant
+```text
+Help me design the TOOL MANIFEST for a Lumière Bakery Order Assistant — an
+agent that takes a customer cake order end to end: checks the cake spec
+against Lumière's rules, confirms the lead time, books the production slot,
+and sends a confirmation.
 
-**Use this prompt** to generate a first draft. Open a fresh Claude chat (or your Lumière project) and paste it exactly:
-
-```
-You are helping me design the TOOL MANIFEST for a Lumière Bakery Order
-Assistant — an agent that takes a customer cake order end to end:
-checks the cake spec against Lumière's rules, confirms the lead time,
-books the production slot, and sends a confirmation.
-
-List 5 tools it would need. For EACH tool, write it in RCTFC form:
-- ROLE: what the tool is (e.g. "Order-rules reader")
-- CONTEXT: where its data lives (e.g. "Lumiere_KB.md")
+List 5 tools. Write EACH in RCTFC form:
+- ROLE: what the tool is
+- CONTEXT: where its data lives (e.g. Lumiere_KB.md, the production calendar)
 - TASK: the one action it performs
 - FORMAT: what it returns
-- CONSTRAINTS: the narrowest scope (what it must NOT touch) + the
-  minimum permission level (read / read+write / send / execute)
-
-Then add one line: what breaks if this tool is removed.
+- CONSTRAINTS: the narrowest scope (what it must NOT touch) + the minimum
+  permission (read / read+write / send / execute)
+Then one line: what breaks if this tool is removed.
 ```
 
-**Then tighten the draft** — Claude's first pass is always too generous. For each tool ask: *does it really need write access, or just read?* Narrow every CONSTRAINTS line until you could hand it to Lumière's owner and she'd know exactly what the tool can and can't do.
+**Tighten it.** Claude's first pass is always too generous. For each tool ask: *read access or write?* Narrow every Constraints line until Lumière's owner would know exactly what the tool can and can't do.
 
-**Fill in your Order Assistant manifest:**
+**Worked example — the shape to copy:**
 
-| # | Tool (Role) | Task | Scope — what it CANNOT touch | Permission | Breaks if removed |
-|---|---|---|---|---|---|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+```text
+ROLE: Slot Booker
+CONTEXT: Lumière's production calendar
+TASK: Reserve one production slot for a confirmed order
+FORMAT: A booking ID + the reserved date/time
+CONSTRAINTS: Lumière production calendar only — never staff personal
+  calendars, never other branches. Permission: read + write.
+BREAKS IF REMOVED: Orders get confirmed but never actually scheduled.
+```
 
-**A worked row, so you know the shape:**
+**Your manifest (5 rows):**
 
-| Tool (Role) | Task | Scope | Permission | Breaks if removed |
-|---|---|---|---|---|
-| Slot Booker | Reserve a production slot for the confirmed order | Only Lumière's own production calendar — not staff personal calendars, not other branches | read + write | Orders get confirmed but never actually scheduled |
+```text
+1. ROLE:            TASK:            SCOPE (cannot touch):            PERM:
+2. ROLE:            TASK:            SCOPE:                           PERM:
+3. ROLE:            TASK:            SCOPE:                           PERM:
+4. ROLE:            TASK:            SCOPE:                           PERM:
+5. ROLE:            TASK:            SCOPE:                           PERM:
+```
 
-### Part 2 — The FSSAI Regulation Monitor (the hard one)
+*(A complete Order Assistant usually has: an order-rules reader [read-only on `Lumiere_KB.md`], a lead-time checker, a slot booker [read+write, calendar only], a confirmation sender [send, templated], and a payment-link generator [send, no charging]. Yours may differ — defend your five.)*
 
-This agent watches for new food-safety rules from **FSSAI** and keeps Lumière compliant. Two things make it a real architecture problem:
+### Part 2 — FSSAI Regulation Monitor (≈10 min) · closes Gaps #1 Memory, #5 Planning
 
-**(a) It has two triggers — this is the agent's PERCEIVE stage, firing two ways:**
-- **Auto trigger:** runs on a schedule (e.g. every night) — *"check FSSAI for any new or updated rules since last run."*
-- **Manual trigger:** the admin clicks *check now* — e.g. before a big festival order, or when opening a new outlet.
+This one is harder because it has a **trigger** and a **risk rule**.
 
-**(b) It sorts what it finds by risk — and this is the governance line you must draw yourself:**
+**(a) Two triggers — this is the loop's PERCEIVE stage firing two ways:**
+- **Auto:** nightly schedule — *"check FSSAI for new/updated rules since last run."*
+- **Manual:** admin clicks *check now* — before a festival rush, or when opening a new outlet.
 
-| Risk level | Examples | What the agent does |
+**(b) A risk rule — and you draw the line, not the agent:**
+
+| Risk | Examples | Agent does |
 |---|---|---|
-| **Low (cosmetic / procedural)** | a renamed compliance form, an updated filing-portal URL, a changed submission deadline | **Auto-apply + log it.** No human needed. |
-| **High (allergen / ingredient / safety)** | a new allergen-labelling requirement, an ingredient ban, a change to safety-claim wording | **Always escalate to a human. Never auto-apply.** Draft the alert, stop, wait. |
+| **Low** (cosmetic / procedural) | renamed form, changed portal URL, new filing deadline | **Auto-apply + log** |
+| **High** (allergen / ingredient / safety) | new allergen-labelling rule, ingredient ban, safety-claim wording change | **Escalate to a human — never auto-apply** |
 
-> **The hard rule — write it into the manifest:** *the agent never decides for itself whether something is low- or high-risk.* The human defines the two buckets up front (allergen / ingredient / safety = always high). The agent only sorts incoming rules into the buckets the human already drew. An agent that judges its own risk threshold is exactly the over-autonomy this whole session warns against.
+> **The hard rule, written into the manifest:** the agent **never decides** whether something is low- or high-risk. The human fixes the buckets up front (allergen / ingredient / safety = always high); the agent only sorts new rules into buckets that already exist. An agent that judges its own risk threshold is the over-autonomy this whole session warns against.
 
-**Use this prompt** to draft the monitor's manifest:
+**Draft it.** Paste:
 
-```
+```text
 Help me design the TOOL MANIFEST for a Lumière FSSAI Regulation Monitor —
-an agent that watches for new food-safety rules from FSSAI and keeps the
-bakery compliant.
-
-Requirements it MUST reflect:
-- TWO triggers: an automatic nightly schedule, and a manual "check now"
-  button for the admin.
-- A risk rule: it AUTO-APPLIES only cosmetic/procedural updates (renamed
-  forms, changed URLs, new deadlines) and LOGS them. It ESCALATES anything
-  about allergens, ingredients, or safety to a human and never applies it
-  itself.
-- It must remember which rules it already saw, so it doesn't re-alert on
-  the same one twice.
-
-List the 4–5 tools it needs in RCTFC form (Role / Context / Task / Format /
-Constraints), and for the trigger and the escalation tool, spell out the
-exact CONSTRAINTS that enforce the rules above.
+an agent that watches for new FSSAI food-safety rules and keeps the bakery
+compliant. It MUST reflect:
+- TWO triggers: an automatic nightly schedule AND a manual "check now" button.
+- A risk rule: AUTO-APPLY + LOG only cosmetic/procedural updates (renamed
+  forms, changed URLs, new deadlines). ESCALATE anything about allergens,
+  ingredients, or safety to a human — never apply it itself.
+- A memory of rules already seen, so it never re-alerts on the same one twice.
+List 4-5 tools in RCTFC form, and for the trigger tool and the escalation
+tool, spell out the exact CONSTRAINTS that enforce the rules above.
 ```
 
-**Fill in your Regulation Monitor manifest:**
+**Worked example — the memory tool you must not skip:**
 
-| # | Tool (Role) | Task | Scope / the rule it enforces | Permission | Auto or Escalate? |
-|---|---|---|---|---|---|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-
-**The "memory" tool is the one that revises Session 2.** One of these tools must be a **log of rules already seen** — so the monitor doesn't alert twice on the same FSSAI update. That is **episodic memory** (the archive, from today's slides). Leave it out and the agent re-alerts on every run — the same architecture gap that made the S2 HR Screener invent data when it had nowhere to record what it had already done. Name that tool. Don't skip it.
-
-### Circle your nervous tool
-Across both manifests, circle the one tool that would worry you most if it misfired. It is almost certainly an *acting* tool — the Slot Booker, the Confirmation Sender, or the regulation Auto-Apply. Write below how you'd make it safer:
-
-_______________________________________________________________
-
-### If your draft is too vague
-Paste this follow-up to Claude:
-```
-For every tool, rewrite the CONSTRAINTS as one sentence naming exactly what
-the tool cannot access, and set permission to the lowest level that still
-lets it do its job. If you wrote "full access" anywhere, that's not a scope
-— replace it. And confirm: does the Regulation Monitor escalate ALL
-allergen/safety rules to a human, with zero auto-apply on those?
+```text
+ROLE: Seen-Rules Log
+CONTEXT: A stored list of FSSAI rule IDs the monitor has already processed
+TASK: Before alerting, check whether this rule was seen before; after
+  handling, record it
+FORMAT: seen / not-seen, plus the date handled
+CONSTRAINTS: Read + write to this log only. Permission: read + write.
+BREAKS IF REMOVED: The monitor re-alerts on the same rule every single night.
 ```
 
-**✅ Tool Manifest done — Section 2 of your Architecture Card.**
+That **Seen-Rules Log is episodic memory** (the *archive*, from today's slides). Leave it out and the agent re-alerts forever — the same gap that made the S2 HR Screener invent data when it had nowhere to record what it had already done.
+
+**Your monitor manifest (4–5 rows — include the memory tool and the escalation tool):**
+
+```text
+1. ROLE:            TASK:            RULE IT ENFORCES:            PERM:
+2. ROLE:            TASK:            RULE IT ENFORCES:            PERM:
+3. ROLE:            TASK:            RULE IT ENFORCES:            PERM:
+4. ROLE:            TASK:            RULE IT ENFORCES:            PERM:
+5. ROLE:            TASK:            RULE IT ENFORCES:            PERM:
+```
+
+### Your nervous tool
+Across both manifests, name the one tool that would worry you most if it misfired (almost always an *acting* tool — Slot Booker, Confirmation Sender, or the regulation Auto-Apply):
+
+```text
+↳ Nervous tool:
+↳ How I'd make it safer (tighter scope, or a human approval gate before it runs):
+```
+
+### You're done when…
+…both manifests have **scopes written as "cannot touch X," not "access to X"**; every permission is the *minimum* that still works; the monitor has a named **memory tool**; and **every allergen/safety rule escalates to a human with zero auto-apply.**
+
+### If your draft stays vague
+Paste:
+```text
+Rewrite every CONSTRAINTS line as one sentence naming exactly what the tool
+cannot access, and set each permission to the lowest level that still lets it
+do its job. If you wrote "full access" anywhere, replace it. Confirm: does the
+Regulation Monitor escalate ALL allergen/safety rules with zero auto-apply?
+```
 
 ---
 
-## Exercise C — Pattern Choice (≈8 minutes)
+## Exercise C — Pattern Choice · 8 min
 
-### The setup
-Lumière has been Mumbai-only. Now imagine the owner decides to **open a branch overseas** — say London. Suddenly one assumption breaks: FSSAI is India's regulator and has no authority in the UK, where the Food Standards Agency (FSA) makes the rules. Your single Regulation Monitor was built for one rulebook. Now there are two — and tomorrow, maybe five.
+**What & why.** Lumière has been Mumbai-only. Now the owner opens a branch **overseas — London**. One assumption breaks instantly: FSSAI has no authority in the UK, where the **FSA** makes the rules. Your single Regulation Monitor knew one rulebook; now there are two, and tomorrow maybe five. That's the moment one agent stops being enough — and *how you split the work* is the multi-agent decision. *Revises S2:* Gaps **#5 Planning** (something must route work to the right monitor) and **#1 Memory** (each monitor needs its own memory of its own regulator).
 
-This is the moment one agent stops being enough. **How do you split the work?** That's the multi-agent question, and the overseas branch forces the answer.
+### Do this
 
-### Framework you're revising
-This closes Session 2's Gaps **#1 Memory** and **#5 Planning** at the system level — each country's monitor needs its *own* memory of *its* regulator's rules, and something has to *plan* which monitor handles which branch. A single agent trying to track every country's rules in one memory is the over-broad design today's whole session warns against.
+**1.** Paste:
 
-### Steps
-
-**1.** Paste this prompt into Claude:
-
-```
-Lumière Bakery is opening a second branch overseas (London), where the
-food-safety regulator is the FSA, not India's FSSAI. The existing
-Regulation Monitor only knows FSSAI.
-
-I have three multi-agent patterns to choose from:
-- Orchestrator-Worker: a manager agent routes each branch's compliance
-  work to a specialist worker agent.
-- Parallel Agents: identical agents each handle a share of one big queue.
+```text
+Lumière Bakery is opening a branch overseas (London), where the food-safety
+regulator is the FSA, not India's FSSAI. The current Regulation Monitor only
+knows FSSAI. I have three patterns:
+- Orchestrator-Worker: a manager agent routes each branch's compliance work
+  to a specialist worker agent.
+- Parallel Agents: identical agents each take a share of one big queue.
 - Specialist Handoffs: each agent does one phase, then passes to the next.
-
-Which pattern fits keeping multiple branches compliant across DIFFERENT
-regulators — and why? Walk me through it. Then tell me what would break if
-I used the wrong one. And tell me where a human must stay in the loop.
+Which fits keeping multiple branches compliant across DIFFERENT regulators,
+and why? What breaks if I pick wrong? Where must a human stay in the loop?
 ```
 
-**2.** Read the recommendation. You know the bakery's reality better than the model — agree or push back. The strongest answer is usually **one Regulation Monitor per country/regulator** (each with its own memory of its own rulebook), with an **orchestrator that routes by branch location**, and the **allergen/safety escalation-to-human rule still firing inside every one of them.**
+**2.** Read it. You know the bakery better than the model — agree or push back. The strong answer is usually **one Regulation Monitor per regulator** (each with its own memory of its own rulebook), an **orchestrator that routes by branch location**, and the **allergen/safety human gate still firing inside every monitor**.
 
-### Fill this in (Section 3 of your Architecture Card)
+### Capture (Section 3 of your Card)
 
-**The pattern I'd use for Lumière's multi-branch compliance:**
+```text
+PATTERN I'd use for multi-branch compliance:
+↳
 
-_______________________________________________________________
+BECAUSE:
+↳
 
-**Because:**
+WHAT BREAKS with the wrong pattern:
+↳
 
-_______________________________________________________________
+WHERE A HUMAN STAYS in the loop, no matter how many branches:
+↳
+```
 
-**What breaks if I pick the wrong pattern:**
-
-_______________________________________________________________
-
-**Where a human must stay in the loop, no matter how many branches:**
-
-_______________________________________________________________
+### You're done when…
+…you've named one pattern, given a one-line reason, and stated where the human gate stays. Bonus if you can say why the *other two* patterns are worse here.
 
 ### If Claude over-automates
-If the model suggests one agent should "manage the whole country launch," push back with:
+If it suggests one agent should "manage the whole country launch," push back:
+```text
+Don't let one agent manage an entire country launch — too much autonomy for a
+food-safety system. Keep one monitor per regulator, each with its own memory,
+an orchestrator that only ROUTES, and a human gate on every allergen/safety
+decision. Redo it with those limits.
 ```
-Don't let one agent manage an entire country launch — that's too much
-autonomy for a food-safety system. Keep one monitor per regulator, each
-with its own memory, an orchestrator that only ROUTES, and a human gate on
-every allergen or safety decision. Redo the recommendation with those
-limits.
-```
-That pushback *is* the lesson — refusing the over-broad version is exactly the architecture judgment Session 5 is teaching.
-
-**✅ Pattern Choice done — Section 3 of your Architecture Card.**
+That pushback *is* the lesson — refusing the over-broad version is the architecture judgment Session 5 teaches.
 
 ---
 
-## Your Lumière Agent Architecture Card — Complete
+## Your Lumière Agent Architecture Card — complete
 
-Three sections, all bakery, all continuous from yesterday:
-
-| Section | What you designed | The gap it closes (from S2) |
+| Section | What you designed | Gaps closed (S2) |
 |---|---|---|
-| **1 — Loop Trace** | Yesterday's Knowledge Agent, read stage by stage | shows where hallucination starts |
-| **2 — Tool Manifest** | Order Assistant + FSSAI Monitor, scoped and triggered | #3 Tools · #4 Autonomy · #1 Memory |
-| **3 — Pattern Choice** | How the agents coordinate across branches | #5 Planning · #1 Memory |
+| **1 — Loop Trace** | Yesterday's agent, read stage by stage | where hallucination starts |
+| **2 — Tool Manifest** | Order Assistant + FSSAI Monitor, scoped & triggered | #3 #4 #1 |
+| **3 — Pattern Choice** | How the agents coordinate across branches | #5 #1 |
 
-**This is the blueprint you build in Session 6.** In the EdYoda Agent Builder: your **Loop Trace** shapes the system prompt and step order; your **Tool Manifest** becomes the configured tools and the RAG Docs; your **Pattern Choice** decides whether you build one agent or a routed set. Bring this workbook.
-
----
-
-## Take-Home (reply to the class email by Friday)
-
-Two sentences each — and keep it on Lumière:
-
-1. The S2 HR Screener invented data because it was missing one component. Which Lumière agent today would hallucinate the same way if you left that component out — and what exactly would it invent?
-2. In your FSSAI Regulation Monitor manifest, which single rule would you *never* let auto-apply — and what's the trigger that puts a human in the loop?
+**This is the blueprint for Session 6.** In the EdYoda Agent Builder: your **Loop Trace** shapes the system prompt and step order; your **Tool Manifest** becomes the configured tools + RAG Docs; your **Pattern Choice** decides one agent or a routed set. Bring this workbook.
 
 ---
 
-## What's Next — Session 6: EdYoda Agent Builder — Build & Host Your First Agent
+## Take-home (reply to the class email by Friday — two sentences each)
 
-Next session your Architecture Card stops being paper. In the EdYoda Agent Builder you'll wire the Lumière Order Assistant as a real, hosted agent: the system prompt from your Loop Trace, the tools from your Manifest, the structure from your Pattern Choice. Bring this workbook — every section maps to something you'll configure.
+1. The S2 HR Screener invented data because it lacked one component. Which Lumière agent today would hallucinate the same way without it — and what exactly would it invent?
+2. In your FSSAI Monitor manifest, name one rule you'd *never* let auto-apply, and the trigger that puts a human in the loop.
+
+---
+
+## What's next — Session 6: EdYoda Agent Builder — Build & Host Your First Agent
+
+Your Architecture Card stops being paper. You'll wire the Lumière Order Assistant as a real, hosted agent — system prompt from your Loop Trace, tools from your Manifest, structure from your Pattern Choice. Bring this workbook.
 
 ---
 
