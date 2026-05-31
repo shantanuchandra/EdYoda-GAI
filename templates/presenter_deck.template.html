@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session {{SESSION_NUMBER}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ===================== TOPBAR ===================== */
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .topbar .title .accent { color: var(--accent); }
+  .clock-divider { width: 1px; height: 32px; background: var(--border); }
+  .clock-box { display: flex; flex-direction: column; line-height: 1.15; gap: 2px; }
+  .clock-box .label {
+    color: var(--text-dim); font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.14em; font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+  .topbar .grow { flex: 1; }
+  .topbar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary { background: var(--accent); color: #062420; border-color: var(--accent); font-weight: 600; }
+  .topbar button.primary:hover { background: #7df1de; }
+  .topbar .slide-counter {
+    color: var(--text-muted); font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2); border-left: 1px solid var(--border);
+  }
+
+  /* ===================== MAIN LAYOUT ===================== */
+  .main { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 64px - 56px); }
+  .panel-left { overflow-y: auto; padding: var(--s-3) var(--s-4); border-right: 1px solid var(--border); }
+  .panel-right { overflow-y: auto; background: var(--bg-1); padding: var(--s-3); }
+  .panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track, .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover, .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===================== BOTTOMBAR ===================== */
+  .bottombar {
+    height: 56px; background: var(--bg-1); border-top: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 var(--s-3); gap: var(--s-2); flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1; height: 4px; background: var(--surface); border-radius: 2px;
+    overflow: hidden; margin: 0 var(--s-2); border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%; background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  /* ===================== SLIDE CONTENT ===================== */
+  .timing-bar {
+    display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3);
+    padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration { color: var(--text-muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+  .timing-bar .block-title {
+    font-weight: 500; flex: 1; font-size: 0.88rem; color: var(--text-soft);
+    text-align: right; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--s-2);
+  }
+  .slide-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: var(--s-3); letter-spacing: -0.02em; color: var(--text);
+  }
+
+  .section {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 18px; margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+  .section .header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .section h3 {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+  .section.bridge .quote { border-left-color: #f472b6; }
+  .section.deeper .quote { border-left-color: #60a5fa; }
+
+  .quote {
+    color: var(--text); font-size: 1rem; line-height: 1.6;
+    padding-left: 12px; border-left: 2px solid var(--warm); margin: 0; font-weight: 400;
+  }
+  .section p { font-size: 0.94rem; line-height: 1.6; color: var(--text-soft); margin-bottom: 6px; }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list { counter-reset: step; list-style: none; padding-left: 0; margin: 0; }
+  .step-list > li {
+    counter-increment: step; padding-left: 36px; position: relative;
+    padding-bottom: 10px; font-size: 0.94rem; line-height: 1.55; color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: 0; top: 2px; width: 26px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    background: #060810; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem; color: var(--accent); white-space: pre-wrap;
+    line-height: 1.6; margin-top: 4px;
+  }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-section { margin-bottom: var(--s-3); }
+  .right-section h4 {
+    font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .preview-card {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title { font-size: 0.92rem; font-weight: 500; margin: 4px 0 2px; color: var(--text); line-height: 1.35; }
+  .preview-card .when {
+    font-size: 0.74rem; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 18px 16px; text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    line-height: 1; letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    text-transform: uppercase; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .timer-controls { display: flex; gap: 4px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
+  .timer-controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+  .quick-key kbd {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text-soft); font-weight: 500;
+    min-width: 22px; text-align: center; box-shadow: 0 1px 0 var(--border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session {{SESSION_NUMBER}}</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 2:00</span>
+  </div>
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 03</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(180)">3m</button>
+          <button onclick="startExTimer(240)">4m</button>
+          <button onclick="startExTimer(360)">6m</button>
+          <button onclick="startExTimer(420)">7m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>3</kbd> <kbd>4</kbd> <kbd>6</kbd> <kbd>7</kbd> start timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA =====================
+   Replace these three placeholder slides with the real deck.
+   Per-slide shape:
+     {
+       num, when, duration,
+       tag: "title" | "demo" | "exercise" | "break",
+       title,
+       say,                 // facilitator opening speech
+       afterPause,          // (optional) bridge between say chunks
+       sayAfter,            // (optional) followup speech after action
+       doSteps: [...],      // facilitator step-by-step actions
+       watch,               // contingency / chat-watch instruction
+       deeper: [...] | "",  // deeper context — use if asked
+       note,                // sidebar note to self
+       bridge,              // transition to next slide
+       prompt               // (optional) paste-ready monospace block
+     }
+   ===================================================== */
+const slides = [
+  {
+    num: 1, when: "0:00 – 0:02", duration: "2 min", tag: "title",
+    title: "{{SLIDE_1_TITLE}}",
+    say: "{{SLIDE_1_SAY — what the facilitator says aloud to open this slide.}}",
+    doSteps: [
+      "{{SLIDE_1_DO_STEP_1 — concrete facilitator action.}}",
+      "{{SLIDE_1_DO_STEP_2}}"
+    ],
+    watch: "{{SLIDE_1_WATCH — contingency / chat-monitoring instruction.}}",
+    bridge: "{{SLIDE_1_BRIDGE — one-line transition to slide 2.}}"
+  },
+  {
+    num: 2, when: "0:02 – 0:09", duration: "7 min", tag: "exercise",
+    title: "{{SLIDE_2_TITLE}}",
+    say: "{{SLIDE_2_SAY — set up the exercise.}}",
+    prompt: "{{SLIDE_2_PROMPT — paste-ready monospace block for learners.}}",
+    doSteps: [
+      "{{SLIDE_2_DO_STEP_1 — e.g. 'Paste prompt in chat'}}",
+      "{{SLIDE_2_DO_STEP_2 — e.g. 'Start the 7-min timer (key: 7)'}}"
+    ],
+    sayAfter: "{{SLIDE_2_SAY_AFTER — debrief speech.}}",
+    deeper: [
+      "{{SLIDE_2_DEEPER_1 — only if a learner asks.}}",
+      "{{SLIDE_2_DEEPER_2}}"
+    ],
+    bridge: "{{SLIDE_2_BRIDGE}}"
+  },
+  {
+    num: 3, when: "0:09 – 0:11", duration: "2 min", tag: "demo",
+    title: "{{SLIDE_3_TITLE}}",
+    say: "{{SLIDE_3_SAY}}",
+    doSteps: [
+      "{{SLIDE_3_DO_STEP_1}}",
+      "{{SLIDE_3_DO_STEP_2}}"
+    ],
+    note: "{{SLIDE_3_NOTE — sidebar reminder to self.}}",
+    bridge: "{{SLIDE_3_BRIDGE}}"
+  },
+  /* ===== BREAK SLIDE (place at the hard-break moment, ~0:55) =====
+     `tag: "break"` auto-fires the 10-min sidebar timer when this slide is shown.
+     The B keyboard shortcut jumps here via findIndex below.
+     IMPORTANT: the learner deck must have a matching .break-slide at the same index. */
+  {
+    num: 4, when: "0:55 – 1:05", duration: "10 min", tag: "break", block: "BREAK",
+    title: "🟢 HARD BREAK · 10 minutes · NON-NEGOTIABLE",
+    say: "Real ten-minute break. Cameras off. Get up. Stretch. Water. We come back at the exact clock time on screen.",
+    doSteps: [
+      "Both decks now show a 10-min countdown — learner deck big Fraunces clock, your sidebar exTimer (auto-fires).",
+      "Play music. Mute yourself.",
+      "{{BREAK_WORK_TODO — e.g. 'DM stragglers, clone backup agents into stuck learners' accounts, confirm test runs.'}}",
+      "Come back when the sidebar timer hits ~01:30 — sip water, prepare the next-block visual."
+    ],
+    note: "Why non-negotiable: Bailenson Zoom-fatigue research — screen fatigue compounds non-linearly after an hour. Skipping the break costs the second hour.",
+    watch: "Honor the break. Do NOT start the next block early."
+  }
+];
+
+/* Index of the break slide (0-based). Pressing B jumps here.
+   Auto-resolved from the slides array — works after reorderings.
+   Returns -1 if no break slide exists, in which case B is a no-op. */
+const BREAK_SLIDE_INDEX = slides.findIndex(s => s.tag === 'break');
+
+/* ===================== SAFE DOM RENDERING ===================== */
+const slidePane = document.getElementById('slidePane');
+
+function el(tag, opts = {}) {
+  const e = document.createElement(tag);
+  if (opts.cls) e.className = opts.cls;
+  if (opts.text) e.textContent = opts.text;
+  return e;
+}
+
+function makeSection(cls, title, contentBuilder) {
+  const section = el('div', { cls: `section ${cls}` });
+  const header = el('div', { cls: 'header' });
+  const h = el('h3', { text: title });
+  header.appendChild(h);
+  section.appendChild(header);
+  contentBuilder(section);
+  return section;
+}
+
+function renderSlide(s) {
+  while (slidePane.firstChild) slidePane.removeChild(slidePane.firstChild);
+
+  const bar = el('div', { cls: 'timing-bar' });
+  bar.appendChild(el('span', { cls: 'time-pill', text: s.when }));
+  bar.appendChild(el('span', { cls: 'duration', text: s.duration }));
+  bar.appendChild(el('span', { cls: 'block-title', text: `Slide ${String(s.num).padStart(2, '0')} of ${slides.length}` }));
+  slidePane.appendChild(bar);
+
+  slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
+  slidePane.appendChild(el('h1', { text: s.title }));
+
+  if (s.say) {
+    slidePane.appendChild(makeSection('say', 'Say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.say }));
+    }));
+  }
+  if (s.doSteps) {
+    slidePane.appendChild(makeSection('do', 'Do', (sec) => {
+      const ol = el('ol', { cls: 'step-list' });
+      s.doSteps.forEach(step => ol.appendChild(el('li', { text: step })));
+      sec.appendChild(ol);
+    }));
+  }
+  if (s.prompt) {
+    slidePane.appendChild(makeSection('prompt-section', 'Paste in chat', (sec) => {
+      sec.appendChild(el('div', { cls: 'prompt-box', text: s.prompt }));
+    }));
+  }
+  if (s.afterPause) {
+    slidePane.appendChild(makeSection('watch', 'Pause for', (sec) => {
+      sec.appendChild(el('p', { text: s.afterPause }));
+    }));
+  }
+  if (s.sayAfter) {
+    slidePane.appendChild(makeSection('say', 'Then say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.sayAfter }));
+    }));
+  }
+  if (s.watch) {
+    slidePane.appendChild(makeSection('watch', 'Watch for · contingency', (sec) => {
+      sec.appendChild(el('p', { text: s.watch }));
+    }));
+  }
+  if (s.deeper) {
+    slidePane.appendChild(makeSection('deeper', 'Deeper context · use if asked', (sec) => {
+      if (Array.isArray(s.deeper)) s.deeper.forEach(d => sec.appendChild(el('p', { text: d })));
+      else sec.appendChild(el('p', { text: s.deeper }));
+    }));
+  }
+  if (s.bridge) {
+    slidePane.appendChild(makeSection('bridge', 'Bridge to next slide', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.bridge }));
+    }));
+  }
+  if (s.note) {
+    slidePane.appendChild(makeSection('note', 'Note to self', (sec) => {
+      sec.appendChild(el('p', { text: s.note }));
+    }));
+  }
+}
+
+let current = 0;
+function show(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  renderSlide(slides[current]);
+  document.getElementById('slideCounter').textContent = `${String(current + 1).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  document.getElementById('nowNum').textContent = `SLIDE ${String(slides[current].num).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('nowTitle').textContent = slides[current].title;
+  document.getElementById('nowWhen').textContent = slides[current].when;
+
+  const nxt = slides[current + 1];
+  document.getElementById('nextNum').textContent = nxt ? `SLIDE ${String(nxt.num).padStart(2, '0')} / ${slides.length}` : '—';
+  document.getElementById('nextTitle').textContent = nxt ? nxt.title : 'End of deck';
+  document.getElementById('nextWhen').textContent = nxt ? nxt.when : '—';
+
+  const nxt2 = slides[current + 2];
+  document.getElementById('next2Num').textContent = nxt2 ? `SLIDE ${String(nxt2.num).padStart(2, '0')} / ${slides.length}` : '—';
+  document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
+  document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
+
+  try { localStorage.setItem('genai_s{{SESSION_NUMBER}}_slide_master', String(current)); } catch (e) {}
+
+  // Auto-fire the 10-min break timer on the break slide. Stop a phantom break
+  // timer (≥9 min remaining) if we navigated away early. Don't kill a regular
+  // exercise timer which never starts above 600s.
+  if (slides[current].tag === 'break') {
+    startExTimer(600);
+  } else if (typeof exSecs !== 'undefined' && exSecs > 540) {
+    stopExTimer();
+  }
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+function goSlide(i) { show(i); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') toggleClassClock();
+  if ((e.key === 'b' || e.key === 'B') && BREAK_SLIDE_INDEX >= 0) goSlide(BREAK_SLIDE_INDEX);
+  if (e.key === '3') startExTimer(180);
+  if (e.key === '4') startExTimer(240);
+  if (e.key === '6') startExTimer(360);
+  if (e.key === '7') startExTimer(420);
+  if (e.key === 'p' || e.key === 'P') exportLearnerPDF();
+});
+
+/* ===================== EXPORT LEARNER → PDF =====================
+   Signals the paired learner tab to open its own Chrome Save-as-PDF dialog.
+   If no learner tab is open, opens one first, then signals after a render delay.
+   The learner-side @page CSS forces landscape 16:9 one-slide-per-page. */
+function exportLearnerPDF() {
+  const PRINT_KEY = 'genai_s{{SESSION_NUMBER}}_print_request';
+  const MASTER_KEY = 'genai_s{{SESSION_NUMBER}}_slide_master';
+  // Bump the value so a repeat press still fires a 'storage' event in the other tab.
+  const stamp = Date.now().toString();
+  // Always write so a learner tab that's already open hears the signal.
+  try { localStorage.setItem(PRINT_KEY, stamp); } catch (e) {}
+  // Best-effort fallback: if no learner tab might be open, open one and resend after it loads.
+  // We can't reliably detect "is the other tab open" — so we open a new window and resend.
+  // If a learner tab already exists, the browser focuses it instead of duplicating in most setups.
+  const w = window.open('learner_deck.html', 'edyoda_learner_deck');
+  if (w) {
+    // Give the learner tab time to attach its storage listener and finish first render.
+    setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);
+  }
+}
+
+/* ===================== CLOCKS ===================== */
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(secs) { const m = Math.floor(secs / 60); const s = secs % 60; return `${pad(m)}:${pad(s)}`; }
+function fmtClass(secs) {
+  const m = Math.floor(Math.abs(secs) / 60);
+  const s = Math.abs(secs) % 60;
+  const sign = secs < 0 ? '-' : '';
+  return `${sign}${pad(m)}:${pad(s)}`;
+}
+function updateRealClock() {
+  const d = new Date();
+  document.getElementById('realClock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+let classStartTs = null;
+let paused = false;
+let pausedAt = 0;
+let pausedAccum = 0;
+
+function startClass() {
+  if (classStartTs === null) {
+    classStartTs = Date.now();
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  } else { toggleClassClock(); }
+}
+function toggleClassClock() {
+  if (classStartTs === null) { startClass(); return; }
+  if (!paused) { pausedAt = Date.now(); paused = true; document.getElementById('startBtn').textContent = '▶ Resume'; }
+  else { pausedAccum += Date.now() - pausedAt; paused = false; document.getElementById('startBtn').textContent = '⏸ Pause'; }
+}
+function resetClass() {
+  if (confirm('Reset class clock?')) {
+    classStartTs = null; paused = false; pausedAccum = 0;
+    document.getElementById('startBtn').textContent = '▶ Start Class';
+    updateClassClock();
+  }
+}
+function classElapsedSecs() {
+  if (classStartTs === null) return 0;
+  const now = paused ? pausedAt : Date.now();
+  return Math.floor((now - classStartTs - pausedAccum) / 1000);
+}
+function plannedSecsForCurrent() {
+  const w = slides[current].when;
+  if (!w || w === "Pre-start") return 0;
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return 0;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+function updateClassClock() {
+  const elapsed = classElapsedSecs();
+  document.getElementById('classClock').textContent = `${fmt(elapsed)} / 2:00`;
+  const planned = plannedSecsForCurrent();
+  if (classStartTs === null || planned === 0) {
+    document.getElementById('paceLabel').textContent = '—';
+    document.getElementById('paceLabel').className = 'big ok';
+    return;
+  }
+  const delta = elapsed - planned;
+  const labelEl = document.getElementById('paceLabel');
+  if (Math.abs(delta) < 60) { labelEl.textContent = 'on time'; labelEl.className = 'big ok'; }
+  else if (delta > 0) { labelEl.textContent = `+${fmtClass(delta)} late`; labelEl.className = delta > 180 ? 'big danger' : 'big warn'; }
+  else { labelEl.textContent = `${fmtClass(delta)} early`; labelEl.className = 'big ok'; }
+}
+setInterval(updateClassClock, 1000);
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval = null;
+let exSecs = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exSecs = secs;
+  const block = document.getElementById('timerBlock');
+  const disp = document.getElementById('exTimer');
+  function tick() {
+    disp.textContent = fmt(exSecs);
+    block.classList.remove('warn', 'danger');
+    if (exSecs <= 30) block.classList.add('danger');
+    else if (exSecs <= 60) block.classList.add('warn');
+    if (exSecs <= 0) { stopExTimer(); return; }
+    exSecs--;
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+function openLearnerDeck() { window.open('learner_deck.html', '_blank'); }
+
+show(0);
+</script>
+</body>
+</html>

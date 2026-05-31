@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EdYoda · Session 2 Learner Workbook</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --paper: #f5efe6;
+  --paper-warm: #ede4d3;
+  --paper-cream: #faf6ef;
+  --ink: #1a1814;
+  --ink-soft: #4a463e;
+  --ink-mute: #8a8478;
+  --ink-faint: #b8b1a3;
+  --rule: #d4ccba;
+  --rule-soft: #e3dccb;
+  --terra: #b8431b;
+  --terra-soft: rgba(184, 67, 27, 0.08);
+  --ink-blue: #1e3a5f;
+  --warn: #a16207;
+  --danger: #991b1b;
+  --calm: #14532d;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 18mm 22mm 18mm;
+}
+
+@page :first {
+  margin-top: 28mm;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Geist', -apple-system, system-ui, sans-serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.wb {
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Headings ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fraunces', Georgia, serif;
+  color: var(--ink);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+  page-break-after: avoid;
+  break-after: avoid;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+h1 {
+  font-size: 24pt;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--ink);
+}
+h1 + p { font-size: 12pt; color: var(--ink-soft); font-style: italic; }
+h2 {
+  font-size: 17pt;
+  font-weight: 400;
+  margin-top: 1.6em;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
+}
+h3 {
+  font-size: 13pt;
+  font-weight: 500;
+  color: var(--terra);
+  margin-top: 1.4em;
+}
+h4 {
+  font-size: 11pt;
+  font-weight: 600;
+  color: var(--ink-blue);
+  font-family: 'Geist', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1.2em;
+}
+
+/* ===== Body ===== */
+p { margin: 0 0 0.7em 0; }
+p strong, li strong, td strong { color: var(--ink); font-weight: 600; }
+em { color: var(--ink-soft); }
+
+a { color: var(--terra); text-decoration: none; border-bottom: 1px dotted var(--terra); }
+
+/* ===== Lists ===== */
+ul, ol {
+  margin: 0 0 0.9em 0;
+  padding-left: 1.4em;
+}
+li { margin-bottom: 0.35em; line-height: 1.55; }
+li > ul, li > ol { margin: 0.3em 0 0.3em 0; }
+ul { list-style-type: square; }
+ul li::marker { color: var(--terra); }
+ol li::marker { color: var(--terra); font-family: 'Geist Mono', monospace; font-size: 0.9em; }
+
+/* Checkbox list items */
+li input[type="checkbox"] {
+  margin-right: 6px;
+  transform: translateY(1px);
+}
+
+/* ===== Code ===== */
+code {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.88em;
+  background: var(--paper-warm);
+  color: var(--ink);
+  padding: 0.08em 0.4em;
+  border-radius: 3px;
+  border: 1px solid var(--rule-soft);
+}
+pre {
+  background: var(--paper-cream);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--terra);
+  padding: 12pt 14pt;
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 8.5pt;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0.6em 0 1em 0;
+  overflow: visible;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  border-radius: 3px;
+}
+pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ===== Blockquote (callout) ===== */
+blockquote {
+  margin: 0.8em 0;
+  padding: 10pt 14pt;
+  background: var(--terra-soft);
+  border-left: 3px solid var(--terra);
+  border-radius: 0 4px 4px 0;
+  color: var(--ink);
+  font-style: normal;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+blockquote p { margin-bottom: 0.4em; }
+blockquote p:last-child { margin-bottom: 0; }
+blockquote strong { color: var(--terra); }
+blockquote code { background: rgba(255,255,255,0.5); }
+
+/* ===== Tables ===== */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8em 0 1.2em 0;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+thead {
+  background: var(--ink);
+  color: var(--paper);
+}
+th {
+  font-family: 'Geist Mono', monospace;
+  font-size: 8pt;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8pt 10pt;
+  text-align: left;
+  border: 1px solid var(--ink);
+}
+td {
+  padding: 7pt 10pt;
+  border: 1px solid var(--rule);
+  vertical-align: top;
+  line-height: 1.45;
+}
+tbody tr:nth-child(even) { background: var(--paper-cream); }
+td code { font-size: 0.85em; }
+
+/* ===== Horizontal rule (section divider) ===== */
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--rule);
+  margin: 2em 0;
+  position: relative;
+}
+hr::after {
+  content: '· · ·';
+  position: absolute;
+  top: -0.65em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper);
+  padding: 0 0.7em;
+  color: var(--ink-mute);
+  font-family: 'Geist Mono', monospace;
+  font-size: 8pt;
+  letter-spacing: 0.3em;
+}
+
+/* ===== Page breaks ===== */
+h2.new-page {
+  page-break-before: always;
+  break-before: page;
+}
+/* Avoid orphan headings */
+h1, h2, h3, h4 {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+pre, table, blockquote {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* ===== Footer running text on each page (via @page if supported) ===== */
+@page {
+  @bottom-right {
+    content: "Page " counter(page);
+    font-family: 'Geist Mono', monospace;
+    font-size: 8pt;
+    color: #8a8478;
+  }
+  @bottom-left {
+    content: "Generative AI for Non-Coders · Session 2 Workbook";
+    font-family: 'Geist Mono', monospace;
+    font-size: 8pt;
+    color: #8a8478;
+  }
+}
+
+/* Cover styling for the first h1 */
+.cover-header {
+  text-align: left;
+  margin-bottom: 1.8em;
+}
+.cover-header .eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 8pt;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--terra);
+  margin-bottom: 0.6em;
+  display: block;
+}
+
+/* Inline emoji size */
+li, p, td, th { font-variant-emoji: emoji; }
+</style>
+</head>
+<body>
+  <div class="wb">
+    <div class="cover-header">
+      <span class="eyebrow">EdYoda · Generative AI for Non-Coders · Session 2</span>
+    </div>
+<h1 id="generative-ai-for-non-coders-session-2-workbook">Generative AI for Non-Coders — Session 2 Workbook</h1>
+<p><strong>Why Agents? The Case for Autonomous AI</strong></p>
+<p>By the end of these two hours, you will have a working <strong>AI Pattern Advisor</strong> agent — yours, customised to your job — that takes any business problem you describe and tells you which AI pattern fits: <strong>Chatbot · RAG · Agent · Multi-Agent.</strong></p>
+<p>No code. No prep. Just you, the EdYoda Agent Builder, and this workbook.</p>
+<p>One rule for today: <strong>you will not leave with notes. You will leave with a working agent.</strong></p>
+<hr />
+<h2 id="how-to-use-this-workbook-in-the-room">🧭 HOW TO USE THIS WORKBOOK IN THE ROOM</h2>
+<p>This workbook is a <strong>build companion</strong>, not a reading. You open it once when the facilitator calls &ldquo;open your workbook to your track&rsquo;s page&rdquo; and then you work from it for the next hour.</p>
+<h3 id="what-you-re-actually-building">What you&rsquo;re actually building</h3>
+<p>You&rsquo;re building an <strong>agent as a pipeline of LLM nodes</strong> inside the EdYoda Agent Builder. Each node has its own system prompt and runs in sequence — the output of Node 1 feeds Node 2, which feeds Node 3, and so on. By the end of the session your agent has <strong>5 nodes</strong> and runs the full sequence on one button-press.</p>
+<p>That&rsquo;s it. That&rsquo;s the whole mental model. No code. No &ldquo;tools&rdquo; to toggle. Just a chain of small LLM brains, each with a clear job, wired in order.</p>
+<h3 id="the-platform-you-ll-be-in">The platform you&rsquo;ll be in</h3>
+<p>After you log into <a href="https://build.edyoda.com">build.edyoda.com</a>, you&rsquo;ll see an agent detail page with these sections:</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What lives here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overview</strong></td>
+<td>Agent name, the agent&rsquo;s role (<code>Description</code> field), welcome message, avatar emoji, file-upload toggle.</td>
+</tr>
+<tr>
+<td><strong>Configure → No-Code</strong></td>
+<td>The node pipeline. This is where most of your build happens.</td>
+</tr>
+<tr>
+<td><strong>Configure → Code</strong></td>
+<td>Ignore for today — that&rsquo;s for Python developers.</td>
+</tr>
+<tr>
+<td><strong>RAG Docs</strong></td>
+<td>Where you upload documents the agent retrieves from. This is how you give your agent persistent context.</td>
+</tr>
+<tr>
+<td><strong>Logs</strong></td>
+<td>Run history — useful after you publish.</td>
+</tr>
+<tr>
+<td><strong>Share Config</strong> (header button)</td>
+<td>The public chat URL after you publish. Use this to test on your phone or share with a colleague.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-build-in-five-steps">The build, in five steps</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What you do</th>
+<th>Time</th>
+<th>Gap closed (from Sprint 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td>Create the agent. Add <strong>Node 1</strong>: write a system prompt that uses <strong>web search</strong>.</td>
+<td>~10 min</td>
+<td>#3 Tools</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>First test run. Send a starter problem to your one-node agent. Read the trace.</td>
+<td>~6 min</td>
+<td>— (proof-of-life run)</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>Add <strong>Node 2</strong> to the pipeline. Its system prompt processes Node 1&rsquo;s output.</td>
+<td>~8 min</td>
+<td>#4 Autonomy</td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td>Upload a <strong>RAG Doc</strong> with your real context (company, audience, voice). Re-run.</td>
+<td>~7 min</td>
+<td>#1 Memory</td>
+</tr>
+<tr>
+<td><strong>E</strong></td>
+<td>Add <strong>Nodes 3, 4, and 5</strong>. Click <strong>Proceed (Generate Code)</strong>. Click <strong>Publish Agent</strong>. Run the published agent end-to-end.</td>
+<td>~10 min</td>
+<td>#2 Multi-step + #5 Planning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-the-pages-are-laid-out">How the pages are laid out</h3>
+<ul>
+<li><strong>Page 3</strong> is the <strong>Bakery Launch Agent</strong> — the canonical 5-node example the facilitator demos at the front of the room. Read it before you start your own build. Then copy whatever&rsquo;s useful into your track.</li>
+<li><strong>Pages 4–7</strong> are the <strong>four track pages.</strong> Pick the one closest to your day job and work from that page only. Each page gives you copy-ready prompts for Nodes 1–5.</li>
+<li><strong>Pages 8–11</strong> are reference sheets (RAG-doc templates, troubleshooting, what to do when the pipeline misfires).</li>
+<li><strong>Page 12</strong> is the <strong>doctor track&rsquo;s sample patient cases</strong> — use these in Step E if you&rsquo;d rather not paste real patient context into a public tool.</li>
+<li><strong>Page 13</strong> is your <strong>week-after tracker</strong> + the take-home reflection.</li>
+</ul>
+<h3 id="when-something-breaks-during-the-build">When something breaks during the build</h3>
+<p>The session has no separate help channel — it&rsquo;s just you, the facilitator, and the room. Before raising a hand, <strong>try the workbook&rsquo;s troubleshooting first</strong>:</p>
+<ol>
+<li>The track page itself has a troubleshooting table for the 3–4 ways that specific pipeline tends to misbehave.</li>
+<li>The reference pages (8–11) have generic troubleshooting for node-output, RAG-context, and publish-time failures.</li>
+<li>If both of those don&rsquo;t get you unstuck in 60 seconds, <strong>raise your hand in chat</strong> (or unmute) and the facilitator will jump in. If your account is genuinely broken, the facilitator will share the <strong>public chat URL</strong> of their pre-built version of your agent — you use that to keep up with the room while you fix your own.</li>
+</ol>
+<blockquote>
+<p><strong>Pick your track now:</strong>
+1. Marketing/Sales → <strong>page 4</strong>
+2. Finance/Consulting → <strong>page 5</strong>
+3. Doctor/Healthcare → <strong>page 6</strong>
+4. Generic → <strong>page 7</strong></p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="bakery-launch-agent-the-canonical-5-node-example">🥐 BAKERY LAUNCH AGENT — the canonical 5-node example</h2>
+<p>This is the agent your facilitator demos at the front of the room. Same bakery from Session 1 — <strong>Lumière</strong>, in Mumbai, run by you and Sneha, launching a new croissant line next month. Last session a plain chatbot got two of six steps. This agent does all six.</p>
+<p>Read this section before you start your own build. The track pages mirror this exact shape.</p>
+<h3 id="how-to-create-it-you-can-publish-this-verbatim-before-class">How to create it (you can publish this verbatim before class)</h3>
+<p><strong>Step 1 — Create the agent.</strong> On the Agents list, click <strong>+ New</strong> and fill the modal:</p>
+<ul>
+<li><strong>Agent Name:</strong> <code>Bakery Launch Agent</code></li>
+<li><strong>Description:</strong> <em>You are an end-to-end launch agent for Lumière, a Mumbai-based artisan bakery. Your job is to take a launch brief from the founder and return a publish-ready launch plan: live trend research, audience profile, a 7-day social schedule with three posts in the brand voice, a 30-day post-launch retro reminder, and an executive summary email. Brand voice is set by the partner, Sneha — funny, slightly sarcastic, never corporate. You work as a pipeline: each stage builds on the one before it.</em></li>
+<li><strong>Welcome Message:</strong> <em>Hi! I&rsquo;m your launch agent. Tell me what you&rsquo;re launching — product, audience, launch date — and I&rsquo;ll come back with a full plan.</em></li>
+<li><strong>Framework:</strong> <code>anthropic</code></li>
+</ul>
+<p>Click <strong>Create Agent → Confirm &amp; Create</strong>.</p>
+<p><strong>Step 2 — Configure → No-Code.</strong> Add five nodes, in this order:</p>
+<h4 id="node-1-trend-scout-closes-gap-3-tools">NODE 1 — Trend Scout <em>(closes Gap #3 Tools)</em></h4>
+<ul>
+<li><strong>Name:</strong> <code>Trend Scout</code></li>
+<li><strong>Model:</strong> Claude Sonnet 4.6</li>
+<li><strong>Max Tokens:</strong> <code>1024</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the Trend Scout for a Mumbai artisan bakery called Lumière.
+
+Read the user's launch brief carefully. Then use web search to gather
+the freshest possible signal on:
+- Current bakery and café trends in Mumbai (last 3 months)
+- What's trending in the user's specific product category (e.g., croissants,
+  sourdough, plant-based pastry) globally and in India
+- Adjacent lifestyle trends that matter to the target audience
+  (e.g., specialty coffee, brunch culture, food-photography aesthetics)
+
+Output exactly this structure:
+- HEADLINE TREND: [one sentence — the single most useful insight]
+- LOCAL SIGNALS: [3 bullets, Mumbai-specific]
+- CATEGORY SIGNALS: [3 bullets, product-category-specific]
+- ADJACENT SIGNALS: [2 bullets — lifestyle/aesthetic adjacencies]
+- SOURCES: [list 3-5 URLs you actually consulted]
+
+Keep each bullet under 20 words. No filler. No &quot;in conclusion.&quot; Just signal.
+</code></pre>
+<h4 id="node-2-audience-profiler-closes-gap-1-memory">NODE 2 — Audience Profiler <em>(closes Gap #1 Memory)</em></h4>
+<ul>
+<li><strong>Name:</strong> <code>Audience Profiler</code></li>
+<li><strong>Model:</strong> Claude Sonnet 4.6</li>
+<li><strong>Max Tokens:</strong> <code>1024</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the Audience Profiler for Lumière, a Mumbai artisan bakery.
+
+The Trend Scout's output is your input. Combine it with what you know about
+Lumière from RAG Docs (brand voice, partner Sneha's tone, current customer base)
+and produce a tight audience profile for this specific launch.
+
+Output exactly this structure:
+- PRIMARY AUDIENCE: [one sentence — who buys this launch, where they live,
+  what they earn, what they care about]
+- WHY NOW: [2 lines — why this audience will care about THIS launch THIS month,
+  grounded in the trends from Node 1]
+- WHERE THEY ARE: [3 bullets — the channels/places where this audience
+  actually pays attention, e.g., specific Instagram communities, neighbourhood
+  cafes, food-blogger circles]
+- WHAT NOT TO DO: [2 bullets — the moves that would alienate this audience.
+  Be specific to Mumbai food culture.]
+
+Voice: confident, no jargon. Write like a brand strategist briefing a founder
+over coffee, not like a market research report.
+</code></pre>
+<h4 id="node-3-campaign-planner-closes-gap-2-multi-step-reasoning">NODE 3 — Campaign Planner <em>(closes Gap #2 Multi-step reasoning)</em></h4>
+<ul>
+<li><strong>Name:</strong> <code>Campaign Planner</code></li>
+<li><strong>Model:</strong> Claude Sonnet 4.6</li>
+<li><strong>Max Tokens:</strong> <code>1024</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the Campaign Planner for Lumière.
+
+The Audience Profiler's output is your input. Build a 7-day social launch
+schedule with exactly three posts, written in Sneha's voice (funny, slightly
+sarcastic, never corporate, occasional Mumbai-isms welcome).
+
+Output exactly this structure:
+
+LAUNCH WEEK SCHEDULE
+- Day -2 (Teaser): [channel] · [post time IST] · [hook in one line]
+- Day 0 (Launch): [channel] · [post time IST] · [hook in one line]
+- Day +3 (Social proof): [channel] · [post time IST] · [hook in one line]
+
+POSTS (three, in Sneha's voice)
+
+POST 1 — Teaser (Day -2)
+[80-120 words. Must include a sensory detail about the croissant. Must end
+with a question or a tease, not a CTA.]
+
+POST 2 — Launch (Day 0)
+[80-120 words. Must reference one of the Mumbai-specific signals from Node 1.
+Soft CTA only — invite, don't sell.]
+
+POST 3 — Social proof (Day +3)
+[80-120 words. Built around a real-sounding customer reaction. End with
+a forward-looking line about what's next at Lumière.]
+
+If the brief doesn't give you the product name, use [PRODUCT] as a placeholder.
+Don't invent a name.
+</code></pre>
+<h4 id="node-4-reminder-drafter-closes-gap-5-planning">NODE 4 — Reminder Drafter <em>(closes Gap #5 Planning)</em></h4>
+<ul>
+<li><strong>Name:</strong> <code>Reminder Drafter</code></li>
+<li><strong>Model:</strong> Claude Sonnet 4.6</li>
+<li><strong>Max Tokens:</strong> <code>1024</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the Reminder Drafter for Lumière.
+
+The Campaign Planner's output is your input. Draft a 30-day post-launch
+retrospective reminder that the founder will receive in a month.
+
+Output exactly this structure:
+
+REMINDER FOR: [launch date + 30 days, ISO format]
+SUBJECT: [one line — punchy, specific to this launch]
+
+BODY:
+[8-12 lines. Tell the founder, in plain English, what data to pull and what
+questions to answer. Examples:
+- Units sold of [PRODUCT] vs. forecast?
+- Top-performing post of the three from launch week? By what metric?
+- Did the Mumbai-specific angle from Day 0 outperform the generic teaser?
+- Repeat-customer rate among Day 0 buyers?
+- One thing Sneha would do differently next launch?
+
+End with one line of encouragement, in Sneha's voice.]
+
+This is a draft to be saved by the founder, not sent immediately.
+Do not include &quot;send now&quot; or &quot;schedule&quot; instructions — that's the
+Summary Composer's job in the next node.
+</code></pre>
+<h4 id="node-5-summary-composer-closes-gap-4-autonomy">NODE 5 — Summary Composer <em>(closes Gap #4 Autonomy)</em></h4>
+<ul>
+<li><strong>Name:</strong> <code>Summary Composer</code></li>
+<li><strong>Model:</strong> Claude Sonnet 4.6</li>
+<li><strong>Max Tokens:</strong> <code>1024</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the Summary Composer for Lumière.
+
+You receive the full output of Nodes 1-4 above. Your job is to compose a
+single executive brief that the founder can read in 90 seconds on Monday
+morning and immediately act on.
+
+Output exactly this structure:
+
+LUMIÈRE LAUNCH BRIEF — [PRODUCT, or [PRODUCT] if not specified]
+Prepared by: Bakery Launch Agent · For: Lumière founders
+
+THE TAKE (3 lines max)
+[The headline insight from the whole run. What's the single thing the founder
+should know? What's the bet you're making?]
+
+THE PLAN (the schedule from Node 3, condensed to 3 lines)
+- Day -2: [hook + channel]
+- Day 0: [hook + channel]
+- Day +3: [hook + channel]
+
+THE POSTS
+[Embed the three full posts from Node 3, verbatim. Do not edit them.]
+
+THE FOLLOW-THROUGH
+[Embed the 30-day reminder from Node 4, verbatim.]
+
+NEXT STEP FOR THE FOUNDER
+[One sentence. The single thing the founder needs to decide or approve
+before the team can execute. Make it specific — &quot;approve the Day 0 post copy&quot;
+beats &quot;review the plan&quot;.]
+
+Sign off with: &quot;— Lumière Launch Agent, run [today's date in ISO format]&quot;
+</code></pre>
+<p><strong>Step 3 — Click Proceed (Generate Code), then Publish Agent.</strong> The agent goes live and you get a public chat URL on the header (e.g., <code>https://build.edyoda.com/chat/&lt;uuid&gt;</code>). That URL is what you share with anyone you want to demo to — or with a stuck learner in the room.</p>
+<p><strong>Step 4 — Test it.</strong> Open the public chat URL and paste this brief:</p>
+<pre><code>Launching a new croissant line at Lumière next month — the &quot;Monsoon Croissant&quot;,
+filled with masala chai cremeux and dusted with kala namak. Target: the
+Bandra-Khar lifestyle crowd. Sneha wants it on Insta-first, restaurant
+collabs second. Launch date: 14 July.
+</code></pre>
+<p>Watch the trace. Five nodes fire in order. You walk away with a full launch brief.</p>
+<hr />
+<h2 class="new-page" id="track-1-marketing-sales">📒 TRACK 1 — Marketing/Sales</h2>
+<p><strong>Your agent will become:</strong> <em>AI Pattern Advisor for marketing/sales workflows.</em></p>
+<p>Build the same 5-node shape as the bakery example, but pointed at your marketing/sales day job. The agent takes any marketing/sales problem you describe — <em>&ldquo;we get 200 leads a week and can&rsquo;t qualify them,&rdquo; &ldquo;our campaign analytics live in 4 dashboards,&rdquo; &ldquo;we want a chatbot on the pricing page&rdquo;</em> — and returns a structured AI-pattern recommendation, customised to your context.</p>
+<h3 id="step-a-create-the-agent-node-1-web-search-tool-agent">Step A — create the agent + Node 1 (Web Search Tool Agent)</h3>
+<p>Create the agent via the <strong>+ New</strong> modal:</p>
+<ul>
+<li><strong>Agent Name:</strong> <code>[YourName]'s AI Pattern Advisor — Marketing</code></li>
+<li><strong>Description:</strong> <em>You are an AI Pattern Advisor for a marketing/sales team. When a user describes a business problem, you classify it as Chatbot, RAG, Agent, or Multi-Agent using a 4-question funnel, and return a structured recommendation with maturity level and risk flags. You work as a pipeline.</em></li>
+<li><strong>Welcome Message:</strong> <em>Tell me a marketing or sales problem you&rsquo;re trying to solve, and I&rsquo;ll tell you what kind of AI pattern fits — and how to start.</em></li>
+</ul>
+<p>Then in <strong>Configure → No-Code → Node 1</strong>:</p>
+<ul>
+<li><strong>Name:</strong> <code>Web Search Tool Agent</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the research stage of an AI Pattern Advisor for a marketing/sales team.
+
+Read the user's problem statement carefully. Then use web search to find
+current best practices for solving problems of this shape. Look for:
+- How leading B2B/B2C companies are using AI for this category of problem
+- Specific tools, vendors, or open-source projects that solve this problem
+- One or two short case studies (named company, named outcome)
+
+Output exactly this structure:
+- PROBLEM RESTATED: [one line — your understanding of what the user actually
+  needs]
+- CURRENT PRACTICE: [3 bullets — what good teams are doing in 2025]
+- TOOLS NAMED: [3-5 tools/vendors by name, with one-line on each]
+- CASE: [one short case study — company, what they did, what it produced]
+- SOURCES: [3-5 URLs you actually consulted]
+
+Keep each bullet under 25 words.
+</code></pre>
+<h3 id="step-b-first-run">Step B — first run</h3>
+<p>Open the chat panel (the Test/Run area, or the published URL once you publish). Paste this starter problem:</p>
+<pre><code>We get 200 inbound leads per week. Each needs to be qualified, scored,
+and routed to the right rep. What AI pattern should we use?
+</code></pre>
+<blockquote>
+<p><strong>Expected output shape:</strong> the Trend Scout&rsquo;s structured output — a problem restatement, current practice, tools, a case, sources. If you instead get prose (&ldquo;Great question! Lead qualification can be solved by…&rdquo;), the structured-output instruction is being ignored — re-paste Node 1&rsquo;s system prompt.</p>
+</blockquote>
+<h3 id="step-c-add-node-2-the-classifier">Step C — add Node 2 (the Classifier)</h3>
+<p>Click <strong>+ Add Node</strong> in Configure → No-Code.</p>
+<ul>
+<li><strong>Name:</strong> <code>Pattern Classifier</code></li>
+<li><strong>System Prompt:</strong></li>
+</ul>
+<pre><code>You are the classifier stage of an AI Pattern Advisor for a marketing/sales team.
+
+The Web Search Tool Agent's output is your input. Apply the 4-question
+funnel in order, stop at the first YES:
+
+1. Does the answer exist in a fixed document or database?  YES → RAG.
+2. Does the task need a single response with no follow-up action?  YES → Chatbot.
+3. Does the task require multiple steps, memory, or tool use?  YES → Agent.
+4. Does the task require multiple specialized capabilities working in
+   parallel?  YES → Multi-Agent.
+
+Output exactly this structure:
+- PATTERN: [Chatbot / RAG / Agent / Multi-Agent]
+- MATURITY LEVEL: [L0 / L1 / L2 / L3]
+- RATIONALE: [3 lines max. Plain English. No jargon.]
+- RISK FLAG: [One line — what could go wrong if implemented poorly. Say
+  &quot;None material&quot; only if truly low-risk.]
+
+If the problem is ambiguous, ask ONE clarifying question before classifying.
+</code></pre>
+<p>Re-run the starter problem from Step B. Watch the trace — Node 1 fires, then Node 2 takes Node 1&rsquo;s research and produces the structured recommendation. <strong>That&rsquo;s two nodes. That&rsquo;s your AI Pattern Advisor&rsquo;s spine.</strong></p>
+<h3 id="step-d-upload-a-rag-doc-with-your-context-this-is-your-memory">Step D — upload a RAG Doc with your context (this is your &ldquo;memory&rdquo;)</h3>
+<p>Go to the <strong>RAG Docs</strong> tab. Click upload and add a single text or PDF file containing your real context. The agent retrieves from this doc on every run.</p>
+<p><strong>Template</strong> (save as <code>my-context.txt</code>, edit before uploading):</p>
+<pre><code>Company: [X]
+Audience: [Y]
+Brand voice: [Z]
+Top 3 priorities this quarter: [list 3]
+Current marketing/sales stack: [list 3-5 tools]
+</code></pre>
+<p><strong>Filled-in example</strong> (this is what &ldquo;specific enough&rdquo; looks like):</p>
+<pre><code>Company: Aperture — B2B SaaS in legal tech serving General Counsels
+at mid-market US firms (200-2,000 employees).
+Audience: technical buyers and skeptical legal ops leaders.
+Brand voice: concise, data-led, slightly skeptical of vendor hype.
+Top 3 priorities this quarter: 1) cut sales-cycle time by 25%,
+2) double inbound MQL volume, 3) launch a self-serve trial.
+Current marketing/sales stack: HubSpot, Salesforce, Apollo,
+Outreach.io, ChiliPiper, Google Analytics.
+</code></pre>
+<p>Re-run the starter problem. The agent now grounds its recommendation in
+your actual stack and priorities — no more generic &ldquo;use a CRM&rdquo; suggestions.</p>
+<h3 id="step-e-add-nodes-3-4-5-publish">Step E — add Nodes 3, 4, 5 + publish</h3>
+<p>Add three more nodes to extend the pipeline into a full advisory output:</p>
+<ul>
+<li><strong>Node 3 — Implementation Sketch:</strong> outputs a 5-step implementation plan for the recommended pattern, scoped to a 30-day pilot.</li>
+<li><strong>Node 4 — Risk &amp; Compliance:</strong> flags the top 3 risks (data, customer trust, brand) and proposes mitigations.</li>
+<li><strong>Node 5 — Executive Brief:</strong> composes everything into a one-page memo the user can paste into Slack or email.</li>
+</ul>
+<p>Use the same prompt shape as the Bakery example&rsquo;s Nodes 3–5 — read the upstream node&rsquo;s output, produce a tight structured output, hand off cleanly. You can copy the Summary Composer prompt from the Bakery section as a starting point for Node 5.</p>
+<p>Then: <strong>Proceed (Generate Code) → Publish Agent.</strong> Grab the public chat URL from the Share Config header button. Test it by pasting:</p>
+<pre><code>Our SDR team manually researches every inbound demo request before the
+discovery call. That's eating 30 minutes per rep per day. What pattern
+should we use?
+</code></pre>
+<h3 id="track-specific-troubleshooting">Track-specific troubleshooting</h3>
+<table>
+<thead>
+<tr>
+<th>What&rsquo;s happening</th>
+<th>Likely cause</th>
+<th>The fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node 1 doesn&rsquo;t actually web-search; it just summarises from training data</td>
+<td>Web search isn&rsquo;t being triggered. The system prompt needs an explicit &ldquo;use web search&rdquo; verb.</td>
+<td>Open Node 1, confirm the literal phrase &ldquo;use web search&rdquo; appears in the system prompt. If you wrote &ldquo;research the web&rdquo; or &ldquo;find online&rdquo;, swap it for &ldquo;use web search&rdquo;.</td>
+</tr>
+<tr>
+<td>Node 2 classifies everything as &ldquo;Agent&rdquo;</td>
+<td>Funnel order isn&rsquo;t being enforced — Node 2 is skipping to Q3 because agents sound impressive.</td>
+<td>Re-paste Node 2&rsquo;s prompt. Confirm <em>&ldquo;Stop at the first YES. Do not skip questions.&rdquo;</em> is still there.</td>
+</tr>
+<tr>
+<td>Recommendations ignore my RAG-doc context</td>
+<td>Either the doc didn&rsquo;t upload, or your nodes&rsquo; system prompts don&rsquo;t reference the context.</td>
+<td>Confirm the doc shows up under the RAG Docs tab. Then add a line to Node 2&rsquo;s prompt: <em>&ldquo;Use the company context from RAG Docs to ground the rationale and risk flag.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Node 5 (Executive Brief) is too long</td>
+<td>&ldquo;One-page memo&rdquo; wasn&rsquo;t constrained tightly enough.</td>
+<td>Add to Node 5&rsquo;s prompt: <em>&ldquo;Hard cap: 250 words total. Use bullets, not paragraphs. The reader has 90 seconds.&rdquo;</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="one-line-reflection">One-Line Reflection</h3>
+<blockquote>
+<p>What&rsquo;s the most surprising thing your published agent did during BUILD STEP E? <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="track-2-finance-consulting">📒 TRACK 2 — Finance/Consulting</h2>
+<p><strong>Your agent will become:</strong> <em>AI Pattern Advisor for financial workflows.</em></p>
+<p>Same 5-node shape, pointed at your finance/audit/compliance/consulting day job. The agent deliberately defaults to conservative reads on explainability and audit risk — when a workflow touches regulated data, the recommendation includes a Human-in-the-Loop checkpoint by default.</p>
+<h3 id="step-a-create-the-agent-node-1">Step A — create the agent + Node 1</h3>
+<p>Via the <strong>+ New</strong> modal:</p>
+<ul>
+<li><strong>Agent Name:</strong> <code>[YourName]'s AI Pattern Advisor — Finance</code></li>
+<li><strong>Description:</strong> <em>You are an AI Pattern Advisor for a finance/consulting team. You default to conservative reads on explainability and audit risk. When a workflow touches regulated data, you always recommend Human-in-the-Loop. You work as a pipeline.</em></li>
+<li><strong>Welcome Message:</strong> <em>Tell me a finance, audit, or compliance workflow problem, and I&rsquo;ll tell you what kind of AI pattern fits — with explicit risk flags.</em></li>
+</ul>
+<p><strong>Node 1 — Web Search Tool Agent</strong> system prompt:</p>
+<pre><code>You are the research stage of an AI Pattern Advisor for a finance/consulting team.
+
+Read the user's problem statement. Then use web search to find current
+regulatory and industry guidance for the workflow described. Look for:
+- Current regulator guidance (SEC, FINRA, OCC, FCA, RBI, SEBI — match jurisdiction)
+- How major banks, asset managers, or consultancies are deploying AI here
+- Audit-trail and explainability requirements specific to this workflow
+
+Output exactly this structure:
+- PROBLEM RESTATED: [one line]
+- REGULATORY CONTEXT: [3 bullets — named regulators, named rules]
+- CURRENT PRACTICE: [3 bullets — what regulated firms are actually doing]
+- AUDIT-TRAIL CONSTRAINT: [one line — what must be preserved]
+- SOURCES: [3-5 URLs]
+</code></pre>
+<h3 id="step-b-first-run_1">Step B — first run</h3>
+<pre><code>Our compliance team manually reviews 500 transactions per day for SOX.
+What AI pattern fits — chatbot, RAG, agent, multi-agent?
+</code></pre>
+<blockquote>
+<p><strong>Expected output shape:</strong> structured Node 1 output that names SOX, names the audit-trail requirement, and links to current SEC/PCAOB guidance.</p>
+</blockquote>
+<h3 id="step-c-add-node-2-classifier-with-regulated-data-guardrail">Step C — add Node 2 (Classifier with regulated-data guardrail)</h3>
+<pre><code>You are the classifier stage of an AI Pattern Advisor for a finance/consulting team.
+Be conservative on explainability and audit-trail risk.
+
+Apply the 4-question funnel in order, stop at the first YES:
+1. Does the answer exist in a fixed document or database?  YES → RAG.
+2. Single response, no follow-up action?  YES → Chatbot.
+3. Multiple steps, memory, or tool use?  YES → Agent.
+4. Multiple specialized capabilities in parallel?  YES → Multi-Agent.
+
+Output exactly this structure:
+- PATTERN: [Chatbot / RAG / Agent / Multi-Agent]
+- MATURITY LEVEL: [L0 / L1 / L2 / L3]
+- RATIONALE: [3 lines max. Plain English. No finance jargon for jargon's sake.]
+- RISK FLAG: [One line — call out explainability, audit, or regulatory risk
+  explicitly if it applies.]
+
+If the problem touches regulated data (PII, financial records, customer money),
+always flag it and recommend a Human-in-the-Loop checkpoint added to the
+recommended pattern (e.g., &quot;Agent + HITL&quot;).
+</code></pre>
+<h3 id="step-d-upload-your-context-as-a-rag-doc">Step D — upload your context as a RAG Doc</h3>
+<p><strong>Template</strong> (save as <code>my-context.txt</code>):</p>
+<pre><code>Sector: [e.g., private credit, retail banking, audit]
+Portfolio focus: [X]
+Key risk metrics: [Y]
+Regulatory bodies you report to: [list]
+Audit-trail requirements: [in one line]
+</code></pre>
+<p><strong>Filled-in example:</strong></p>
+<pre><code>Sector: private credit
+Portfolio focus: mid-market direct lending ($25M-$150M tickets,
+mostly US sponsor-backed deals.
+Key risk metrics: leverage multiple, interest coverage, covenant
+headroom, revenue concentration in top 3 customers.
+Regulatory bodies you report to: SEC (as a registered investment
+advisor), state-level lending licenses.
+Audit-trail requirements: every recommendation must be reproducible
+from documented inputs; LLM outputs must be reviewable by a human
+analyst within 24 hours of decision.
+</code></pre>
+<h3 id="step-e-add-nodes-3-4-5-publish_1">Step E — add Nodes 3, 4, 5 + publish</h3>
+<ul>
+<li><strong>Node 3 — Implementation Sketch:</strong> scoped to a 90-day regulated-environment pilot, not 30 days.</li>
+<li><strong>Node 4 — Risk &amp; Compliance:</strong> ALWAYS includes named regulators and named audit-trail mitigations.</li>
+<li><strong>Node 5 — Executive Brief:</strong> the audience is the CFO or Head of Compliance, not the GTM team. Voice is conservative.</li>
+</ul>
+<p>Publish, grab the URL, and test with:</p>
+<pre><code>We want to use AI to summarise quarterly 10-K filings across our portfolio
+companies for our IC memo. What pattern fits?
+</code></pre>
+<h3 id="track-specific-troubleshooting_1">Track-specific troubleshooting</h3>
+<table>
+<thead>
+<tr>
+<th>What&rsquo;s happening</th>
+<th>Likely cause</th>
+<th>The fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RISK FLAG keeps saying &ldquo;None material&rdquo; on regulated workflows</td>
+<td>The HITL trigger is being interpreted too softly.</td>
+<td>Strengthen Node 2: change <em>&ldquo;If the problem touches regulated data…&rdquo;</em> to <em>&ldquo;If the problem touches any of: customer money, customer PII, regulated financial records, audit-traced workflows — always flag and always recommend HITL.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Agent recommends full autonomy on a transaction-touching task</td>
+<td>The HITL default isn&rsquo;t carrying through to Node 5.</td>
+<td>Add to Node 5&rsquo;s prompt: <em>&ldquo;On any workflow flagged by Node 2 as touching regulated data, the recommended pattern in the executive brief must be the upstream pattern + HITL, not the upstream pattern alone.&rdquo;</em></td>
+</tr>
+<tr>
+<td>RATIONALE is full of jargon (RWA, NPV, MD&amp;A)</td>
+<td>Plain-English instruction is being ignored.</td>
+<td>Tighten Node 2&rsquo;s output line: <em>&ldquo;RATIONALE must be readable by a non-finance executive. Define any acronym on first use, or replace it with a plain phrase.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Node 3&rsquo;s implementation plan is too aggressive (e.g., &ldquo;launch in production in 30 days&rdquo;)</td>
+<td>Default cadence is too fast for regulated work.</td>
+<td>Add to Node 3: <em>&ldquo;Default cadence: 90-day regulated pilot, sandbox first, no production traffic until compliance sign-off. Adjust only if the user explicitly waives this.&rdquo;</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="one-line-reflection_1">One-Line Reflection</h3>
+<blockquote>
+<p>What&rsquo;s the most surprising thing your published agent did during BUILD STEP E? <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="track-3-doctor-healthcare">📒 TRACK 3 — Doctor/Healthcare</h2>
+<p><strong>Your agent will become:</strong> <em>AI Pattern Advisor for clinical workflows.</em></p>
+<p>Same 5-node shape, pointed at clinical/ward/department workflows. This track has the strongest guardrails of any in the session — diagnosis, medication, and discharge workflows ALWAYS get Human-in-the-Loop, with no exceptions.</p>
+<h3 id="step-a-create-the-agent-node-1_1">Step A — create the agent + Node 1</h3>
+<p>Via the <strong>+ New</strong> modal:</p>
+<ul>
+<li><strong>Agent Name:</strong> <code>[YourName]'s AI Pattern Advisor — Clinical</code></li>
+<li><strong>Description:</strong> <em>You are an AI Pattern Advisor for a clinical team. You default to Human-in-the-Loop for any workflow involving diagnosis, medication, or discharge. You are conservative on patient-data risk. You work as a pipeline.</em></li>
+<li><strong>Welcome Message:</strong> <em>Tell me a clinical workflow problem — handover, triage, documentation, scheduling — and I&rsquo;ll tell you what AI pattern fits, with explicit patient-safety flags.</em></li>
+</ul>
+<p><strong>Node 1 — Web Search Tool Agent</strong> system prompt:</p>
+<pre><code>You are the research stage of an AI Pattern Advisor for a clinical team.
+
+Read the user's problem statement. Then use web search to find current
+AI-assisted clinical workflow practices. Look for:
+- Peer-reviewed studies or published case studies from academic
+  medical centres
+- Current regulatory guidance (FDA SaMD, NHS digital, EMA, CDSCO —
+  match jurisdiction)
+- Risks named in the literature: hallucination, bias, automation bias,
+  alert fatigue
+
+Output exactly this structure:
+- PROBLEM RESTATED: [one line, in plain clinical English]
+- CLINICAL PRECEDENT: [3 bullets — what academic medical centres are doing]
+- REGULATORY POSTURE: [2 bullets — what regulators say about this category]
+- NAMED RISKS: [3 bullets — specific risks the literature names]
+- SOURCES: [3-5 URLs, prefer .gov, .edu, peer-reviewed journals]
+</code></pre>
+<h3 id="step-b-first-run_2">Step B — first run</h3>
+<pre><code>Our department spends 2 hours per day on patient handover notes
+between shifts. What AI pattern fits?
+</code></pre>
+<blockquote>
+<p><strong>Expected output shape:</strong> Node 1 should return clinical precedent (e.g., Mayo, Mass General handover-summary pilots), regulatory posture, and named risks. If it returns generic SaaS-vendor marketing, the search bias is wrong — tighten Node 1&rsquo;s prompt with <em>&ldquo;prefer .gov, .edu, and peer-reviewed sources.&rdquo;</em></p>
+</blockquote>
+<h3 id="step-c-add-node-2-classifier-with-clinical-safety-guardrail">Step C — add Node 2 (Classifier with clinical-safety guardrail)</h3>
+<pre><code>You are the classifier stage of an AI Pattern Advisor for a clinical team.
+Be conservative on patient-data risk. Default to Human-in-the-Loop for any
+workflow involving diagnosis, medication, or discharge.
+
+Apply the 4-question funnel in order, stop at the first YES:
+1. Fixed document/database (e.g., guidelines)?  YES → RAG.
+2. Single response, no follow-up?  YES → Chatbot.
+3. Multiple steps, memory, tool use?  YES → Agent.
+4. Multiple specialised capabilities in parallel?  YES → Multi-Agent.
+
+Output exactly this structure:
+- PATTERN: [Chatbot / RAG / Agent / Multi-Agent, with HITL appended where
+  required]
+- MATURITY LEVEL: [L0 / L1 / L2 / L3]
+- RATIONALE: [3 lines max. Plain clinical English. Use clinical shorthand
+  where standard (NEWS2, COPD, ED) but avoid management-consulting language.]
+- RISK FLAG: [One line. Always name patient-safety, PHI, or regulatory risk
+  explicitly. &quot;None material&quot; is only acceptable for purely administrative
+  workflows.]
+
+Never recommend full autonomy for any task touching diagnosis, medication,
+or discharge. Always append &quot;+ HITL&quot; to the pattern name for those.
+</code></pre>
+<h3 id="step-d-upload-your-context-as-a-rag-doc_1">Step D — upload your context as a RAG Doc</h3>
+<p><strong>Template:</strong></p>
+<pre><code>Department: [e.g., internal medicine, emergency, paediatrics]
+Setting: [bed count, hospital type, jurisdiction]
+Red-flag protocols: [list 3]
+Patient-data constraints: [PHI rules in your jurisdiction]
+</code></pre>
+<p><strong>Filled-in example:</strong></p>
+<pre><code>Department: internal medicine, 28-bed step-down unit in a 600-bed
+academic tertiary hospital in Mumbai.
+Setting: India, DPDP Act applies for patient data.
+Red-flag protocols:
+  1) NEWS2 &gt;= 5 triggers automatic rapid-response escalation
+  2) Any new oxygen requirement above baseline gets a senior review
+     within 30 minutes
+  3) Any sepsis suspicion triggers the sepsis-six bundle within the hour
+Patient-data constraints: No identified patient data leaves the
+hospital network. De-identified data may be used in research
+with IRB approval.
+Default safety stance: always recommend HITL for diagnosis,
+medication, and discharge decisions.
+</code></pre>
+<h3 id="step-e-add-nodes-3-4-5-publish_2">Step E — add Nodes 3, 4, 5 + publish</h3>
+<ul>
+<li><strong>Node 3 — Implementation Sketch:</strong> scoped to a 6-month clinical pilot with explicit IRB-style review checkpoints, NOT a 30-day product launch.</li>
+<li><strong>Node 4 — Risk &amp; Compliance:</strong> every flag must name patient-safety, PHI, or regulatory risk explicitly. &ldquo;None material&rdquo; is rarely an acceptable answer here.</li>
+<li><strong>Node 5 — Executive Brief:</strong> audience is the head of department or chief medical officer. The recommendation must be defensible in a clinical governance meeting.</li>
+</ul>
+<p>Test with:</p>
+<pre><code>We want to triage incoming GP referrals (about 80 a day) to route urgent
+cases faster. What pattern fits?
+</code></pre>
+<h3 id="track-specific-troubleshooting_2">Track-specific troubleshooting</h3>
+<table>
+<thead>
+<tr>
+<th>What&rsquo;s happening</th>
+<th>Likely cause</th>
+<th>The fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent recommends full autonomy on a prescribing or discharge task</td>
+<td>The HITL guardrail line was edited or got dropped on paste. <strong>Worst failure mode in this track.</strong></td>
+<td><strong>Stop.</strong> Re-paste Node 2&rsquo;s entire system prompt. Confirm the last two sentences about diagnosis/medication/discharge are intact. Re-run to verify HITL appears in the pattern name.</td>
+</tr>
+<tr>
+<td>RISK FLAG keeps saying &ldquo;None material&rdquo; on patient-touching workflows</td>
+<td>The &ldquo;None material&rdquo; exception is being interpreted liberally.</td>
+<td>Tighten Node 2: <em>&ldquo;RISK FLAG must explicitly name a patient-safety, PHI, or regulatory consideration. &lsquo;None material&rsquo; is only acceptable if the workflow does not touch patient identifiers, clinical decisions, or regulated reporting — and even then, justify it in the same line.&rdquo;</em></td>
+</tr>
+<tr>
+<td>RATIONALE reads for hospital executives, not clinicians</td>
+<td>Audience is being inferred from search results, not your instruction.</td>
+<td>Add to Node 2: <em>&ldquo;RATIONALE audience: another clinician on the ward. Use clinical shorthand where standard. Avoid management-consulting language.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Node 5&rsquo;s brief omits the patient-safety RISK FLAG</td>
+<td>The brief is compressing for length and dropping safety-critical sections.</td>
+<td>Add to Node 5: <em>&ldquo;On clinical workflows, the RISK FLAG section from Node 2 must appear verbatim in the executive brief. Do not compress or rewrite it.&rdquo;</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="one-line-reflection_2">One-Line Reflection</h3>
+<blockquote>
+<p>What&rsquo;s the most surprising thing your published agent did during BUILD STEP E? <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="track-4-generic">📒 TRACK 4 — Generic</h2>
+<p><strong>Your agent will become:</strong> <em>AI Pattern Advisor for general knowledge-work workflows.</em></p>
+<p>Same 5-node shape, pointed at any office workflow that doesn&rsquo;t fit cleanly into marketing, finance, or healthcare — reporting, scheduling, status updates, vendor management, internal comms. This is the most flexible track and the best one if you&rsquo;re in a cross-functional role.</p>
+<h3 id="step-a-create-the-agent-node-1_2">Step A — create the agent + Node 1</h3>
+<p>Via the <strong>+ New</strong> modal:</p>
+<ul>
+<li><strong>Agent Name:</strong> <code>[YourName]'s AI Pattern Advisor — Generic</code></li>
+<li><strong>Description:</strong> <em>You are an AI Pattern Advisor for any office function. You take any workflow problem and classify it as Chatbot, RAG, Agent, or Multi-Agent. You work as a pipeline.</em></li>
+<li><strong>Welcome Message:</strong> <em>Tell me a workflow problem from your day job and I&rsquo;ll tell you what AI pattern fits.</em></li>
+</ul>
+<p><strong>Node 1 — Web Search Tool Agent</strong> system prompt:</p>
+<pre><code>You are the research stage of an AI Pattern Advisor for general office workflows.
+
+Read the user's problem statement. Then use web search to find current
+best practices and tools for solving problems of this shape. Look for:
+- How leading teams in similar functions are using AI for this workflow
+- Specific tools, vendors, or open-source projects (be concrete)
+- One short case study (named company, named outcome)
+
+Output exactly this structure:
+- PROBLEM RESTATED: [one line]
+- CURRENT PRACTICE: [3 bullets]
+- TOOLS NAMED: [3-5 tools/vendors by name, one line each]
+- CASE: [one short case study]
+- SOURCES: [3-5 URLs]
+</code></pre>
+<h3 id="step-b-first-run_3">Step B — first run</h3>
+<pre><code>Our team manually compiles weekly status updates from 5 different sources
+(Slack, Jira, Google Docs, email, a spreadsheet). What AI pattern fits?
+</code></pre>
+<blockquote>
+<p><strong>Expected output shape:</strong> structured research output that names actual tools (Reclaim, Zapier, n8n, Notion AI, etc.). If the output is generic (&ldquo;use an LLM to summarise&rdquo;), strengthen Node 1&rsquo;s &ldquo;name specific tools and vendors&rdquo; instruction.</p>
+</blockquote>
+<h3 id="step-c-add-node-2-classifier">Step C — add Node 2 (Classifier)</h3>
+<pre><code>You are the classifier stage of an AI Pattern Advisor for general office workflows.
+
+Apply the 4-question funnel in order, stop at the first YES:
+1. Fixed document or database?  YES → RAG.
+2. Single response, no follow-up?  YES → Chatbot.
+3. Multiple steps, memory, tool use?  YES → Agent.
+4. Multiple specialised capabilities in parallel?  YES → Multi-Agent.
+
+Output exactly this structure:
+- PATTERN: [Chatbot / RAG / Agent / Multi-Agent]
+- MATURITY LEVEL: [L0 / L1 / L2 / L3]
+- RATIONALE: [3 lines max. Plain English. No jargon.]
+- RISK FLAG: [One line — what could go wrong. &quot;None material&quot; requires
+  explicit justification in the same line.]
+
+If the problem is ambiguous, ask ONE clarifying question before classifying.
+</code></pre>
+<h3 id="step-d-upload-your-context-as-a-rag-doc_2">Step D — upload your context as a RAG Doc</h3>
+<p><strong>Template:</strong></p>
+<pre><code>Function: [your role]
+Company: [X]
+Top 3 priorities this quarter: [list]
+Current stack: [list 3-5 tools]
+</code></pre>
+<p><strong>Filled-in example:</strong></p>
+<pre><code>Function: operations at Plinth, a 120-person B2B SaaS in payroll.
+Top 3 priorities this quarter:
+  1) cut quote-to-cash cycle time by 30%
+  2) automate the weekly executive status update
+  3) reduce manual data reconciliation between Salesforce and NetSuite
+Current stack: Notion, Slack, Linear, Salesforce, NetSuite, Zapier.
+Constraint: no engineering capacity for custom integrations beyond
+Zapier-level work.
+</code></pre>
+<h3 id="step-e-add-nodes-3-4-5-publish_3">Step E — add Nodes 3, 4, 5 + publish</h3>
+<ul>
+<li><strong>Node 3 — Implementation Sketch:</strong> 30-day pilot scoped to the constraint named in the RAG doc (e.g., Zapier-only, no engineering).</li>
+<li><strong>Node 4 — Risk &amp; Compliance:</strong> name at least one specific failure mode (e.g., &ldquo;silent data staleness&rdquo;, &ldquo;tool quota exhaustion&rdquo;, &ldquo;permissions sprawl&rdquo;).</li>
+<li><strong>Node 5 — Executive Brief:</strong> audience is a team lead or department head.</li>
+</ul>
+<p>Test with:</p>
+<pre><code>Our weekly executive status update takes 4 hours every Friday because
+we manually pull from 6 different systems. What pattern fits?
+</code></pre>
+<h3 id="track-specific-troubleshooting_3">Track-specific troubleshooting</h3>
+<table>
+<thead>
+<tr>
+<th>What&rsquo;s happening</th>
+<th>Likely cause</th>
+<th>The fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recommendations are very generic (&ldquo;use an AI agent to streamline your workflow&rdquo;)</td>
+<td>Description field on the Overview tab is too broad — the agent has no domain anchor.</td>
+<td>Edit the Overview tab Description: add one sentence naming your function: <em>&ldquo;…for an operations team in a B2B SaaS company of ~100 people.&rdquo;</em> You&rsquo;ll see specificity jump immediately.</td>
+</tr>
+<tr>
+<td>Node 2 picks &ldquo;RAG&rdquo; for almost everything that involves any document</td>
+<td>Q1 of the funnel is being read too liberally — <em>&ldquo;answer exists in a document&rdquo;</em> is being interpreted as <em>&ldquo;a document exists somewhere related to this problem.&rdquo;</em></td>
+<td>Tighten Node 2&rsquo;s Q1: <em>&ldquo;Is this purely an information-retrieval task where the answer is fully contained in an existing document, with no follow-up action needed? YES → RAG.&rdquo;</em></td>
+</tr>
+<tr>
+<td>RISK FLAG defaults to &ldquo;None material&rdquo; too often</td>
+<td>Generic track has the loosest risk language.</td>
+<td>Append to Node 2&rsquo;s output block: <em>&ldquo;RISK FLAG must name at least one specific failure mode. &lsquo;None material&rsquo; requires explicit justification in the same line.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Node 5&rsquo;s executive brief is too long</td>
+<td>&ldquo;Executive brief&rdquo; wasn&rsquo;t constrained tightly.</td>
+<td>Add: <em>&ldquo;Hard cap: 250 words. Bullets, not paragraphs. The reader has 90 seconds.&rdquo;</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="one-line-reflection_3">One-Line Reflection</h3>
+<blockquote>
+<p>What&rsquo;s the most surprising thing your published agent did during BUILD STEP E? <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="pipeline-patterns-what-each-node-should-do-well">🛠 PIPELINE PATTERNS — what each node should do well</h2>
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th>Job in the pipeline</th>
+<th>What makes it work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Node 1 (Research)</strong></td>
+<td>Read the user&rsquo;s problem, hit the web, return structured findings.</td>
+<td>Explicit <em>&ldquo;use web search&rdquo;</em> instruction. Output structure that downstream nodes can parse. Source URLs included.</td>
+</tr>
+<tr>
+<td><strong>Node 2 (Classify / Decide)</strong></td>
+<td>Apply a framework to Node 1&rsquo;s output. Return a structured recommendation.</td>
+<td>A strict numbered framework. A &ldquo;stop at first YES&rdquo; rule. A required output shape with named fields.</td>
+</tr>
+<tr>
+<td><strong>Node 3 (Plan / Implement)</strong></td>
+<td>Turn the recommendation into a concrete action plan.</td>
+<td>Scoped to a realistic time horizon. Names specific steps. Acknowledges the constraints in the RAG doc.</td>
+</tr>
+<tr>
+<td><strong>Node 4 (Risk / Compliance)</strong></td>
+<td>Surface what could go wrong and how to mitigate.</td>
+<td>Names specific failure modes, not generic risks. References regulators or data constraints where relevant.</td>
+</tr>
+<tr>
+<td><strong>Node 5 (Compose / Ship)</strong></td>
+<td>Assemble Nodes 1–4 into a single artifact the user can act on.</td>
+<td>Hard length cap. Specific audience. A clear &ldquo;next step&rdquo; the user can do today.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why this shape works:</strong> each node has one job and one output structure. When the agent misbehaves, you know exactly which node to fix. When you want to add capability, you add a node — you don&rsquo;t rewrite the existing ones.</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="rag-docs-reference-how-to-write-a-good-context-doc">🧠 RAG DOCS REFERENCE — how to write a good context doc</h2>
+<p>You upload one or more docs to the <strong>RAG Docs</strong> tab. The agent retrieves from these on every run. This is the closest thing to &ldquo;persistent memory&rdquo; in the platform.</p>
+<p><strong>What makes a RAG doc useful:</strong></p>
+<ul>
+<li><strong>Specific over abstract.</strong> &ldquo;B2B SaaS in legal tech serving GCs at mid-market firms&rdquo; beats &ldquo;we&rsquo;re a SaaS company&rdquo;.</li>
+<li><strong>Names over labels.</strong> Name your stack (HubSpot, Salesforce, Apollo) rather than describing it (&ldquo;CRM, email tool, prospecting tool&rdquo;).</li>
+<li><strong>Constraints up front.</strong> &ldquo;No engineering capacity beyond Zapier-level integrations&rdquo; stops the agent from recommending custom builds.</li>
+<li><strong>Voice when relevant.</strong> For marketing/comms tracks, paste 2-3 example sentences in your brand voice.</li>
+</ul>
+<p><strong>All four templates in one place — pick yours, fill it, save it as <code>.txt</code> or <code>.pdf</code>, upload it.</strong></p>
+<p><strong>Marketing/Sales:</strong></p>
+<pre><code>Company: [X]
+Audience: [Y]
+Brand voice: [Z]
+Top 3 priorities this quarter: [list]
+Current marketing/sales stack: [list 3-5 tools]
+</code></pre>
+<p><strong>Finance/Consulting:</strong></p>
+<pre><code>Sector: [e.g., private credit]
+Portfolio focus: [X]
+Key risk metrics: [Y]
+Regulatory bodies you report to: [list]
+Audit-trail requirements: [one line]
+</code></pre>
+<p><strong>Doctor/Healthcare:</strong></p>
+<pre><code>Department: [X]
+Setting: [bed count + hospital type + jurisdiction]
+Red-flag protocols: [list 3]
+Patient-data constraints: [PHI rules in your jurisdiction]
+</code></pre>
+<p><strong>Generic:</strong></p>
+<pre><code>Function: [your role]
+Company: [X]
+Top 3 priorities this quarter: [list]
+Current stack: [list 3-5 tools]
+</code></pre>
+<p><strong>Sanity check after Step D:</strong></p>
+<ul>
+<li>[ ] Doc shows up under the RAG Docs tab.</li>
+<li>[ ] Re-ran the starter problem from Step B.</li>
+<li>[ ] The output now references your real company / stack / constraints (not a generic example).</li>
+</ul>
+<p>If the agent still gives generic output after upload: open Node 2 (or whichever downstream node should ground in context) and add the line <em>&ldquo;Use the company context from RAG Docs to ground the rationale and risk flag.&rdquo;</em></p>
+<hr />
+<h2 class="new-page" id="multi-node-pipeline-when-to-add-nodes-3-4-5">🎯 MULTI-NODE PIPELINE — when to add Nodes 3, 4, 5</h2>
+<p>You add nodes when you want the pipeline to do <em>more</em>, not when one node isn&rsquo;t working. If Node 2 isn&rsquo;t classifying right, fix Node 2 — don&rsquo;t add Node 6.</p>
+<p><strong>Add Node 3 (Plan/Implement) when:</strong> you want the agent to produce an actual action plan, not just a recommendation. This is the step that turns &ldquo;you should use an Agent here&rdquo; into &ldquo;and here&rsquo;s how you&rsquo;d ship a 30-day pilot.&rdquo;</p>
+<p><strong>Add Node 4 (Risk/Compliance) when:</strong> you want the agent to be honest about what could fail. This is especially important in finance and healthcare tracks where missing a risk is worse than over-flagging.</p>
+<p><strong>Add Node 5 (Compose/Ship) when:</strong> you want a single artifact the user can paste into Slack, email, or a doc and act on immediately. Without this node, your output is structured-but-fragmented; with it, you have a brief.</p>
+<h3 id="generic-troubleshooting-when-your-pipeline-misfires">Generic troubleshooting — when your pipeline misfires</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>The fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A node skips its expected output structure</td>
+<td>Output block is too long or too far from the start of the prompt</td>
+<td>Move the output block to the bottom of the system prompt. Make sure it&rsquo;s clearly delimited (<code>Output exactly this structure:</code>).</td>
+</tr>
+<tr>
+<td>The agent loops on Node 1 (re-searches multiple times)</td>
+<td>Web-search instruction is too explicit, agent thinks it failed</td>
+<td>Soften: <em>&ldquo;Use web search to find…&rdquo;</em> instead of <em>&ldquo;You MUST search for…&rdquo;</em></td>
+</tr>
+<tr>
+<td>Downstream node ignores upstream node&rsquo;s output</td>
+<td>Downstream prompt doesn&rsquo;t reference its input</td>
+<td>Add the literal line: <em>&ldquo;The [previous node name]&rsquo;s output is your input. Read it carefully before you produce yours.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Hallucinated sources, made-up companies in Node 1</td>
+<td>No instruction to cite</td>
+<td>Add: <em>&ldquo;Cite the URL of every source you reference. If no source is found for a claim, say so explicitly.&rdquo;</em></td>
+</tr>
+<tr>
+<td>Output is wrong format</td>
+<td>System prompt got dropped on paste — only part of it landed</td>
+<td>Re-paste the full system prompt from this workbook. The Output block is load-bearing.</td>
+</tr>
+<tr>
+<td>Published agent&rsquo;s chat URL works but produces empty output</td>
+<td>&ldquo;Proceed (Generate Code)&rdquo; wasn&rsquo;t clicked after the last node edit</td>
+<td>Go back to Configure → No-Code, click <strong>Proceed</strong>, then unpublish and re-publish.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>When in doubt:</strong> simpler prompt, fewer instructions, one fix at a time. Don&rsquo;t change three things and re-run — you won&rsquo;t know which one helped.</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="sample-patient-case-notes-doctor-track-only">🩺 SAMPLE PATIENT CASE NOTES — Doctor Track Only</h2>
+<p>If you don&rsquo;t want to paste real patient data into a public tool during BUILD STEP E (good instinct), use one of these scrubbed sample cases. They are fictional, varied, and clinically plausible.</p>
+<h3 id="case-a-post-op-handover">Case A — Post-op handover</h3>
+<pre><code>Patient: 62yo M, POD#1 s/p elective laparoscopic cholecystectomy.
+Vitals stable overnight, T 37.4, BP 128/78, HR 84, SpO2 97% on RA.
+Pain 3/10 on PCA morphine. Tolerating sips. Mild nausea, ondansetron PRN.
+JP drain output 40 mL serosanguinous. Ambulating with assistance.
+Plan: advance diet, D/C PCA in AM, discharge home if tolerating PO and pain controlled.
+</code></pre>
+<h3 id="case-b-ed-admit">Case B — ED admit</h3>
+<pre><code>Patient: 78yo F, brought by family for acute confusion x 24h.
+PMH: HTN, T2DM, mild cognitive impairment at baseline.
+Vitals: T 38.6, BP 102/64, HR 110, RR 22, SpO2 94% on RA.
+UA cloudy, +leuks, +nitrites. WBC 14.2. Lactate 2.1.
+Likely urosepsis. Started IV ceftriaxone, IV fluids, sepsis bundle initiated.
+Admit to medical floor with telemetry. Repeat labs in 6h.
+</code></pre>
+<h3 id="case-c-copd-exacerbation">Case C — COPD exacerbation</h3>
+<pre><code>Patient: 67yo M with severe COPD (GOLD stage 3), 50 pack-year history.
+Presents with 3-day worsening dyspnea, productive cough yellow sputum, low-grade fever.
+On home O2 2L NC. Today SpO2 88% on 2L, increased to 4L NC, sat to 93%.
+Started on prednisone 40mg PO daily x 5d, azithromycin 500mg day 1 then 250mg x 4d,
+duonebs q4h. CXR: hyperinflation, no focal infiltrate. No acute decompensation.
+Plan: admit for 48h obs, wean O2 as tolerated, pulmonary consult.
+</code></pre>
+<p>Use any of these as the &ldquo;problem&rdquo; you ask your AI Pattern Advisor to classify — e.g., <em>&ldquo;Should our handover-note workflow for cases like this be a Chatbot, RAG, Agent, or Multi-Agent system?&rdquo;</em></p>
+<hr />
+<h2 class="new-page" id="your-week-after-tracker">📊 YOUR WEEK-AFTER TRACKER</h2>
+<p>This week, run your published AI Pattern Advisor <strong>5 times</strong> on real business problems from your work. Log each one here. We&rsquo;ll come back to this in Session 3.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Business problem you classified</th>
+<th>Pattern the agent picked</th>
+<th>Was it right? (Yes / Partial / No)</th>
+<th>Time saved vs. doing it yourself</th>
+<th>What you&rsquo;d change in a node prompt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="end-of-week-reflection-friday-5-minutes">End-of-week reflection (Friday, 5 minutes)</h3>
+<ol>
+<li>
+<p><strong>Which task was the biggest time saver?</strong> <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</li>
+<li>
+<p><strong>Which task surprised you — either because the agent nailed it or because it was wrong in an interesting way?</strong> <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</li>
+<li>
+<p><strong>Which task is NOT an agent task?</strong> (Should be a chatbot, a RAG system, or kept human?) <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>_____</p>
+</li>
+</ol>
+<blockquote>
+<p>The third question is the most important one. The discipline of saying <em>&ldquo;this is NOT an agent problem&rdquo;</em> is what separates teams that ship from teams that get stuck.</p>
+</blockquote>
+<hr />
+<h2 class="new-page" id="take-home-reply-to-today-s-class-email-by-friday">📩 TAKE-HOME (reply to today&rsquo;s class email by Friday)</h2>
+<p>Two sentences each. Your facilitator reads every reply.</p>
+<ol>
+<li>
+<p><strong>ONE business problem at your job</strong> that you&rsquo;ll classify with your AI Pattern Advisor this month. Tell me the problem in one sentence, and what pattern you think it&rsquo;ll come back as in the second.</p>
+</li>
+<li>
+<p><strong>ONE workflow you WON&rsquo;T automate with an agent</strong> — because it&rsquo;s a chatbot job, a RAG job, or because it&rsquo;s too sensitive for an agent today. One sentence on the workflow, one on why it stays manual (or stays a simpler pattern).</p>
+</li>
+</ol>
+<blockquote>
+<p>Why both questions matter: the first one builds the habit of using your agent. The second one builds the discipline of knowing when <strong>not</strong> to. Both are the work.</p>
+</blockquote>
+<hr />
+<h2 id="lingering-questions">📌 LINGERING QUESTIONS</h2>
+<p>Anything we didn&rsquo;t get to in the live Q&amp;A: reply to today&rsquo;s class email. Answered by tomorrow morning. The biggest ones become opening callbacks in Session 3.</p>
+<hr />
+<h2 class="new-page" id="what-s-next-session-3-prompt-engineering">🔮 WHAT&rsquo;S NEXT — SESSION 3: PROMPT ENGINEERING</h2>
+<p>Today you built a 5-node agent. Next time, we make every node&rsquo;s prompt sharp enough that the pipeline is reliable.</p>
+<p><strong>Session 3 — Prompt Engineering &amp; Context Engineering for Agents</strong> is where the language you give each node gets precise enough to stop the small, annoying failures you&rsquo;ll spot over your 5 runs this week. You&rsquo;ll take the AI Pattern Advisor you built today and harden every node prompt — output schemas, refusal handling, edge-case behaviour. (Six more sessions ahead of this in the arc — RAG, agent architecture, the EdYoda Agent Builder deep-build, n8n workflows, and a business-cases capstone. We&rsquo;re in week 2 of the journey.)</p>
+<p>Bring your tracker. Bring your favorite run, your weirdest run, and your worst run. We&rsquo;ll fix all three.</p>
+<hr />
+<p><em>See you for Session 3 — Prompt Engineering. Go build.</em></p>
+  </div>
+</body>
+</html>

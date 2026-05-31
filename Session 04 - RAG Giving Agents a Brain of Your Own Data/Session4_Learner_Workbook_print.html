@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generative AI for Non-Coders — Session 4 Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:       #f5efe6;
+  --paper-warm:  #ede4d3;
+  --paper-cream: #faf6ef;
+  --ink:         #1a1814;
+  --ink-soft:    #4a463e;
+  --ink-mute:    #8a8478;
+  --ink-faint:   #b8b1a3;
+  --rule:        #d4ccba;
+  --rule-soft:   #e3dccb;
+  --terra:       #b8431b;
+  --terra-soft:  rgba(184, 67, 27, 0.10);
+  --terra-deep:  #8c2e10;
+  --gold:        #a16207;
+  --leaf:        #5a7a3c;
+}
+
+@page {
+  size: A4;
+  margin: 22mm 18mm 22mm 18mm;
+
+  @bottom-left {
+    content: "Lumière · Session 4 · RAG";
+    font-family: 'Geist Mono', monospace;
+    font-size: 7.5pt;
+    color: #8a8478;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  @bottom-right {
+    content: counter(page);
+    font-family: 'Fraunces', serif;
+    font-size: 10pt;
+    color: #8a8478;
+  }
+}
+@page :first {
+  margin: 0;
+  @bottom-left { content: ""; }
+  @bottom-right { content: ""; }
+}
+@page toc {
+  @bottom-left { content: "Table of Contents"; }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Cover ─────────────────────────────────────────────────────────── */
+.cover {
+  page: first;
+  width: 210mm; height: 297mm;
+  background: var(--paper);
+  position: relative;
+  padding: 28mm 24mm;
+  display: flex; flex-direction: column;
+  page-break-after: always;
+}
+.cover::before {
+  /* subtle paper grain */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  opacity: 0.30; mix-blend-mode: multiply; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+.cover-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  height: 100%;
+}
+.cover .eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 8.5pt; letter-spacing: 0.30em; text-transform: uppercase;
+  color: var(--terra); font-weight: 500; padding-left: 36pt;
+  position: relative;
+}
+.cover .eyebrow::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: 28pt; height: 1px; background: var(--terra);
+}
+.cover .vol {
+  margin-top: 14pt;
+  font-family: 'Geist Mono', monospace;
+  font-size: 8pt; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.cover h1 {
+  margin-top: auto;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 62pt; line-height: 0.96; letter-spacing: -0.025em;
+  font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+  color: var(--ink);
+  max-width: 14ch;
+}
+.cover h1 em {
+  font-style: italic; color: var(--terra);
+  font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+}
+.cover .cover-lede {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+  font-size: 14pt; line-height: 1.4; color: var(--ink-soft);
+  font-variation-settings: 'opsz' 36;
+  max-width: 50ch; margin-top: 18pt;
+}
+.cover .cover-foot {
+  margin-top: 32pt; padding-top: 12pt;
+  border-top: 1px solid var(--ink);
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: 'Geist Mono', monospace; font-size: 8pt;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute);
+}
+.cover .cover-foot .name {
+  font-family: 'Fraunces', serif; font-style: italic; font-size: 11pt;
+  letter-spacing: 0; text-transform: none; color: var(--ink);
+}
+
+/* ── TOC ──────────────────────────────────────────────────────────── */
+.toc-page {
+  page: toc;
+  page-break-before: always;
+  page-break-after: always;
+  padding: 14mm 4mm;
+}
+.toc-page h2 {
+  font-family: 'Fraunces', serif; font-weight: 400;
+  font-size: 28pt; line-height: 1.05; color: var(--ink);
+  font-variation-settings: 'opsz' 80, 'SOFT' 30;
+  margin-bottom: 4pt;
+}
+.toc-page h2 em { font-style: italic; color: var(--terra); }
+.toc-page .toc-eyebrow {
+  font-family: 'Geist Mono', monospace; font-size: 8pt;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--terra); font-weight: 500;
+  margin-bottom: 12pt; padding-left: 36pt; position: relative;
+}
+.toc-page .toc-eyebrow::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: 28pt; height: 1px; background: var(--terra);
+}
+.toc-list {
+  margin-top: 18pt;
+  border-top: 2px solid var(--ink);
+  padding-top: 14pt;
+}
+.toc-list ul { list-style: none; margin: 0; padding: 0; }
+.toc-list > ul > li {
+  padding: 6pt 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.toc-list > ul > li > a {
+  font-family: 'Fraunces', serif;
+  font-size: 13pt; font-weight: 400; color: var(--ink);
+  text-decoration: none; line-height: 1.3;
+  font-variation-settings: 'opsz' 36;
+}
+.toc-list ul ul {
+  margin: 4pt 0 4pt 16pt;
+  padding-left: 12pt; border-left: 1px solid var(--rule-soft);
+}
+.toc-list ul ul li {
+  padding: 2pt 0;
+  font-family: 'Geist', sans-serif;
+}
+.toc-list ul ul li a {
+  font-size: 9.5pt; color: var(--ink-soft); text-decoration: none;
+}
+.toc-list ul ul li a:hover { color: var(--terra); }
+.toc-list a { color: inherit; text-decoration: none; }
+
+/* ── Body content ─────────────────────────────────────────────────── */
+.content {
+  padding: 4mm;
+  page-break-before: always;
+}
+/* Major sections (h2) — start on a new page only for the "big" sections;
+   short sections like Troubleshooting can flow inline to avoid huge gaps.
+   We tag the big ones via .h2-major in post-processing. */
+.content h2 {
+  page-break-after: avoid;
+  font-family: 'Fraunces', serif;
+  font-weight: 400; font-size: 24pt; line-height: 1.1;
+  color: var(--ink); margin: 28pt 0 4pt 0;
+  font-variation-settings: 'opsz' 80, 'SOFT' 30;
+  padding-bottom: 8pt; border-bottom: 1px solid var(--rule);
+}
+.content h2.h2-major {
+  page-break-before: always;
+  margin-top: 0;
+}
+.content h2:first-of-type { page-break-before: avoid; margin-top: 0; }
+.content h2 em { font-style: italic; color: var(--terra); }
+.content h3 {
+  page-break-after: avoid;
+  font-family: 'Fraunces', serif;
+  font-weight: 500; font-size: 14pt; line-height: 1.25;
+  color: var(--ink); margin: 16pt 0 4pt 0;
+}
+.content h3 em { font-style: italic; color: var(--terra); }
+.content h4 {
+  page-break-after: avoid;
+  font-family: 'Geist Mono', monospace;
+  font-size: 8.5pt; letter-spacing: 0.14em; text-transform: uppercase;
+  font-weight: 600; color: var(--ink-mute);
+  margin: 12pt 0 4pt 0;
+}
+
+.content p {
+  margin: 6pt 0; orphans: 3; widows: 3;
+  font-size: 10.5pt; line-height: 1.6; color: var(--ink);
+}
+.content em { font-style: italic; color: var(--ink); }
+.content strong { color: var(--ink); font-weight: 600; }
+.content a { color: var(--terra); text-decoration: none; }
+
+.content ul, .content ol {
+  margin: 6pt 0 6pt 18pt; padding: 0;
+}
+.content li {
+  margin: 2pt 0; line-height: 1.55;
+  font-size: 10.5pt; color: var(--ink);
+}
+.content li::marker { color: var(--terra); }
+
+.content blockquote {
+  margin: 10pt 0;
+  padding: 8pt 14pt;
+  background: var(--paper-cream);
+  border-left: 3px solid var(--terra);
+  font-family: 'Fraunces', serif; font-style: italic;
+  color: var(--ink-soft); font-size: 10.5pt; line-height: 1.55;
+  font-variation-settings: 'opsz' 36;
+}
+.content blockquote p { margin: 0; font-style: italic; color: var(--ink-soft); }
+
+.content hr {
+  margin: 18pt 0; border: none;
+  border-top: 1px solid var(--rule);
+}
+
+/* code blocks (the two prompts + the architecture diagram).
+   We use pre-wrap by default so long prompt lines soft-wrap inside the dark
+   panel (no clipping). The architecture ASCII diagram needs whitespace
+   preserved EXACTLY — it's tagged with .ascii via post-processing and
+   reverts to white-space: pre. */
+.content pre {
+  background: #1a1814;            /* dark editorial mono panel */
+  color: #f5efe6;
+  padding: 12pt 14pt;
+  border-radius: 3px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 8pt; line-height: 1.55;
+  white-space: pre-wrap;          /* soft-wrap long lines, don't clip */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  page-break-inside: avoid;       /* try not to split mid-prompt */
+  margin: 10pt 0;
+}
+.content pre code {
+  background: transparent; color: inherit;
+  font-family: inherit; font-size: inherit;
+  padding: 0;
+  white-space: inherit;
+  word-break: inherit;
+  overflow-wrap: inherit;
+}
+/* ASCII diagrams (architecture, fillable KB sheet, etc.) — preserve exact
+   whitespace, allow page break for the giant ones. */
+.content pre.ascii {
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+  font-size: 7.5pt; line-height: 1.35;
+}
+.content pre.ascii.allow-break { page-break-inside: auto; }
+
+.content code {
+  background: var(--paper-warm);
+  color: var(--terra-deep);
+  padding: 1pt 4pt; border-radius: 2px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9pt;
+}
+
+/* tables */
+.content table {
+  width: 100%; border-collapse: collapse;
+  margin: 10pt 0; font-size: 9.5pt;
+  page-break-inside: avoid;
+}
+.content table th {
+  text-align: left; padding: 6pt 8pt;
+  font-family: 'Geist Mono', monospace;
+  font-size: 8pt; letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--ink); font-weight: 600;
+  border-bottom: 2px solid var(--ink); background: var(--paper-cream);
+}
+.content table td {
+  padding: 6pt 8pt;
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--ink-soft); line-height: 1.5;
+  vertical-align: top;
+}
+.content table tr:last-child td { border-bottom: none; }
+.content table td strong, .content table td code { color: var(--ink); }
+
+/* Avoid orphaned headings — the heading and the first paragraph after it
+   must travel together, never split across pages. */
+.content h2 + p, .content h3 + p, .content h4 + p { page-break-before: avoid; }
+
+/* Keep a sub-heading + its lead paragraph + a following code block on the
+   same page when possible. CSS `break-before: avoid` on the pre that
+   immediately follows a heading is the precise version. */
+.content h3 + p + pre,
+.content h3 + pre,
+.content h4 + p + pre,
+.content h4 + pre {
+  page-break-before: avoid;
+}
+
+/* ── Write-in fields (workbook-style fill-in lines) ─────────────────────
+   We tag a paragraph as .writein in post-processing when the source uses
+   the pattern **Log the answer here:** / **Paste the source line ...** /
+   **After — what did the agent say?**. We then render the prompt PLUS
+   three blank ruled lines underneath, so the printed PDF has real
+   space for the learner to write. */
+.content p.writein {
+  margin: 8pt 0 4pt 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+.content p.writein + .writein-lines {
+  margin: 0 0 14pt 0;
+  page-break-inside: avoid;
+}
+.content .writein-lines .ln {
+  display: block;
+  height: 0;
+  border-bottom: 1px solid var(--rule);
+  margin: 14pt 0 0 0;
+}
+.content .writein-lines .ln:first-child { margin-top: 8pt; }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER ===== -->
+<section class="cover">
+  <div class="cover-inner">
+    <div class="eyebrow">EdYoda · Generative AI for Non-Coders</div>
+    <div class="vol">Session 04 · Two-Hour Live · Learner Workbook</div>
+    <h1>RAG —<br>a brain<br>of your <em>own</em><br>data.</h1>
+    <p class="cover-lede">A field workbook for the Lumière build. Four personas. Five build steps. Three reference sheets. Two prompts to take home and rebuild it from scratch.</p>
+    <div class="cover-foot">
+      <span>No. 04 / Knowledge Agents</span>
+      <span class="name">Shantanu Chandra</span>
+      <span>linkedin.com/in/chandrashantanu</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TABLE OF CONTENTS ===== -->
+<section class="toc-page">
+  <div class="toc-eyebrow">Inside this workbook</div>
+  <h2>Table of <em>Contents.</em></h2>
+  <div class="toc-list">
+    <ul>
+<li><a href="#orientation">Orientation</a></li>
+<li><a href="#the-lumiere-knowledge-base-key-facts-at-a-glance">The Lumière Knowledge Base — Key Facts at a Glance</a></li>
+<li><a href="#the-four-personas-pick-one">The Four Personas — Pick One</a></li>
+<li><a href="#persona-1-last-minute-birthday">Persona 1 — Last-minute Birthday</a><ul>
+<li><a href="#build-a-feed-the-brain">Build A — Feed the Brain</a></li>
+<li><a href="#build-b-make-it-cite">Build B — Make It Cite</a></li>
+<li><a href="#build-c-make-it-refuse">Build C — Make It Refuse</a></li>
+<li><a href="#build-d-observe-and-design">Build D — Observe and Design</a></li>
+<li><a href="#build-e-stress-and-ship">Build E — Stress and Ship</a></li>
+</ul>
+</li>
+<li><a href="#persona-2-allergy-parent">Persona 2 — Allergy Parent</a><ul>
+<li><a href="#build-a-feed-the-brain_1">Build A — Feed the Brain</a></li>
+<li><a href="#build-b-make-it-cite_1">Build B — Make It Cite</a></li>
+<li><a href="#build-c-make-it-refuse_1">Build C — Make It Refuse</a></li>
+<li><a href="#build-d-observe-and-design_1">Build D — Observe and Design</a></li>
+<li><a href="#build-e-stress-and-ship_1">Build E — Stress and Ship</a></li>
+</ul>
+</li>
+<li><a href="#persona-3-corporate-bulk">Persona 3 — Corporate Bulk</a><ul>
+<li><a href="#build-a-feed-the-brain_2">Build A — Feed the Brain</a></li>
+<li><a href="#build-b-make-it-cite_2">Build B — Make It Cite</a></li>
+<li><a href="#build-c-make-it-refuse_2">Build C — Make It Refuse</a></li>
+<li><a href="#build-d-observe-and-design_2">Build D — Observe and Design</a></li>
+<li><a href="#build-e-stress-and-ship_2">Build E — Stress and Ship</a></li>
+</ul>
+</li>
+<li><a href="#persona-4-delivery-edge-case">Persona 4 — Delivery Edge-case</a><ul>
+<li><a href="#build-a-feed-the-brain_3">Build A — Feed the Brain</a></li>
+<li><a href="#build-b-make-it-cite_3">Build B — Make It Cite</a></li>
+<li><a href="#build-c-make-it-refuse_3">Build C — Make It Refuse</a></li>
+<li><a href="#build-d-observe-and-design_3">Build D — Observe and Design</a></li>
+<li><a href="#build-e-stress-and-ship_3">Build E — Stress and Ship</a></li>
+</ul>
+</li>
+<li><a href="#reference-sheet-1-grounding-prompt-library">Reference Sheet 1 — Grounding Prompt Library</a><ul>
+<li><a href="#the-grounding-prompt-build-b">The grounding prompt (Build B)</a></li>
+<li><a href="#the-refusal-line-build-c">The refusal line (Build C)</a></li>
+<li><a href="#combined-prompt-copy-paste-ready-for-steps-b-and-c-together">Combined prompt (copy-paste ready for Steps B and C together)</a></li>
+<li><a href="#sharpening-tips">Sharpening tips</a></li>
+</ul>
+</li>
+<li><a href="#reference-sheet-2-the-rag-dial">Reference Sheet 2 — The RAG Dial</a></li>
+<li><a href="#reference-sheet-3-knowledge-base-design-sheet">Reference Sheet 3 — Knowledge Base Design Sheet</a><ul>
+<li><a href="#fillable-sheet">Fillable sheet</a></li>
+<li><a href="#worked-example-last-minute-birthday-persona">Worked example — Last-minute Birthday persona</a></li>
+</ul>
+</li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#build-lumiere-yourself-two-prompts-two-stages">Build Lumière yourself — two prompts, two stages</a><ul>
+<li><a href="#before-you-start">Before you start</a></li>
+<li><a href="#stage-1-a-grounded-bakery-bot">Stage 1 — A grounded bakery bot</a></li>
+<li><a href="#stage-2-make-it-agentic">Stage 2 — Make it agentic</a></li>
+<li><a href="#what-the-tools-actually-do-read-this-before-you-wonder">What the tools actually do — read this before you wonder</a></li>
+<li><a href="#architecture-both-stages-side-by-side">Architecture — both stages, side by side</a></li>
+<li><a href="#what-you-have-end-to-end">What you have, end to end</a></li>
+</ul>
+</li>
+<li><a href="#whats-next-session-5">What's Next — Session 5</a></li>
+</ul>
+  </div>
+</section>
+
+<!-- ===== BODY ===== -->
+<main class="content">
+<p><strong>RAG: Giving Agents a Brain of Your Own Data</strong></p>
+<p><strong>What you build today:</strong> A knowledge agent grounded on the Lumière Bakery document — one that answers from the file, names its source, and says "I don't have that in my knowledge base" when the answer isn't there.</p>
+<p><strong>What you take home:</strong> A completed Knowledge Base Design Sheet — a reusable recipe for grounding any document at work.</p>
+<hr />
+<h2 id="orientation">Orientation</h2>
+<p>All learners work from the same document: <strong><code>Lumiere_KB.md</code></strong>. You'll find the download link in the calendar invite.</p>
+<p>Pick a persona below that fits your mindset today. Your persona shapes the questions you ask — the document is the same for everyone.</p>
+<p>No Project? Attach <code>Lumiere_KB.md</code> to a fresh chat — same result.</p>
+<p><strong>Reference sheets at the end of this workbook:</strong></p>
+<ul>
+<li>Grounding Prompt Library</li>
+<li>The RAG Dial</li>
+<li>Knowledge Base Design Sheet</li>
+</ul>
+<hr />
+<h2 id="the-lumiere-knowledge-base-key-facts-at-a-glance" class="h2-major">The Lumière Knowledge Base — Key Facts at a Glance</h2>
+<p>Use this as a quick orientation before you start. Everything here is in <code>Lumiere_KB.md</code>; the agent you build today will answer questions about all of it.</p>
+<ul>
+<li><strong>Branches:</strong> Bandra West (Mon–Fri 7:30am–8:30pm), Andheri West (Mon–Fri 8am–8pm), Powai (daily 8am–9pm)</li>
+<li><strong>Custom cakes:</strong> Minimum 48h lead time; 72h for cakes over 3kg or with fondant; same-day orders are never accepted; 50% advance required</li>
+<li><strong>Eggless option:</strong> Available for all standard cake flavours at +₹80 per cake</li>
+<li><strong>Eggless lead time:</strong> Same as standard — 48h minimum, 72h for fondant or over 3kg</li>
+<li><strong>Allergens:</strong> The kitchen is NOT nut-free; Lumière cannot guarantee any item is allergen-free</li>
+<li><strong>Delivery:</strong> 8km radius from each branch; Mumbai only (no Gurgaon in Version 1 of the document)</li>
+<li><strong>Current offer:</strong> 15% off celebration cakes ordered 3 or more days ahead — code LUMIERE15</li>
+<li><strong>Eggless cakes and the LUMIERE15 offer:</strong> The offer applies to eggless celebration cakes too, as long as the 3-day minimum is met</li>
+</ul>
+<hr />
+<h2 id="the-four-personas-pick-one" class="h2-major">The Four Personas — Pick One</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Persona</th>
+<th>In brief</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Last-minute Birthday</td>
+<td>Needs a 2kg eggless cake by Saturday — never ordered from Lumière before</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Allergy Parent</td>
+<td>Child has a severe nut allergy; needs to know what's safe before ordering</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Corporate Bulk</td>
+<td>Organising an 80-person office event in Andheri, Friday delivery</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Delivery Edge-case</td>
+<td>Lives in Sector 90, Gurgaon; heard Lumière is expanding</td>
+</tr>
+</tbody>
+</table>
+<p>Work through <strong>Builds A–E</strong> on your chosen persona page. The build steps carry the same heading on every persona page — when the facilitator calls "Build C," find it in the same place on your page.</p>
+<hr />
+<h2 id="persona-1-last-minute-birthday" class="h2-major">Persona 1 — Last-minute Birthday</h2>
+<p>You need a 2kg eggless chocolate cake for this Saturday. You've heard Lumière is good but you've never ordered from them. You also want to know whether the eggless option adds to the price and whether you can still get the 15% offer code for the eggless version.</p>
+<p><strong>Your starter document:</strong> <code>Lumiere_KB.md</code></p>
+<hr />
+<h3 id="build-a-feed-the-brain">Build A — Feed the Brain</h3>
+<p>Upload <code>Lumiere_KB.md</code> to your Claude Project (or attach to a fresh chat). Then ask:</p>
+<blockquote>
+<p>"Can I get a 2kg eggless chocolate cake for this Saturday?"</p>
+</blockquote>
+<p class="writein">Log the answer here:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<hr />
+<h3 id="build-b-make-it-cite">Build B — Make It Cite</h3>
+<p>Open Reference Sheet 1 at the end of this workbook. Copy the <strong>Grounding Prompt</strong> and paste it into your Project's custom instructions (or as the first message of your chat). Then re-ask your Build A question.</p>
+<p>The answer should now end with a real <strong>(Source: …)</strong> line naming a specific heading — not just "the document."</p>
+<p class="writein">Paste the source line the agent returned:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<p>(Source: <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>____)</p>
+<hr />
+<h3 id="build-c-make-it-refuse">Build C — Make It Refuse</h3>
+<p>Ask your agent a question that is outside the document:</p>
+<blockquote>
+<p>"Can you match a competitor's price on a custom eggless cake?"</p>
+</blockquote>
+<p class="writein">Before adding the refusal line — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<p>Open Reference Sheet 1. Copy the <strong>Refusal Line</strong> and add it to your grounding prompt. Re-ask the same question.</p>
+<p class="writein">After — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<h3 id="build-d-observe-and-design">Build D — Observe and Design</h3>
+<p>Facilitator demo. Watch the live screen and fill in the KB Design Sheet chunk/tag fields at the end of this workbook based on what you observe.</p>
+<p>Key thing to watch: how does splitting the document by heading change which answer the agent retrieves when two sections both use similar terms?</p>
+<hr />
+<h3 id="build-e-stress-and-ship">Build E — Stress and Ship</h3>
+<p>Run all three probes. Log the result as <strong>HELD</strong> (correct answer), <strong>REFUSED</strong> (clean "I don't have that"), or <strong>MISSED</strong> (wrong or hallucinated answer).</p>
+<table>
+<thead>
+<tr>
+<th>Probe</th>
+<th>Query</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synonym</td>
+<td>"What's your no-egg option for celebration cakes?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Out-of-scope</td>
+<td>"Can you tell me if the birthday boy will like this flavour?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Exact-code</td>
+<td>"What does Custom Order Policy clause 3 say about same-day orders?"</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="persona-2-allergy-parent" class="h2-major">Persona 2 — Allergy Parent</h2>
+<p>You're buying pastries for your child who has a severe nut allergy. You need to know exactly what's safe before ordering. You're also curious whether the eggless option affects the allergen risk in any way.</p>
+<p><strong>Your starter document:</strong> <code>Lumiere_KB.md</code></p>
+<hr />
+<h3 id="build-a-feed-the-brain_1">Build A — Feed the Brain</h3>
+<p>Upload <code>Lumiere_KB.md</code> to your Claude Project (or attach to a fresh chat). Then ask:</p>
+<blockquote>
+<p>"Does the almond croissant contain nuts?"</p>
+</blockquote>
+<p class="writein">Log the answer here:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<hr />
+<h3 id="build-b-make-it-cite_1">Build B — Make It Cite</h3>
+<p>Open Reference Sheet 1. Copy the <strong>Grounding Prompt</strong> and paste it into your Project's custom instructions (or as the first message of your chat). Then re-ask your Build A question.</p>
+<p>The answer should now end with a real <strong>(Source: …)</strong> line naming a specific heading.</p>
+<p class="writein">Paste the source line the agent returned:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<p>(Source: <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>____)</p>
+<hr />
+<h3 id="build-c-make-it-refuse_1">Build C — Make It Refuse</h3>
+<p>Ask your agent:</p>
+<blockquote>
+<p>"Is your kitchen completely nut-free and certified allergen-free?"</p>
+</blockquote>
+<p>Note: the document states the kitchen is NOT nut-free — so the agent should answer that part from the document. "Certified allergen-free" is the out-of-scope part. Observe whether your agent handles both in the same response, or conflates them.</p>
+<p class="writein">Before adding the refusal line — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<p>Open Reference Sheet 1. Copy the <strong>Refusal Line</strong> and add it to your grounding prompt. Re-ask the same question.</p>
+<p><strong>After — what changed?</strong></p>
+<hr />
+<hr />
+<h3 id="build-d-observe-and-design_1">Build D — Observe and Design</h3>
+<p>Facilitator demo. Watch the live screen and fill in the KB Design Sheet chunk/tag fields at the end of this workbook based on what you observe.</p>
+<p>Key thing to watch: how does tagging the Allergens section separately change the precision of the retrieval?</p>
+<hr />
+<h3 id="build-e-stress-and-ship_1">Build E — Stress and Ship</h3>
+<p>Run all three probes. Log the result as <strong>HELD</strong>, <strong>REFUSED</strong>, or <strong>MISSED</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Probe</th>
+<th>Query</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synonym</td>
+<td>"Are there any items safe for someone with a tree-nut sensitivity?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Out-of-scope</td>
+<td>"Can Lumière guarantee my child won't have a reaction?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Exact-code</td>
+<td>"What does the Allergens &amp; Ingredients section say about cross-contamination?"</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="persona-3-corporate-bulk" class="h2-major">Persona 3 — Corporate Bulk</h2>
+<p>You're organising a company event at your Andheri office — 80 people, mixed dietary needs including a group who need eggless options, Friday delivery.</p>
+<p><strong>Your starter document:</strong> <code>Lumiere_KB.md</code></p>
+<hr />
+<h3 id="build-a-feed-the-brain_2">Build A — Feed the Brain</h3>
+<p>Upload <code>Lumiere_KB.md</code> to your Claude Project (or attach to a fresh chat). Then ask:</p>
+<blockquote>
+<p>"What's the minimum order for corporate catering, and do you deliver to Andheri?"</p>
+</blockquote>
+<p class="writein">Log the answer here:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<hr />
+<h3 id="build-b-make-it-cite_2">Build B — Make It Cite</h3>
+<p>Open Reference Sheet 1. Copy the <strong>Grounding Prompt</strong> and paste it into your Project's custom instructions (or as the first message of your chat). Then re-ask your Build A question.</p>
+<p>The answer should now end with a real <strong>(Source: …)</strong> line naming a specific heading.</p>
+<p class="writein">Paste the source line the agent returned:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<p>(Source: <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>____)</p>
+<hr />
+<h3 id="build-c-make-it-refuse_2">Build C — Make It Refuse</h3>
+<p>Ask your agent a question that is outside the document:</p>
+<blockquote>
+<p>"Can you process a company GST invoice directly through this chat?"</p>
+</blockquote>
+<p class="writein">Before adding the refusal line — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<p>Open Reference Sheet 1. Copy the <strong>Refusal Line</strong> and add it to your grounding prompt. Re-ask the same question.</p>
+<p class="writein">After — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<h3 id="build-d-observe-and-design_2">Build D — Observe and Design</h3>
+<p>Facilitator demo. Watch the live screen and fill in the KB Design Sheet chunk/tag fields at the end of this workbook based on what you observe.</p>
+<p>Key thing to watch: how does the Delivery section's structure affect what the agent returns for a branch-specific query?</p>
+<hr />
+<h3 id="build-e-stress-and-ship_2">Build E — Stress and Ship</h3>
+<p>Run all three probes. Log the result as <strong>HELD</strong>, <strong>REFUSED</strong>, or <strong>MISSED</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Probe</th>
+<th>Query</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synonym</td>
+<td>"Do you handle large office orders?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Out-of-scope</td>
+<td>"What's the catering market rate in Mumbai this year?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Exact-code</td>
+<td>"What is the delivery pincode range for the Andheri West branch?"</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="persona-4-delivery-edge-case" class="h2-major">Persona 4 — Delivery Edge-case</h2>
+<p>You live in Sector 90, Gurgaon and you've just heard Lumière is expanding. You want to know if you can get delivery — and if a Gurgaon branch opens, whether their eggless cakes will be available there too.</p>
+<p><strong>Your starter document:</strong> <code>Lumiere_KB.md</code></p>
+<hr />
+<h3 id="build-a-feed-the-brain_3">Build A — Feed the Brain</h3>
+<p>Upload <code>Lumiere_KB.md</code> to your Claude Project (or attach to a fresh chat). Then ask:</p>
+<blockquote>
+<p>"Do you deliver to Sector 90, Gurgaon?"</p>
+</blockquote>
+<p>The Version 1 document covers Mumbai only — there is no Gurgaon entry yet. The agent should say so cleanly rather than guessing.</p>
+<p class="writein">Log the answer here:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<hr />
+<h3 id="build-b-make-it-cite_3">Build B — Make It Cite</h3>
+<p>Open Reference Sheet 1. Copy the <strong>Grounding Prompt</strong> and paste it into your Project's custom instructions (or as the first message of your chat). Then re-ask your Build A question.</p>
+<p>The answer should now end with a real <strong>(Source: …)</strong> line naming a specific heading.</p>
+<p class="writein">Paste the source line the agent returned:</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<p>(Source: <strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong><strong><em>_</em></strong>____)</p>
+<hr />
+<h3 id="build-c-make-it-refuse_3">Build C — Make It Refuse</h3>
+<p>Ask your agent a question that is outside the document:</p>
+<blockquote>
+<p>"Can you tell me when you'll open a branch in Delhi?"</p>
+</blockquote>
+<p class="writein">Before adding the refusal line — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<p>Open Reference Sheet 1. Copy the <strong>Refusal Line</strong> and add it to your grounding prompt. Re-ask the same question.</p>
+<p class="writein">After — what did the agent say?</p><div class="writein-lines"><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+<hr />
+<hr />
+<h3 id="build-d-observe-and-design_3">Build D — Observe and Design</h3>
+<p>Facilitator demo. Watch the live screen and fill in the KB Design Sheet chunk/tag fields at the end of this workbook based on what you observe.</p>
+<p>During the demo the facilitator will add a Gurgaon branch entry to the live document and re-upload it. Note how the agent's answer to the Gurgaon delivery question changes after the document update.</p>
+<hr />
+<h3 id="build-e-stress-and-ship_3">Build E — Stress and Ship</h3>
+<p>Run all three probes. Log the result as <strong>HELD</strong>, <strong>REFUSED</strong>, or <strong>MISSED</strong>.</p>
+<p>For the synonym probe: re-ask after the facilitator has added the Gurgaon branch entry to the live document — the answer should change.</p>
+<table>
+<thead>
+<tr>
+<th>Probe</th>
+<th>Query</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synonym</td>
+<td>"Which areas near DLF Garden City can you deliver to?" (re-ask after doc update)</td>
+<td></td>
+</tr>
+<tr>
+<td>Out-of-scope</td>
+<td>"Can you GPS-track my delivery in real time?"</td>
+<td></td>
+</tr>
+<tr>
+<td>Exact-code</td>
+<td>"What are the pincodes covered by the Powai branch delivery zone?"</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="reference-sheet-1-grounding-prompt-library" class="h2-major">Reference Sheet 1 — Grounding Prompt Library</h2>
+<h3 id="the-grounding-prompt-build-b">The grounding prompt (Build B)</h3>
+<p>Paste this into your Project's custom instructions, or as the first message of your chat.</p>
+<pre><code>You are a knowledge agent for Lumière Bakery. Answer questions using ONLY the document(s) in your knowledge. After every answer, name the section, heading, or page you pulled it from, like this: (Source: &lt;section/heading&gt;). Do not add outside facts.
+</code></pre>
+<h3 id="the-refusal-line-build-c">The refusal line (Build C)</h3>
+<p>Add this after the grounding prompt once you've confirmed citation is working.</p>
+<pre><code>If the answer is not in the document, say: 'I don't have that in my knowledge base' — and stop. Never guess, never fill in from outside knowledge.
+</code></pre>
+<h3 id="combined-prompt-copy-paste-ready-for-steps-b-and-c-together">Combined prompt (copy-paste ready for Steps B and C together)</h3>
+<p>Paste the grounding prompt above, then immediately add the refusal line below it. Together they form the complete custom instructions for your Lumière Bakery agent.</p>
+<h3 id="sharpening-tips">Sharpening tips</h3>
+<ul>
+<li>If the source line comes back vague ("Source: the document"), add: "Name the exact heading or page number, never just 'the document'."</li>
+<li>If the agent guesses even after the refusal line, tighten the test: ask something more cleanly outside the doc (e.g. future expansion plans, live competitor pricing).</li>
+<li>If you adapt this for a different document, swap "Lumière Bakery" for the name of your organisation or system.</li>
+</ul>
+<hr />
+<h2 id="reference-sheet-2-the-rag-dial" class="h2-major">Reference Sheet 2 — The RAG Dial</h2>
+<p>RAG is a dial, not a switch. Find where your use-case sits today; write the level on the headline row of your Knowledge Base Design Sheet.</p>
+<p><strong>Level 0 — No retrieval.</strong> The model answers from its training data alone. It guesses Lumière's lead time rather than reading the document. The baseline you move off of.</p>
+<p><strong>Level 1 — CAG (Cache-Augmented Generation).</strong> Load the whole document into context — no vector database, no chunk-and-search. The model has the entire <code>Lumiere_KB.md</code> in front of it. This is Build A. Right for small, stable docs.</p>
+<p><strong>Level 2 — Vanilla RAG.</strong> Lumière grows to 500 locations and a 10,000-page operations manual. You can't load it all, so you retrieve only the sections that match the question and answer from those. The default — roughly eight in ten business cases land here. This is Builds B through D.</p>
+<p><strong>Level 3 — Hybrid RAG.</strong> Keyword and semantic search run together. "Custom Order Clause 3" (exact keyword) and "eggless celebration cake for a birthday" (semantic meaning) both fire in the same query. Reach for it when your documents contain clause numbers, SKUs, or policy codes alongside plain prose. This is Build E.</p>
+<p><strong>Level 4 — Agentic RAG.</strong> The agent decides for itself when and how often to retrieve, across more than one source — for example, comparing this season's offer codes to last season's and flagging what changed. Concept today; Session 5 picks it up.</p>
+<p><strong>Name-drops (one line each):</strong>
+- <strong>GraphRAG</strong> — builds a graph of relationships across documents; useful for cross-document synthesis. Complementary to plain RAG, not a replacement.
+- <strong>Re-ranking RAG</strong> — retrieve 20 candidate chunks, re-sort to the best 3 before answering; useful for precision-critical queries where the first-retrieved chunk is rarely the best one.</p>
+<hr />
+<h2 id="reference-sheet-3-knowledge-base-design-sheet" class="h2-major">Reference Sheet 3 — Knowledge Base Design Sheet</h2>
+<h3 id="fillable-sheet">Fillable sheet</h3>
+<pre class="ascii allow-break"><code>KNOWLEDGE BASE DESIGN SHEET
+Name: ____________________   Persona: ___________________________
+Document grounded: Lumiere_KB.md   Branch: ______________________
+──────────────────────────────────────────────────────────────────
+
+★ HEADLINE ROW — Where on the RAG dial?
+  Level: _________   Why: ______________________________________
+
+1. CHUNK STRATEGY — how I'd split this document
+   (by section / by topic / by branch):
+   ________________________________________________________
+
+2. METADATA TAGS
+   a. Structural tags — section labels retrieval needs
+      (e.g. [CustomOrders], [Allergens], [Delivery]):
+      ________________________________________________________
+   b. Semantic tags — questions each section answers
+      (e.g. &quot;Can I get a same-day cake?&quot;):
+      ________________________________________________________
+
+3. QUERY RANGE
+   This agent SHOULD answer: ________________________________
+   This agent must REFUSE: _________________________________
+
+4. GROUNDING + REFUSAL PROMPT — my final custom-instructions text:
+   ________________________________________________________
+   ________________________________________________________
+──────────────────────────────────────────────────────────────────
+</code></pre>
+<h3 id="worked-example-last-minute-birthday-persona">Worked example — Last-minute Birthday persona</h3>
+<pre><code>Name: [Name]                 Persona: Last-minute Birthday
+Document grounded: Lumiere_KB.md
+
+★ HEADLINE ROW: Level-1 CAG — one doc, stable content, fits whole in Project.
+
+1. CHUNK STRATEGY: by section heading (each of the 8 sections is one chunk).
+
+2. METADATA TAGS:
+   a. Structural: [CustomOrders] [Allergens] [Delivery] [Offers] [Hours]
+   b. Semantic: &quot;Can I get same-day?&quot; &quot;Is the eggless option available?&quot;
+      &quot;Do you deliver to X?&quot; &quot;Does LUMIERE15 apply to eggless cakes?&quot;
+
+3. QUERY RANGE:
+   SHOULD: cake availability, eggless surcharge, lead times, delivery zones,
+           allergen info, current offers including eggless eligibility.
+   REFUSE: competitor pricing, revenue/financial data, GPS-live tracking.
+
+4. GROUNDING + REFUSAL PROMPT:
+   [Grounding Prompt from Reference Sheet 1]
+   [Refusal Line from Reference Sheet 1]
+</code></pre>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ol>
+<li>
+<p><strong>Vague source</strong> — agent returns "(Source: the document)" rather than a real heading. Fix: add "Name the exact heading or page number, never just 'the document'."</p>
+</li>
+<li>
+<p><strong>Still guesses after the refusal guardrail</strong> — ask a question that is more cleanly outside the doc (expansion timelines, competitor data, anything not written in <code>Lumiere_KB.md</code>).</p>
+</li>
+<li>
+<p><strong>Retrieval miss — fact you know is in the doc but the agent can't find it</strong> — the section probably lacks a clear heading or tag. Add a heading, add a tag, re-upload, re-ask.</p>
+</li>
+<li>
+<p><strong>Good retrieval but vague response</strong> — the agent found the right section but paraphrased loosely. This is an integration failure, not a retrieval miss. Sharpen the instruction: "Quote the exact clause or sentence; do not paraphrase."</p>
+</li>
+</ol>
+<hr />
+<h2 id="build-lumiere-yourself-two-prompts-two-stages" class="h2-major">Build Lumière yourself — two prompts, two stages</h2>
+<p>You watched the Lumière demo end-to-end. Now you can rebuild it. Two prompts. Each one is a single message you paste into a fresh Claude chat. The first prompt produces a grounded bot. The second turns it into an agent. Everything you've learned in Sessions 1–4 is in here: how a chatbot fails (S1), why you'd want an agent (S2), prompt engineering (S3), grounded retrieval and refusal (S4).</p>
+<h3 id="before-you-start">Before you start</h3>
+<p>Install Ollama from <code>ollama.com/download</code>. In a terminal, run <code>ollama pull qwen2.5:3b-instruct</code> once and leave Ollama running in the background. That's the model the bot will use — small, fast, runs entirely on your laptop, no API keys, nothing leaves your machine.</p>
+<p>Create a folder. Put <code>Lumiere_KB.md</code> in it. Save the HTML each prompt produces into that same folder as <code>index.html</code>. To run it: open a terminal in the folder and run <code>python3 -m http.server 8000</code>. Then visit <code>http://localhost:8000</code> in your browser. (The local server is needed so the page can read <code>Lumiere_KB.md</code>. Double-clicking the HTML won't work — browsers block file reads from <code>file://</code> for security.)</p>
+<p>If a prompt's output doesn't work, paste the error back into the same chat and ask Claude to fix it. Don't start over.</p>
+<hr />
+<h3 id="stage-1-a-grounded-bakery-bot">Stage 1 — A grounded bakery bot</h3>
+<p>This prompt produces a small Lumière website with a chatbot in the corner. The bot reads the bakery's knowledge base from a file in the same folder, answers customer questions strictly from it, cites the section it pulled from, and refuses anything not in the document.</p>
+<p><strong>Paste this into a fresh Claude chat. (No attachment needed — the bot fetches the file at runtime.) Send.</strong></p>
+<pre><code>Build me one single index.html file: a small website for &quot;Lumière&quot;, a Mumbai
+artisan bakery (three branches: Bandra West, Andheri West, Powai), plus a
+floating chatbot in the corner that answers customer questions about it.
+
+The chatbot must talk to my local Ollama:
+  POST http://localhost:11434/api/chat
+  body: { &quot;model&quot;: &quot;qwen2.5:3b-instruct&quot;, &quot;messages&quot;: [...], &quot;stream&quot;: false }
+  reply is at data.message.content
+
+The bot's brain is a file called Lumiere_KB.md in the SAME FOLDER as
+index.html. When the page loads, fetch('Lumiere_KB.md') and store the text
+in a variable called KB_TEXT. If the fetch fails, disable the chatbot and
+show &quot;Couldn't load Lumiere_KB.md — make sure it's next to this file and
+that you opened the page via a local server (not by double-clicking).&quot;
+
+Build the system prompt every turn like this:
+
+  You are Lumière bakery's customer-service bot.
+
+  Rules:
+  1. Answer ONLY from the KNOWLEDGE below. Never use outside facts.
+  2. End every answer with (Source: &lt;section name&gt;).
+  3. If the answer is not in KNOWLEDGE, reply exactly:
+     &quot;I don't have that in my knowledge base.&quot; — and stop. Never guess.
+
+  KNOWLEDGE:
+  &lt;KB_TEXT&gt;
+
+Look: warm cream background, terracotta accent, serif headings. Floating chat
+button bottom-right; clicking it opens a chat panel with a message log, an
+input, a send button. Show &quot;thinking…&quot; while waiting. If the Ollama fetch
+fails, say &quot;Ollama isn't running — start it and try again.&quot;
+
+Use textContent (not innerHTML) for all user/bot text — no script injection.
+
+One file. No frameworks. No build step. Output the complete index.html only,
+no commentary.
+</code></pre>
+<p><strong>Save the output as <code>index.html</code>, run the local server, open it, click the chat button, and ask "what are your opening hours?" The reply should end with <code>(Source: Locations &amp; Hours)</code>. Ask "what's your CEO's salary?" and it should refuse with the exact canonical sentence. If both work, Stage 1 is done.</strong></p>
+<hr />
+<h3 id="stage-2-make-it-agentic">Stage 2 — Make it agentic</h3>
+<p>The Stage 1 bot is a <em>retriever</em> — it reads the document and answers. Stage 2 makes it an <em>agent</em> for one specific question: <strong>"do you deliver to me?"</strong></p>
+<p>For that question, the bot must not guess from the document. It must:</p>
+<ol>
+<li>Ask the browser for the user's location.</li>
+<li>Read the branch list from the document (so newly opened branches are picked up automatically).</li>
+<li>Calculate the distance from the user to the nearest branch.</li>
+<li>Apply the bakery's delivery rule and answer with a real distance and ETA.</li>
+</ol>
+<p>This is the move from S2 — <em>a chatbot that can use tools, then decide what to say from the results.</em></p>
+<p><strong>Paste this into the SAME Claude chat where Stage 1 was built. Send.</strong></p>
+<pre><code>Upgrade the bot: when the user asks about delivery / &quot;near me&quot; / &quot;my area&quot;,
+skip Ollama and run this tool chain instead.
+
+Tools:
+  1. getMyLocation() → browser geolocation → {lat, lng}.
+     If denied: &quot;I need your location — please allow it and ask again.&quot;
+  2. listBranches() → parse KB_TEXT for branches under &quot;Locations &amp; Hours&quot;.
+     For each, use the coordinates if present, else geocode the address once via
+     https://nominatim.openstreetmap.org/search?q=&lt;address&gt;&amp;format=json&amp;limit=1
+     and cache the result.
+  3. nearest(lat, lng) → haversine distance from user to each branch; return
+     the closest { branch, km }.
+
+Rule — Lumière delivers within 7 km. ETA: ≤2 km → 20 min · 2–5 km → 30 min ·
+5–7 km → 45 min · &gt;7 km → refuse + suggest self-collect.
+
+Reply in plain English naming the branch + distance + ETA, end with
+(Source: live location + Lumière KB).
+
+Show a collapsible &quot;Agent steps&quot; panel under each delivery reply listing
+each tool call and its result.
+
+Do NOT call Ollama for delivery answers. All other questions still use the
+Stage 1 grounded flow, unchanged. Use textContent for dynamic text. One file.
+Output the complete updated index.html only.
+</code></pre>
+<p><strong>Save, refresh, ask "do you deliver to my place?" Allow the location permission. The bot should reply with the nearest branch + distance + ETA. Click open the "Agent steps" panel below the reply to see every tool that ran. That panel is the lesson made visible.</strong></p>
+<hr />
+<h3 id="what-the-tools-actually-do-read-this-before-you-wonder">What the tools actually do — read this before you wonder</h3>
+<p>The Stage 2 prompt names three tools. Each is a small plain-JavaScript function that does one thing. They are called in a fixed order; nothing magical happens; the model is not what calls them. Your code's <code>if</code> statement decides "is this a delivery question?" — and if yes, the tools run.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Tool</th>
+<th>What it does</th>
+<th>Where the data comes from</th>
+<th>What can go wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong><code>getMyLocation()</code></strong></td>
+<td>Returns the user's latitude and longitude</td>
+<td>The browser's built-in geolocation API. The first time it runs, the browser asks the user for permission.</td>
+<td>User declines permission → the tool returns an error → the agent replies asking them to enable it.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>listBranches()</code></strong></td>
+<td>Returns every Lumière branch the document knows about, with coordinates</td>
+<td>Reads <code>KB_TEXT</code> (the bakery's knowledge file) and pulls out anything under the "Locations &amp; Hours" section. If a branch only has an address (no coordinates), it geocodes the address once via OpenStreetMap and caches the result.</td>
+<td>OpenStreetMap rate-limits if asked too often → cache means each branch is geocoded only once per page load.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>nearest(lat, lng)</code></strong></td>
+<td>Picks the closest branch to the user and returns its name and distance in kilometres</td>
+<td>Calls <code>listBranches()</code> for the branch list, then runs the haversine formula (the standard great-circle-distance equation) for each.</td>
+<td>Nothing — pure maths.</td>
+</tr>
+</tbody>
+</table>
+<p>After the three tools run, the agent applies the <strong>delivery rule</strong> in JavaScript (not in the model):</p>
+<ul>
+<li>≤ 2 km → ~20 min delivery</li>
+<li>2–5 km → ~30 min</li>
+<li>5–7 km → ~45 min</li>
+<li>More than 7 km → refuse, suggest self-collect</li>
+</ul>
+<p>It then writes the reply in plain English naming the branch, the distance, and the ETA — and ends with <code>(Source: live location + Lumière KB)</code> so the user can see <em>exactly</em> where that answer came from.</p>
+<p><strong>Why isn't Ollama answering this question?</strong> Because the model doesn't know your location and can't do geolocation. The model is great at reading documents and writing in natural language. It is the wrong tool for "where am I and how far is the bakery?" That's a factual lookup the browser and basic geometry can do directly. <strong>The agent uses the model where the model is good, and uses tools where tools are good.</strong> That's the whole idea.</p>
+<hr />
+<h3 id="architecture-both-stages-side-by-side">Architecture — both stages, side by side</h3>
+<pre class="ascii allow-break"><code>       ┌──────────────────────────────────────────────────────────────┐
+       │                  YOUR BROWSER  (index.html)                  │
+       │   Bakery website  ◇  Floating chatbot  ◇  User types here    │
+       └──────────────────────────────────┬───────────────────────────┘
+                                          ▼
+                          ┌──────────────────────────────┐
+                          │  Is this a delivery question? │
+                          └─────┬──────────────────┬─────┘
+                          NO    │                  │   YES
+                                ▼                  ▼
+        ╔══════════════════════════════╗  ╔══════════════════════════════╗
+        ║         STAGE 1 — RAG        ║  ║       STAGE 2 — AGENTIC      ║
+        ║      (the grounded bot)      ║  ║       (the tool chain)       ║
+        ╠══════════════════════════════╣  ╠══════════════════════════════╣
+        ║                              ║  ║  1. getMyLocation()          ║
+        ║  Build system prompt:        ║  ║       │  navigator.geo →     ║
+        ║    rules + KB_TEXT           ║  ║       ▼  (lat, lng)          ║
+        ║                              ║  ║                              ║
+        ║         │                    ║  ║  2. listBranches()           ║
+        ║         ▼                    ║  ║       │  read KB_TEXT,       ║
+        ║  POST  /api/chat             ║  ║       ▼  geocode if needed   ║
+        ║                              ║  ║      OpenStreetMap (cached)  ║
+        ║         │                    ║  ║                              ║
+        ║         ▼                    ║  ║  3. nearest(lat, lng)        ║
+        ║   Local Ollama               ║  ║       │  haversine maths     ║
+        ║   qwen2.5:3b-instruct        ║  ║       ▼                      ║
+        ║                              ║  ║   Apply delivery rule        ║
+        ║         │                    ║  ║   (≤7 km / ETA table)        ║
+        ║         ▼                    ║  ║                              ║
+        ║  Reply + (Source: …)         ║  ║   Reply + &quot;Agent steps&quot;      ║
+        ║                              ║  ║   trace + (Source: …)        ║
+        ╚══════════════╤═══════════════╝  ╚══════════════╤═══════════════╝
+                       │                                 │
+                       └────────────────┬────────────────┘
+                                        ▼
+                       ┌──────────────────────────────────┐
+                       │  Lumiere_KB.md  (the document)   │
+                       │  sits in the same folder         │
+                       └──────────────────────────────────┘
+</code></pre>
+<p><strong>Read the diagram top-down for any question, and you can answer "what just happened?" yourself:</strong></p>
+<ul>
+<li>A normal question (hours, menu, allergens) → left branch → Ollama with the whole document loaded in the prompt → grounded reply with a <code>(Source: ...)</code> line.</li>
+<li>A delivery question → right branch → three tools run in order → JavaScript applies the bakery's delivery rule → reply with branch + distance + ETA, plus a visible trace of each tool call.</li>
+</ul>
+<p>Same chat window. Same user experience. Two completely different paths under the hood, picked by one <code>if</code> statement.</p>
+<hr />
+<h3 id="what-you-have-end-to-end">What you have, end to end</h3>
+<p>A single HTML file. A real working customer agent. Open the website, ask about hours, menu, allergens, custom orders — the bot answers from the document and cites it. Ask something not in the document — it refuses honestly. Ask about delivery — the agent uses your live location, reads the branch list from the document (so adding a new branch to the doc is the whole "deploy" step), computes the distance, and tells you the ETA.</p>
+<p>Two prompts. One model. Three tools. The S4 lesson made into something you can show your team on Monday.</p>
+<hr />
+<h2 id="whats-next-session-5" class="h2-major">What's Next — Session 5</h2>
+<p>Session 5 covers Agent Architecture — how agents think, remember, and act. Today's agent retrieves when you ask it to; you drove every query. Session 5 gives it the will to decide for itself when to retrieve, which source to consult, and what to do with the result. The brain you built today stays; next session we add the will to use it.</p>
+
+</main>
+
+</body>
+</html>

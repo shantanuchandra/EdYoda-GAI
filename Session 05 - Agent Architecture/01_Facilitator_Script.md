@@ -71,7 +71,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 *"That's four sessions of building. What we've never done is open one of those agents up and name every part. Today we do that."*
 
-*"And I want to start with something specific. The HR Screener you built in Session 2 — the 3-node pipeline, Node 1 searches, Node 2 extracts skills, Node 3 scores candidates. That agent hallucinated LinkedIn URLs when Node 1 came back empty. Some of you caught it. Some of you didn't. Either way — today we name exactly why it happened. Not a Claude problem. An architecture problem. A component that was missing. By the end of this session, you'll know what it was, and you'll know how to add it."*
+*"And I want to start with something specific. The HR Screener you built in Session 2 — the 3-node pipeline, Node 1 searches, Node 2 extracts skills, Node 3 scores candidates. That agent hallucinated LinkedIn URLs when Node 1 came back empty. Some of you caught it. Some of you didn't. Either way — today we name exactly why it happened. Not a Claude problem. An architecture problem — one of the agent's parts was the wrong tool for the job, and nothing was there to catch it. By the end of this session, you'll know exactly which part, and how you'd build it right."*
 
 → Pause. Let that land.
 
@@ -128,17 +128,19 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Walk the mapping:
 
-- *"LLM: Claude Sonnet running each node."*
-- *"Memory: nothing. Genuinely nothing — no memory component was configured. That is the bug we're naming today."*
-- *"Tools: native web search on Node 1. That's it."*
-- *"Planner: the 3-node sequence you designed. Implicit plan — baked into the pipeline."*
-- *"Executor: the Agent Builder pipeline runner."*
+- *"LLM: Claude Sonnet running each node — and it reasoned fine."*
+- *"Planner: the 3-node sequence you designed. Implicit plan, baked into the pipeline. Fine."*
+- *"Executor: the Agent Builder pipeline runner. Fine."*
+- *"Tools: native web search on Node 1 — and this is the one that broke."*
+- *"Memory: none configured. Worth noting — but it's not what caused the hallucination. Hold that thought."*
 
-*"The screener had no memory. That's not a Claude problem. That's a design choice you didn't know you were making. When Node 1 came back empty — no profiles found — there was no memory component to log that failure. No place to store 'I already looked this up, it came back empty, don't invent something.' So it invented something. LinkedIn URLs that don't exist."*
+*"Here's the real cause, and I want to be precise about it. Node 1's job was to fetch real, verified LinkedIn profiles. But LinkedIn allows no scraping, no public API, no MCP — there is no legal tool that can pull those profiles. So the web search Node 1 was handed physically could not do the job. It came back empty. That's a TOOL problem — Gap #3 from Session 2."*
 
-*"That's the anatomy. Five parts. Your screener was missing one."*
+*"Now — why did an empty tool become a hallucination? Because there was no guardrail telling it what to do with nothing. With no working tool AND no refusal rule, the model did what models do with a gap: it filled it. Plausible-looking LinkedIn URLs that don't exist."*
 
-**Analogy (memorize):** *"An agent without memory is a brilliant expert who forgets every conversation the moment it ends."*
+*"So two things, kept straight: the cause was the tool — there was no real tool for the job. The fix that was missing was a refusal guardrail — a line that says 'I can't verify these, escalate to a recruiter' instead of inventing. Not a memory problem. A tool problem with no guardrail."*
+
+**Analogy (memorize):** *"Hand someone a job their tools can't do, with no permission to say 'I can't' — and they'll bluff. That's the screener."*
 
 > ⏱ **0:22.** If past it, cut the analogy. Keep the failure walk and the HR Screener mapping.
 
@@ -194,7 +196,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Walk both agents:
 
-- *"HR Screener — had short-term only. When Node 1 returned empty results, there was no episodic memory to log 'search failed, do not invent.' The missing type: episodic — the archive."*
+- *"HR Screener — had short-term only. (Quick note so we keep the earlier lesson straight: its hallucination was the broken tool, not missing memory. But it's true it also had no archive — so even on a good day it couldn't remember what it searched yesterday.)"*
 - *"Lumière Knowledge Agent — had semantic memory. The RAG Docs you uploaded. It answers the Saturday cake question correctly. But ask it 'what did we discuss last week?' and it has nothing. No episodic, no long-term. It knows Lumière's policies. It forgets every conversation."*
 
 *"You built semantic memory in Session 4. You've been using short-term memory in every session since Session 1. Today you learn the names for all four — so you can design the ones that are missing."*
@@ -450,7 +452,7 @@ Read critique aloud.
 
 ### 1:55 – 1:57 — Synthesis
 
-*"Step back. The HR Screener hallucinated LinkedIn URLs. We now know why — no episodic memory, no reflection node, no exit condition. Those aren't bugs in the code. They're gaps in the architecture. And architecture is a design decision — which means you can make it."*
+*"Step back. The HR Screener hallucinated LinkedIn URLs. We now know why — the tool couldn't do the job (no legal way to fetch real profiles) and there was no guardrail to catch the gap. That's not a bug in the model. It's a design choice — the wrong tool, no refusal rule. And a choice is something you can make differently. You now know how."*
 
 *"Flip to your workbook. Three sections. Loop Trace — you read an agent's reasoning, named every stage, found the gap. Tool Manifest — you designed the governance layer, found your nervous tool, wrote the scope. Pattern Choice — you picked the architecture and defended it in one sentence."*
 
@@ -522,12 +524,12 @@ Do a full dry-run alone with a stopwatch the day before.
 
 1. **Run Exercise A yourself.** Use your own Lumière Knowledge Agent. Paste the loop-trace instruction above the three-constraint question. Fill in the 6-box trace yourself — know which boxes the agent fills naturally and which it skips. That's your debrief material.
 
-2. **Run Exercise B yourself.** Pick an agent you'd actually want at your own job. Use the Claude prompt to generate the manifest. Narrow every scope until you can write the boundary in one sentence. Circle your nervous tool.
+2. **Run Exercise B yourself.** Draft both manifests — the Lumière Order Assistant and the FSSAI Regulation Monitor — with the workbook prompts. Narrow every scope until you can write the boundary in one sentence. Confirm the monitor escalates every allergen/safety rule and auto-applies only cosmetic ones. Circle your nervous tool.
 
-3. **Time Sprint 2 (The Loop)** — the longest sprint at 12 minutes. The invoice trace + HR Screener trace run about 8 minutes. Exit conditions need 2 minutes. That leaves 2 minutes for the analogy and transition. Know which sentence to cut if you're 1 minute over.
+3. **Time Sprint 2 (The Loop)** — the longest sprint. The invoice recovery trace + the screener gap trace run about 8 minutes. Exit conditions need 2 minutes. Know which sentence to cut if you're 1 minute over.
 
 4. **Know these lines cold:**
-   - The anatomy verdict: *"The screener had no memory. That's not a Claude problem. That's a design choice you didn't know you were making."*
+   - The anatomy verdict (corrected): *"It wasn't a memory problem — it was a tool problem. No legal tool could fetch real LinkedIn profiles, and no guardrail caught the gap. So it invented."*
    - The loop exit: *"Goal achieved. Max iterations. Human escalation. All three. Without all three, it loops forever."*
    - The tool manifest: *"Scope every tool. Permission every tool. If you can't describe what a tool cannot do — it's not scoped."*
    - The multi-agent callback: *"You built a multi-agent architecture in Session 2 without knowing what to call it. Now you know."*

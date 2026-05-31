@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===================== EDITORIAL DESIGN TOKENS ===================== */
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --ink-blue-soft: rgba(30, 58, 95, 0.08);
+
+    --warn:         #a16207;
+    --warn-soft:    rgba(161, 98, 7, 0.10);
+    --danger:       #991b1b;
+    --danger-soft:  rgba(153, 27, 27, 0.08);
+    --calm:         #14532d;
+    --calm-soft:    rgba(20, 83, 45, 0.08);
+
+    --s-1: 0.5rem;  --s-2: 1rem;  --s-3: 1.5rem;  --s-4: 2rem;
+    --s-5: 3rem;    --s-6: 4.5rem; --s-7: 6rem;    --s-8: 9rem;
+
+    --t-eyebrow: 0.72rem;
+    --t-meta:    0.78rem;
+    --t-body:    1.05rem;
+    --t-lede:    1.35rem;
+    --t-h3:      1.5rem;
+    --t-h2:      2.5rem;
+    --t-h1:      clamp(2.8rem, 5.2vw, 4.8rem);
+    --t-display: clamp(3.4rem, 6.6vw, 6.2rem);
+    --t-mega:    clamp(5rem, 11vw, 11rem);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur:  480ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%; width: 100%; overflow: hidden;
+    background: var(--paper); color: var(--ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  /* Paper grain — subtle, throughout */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.45; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(26, 24, 20, 0.08) 100%);
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; z-index: 2; }
+
+  /* ===================== SLIDE LAYOUT — EDITORIAL FRAME ===================== */
+  .slide {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; padding: 3.6vh 5vw 4.2vh;
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  .slide.active { display: flex; opacity: 1; }
+
+  .running-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: var(--s-2); border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .running-head .left { display: flex; gap: 1.4em; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+  .running-head .left .topic { color: var(--ink-soft); }
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 0.9rem; letter-spacing: 0.02em;
+    text-transform: none; color: var(--ink); font-weight: 400;
+  }
+
+  .slide-body {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: var(--s-4) 0; max-width: 1300px; margin: 0 auto; width: 100%;
+  }
+
+  .folio {
+    position: absolute; bottom: 1.2rem; right: 5vw;
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 8.5rem; line-height: 0.8; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums; letter-spacing: -0.04em;
+    pointer-events: none; user-select: none; z-index: 0; opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em; vertical-align: top; margin-left: 0.15em;
+    color: var(--ink-mute); font-weight: 400;
+  }
+
+  /* ===================== TYPOGRAPHY ===================== */
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--terra); font-weight: 500;
+    margin-bottom: var(--s-3); position: relative; padding-left: 1.8em;
+  }
+  .eyebrow::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: 1.2em; height: 1px; background: var(--terra);
+  }
+  .eyebrow.cool { color: var(--ink-blue); }
+  .eyebrow.cool::before { background: var(--ink-blue); }
+  .eyebrow.warn { color: var(--warn); }
+  .eyebrow.warn::before { background: var(--warn); }
+  .eyebrow.danger { color: var(--danger); }
+  .eyebrow.danger::before { background: var(--danger); }
+
+  h1, h2, h3, .display, .mega {
+    font-family: 'Fraunces', serif; color: var(--ink); letter-spacing: -0.02em;
+  }
+  h1 {
+    font-size: var(--t-h1); font-weight: 400; line-height: 1.02;
+    font-variation-settings: 'opsz' 120, 'SOFT' 30; margin-bottom: var(--s-4);
+  }
+  h2 {
+    font-size: var(--t-h2); font-weight: 400; line-height: 1.1;
+    font-variation-settings: 'opsz' 80; margin-bottom: var(--s-3);
+  }
+  h3 {
+    font-size: var(--t-h3); font-weight: 500; line-height: 1.2;
+    color: var(--ink); margin-bottom: var(--s-1);
+  }
+  .display {
+    font-size: var(--t-display); font-weight: 300; line-height: 1.05;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1; max-width: 18ch;
+  }
+  .mega {
+    font-size: var(--t-mega); font-weight: 300; line-height: 0.95;
+    font-variation-settings: 'opsz' 144, 'WONK' 1; letter-spacing: -0.04em;
+  }
+  p, li { font-size: var(--t-body); line-height: 1.6; color: var(--ink-soft); }
+  .lede {
+    font-family: 'Fraunces', serif; font-size: var(--t-lede);
+    font-weight: 300; font-style: italic; line-height: 1.45;
+    color: var(--ink-soft); max-width: 56ch;
+    font-variation-settings: 'opsz' 36;
+  }
+  .terra { color: var(--terra); }
+  .blue  { color: var(--ink-blue); }
+  .marked       { background: linear-gradient(180deg, transparent 60%, var(--terra-soft) 60%); padding: 0 0.05em; }
+  .marked-blue  { background: linear-gradient(180deg, transparent 60%, var(--ink-blue-soft) 60%); padding: 0 0.05em; }
+
+  .drop {
+    float: left; font-family: 'Fraunces', serif;
+    font-size: 5.2em; line-height: 0.82; font-weight: 400; color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  .rule { height: 1px; background: var(--rule); margin: var(--s-3) 0; }
+  .rule-double { height: 4px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: var(--s-3) 0; }
+
+  /* Code/prompt — like a fixed-width sidebar in a magazine */
+  .prompt {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink); padding: var(--s-3) var(--s-3);
+    font-family: 'Geist Mono', monospace; font-size: 0.95rem;
+    line-height: 1.7; color: var(--ink); white-space: pre-wrap; position: relative;
+  }
+  .prompt::before {
+    content: 'PROMPT'; position: absolute; top: -0.6em; left: var(--s-3);
+    background: var(--paper); padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.2em; color: var(--ink-mute); font-weight: 500;
+  }
+
+  /* Grid systems */
+  .grid { display: grid; gap: var(--s-3); }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .mt-3 { margin-top: var(--s-3); }
+  .mt-4 { margin-top: var(--s-4); }
+
+  /* Cover (slide 1) — special layout */
+  .cover {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: var(--s-6); align-items: end;
+    height: 100%; padding: var(--s-5) 0 var(--s-3);
+  }
+  .cover .vol {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.4em; text-transform: uppercase; color: var(--ink-mute);
+    align-self: stretch; border-right: 1px solid var(--rule); padding-right: var(--s-2);
+  }
+  .cover .cover-main h1.cover-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.5rem, 7vw, 6.4rem); font-weight: 300;
+    line-height: 0.94; letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; max-width: 16ch;
+  }
+  .cover .cover-byline {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.4rem; color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-3); max-width: 50ch; line-height: 1.4;
+  }
+  .cover .cover-foot {
+    margin-top: var(--s-5); display: flex; justify-content: space-between;
+    align-items: baseline; padding-top: var(--s-2); border-top: 1px solid var(--ink);
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-mute);
+  }
+  .byline {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.16em;
+  }
+
+  /* Exercise slide variant — oversized terra Fraunces letter */
+  .exercise-slide .slide-body {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: var(--s-5); align-items: start;
+  }
+  .exercise-slide .ex-letter {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(10rem, 22vw, 18rem); line-height: 0.85;
+    color: var(--terra);
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    letter-spacing: -0.04em;
+  }
+  .exercise-slide .ex-meta {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-meta);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-mute); margin-bottom: var(--s-2);
+  }
+  .exercise-slide .ex-timer {
+    position: absolute; bottom: 1.4rem; right: 5vw;
+    font-family: 'Fraunces', serif; font-weight: 300; font-size: 3rem;
+    color: var(--ink-mute); font-variant-numeric: tabular-nums oldstyle-nums;
+    z-index: 3;
+  }
+  .exercise-slide .folio { left: 5vw; right: auto; }
+
+  /* Nav — minimal */
+  .nav {
+    position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.4rem; z-index: 100;
+    background: rgba(245, 239, 230, 0.85); backdrop-filter: blur(8px);
+    padding: 4px; border-radius: 999px; border: 1px solid var(--rule);
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  body:hover .nav { opacity: 0.5; }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: transparent; border: none; color: var(--ink-soft);
+    cursor: pointer; font-size: 0.84rem; padding: 5px 12px;
+    border-radius: 999px; font-family: 'Geist Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    transition: background var(--dur) var(--ease);
+  }
+  .nav button:hover { background: var(--paper-warm); color: var(--ink); }
+
+  .progress-thread {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--terra); z-index: 200;
+    transition: width var(--dur) var(--ease);
+  }
+
+  /* Break slide — auto-countdown when navigated to. JS hook: startBreakClock(). */
+  .break-slide { align-items: center; justify-content: center; text-align: center; }
+  .break-slide .slide-body { align-items: center; justify-content: center; text-align: center; }
+  .break-clock {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(7rem, 16vw, 14rem);
+    font-weight: 300;
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144;
+    margin: var(--s-3) 0;
+  }
+  .break-clock.warn { color: var(--warn); }
+  .break-clock.danger { color: var(--danger); }
+  .break-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: var(--s-2);
+  }
+
+  /* ===================== PIPELINE (5-step) ===================== */
+  .pipe-row { display: flex; align-items: stretch; gap: 0; margin-top: var(--s-4); }
+  .pipe-step {
+    flex: 1; padding: var(--s-3) var(--s-2);
+    border-top: 2px solid var(--terra);
+    position: relative;
+  }
+  .pipe-step .pipe-n {
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.18em; color: var(--terra); font-weight: 600;
+  }
+  .pipe-step .pipe-name {
+    font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 500;
+    color: var(--ink); line-height: 1.1; margin: 0.2em 0 0.35em;
+  }
+  .pipe-step .pipe-desc { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.45; }
+  .pipe-step + .pipe-step::before {
+    content: '→'; position: absolute; left: -0.55em; top: var(--s-3);
+    color: var(--ink-faint); font-size: 1.1rem;
+  }
+
+  /* ===================== TWO-COLUMN COMPARE ===================== */
+  .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); margin-top: var(--s-4); }
+  .cmp-cell { border-top: 2px solid var(--rule); padding-top: var(--s-2); }
+  .cmp-cell.live { border-top-color: var(--terra); }
+  .cmp-cell .cmp-tag {
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
+    margin-bottom: var(--s-1); font-weight: 600;
+  }
+  .cmp-cell.live .cmp-tag { color: var(--terra); }
+  .cmp-cell h3 { margin-bottom: var(--s-1); }
+  .cmp-cell p { font-size: 0.95rem; }
+
+  /* ===================== THE RAG DIAL (centerpiece) ===================== */
+  .dial-track {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 0; margin-top: var(--s-4); position: relative;
+  }
+  .dial-track::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 1.05rem; height: 3px;
+    background: linear-gradient(90deg, var(--ink-faint) 0%, var(--terra) 100%);
+    border-radius: 2px; z-index: 0;
+  }
+  .dial-level { position: relative; padding: 0 var(--s-2); z-index: 1; }
+  .dial-level .dial-dot {
+    width: 0.7rem; height: 0.7rem; border-radius: 50%;
+    background: var(--paper); border: 3px solid var(--terra);
+    margin: 0.7rem auto var(--s-2); position: relative;
+  }
+  .dial-level:first-child .dial-dot { border-color: var(--ink-faint); }
+  .dial-level .dial-num {
+    font-family: 'Geist Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.16em; color: var(--ink-mute); font-weight: 600;
+    text-align: center; text-transform: uppercase;
+  }
+  .dial-level .dial-name {
+    font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 500;
+    color: var(--ink); line-height: 1.12; text-align: center;
+    margin: 0.25em 0 0.4em;
+  }
+  .dial-level .dial-name .terra { color: var(--terra); }
+  .dial-level .dial-line {
+    font-size: 0.82rem; color: var(--ink-soft); line-height: 1.4; text-align: center;
+  }
+  .dial-foot {
+    margin-top: var(--s-4); padding-top: var(--s-2);
+    border-top: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+    color: var(--ink-mute); letter-spacing: 0.04em; line-height: 1.7;
+  }
+  .dial-foot .lbl { color: var(--terra); letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
+
+  /* ===================== PATTERN CARDS ===================== */
+  .pat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-4); }
+  .pat-cell { border: 1px solid var(--rule); background: var(--paper-cream); padding: var(--s-3); }
+  .pat-cell .pat-name {
+    font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 500; color: var(--ink);
+  }
+  .pat-cell .pat-track {
+    font-family: 'Geist Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--terra);
+    margin: 0.3em 0 0.5em; font-weight: 600;
+  }
+  .pat-cell .pat-body { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.45; }
+
+  /* ===================== KB SHEET FIELDS ===================== */
+  .kb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2) var(--s-4); margin-top: var(--s-4); }
+  .kb-field { display: flex; gap: 0.7em; align-items: baseline; padding: var(--s-1) 0; border-bottom: 1px dotted var(--rule-soft); }
+  .kb-field .kb-n {
+    font-family: 'Geist Mono', monospace; font-size: 0.72rem; color: var(--terra);
+    font-weight: 600; flex-shrink: 0; min-width: 1.4em;
+  }
+  .kb-field .kb-body { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.4; }
+  .kb-field .kb-body strong { color: var(--ink); font-weight: 500; }
+  .kb-field.headline { border-bottom: 2px solid var(--terra); }
+  .kb-field.headline .kb-body strong { color: var(--terra); }
+
+  /* ===================== COLOPHON (close slide) ===================== */
+  .colophon {
+    margin-top: var(--s-4); padding-top: var(--s-2);
+    border-top: 1px solid var(--rule);
+    display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s-3);
+  }
+  .colophon .by {
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500;
+  }
+  .colophon .by .name {
+    display: block; font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.25rem; color: var(--ink); letter-spacing: -0.01em;
+    margin-top: 0.3em; font-weight: 400; text-transform: none;
+    font-variation-settings: 'opsz' 96, 'SOFT' 30;
+  }
+  .colophon .by .linkedin {
+    display: block; font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; color: var(--terra); margin-top: 0.3em;
+    text-transform: none; font-weight: 500;
+  }
+  .colophon .course-mark {
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
+    text-align: right; line-height: 1.7;
+  }
+  .colophon .course-mark .terra { color: var(--terra); }
+
+  /* ===================== VISUAL: PIPELINE JOURNEY (slide 3) ===================== */
+  /* A 5-row vertical journey showing the SAME content transforming. */
+  .journey { display: flex; flex-direction: column; gap: 0; margin-top: var(--s-3); }
+  .journey-row {
+    display: grid; grid-template-columns: 7em 1fr; gap: var(--s-3);
+    align-items: center; padding: 0.55em 0;
+    border-top: 1px solid var(--rule-soft);
+    position: relative;
+  }
+  .journey-row:first-child { border-top: none; }
+  .journey-row .j-label {
+    font-family: 'Geist Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--terra); font-weight: 600;
+    text-align: right; padding-right: var(--s-2);
+    border-right: 2px solid var(--rule);
+  }
+  .journey-row .j-label .j-n {
+    display: block; font-size: 0.62rem; color: var(--ink-mute); letter-spacing: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .journey-row .j-content { display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; min-height: 2.2em; }
+  /* Doc card (step 1 input) */
+  .j-doc {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+    padding: 0.4em 0.8em; font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem; color: var(--ink); line-height: 1.4;
+    max-width: 38em;
+  }
+  /* Chunk cards (step 2: cut into 3) */
+  .j-chunk {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-top: 2px solid var(--terra);
+    padding: 0.35em 0.6em; font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem; color: var(--ink-soft); line-height: 1.35;
+    min-width: 8.5em; max-width: 11em;
+  }
+  .j-chunk .j-chunk-tag {
+    display: block; color: var(--terra); font-size: 0.6rem;
+    letter-spacing: 0.12em; font-weight: 600; margin-bottom: 0.15em;
+  }
+  /* Coordinate cards (step 3: embed) */
+  .j-vec {
+    background: var(--paper-cream); border: 1px dashed var(--rule);
+    padding: 0.35em 0.6em; font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem; color: var(--ink-blue); line-height: 1.3;
+    min-width: 8.5em; max-width: 11em;
+  }
+  .j-vec .j-vec-label {
+    color: var(--ink-mute); font-size: 0.58rem;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.15em; display: block;
+  }
+  /* Mini-map (step 4: store) */
+  .j-map {
+    width: 100%; height: 5.5em; max-width: 38em;
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-radius: 4px; position: relative;
+  }
+  .j-map .j-dot {
+    position: absolute; width: 0.55em; height: 0.55em; border-radius: 50%;
+    background: var(--terra); transform: translate(-50%, -50%);
+  }
+  .j-map .j-dot.muted { background: var(--ink-faint); }
+  .j-map .j-dot.query { background: var(--ink-blue); width: 0.75em; height: 0.75em; box-shadow: 0 0 0 4px var(--ink-blue-soft); }
+  .j-map .j-dot-label {
+    position: absolute; transform: translate(-50%, -150%);
+    font-family: 'Geist Mono', monospace; font-size: 0.56rem;
+    color: var(--ink-mute); letter-spacing: 0.08em; white-space: nowrap;
+    text-transform: uppercase; font-weight: 600;
+  }
+  /* Retrieve highlight (step 5: pulled chunks light up) */
+  .j-chunk.j-pulled {
+    border-top-color: var(--ink-blue); border: 1px solid var(--ink-blue);
+    background: var(--ink-blue-soft); color: var(--ink);
+  }
+  .j-chunk.j-pulled .j-chunk-tag { color: var(--ink-blue); }
+  /* Generate answer (step 6: final response) */
+  .j-answer {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-left: 3px solid var(--terra);
+    padding: 0.45em 0.8em; font-family: 'Fraunces', serif;
+    font-style: italic; font-size: 0.95rem; color: var(--ink); line-height: 1.5;
+    max-width: 38em;
+  }
+  .j-answer .j-cite {
+    display: block; font-family: 'Geist Mono', monospace; font-style: normal;
+    font-size: 0.66rem; color: var(--terra); letter-spacing: 0.06em;
+    margin-top: 0.25em;
+  }
+  /* Query bubble (between store and retrieve) */
+  .j-query {
+    background: var(--ink-blue-soft); border-left: 2px solid var(--ink-blue);
+    padding: 0.35em 0.7em; font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 0.88rem; color: var(--ink); line-height: 1.4;
+    max-width: 24em;
+  }
+
+  /* ===================== VISUAL: SEMANTIC vs KEYWORD lanes (slide 4) ===================== */
+  .lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); margin-top: var(--s-3); }
+  .lane {
+    border: 1px solid var(--rule); background: var(--paper-cream);
+    padding: var(--s-2) var(--s-3) var(--s-3);
+    display: flex; flex-direction: column;
+  }
+  .lane .lane-q {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1rem; color: var(--ink); line-height: 1.35;
+    margin-bottom: var(--s-2);
+    padding-bottom: 0.55em; border-bottom: 1px solid var(--rule);
+  }
+  .lane .lane-result {
+    display: flex; align-items: baseline; gap: 0.5em;
+    padding: 0.45em 0; font-size: 0.86rem; line-height: 1.4;
+  }
+  .lane .lane-result + .lane-result { border-top: 1px dotted var(--rule-soft); }
+  .lane .lane-tag {
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute);
+    font-weight: 600; min-width: 5em;
+  }
+  .lane .lane-mark {
+    font-family: 'Geist Mono', monospace; font-weight: 700; font-size: 0.95rem;
+    min-width: 1.2em;
+  }
+  .lane .lane-mark.hit { color: var(--calm); }
+  .lane .lane-mark.miss { color: var(--danger); }
+  .lane .lane-mark.fuzzy { color: var(--warn); }
+  .lane .lane-note { color: var(--ink-soft); flex: 1; }
+  .lanes-foot {
+    margin-top: var(--s-3); padding: 0.7em var(--s-3);
+    border-top: 2px solid var(--terra); background: var(--terra-soft);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1rem; color: var(--ink); line-height: 1.4;
+  }
+  .lanes-foot strong { font-style: normal; font-weight: 600; color: var(--terra); }
+
+  /* ===================== VISUAL: VECTOR DB MAP (slide 5) ===================== */
+  .vmap-wrap { display: grid; grid-template-columns: 1fr 14em; gap: var(--s-4); margin-top: var(--s-3); align-items: stretch; }
+  .vmap {
+    position: relative; width: 100%; aspect-ratio: 16/9;
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-radius: 6px;
+    background-image:
+      linear-gradient(to right, rgba(212,204,186,0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212,204,186,0.4) 1px, transparent 1px);
+    background-size: 8% 12%;
+  }
+  .vmap .v-cluster {
+    position: absolute;
+    border: 1.5px dashed var(--ink-faint);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .vmap .v-cluster-label {
+    position: absolute;
+    font-family: 'Geist Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-soft); font-weight: 600;
+    background: var(--paper); padding: 0 0.4em;
+    transform: translate(-50%, -50%);
+  }
+  .vmap .v-dot {
+    position: absolute; width: 0.55em; height: 0.55em; border-radius: 50%;
+    background: var(--terra); transform: translate(-50%, -50%);
+  }
+  .vmap .v-dot-label {
+    position: absolute; transform: translate(-50%, 0.6em);
+    font-family: 'Geist Mono', monospace; font-size: 0.58rem;
+    color: var(--ink-mute); white-space: nowrap;
+  }
+  .vmap .v-query {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 0.9em; height: 0.9em; border-radius: 50%;
+    background: var(--ink-blue); box-shadow: 0 0 0 5px var(--ink-blue-soft);
+    z-index: 3;
+  }
+  .vmap .v-query-line {
+    position: absolute;
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 0.78rem; color: var(--ink); line-height: 1.3;
+    background: var(--paper); padding: 0.25em 0.5em;
+    border: 1px solid var(--ink-blue-soft); border-left: 2px solid var(--ink-blue);
+    transform: translate(0.8em, -50%);
+    max-width: 14em;
+  }
+  .vmap-side {
+    display: flex; flex-direction: column; gap: var(--s-2);
+    justify-content: center; padding: var(--s-2);
+    border-left: 1px solid var(--rule);
+  }
+  .vmap-side .side-h {
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+  }
+  .vmap-side .side-row {
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    color: var(--ink-soft); line-height: 1.45;
+  }
+  .vmap-side .side-row strong { color: var(--ink); font-weight: 600; }
+
+  /* ===================== VISUAL: RAG DIAL gauge (slide 6) ===================== */
+  .gauge-wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--s-4); margin-top: var(--s-3); align-items: center; }
+  .gauge { position: relative; width: 100%; aspect-ratio: 2/1.1; max-width: 36em; }
+  .gauge svg { width: 100%; height: 100%; display: block; }
+  .gauge .gauge-label {
+    position: absolute; font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600; transform: translateX(-50%);
+    text-align: center; line-height: 1.2; white-space: nowrap;
+  }
+  .gauge .gauge-label .gauge-name {
+    display: block; font-family: 'Fraunces', serif; text-transform: none;
+    font-size: 0.85rem; color: var(--ink); letter-spacing: 0; font-weight: 500;
+    margin-top: 0.15em; font-style: normal;
+  }
+  .gauge .gauge-label.current .gauge-name { color: var(--terra); font-weight: 600; }
+  .gauge-legend { display: flex; flex-direction: column; gap: 0.55em; }
+  .gauge-legend .gl-row { display: grid; grid-template-columns: 4.5em 1fr; gap: 0.7em; align-items: baseline; padding: 0.35em 0; border-bottom: 1px dotted var(--rule-soft); }
+  .gauge-legend .gl-row:last-child { border-bottom: none; }
+  .gauge-legend .gl-lvl {
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    color: var(--terra); font-weight: 600; letter-spacing: 0.08em;
+  }
+  .gauge-legend .gl-row.muted .gl-lvl { color: var(--ink-mute); }
+  .gauge-legend .gl-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 0.95rem; color: var(--ink); display: inline; }
+  .gauge-legend .gl-text { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.4; }
+  .gauge-foot {
+    margin-top: var(--s-3); padding-top: var(--s-2);
+    border-top: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    color: var(--ink-mute); letter-spacing: 0.04em; line-height: 1.65;
+  }
+  .gauge-foot .gf-lbl { color: var(--terra); letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
+  .gauge-foot strong { color: var(--ink); font-weight: 600; }
+
+  /* ===================== VISUAL: RAG vs FINE-TUNE 2x2 (slide 14) ===================== */
+  .matrix-wrap { display: grid; grid-template-columns: 8em 1fr; grid-template-rows: 1.5em 1fr; gap: 0.7em; margin-top: var(--s-3); }
+  .matrix-yaxis {
+    grid-column: 1; grid-row: 2;
+    display: flex; flex-direction: column; justify-content: space-around;
+    align-items: flex-end; padding-right: 0.5em;
+    border-right: 2px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-soft); text-align: right;
+  }
+  .matrix-yaxis .m-axis-label {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    margin-right: 0.55em; color: var(--ink-mute); letter-spacing: 0.22em;
+  }
+  .matrix-xaxis {
+    grid-column: 2; grid-row: 1;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em;
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-soft); text-align: center;
+    padding-bottom: 0.5em; border-bottom: 2px solid var(--rule);
+  }
+  .matrix {
+    grid-column: 2; grid-row: 2;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+    gap: 0.5em;
+  }
+  .matrix-cell {
+    border: 1px solid var(--rule); background: var(--paper-cream);
+    padding: var(--s-2) var(--s-2);
+    display: flex; flex-direction: column; gap: 0.35em;
+  }
+  .matrix-cell.primary { border-top: 3px solid var(--terra); background: var(--paper-cream); }
+  .matrix-cell.secondary { border-top: 3px solid var(--ink-blue); }
+  .matrix-cell.both { border-top: 3px solid var(--warn); }
+  .matrix-cell.either { border-top: 3px solid var(--ink-faint); }
+  .matrix-cell .mc-tag {
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
+  }
+  .matrix-cell.primary .mc-tag { color: var(--terra); }
+  .matrix-cell.secondary .mc-tag { color: var(--ink-blue); }
+  .matrix-cell.both .mc-tag { color: var(--warn); }
+  .matrix-cell.either .mc-tag { color: var(--ink-mute); }
+  .matrix-cell .mc-name {
+    font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 500;
+    color: var(--ink); line-height: 1.2;
+  }
+  .matrix-cell .mc-eg {
+    font-size: 0.8rem; color: var(--ink-soft); line-height: 1.4;
+  }
+  .matrix-foot {
+    margin-top: var(--s-3); font-size: 0.82rem; color: var(--ink-soft); line-height: 1.5;
+  }
+  .matrix-foot em { color: var(--ink); font-style: italic; }
+
+  /* ===================== VISUAL: GUESSER vs GROUNDED (slide 2) ===================== */
+  .contrast { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-4); }
+  .contrast .bot {
+    border: 1px solid var(--rule); background: var(--paper-cream);
+    padding: var(--s-3); position: relative;
+  }
+  .contrast .bot.guesser { border-top: 3px solid var(--danger); }
+  .contrast .bot.grounded { border-top: 3px solid var(--calm); }
+  .contrast .bot .b-tag {
+    font-family: 'Geist Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
+    margin-bottom: 0.4em;
+  }
+  .contrast .bot.guesser .b-tag { color: var(--danger); }
+  .contrast .bot.grounded .b-tag { color: var(--calm); }
+  .contrast .bot .b-q {
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    color: var(--ink-mute); margin-bottom: 0.6em; line-height: 1.5;
+  }
+  .contrast .bot .b-q::before { content: 'Q: '; color: var(--ink-faint); }
+  .contrast .bot .b-a {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1rem; color: var(--ink); line-height: 1.5;
+    padding-top: 0.5em; border-top: 1px solid var(--rule);
+  }
+  .contrast .bot .b-a::before { content: 'A: '; color: var(--ink-faint); font-style: normal; }
+  .contrast .bot .b-cite {
+    display: block; font-family: 'Geist Mono', monospace; font-style: normal;
+    font-size: 0.7rem; color: var(--calm); margin-top: 0.45em; letter-spacing: 0.04em;
+  }
+  .contrast .bot .b-flag {
+    display: inline-block; font-family: 'Geist Mono', monospace; font-style: normal;
+    font-size: 0.7rem; color: var(--danger); margin-top: 0.45em;
+    background: var(--danger-soft); padding: 0.15em 0.5em; letter-spacing: 0.04em;
+  }
+
+  /* ===================== VISUAL: enterprise pattern icons (slide 13) ===================== */
+  .pat-cell { position: relative; padding-left: 3.2em !important; }
+  .pat-cell .pat-icon {
+    position: absolute; left: var(--s-3); top: var(--s-3);
+    width: 1.8em; height: 1.8em; color: var(--terra);
+  }
+  .pat-cell .pat-icon svg { width: 100%; height: 100%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .nav, .progress-thread { transition: none !important; }
+  }
+  @media (max-width: 900px) {
+    .g-3 { grid-template-columns: 1fr 1fr; }
+    .cover { grid-template-columns: 1fr; }
+    .cover .vol { display: none; }
+    .pipe-row { flex-wrap: wrap; }
+    .dial-track { grid-template-columns: 1fr 1fr; }
+    .dial-track::before { display: none; }
+    .cmp-grid, .pat-grid, .kb-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===================== PRINT / PDF EXPORT =====================
+     Mirror of Session 1's working print CSS. Page is 13.333in × 7.5in (true 16:9
+     = 1280×720 px @ 96dpi), so the existing fluid clamp() type scale renders at
+     the same sizes it does in a typical browser window. DO NOT override h1, lede,
+     .display, .mega, .folio font sizes here — the fluid scale IS the source of
+     truth and is tuned for this exact viewport width. */
+  @media print {
+    @page {
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+    html, body {
+      width: 13.333in;
+      height: auto;
+      background: var(--paper) !important;
+      overflow: visible !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .deck {
+      width: 13.333in;
+      height: auto;
+      position: static;
+    }
+    /* Show ALL slides for print, one per page */
+    .slide {
+      position: relative !important;
+      inset: auto !important;
+      width: 13.333in !important;
+      height: 7.5in !important;
+      display: flex !important;
+      opacity: 1 !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      overflow: hidden;
+      padding: 0.4in 0.6in 0.5in !important;
+    }
+    .slide:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    /* Hide on-screen navigation */
+    .nav, .progress-thread { display: none !important; }
+    /* Strip the paper grain — it bloats the PDF by ~100MB. Keep the warm bg + vignette. */
+    body::before { background-image: none !important; opacity: 0 !important; }
+    /* Force color preservation */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread" style="width: 0%"></div>
+
+<!-- =========================================================================
+     CANONICAL SLIDE LIST — Session 4 · RAG (16 slides, LOCKED).
+     The presenter deck MUST match this list 1:1 (same order, same count = 16).
+       01  Cover — title + promise
+       02  The Promise / One Rule (display)
+       03  Concept: the 5-step pipeline (content)
+       04  Concept: semantic vs keyword (content)
+       05  Concept: vector DBs under the hood (content)
+       06  The RAG dial — VISUAL CENTERPIECE (display/diagram)
+       07  Build A — Feed the brain (exercise)
+       08  Build B — Make it cite (exercise)
+       09  Build C — Make it refuse (exercise)
+       10  Break (break-slide)
+       11  Build D — Tune the recall (exercise)
+       12  Build E — Stress & ship (exercise)
+       13  Enterprise patterns + deployment strategy (content)
+       14  RAG vs fine-tuning (content/display)
+       15  KB Design Sheet (content)
+       16  Close — synthesis + reflection + S5 bridge + colophon (display/content)
+     ========================================================================= -->
+
+<div class="deck" id="deck">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER -->
+  <!-- ====================================================== -->
+  <div class="slide active">
+    <div class="cover">
+      <div class="vol">Session Four · Two Hours · Live</div>
+      <div class="cover-main">
+        <div class="byline" style="margin-bottom: var(--s-4); color: var(--terra);">— Starting Shortly —</div>
+        <h1 class="cover-title">RAG: giving agents a <em style="font-style: italic; color: var(--terra);">brain</em> of your own data.</h1>
+        <p class="cover-byline">
+          Lumière Bakery has three branches, eight sections of knowledge, and one problem: customers keep asking the same questions. Today you build the agent that answers them — from Lumière's own documents, not from a guess.
+        </p>
+        <div class="cover-foot">
+          <span>No. 04 / Lumière Knows</span>
+          <span>Reading time: 120 min</span>
+        </div>
+      </div>
+    </div>
+    <div class="folio">1<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — THE PROMISE / THE ONE RULE (display) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Session 04</span><span class="dot">·</span><span class="topic">The One Rule</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <p class="display" style="font-size: clamp(2.2rem, 4.6vw, 4rem); max-width: 24ch; margin-bottom: var(--s-2);"><span class="drop" style="font-size: 4em;">Y</span>ou walked in with a confident guesser. You leave with an agent that <span class="marked">cites its source</span>.</p>
+
+      <div class="contrast">
+        <div class="bot guesser">
+          <div class="b-tag">Guesser — no document loaded</div>
+          <div class="b-q">"Can I get a 2kg eggless chocolate cake for this Saturday?"</div>
+          <div class="b-a">For a 2kg eggless chocolate cake, you typically need 48–72 hours' notice. Lumière usually charges around ₹2,200 for that size. Standard 50% advance applies.<span class="b-flag">⚠ Fabricated — no document was ever loaded.</span></div>
+        </div>
+        <div class="bot grounded">
+          <div class="b-tag">Grounded — Lumiere_KB.md loaded</div>
+          <div class="b-q">"Can I get a 2kg eggless chocolate cake for this Saturday?"</div>
+          <div class="b-a">Yes — 2kg cakes are available. Eggless option is +₹80. Minimum 48 hours' advance notice required for any custom cake. 50% advance to confirm.<span class="b-cite">(Source: Custom &amp; Celebration Orders — Lead Times)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">2<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — CONCEPT: THE 5-STEP PIPELINE (content) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Sprint 01</span><span class="dot">·</span><span class="topic">The Pipeline</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Five steps, one document</span>
+      <h1>Chunk · embed · store · retrieve · <em class="terra" style="font-style: italic;">generate.</em></h1>
+
+      <div class="journey">
+
+        <div class="journey-row">
+          <div class="j-label"><span class="j-n">01</span>Chunk</div>
+          <div class="j-content">
+            <div class="j-doc">Lumiere_KB.md  —  <em>About · Locations · Contact · Menu · Allergens · Custom Orders · Delivery · Offers</em></div>
+            <span style="color: var(--ink-faint); font-size: 1.1em;">→</span>
+            <div class="j-chunk"><span class="j-chunk-tag">[CustomOrders]</span>Lead time 48 hrs. Eggless +₹80. 50% advance.</div>
+            <div class="j-chunk"><span class="j-chunk-tag">[Allergens]</span>Kitchen not nut-free. Cross-contam possible.</div>
+            <div class="j-chunk"><span class="j-chunk-tag">[Delivery]</span>8 km radius. ₹60 below ₹500. Mumbai only.</div>
+          </div>
+        </div>
+
+        <div class="journey-row">
+          <div class="j-label"><span class="j-n">02</span>Embed</div>
+          <div class="j-content">
+            <div class="j-vec"><span class="j-vec-label">[CustomOrders] →</span>[0.82, 0.31, 0.55, …]</div>
+            <div class="j-vec"><span class="j-vec-label">[Allergens] →</span>[0.14, 0.77, 0.43, …]</div>
+            <div class="j-vec"><span class="j-vec-label">[Delivery] →</span>[0.91, 0.04, 0.62, …]</div>
+          </div>
+        </div>
+
+        <div class="journey-row">
+          <div class="j-label"><span class="j-n">03</span>Store</div>
+          <div class="j-content">
+            <div class="j-map">
+              <span class="j-dot-label" style="left: 22%; top: 32%;">CustomOrders</span>
+              <span class="j-dot" style="left: 22%; top: 38%;"></span>
+              <span class="j-dot-label" style="left: 78%; top: 30%;">Allergens</span>
+              <span class="j-dot" style="left: 78%; top: 36%;"></span>
+              <span class="j-dot-label" style="left: 50%; top: 70%;">Delivery</span>
+              <span class="j-dot" style="left: 50%; top: 76%;"></span>
+              <span class="j-dot muted" style="left: 30%; top: 78%;"></span>
+              <span class="j-dot muted" style="left: 67%; top: 64%;"></span>
+              <span class="j-dot muted" style="left: 40%; top: 22%;"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="journey-row">
+          <div class="j-label"><span class="j-n">04</span>Retrieve</div>
+          <div class="j-content">
+            <div class="j-query">Customer: "Can I get a 2kg eggless cake for Saturday?"</div>
+            <span style="color: var(--ink-faint); font-size: 1.1em;">→</span>
+            <div class="j-chunk j-pulled"><span class="j-chunk-tag">[CustomOrders]</span>Lead time 48 hrs. Eggless +₹80.</div>
+            <div class="j-chunk j-pulled"><span class="j-chunk-tag">[Menu]</span>Cakes 500g–5kg. Chocolate fudge +₹80 eggless.</div>
+          </div>
+        </div>
+
+        <div class="journey-row">
+          <div class="j-label"><span class="j-n">05</span>Generate</div>
+          <div class="j-content">
+            <div class="j-answer">"Yes — eggless 2kg cakes available with +₹80 surcharge, 48-hour minimum lead time, 50% advance. For Saturday, please confirm by Thursday."<span class="j-cite">(Source: Custom &amp; Celebration Orders)</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="folio">3<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — CONCEPT: SEMANTIC VS KEYWORD (content) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Sprint 02</span><span class="dot">·</span><span class="topic">How Retrieval Finds</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow cool">Three customer queries · two retrieval lanes</span>
+      <h1>It matches <em class="terra" style="font-style: italic;">meaning</em>, not the exact words.</h1>
+
+      <div class="lanes">
+        <div class="lane">
+          <div class="lane-q">"no-egg option for cakes?"</div>
+          <div class="lane-result">
+            <span class="lane-tag">Keyword</span>
+            <span class="lane-mark miss">✕</span>
+            <span class="lane-note">"no-egg" doesn't appear in the doc.</span>
+          </div>
+          <div class="lane-result">
+            <span class="lane-tag">Semantic</span>
+            <span class="lane-mark hit">✓</span>
+            <span class="lane-note">Matches "eggless" by meaning.</span>
+          </div>
+        </div>
+
+        <div class="lane">
+          <div class="lane-q">"deliver near Versova?"</div>
+          <div class="lane-result">
+            <span class="lane-tag">Keyword</span>
+            <span class="lane-mark miss">✕</span>
+            <span class="lane-note">"Versova" sits inside an address line — wrong context for retrieval.</span>
+          </div>
+          <div class="lane-result">
+            <span class="lane-tag">Semantic</span>
+            <span class="lane-mark hit">✓</span>
+            <span class="lane-note">Finds the Andheri West delivery zone.</span>
+          </div>
+        </div>
+
+        <div class="lane">
+          <div class="lane-q">"pincode 400058 deliverable?"</div>
+          <div class="lane-result">
+            <span class="lane-tag">Keyword</span>
+            <span class="lane-mark hit">✓</span>
+            <span class="lane-note">Exact digit match on the Andheri zone.</span>
+          </div>
+          <div class="lane-result">
+            <span class="lane-tag">Semantic</span>
+            <span class="lane-mark fuzzy">~</span>
+            <span class="lane-note">May find nearby zones — the digits aren't "meaning."</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lanes-foot">
+        Different blind spots in each lane. <strong>Hybrid</strong> runs both at once — meaning catches the phrasing, keyword catches the codes. That's Build E.
+      </div>
+    </div>
+    <div class="folio">4<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — CONCEPT: VECTOR DBs UNDER THE HOOD (content) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Sprint 03</span><span class="dot">·</span><span class="topic">Under the Hood</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">A map of meaning · Lumière's chunks plotted</span>
+      <h1>Where the pieces actually live: a <em class="terra" style="font-style: italic;">vector database.</em></h1>
+
+      <div class="vmap-wrap">
+        <div class="vmap">
+          <!-- Cluster regions (ellipses) -->
+          <span class="v-cluster" style="left: 14%; top: 22%; width: 28%; height: 32%;"></span>
+          <span class="v-cluster-label" style="left: 28%; top: 22%;">Allergens</span>
+          <span class="v-dot" style="left: 22%; top: 32%;"></span>
+          <span class="v-dot-label" style="left: 22%; top: 32%;">nut-free?</span>
+          <span class="v-dot" style="left: 32%; top: 40%;"></span>
+          <span class="v-dot-label" style="left: 32%; top: 40%;">cross-contam</span>
+          <span class="v-dot" style="left: 18%; top: 46%;"></span>
+
+          <span class="v-cluster" style="left: 56%; top: 14%; width: 32%; height: 36%;"></span>
+          <span class="v-cluster-label" style="left: 72%; top: 14%;">Pricing &amp; Menu</span>
+          <span class="v-dot" style="left: 64%; top: 26%;"></span>
+          <span class="v-dot-label" style="left: 64%; top: 26%;">eggless +₹80</span>
+          <span class="v-dot" style="left: 76%; top: 32%;"></span>
+          <span class="v-dot-label" style="left: 76%; top: 32%;">500g chocolate</span>
+          <span class="v-dot" style="left: 82%; top: 22%;"></span>
+
+          <span class="v-cluster" style="left: 12%; top: 60%; width: 30%; height: 32%;"></span>
+          <span class="v-cluster-label" style="left: 27%; top: 60%;">Delivery</span>
+          <span class="v-dot" style="left: 22%; top: 72%;"></span>
+          <span class="v-dot-label" style="left: 22%; top: 72%;">8km Bandra</span>
+          <span class="v-dot" style="left: 32%; top: 82%;"></span>
+          <span class="v-dot-label" style="left: 32%; top: 82%;">pincode 400058</span>
+          <span class="v-dot" style="left: 18%; top: 86%;"></span>
+
+          <span class="v-cluster" style="left: 58%; top: 60%; width: 28%; height: 30%;"></span>
+          <span class="v-cluster-label" style="left: 72%; top: 60%;">Hours</span>
+          <span class="v-dot" style="left: 66%; top: 74%;"></span>
+          <span class="v-dot-label" style="left: 66%; top: 74%;">7:30am opens</span>
+          <span class="v-dot" style="left: 78%; top: 80%;"></span>
+          <span class="v-dot-label" style="left: 78%; top: 80%;">Diwali closed</span>
+          <span class="v-dot" style="left: 82%; top: 70%;"></span>
+
+          <!-- The customer query lands inside the Pricing cluster -->
+          <span class="v-query" style="left: 70%; top: 30%;"></span>
+          <span class="v-query-line" style="left: 70%; top: 30%;">"price of an eggless cake?" — lands in <strong style="font-style: normal; color: var(--ink-blue);">Pricing</strong></span>
+        </div>
+
+        <div class="vmap-side">
+          <div>
+            <div class="side-h">Map of meaning</div>
+            <div class="side-row">Each chunk is a point. Similar ideas sit close. "Find me similar" becomes "find me nearby."</div>
+          </div>
+          <div>
+            <div class="side-h">The fork — managed or self-host</div>
+            <div class="side-row"><strong>Pinecone</strong> — managed; someone runs the machine.</div>
+            <div class="side-row"><strong>Weaviate</strong> — self-host; your team runs it.</div>
+          </div>
+          <div>
+            <div class="side-h">Why it scales</div>
+            <div class="side-row">Today, one doc loads instantly. At 500 stores and a 10,000-page manual, this map is what makes retrieval still fast.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">5<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 06 — THE RAG DIAL — VISUAL CENTERPIECE (display/diagram) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Sprint 04</span><span class="dot">·</span><span class="topic">The RAG Dial</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Types of RAG · turn it up as the knowledge gets bigger</span>
+      <h1>RAG is a <em class="terra" style="font-style: italic;">dial</em>, not a switch.</h1>
+
+      <div class="gauge-wrap">
+        <div class="gauge">
+          <!-- Semi-circular gauge SVG. viewBox is 0 0 400 240. Arc centre = (200, 220), radius = 170. Arc sweeps 180° from (30, 220) to (370, 220). -->
+          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Doc stack growing along the arc (subtle, behind everything) -->
+            <g opacity="0.18" fill="#b8431b">
+              <rect x="42" y="208" width="12" height="14" rx="1"/>
+              <rect x="98" y="178" width="14" height="40" rx="1"/>
+              <rect x="113" y="186" width="14" height="32" rx="1"/>
+              <rect x="180" y="150" width="14" height="68" rx="1"/>
+              <rect x="195" y="158" width="14" height="60" rx="1"/>
+              <rect x="210" y="142" width="14" height="76" rx="1"/>
+              <rect x="270" y="160" width="14" height="58" rx="1"/>
+              <rect x="285" y="148" width="14" height="70" rx="1"/>
+              <rect x="300" y="156" width="14" height="62" rx="1"/>
+              <rect x="315" y="138" width="14" height="80" rx="1"/>
+              <!-- Network nodes at L4 (right end) -->
+              <circle cx="358" cy="120" r="6"/>
+              <circle cx="345" cy="100" r="5"/>
+              <circle cx="370" cy="100" r="4"/>
+              <line x1="358" y1="120" x2="345" y2="100" stroke="#b8431b" stroke-width="1.5"/>
+              <line x1="358" y1="120" x2="370" y2="100" stroke="#b8431b" stroke-width="1.5"/>
+            </g>
+
+            <!-- Arc track (faint background) -->
+            <path d="M 30 220 A 170 170 0 0 1 370 220" fill="none" stroke="#d4ccba" stroke-width="3"/>
+            <!-- Arc highlight (terra, from start to current needle) -->
+            <path d="M 30 220 A 170 170 0 0 1 200 50" fill="none" stroke="#b8431b" stroke-width="3"/>
+
+            <!-- Tick marks at each level. Angles measured from horizontal-left (0°) to horizontal-right (180°). L0=0°, L1=45°, L2=90°, L3=135°, L4=180°. Centre (200,220), r=170. -->
+            <!-- L0 tick: angle 180° (left horizontal) -->
+            <circle cx="30" cy="220" r="7" fill="#f5efe6" stroke="#8a8478" stroke-width="2.5"/>
+            <!-- L1 tick: angle 135° (upper-left) -->
+            <circle cx="79.79" cy="99.79" r="7" fill="#f5efe6" stroke="#b8431b" stroke-width="2.5"/>
+            <!-- L2 tick: angle 90° (top) — CURRENT position -->
+            <circle cx="200" cy="50" r="9" fill="#b8431b" stroke="#b8431b" stroke-width="2.5"/>
+            <!-- L3 tick: angle 45° (upper-right) -->
+            <circle cx="320.21" cy="99.79" r="7" fill="#f5efe6" stroke="#d4ccba" stroke-width="2.5"/>
+            <!-- L4 tick: angle 0° (right horizontal) -->
+            <circle cx="370" cy="220" r="7" fill="#f5efe6" stroke="#d4ccba" stroke-width="2.5"/>
+
+            <!-- The needle. Pivots from (200, 220). Currently points at L2 (top, 90°). Length 165, so tip = (200, 55). -->
+            <line x1="200" y1="220" x2="200" y2="55" stroke="#1a1814" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="200" cy="220" r="12" fill="#1a1814"/>
+            <circle cx="200" cy="220" r="5" fill="#f5efe6"/>
+
+            <!-- Knowledge-size axis label under the arc -->
+            <text x="40" y="240" font-family="Geist Mono, monospace" font-size="9" fill="#8a8478" letter-spacing="1.5">SMALL · STABLE</text>
+            <text x="282" y="240" font-family="Geist Mono, monospace" font-size="9" fill="#8a8478" letter-spacing="1.5">LARGE · DYNAMIC</text>
+          </svg>
+
+          <!-- Level labels positioned absolutely over the SVG. Pushed outside arc to avoid tick overlap. -->
+          <span class="gauge-label" style="left: 7.5%; top: 105%;">L0<span class="gauge-name">No retrieval</span></span>
+          <span class="gauge-label" style="left: 14%; top: 20%;">L1<span class="gauge-name">CAG</span></span>
+          <span class="gauge-label current" style="left: 50%; top: -8%;">L2 — Today's default<span class="gauge-name">Vanilla RAG</span></span>
+          <span class="gauge-label" style="left: 86%; top: 20%;">L3<span class="gauge-name">Hybrid RAG</span></span>
+          <span class="gauge-label" style="left: 92.5%; top: 105%;">L4<span class="gauge-name">Agentic RAG</span></span>
+        </div>
+
+        <div>
+          <div class="gauge-legend">
+            <div class="gl-row muted">
+              <span class="gl-lvl">L0</span>
+              <div><span class="gl-name">No retrieval</span><br><span class="gl-text">Ask the cake question with nothing loaded → it guesses a lead time. The baseline.</span></div>
+            </div>
+            <div class="gl-row">
+              <span class="gl-lvl">L1 · Build A</span>
+              <div><span class="gl-name">CAG</span><br><span class="gl-text">Load whole Lumiere_KB.md into context. No vector DB. Small, stable knowledge.</span></div>
+            </div>
+            <div class="gl-row">
+              <span class="gl-lvl">L2 · B–D</span>
+              <div><span class="gl-name">Vanilla RAG</span><br><span class="gl-text">500 locations, 10,000-page manual — retrieve only the matching sections. ~80% of cases.</span></div>
+            </div>
+            <div class="gl-row">
+              <span class="gl-lvl">L3 · Build E</span>
+              <div><span class="gl-name">Hybrid RAG</span><br><span class="gl-text">Keyword + semantic fire together. "Clause 3" and "eggless cake" both land.</span></div>
+            </div>
+            <div class="gl-row muted">
+              <span class="gl-lvl">L4 · S5</span>
+              <div><span class="gl-name">Agentic RAG</span><br><span class="gl-text">The agent decides when to retrieve, across multiple sources. Concept today.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gauge-foot">
+        <span class="gf-lbl">Words you'll hear, not today's build —</span>
+        &nbsp; <strong>GraphRAG</strong>: retrieves over a map of how entities connect — for cross-document synthesis, where plain RAG is for precise single-fact lookup.
+        &nbsp;·&nbsp; <strong>Re-ranking RAG</strong>: retrieve twenty pieces, a second model re-sorts to the best three before answering — for precision-critical work.
+      </div>
+    </div>
+    <div class="folio">6<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 07 — BUILD A — FEED THE BRAIN (exercise) -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build · Ground</span><span class="dot">·</span><span class="topic">Feed the brain</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">A</div>
+      <div>
+        <div class="ex-meta">Build A · Feed the brain · ~8 min</div>
+        <h1>Give the agent its brain.</h1>
+        <p class="lede mt-3">Create a Project, upload Lumiere_KB.md, ask one question from your persona — and watch it answer from the file. Chunk, embed, store, all behind the glass. This is CAG, level one on the dial.</p>
+        <div class="prompt mt-4">Create a Project named "Lumière Knowledge Agent."
+Add Lumiere_KB.md to Project Knowledge.
+Ask one question from your persona's Build A query.
+→ Confirm the answer pulled a real detail from the file.
+
+Fallback: fresh chat + Lumiere_KB.md attached — same result.</div>
+      </div>
+    </div>
+    <div class="ex-timer">08:00</div>
+    <div class="folio">7<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 08 — BUILD B — MAKE IT CITE (exercise) -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build · Ground</span><span class="dot">·</span><span class="topic">Make it cite</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">B</div>
+      <div>
+        <div class="ex-meta">Build B · Make it cite · ~8 min</div>
+        <h1>Make it show its work.</h1>
+        <p class="lede mt-3">One short instruction turns "trust me" into "here's where I found it." Every answer comes back with a receipt — the section it pulled from.</p>
+        <div class="prompt mt-4">Add to your Project instructions:
+"You are a knowledge agent for Lumière Bakery. Answer questions
+using ONLY the document(s) in your knowledge. After every answer,
+name the section, heading, or page you pulled it from, like this:
+(Source: &lt;section/heading&gt;). Do not add outside facts."
+
+→ Re-ask. Confirm it ends with a real (Source: …) line.</div>
+      </div>
+    </div>
+    <div class="ex-timer">08:00</div>
+    <div class="folio">8<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 09 — BUILD C — MAKE IT REFUSE (exercise) -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build · Ground</span><span class="dot">·</span><span class="topic">Make it refuse</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">C</div>
+      <div>
+        <div class="ex-meta">Build C · Make it refuse · ~4 min</div>
+        <h1>Teach it to say "I don't know."</h1>
+        <p class="lede mt-3">Ask something your doc doesn't cover — watch it guess. Then add one line. Now it refuses. The boundary between a grounded answer and an honest refusal is the difference between a demo and something safe to deploy. Especially on allergens — never guess.</p>
+        <div class="prompt mt-4">First, ask your persona's out-of-scope question. Watch it guess.
+Then add to your instructions:
+"If the answer is not in the document, say: 'I don't have
+that in my knowledge base' — and stop. Never guess, never
+fill in from outside knowledge."
+
+→ Re-ask. Confirm it now refuses instead of guessing.</div>
+      </div>
+    </div>
+    <div class="ex-timer">04:00</div>
+    <div class="folio">9<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 10 — BREAK SLIDE -->
+  <!-- ====================================================== -->
+  <!-- The .break-slide class triggers startBreakClock() automatically when active. -->
+  <!-- The 10:00 countdown lives in #breakClock — do not change the id. -->
+  <!-- IMPORTANT: presenter must have a matching .tag === 'break' slide at the same index. -->
+  <div class="slide break-slide">
+    <div class="running-head">
+      <div class="left"><span>Session 04</span><span class="dot">·</span><span class="topic">— Intermission —</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <div class="break-label">— Break —</div>
+      <div class="break-clock" id="breakClock">10:00</div>
+      <p class="lede center mt-5" style="font-size: 1.6rem;">Stand up. Water. Stretch.</p>
+      <p class="byline mt-4" style="color: var(--terra); letter-spacing: 0.18em;">Grounded, cited, honest. Next we make it sturdy.</p>
+    </div>
+    <div class="folio">10<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 11 — BUILD D — TUNE THE RECALL (exercise) -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build · Ground</span><span class="dot">·</span><span class="topic">Tune the recall</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">D</div>
+      <div>
+        <div class="ex-meta">Build D · Tune the recall · ~12 min</div>
+        <h1>Break it on purpose, then make it findable.</h1>
+        <p class="lede mt-3">The agent is only as good as the document you feed it. Today's demo: a wall-of-text policy doc that breaks retrieval, then the same content structured with headings and tags — and the query lands. The model didn't get smarter. The document got findable.</p>
+        <div class="prompt mt-4">Watch the facilitator demo:
+  → MESSY policy doc: ask a cancellation-rules query.
+     Note what the agent gets wrong or misses.
+  → CLEAN policy doc: same query, structured doc.
+     Note how it lands and cites correctly.
+
+Fill in your KB Design Sheet:
+  → What chunk strategy did the clean doc use?
+  → What section tags made the difference?
+
+Then test your own Lumière agent:
+  → Ask a question you think it should answer.
+  → If it misses — add a heading or tag to that section, re-upload.</div>
+      </div>
+    </div>
+    <div class="ex-timer">12:00</div>
+    <div class="folio">11<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 12 — BUILD E — STRESS & SHIP (exercise) -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build · Ground</span><span class="dot">·</span><span class="topic">Stress &amp; ship</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">E</div>
+      <div>
+        <div class="ex-meta">Build E · Stress &amp; ship · ~14 min</div>
+        <h1>Three probes, then finalize.</h1>
+        <p class="lede mt-3">The last test is the real world being awkward — wrong words, adjacent questions, exact codes. Attack it three ways, then lock and ship.</p>
+        <div class="prompt mt-4">Synonym probe — ask in different words than the doc uses.
+  → "no-egg option" when the doc says "eggless."
+  → Confirm semantic still finds it.
+Out-of-scope probe — ask something adjacent but absent.
+  → Confirm the refusal still holds.
+Exact-code probe — ask for a pincode, clause, or section number.
+  → "What pincodes does the Andheri branch cover?"
+  → Keyword fires on the code; meaning handles the prose: hybrid.
+Lock grounding + citation + refusal. Shipped.</div>
+      </div>
+    </div>
+    <div class="ex-timer">14:00</div>
+    <div class="folio">12<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 13 — ENTERPRISE PATTERNS + DEPLOYMENT STRATEGY (content) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Deploy</span><span class="dot">·</span><span class="topic">Where this goes to work</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Four shapes · one pipeline</span>
+      <h1>The same five steps, <em class="terra" style="font-style: italic;">four jobs.</em> Find yours.</h1>
+
+      <div class="pat-grid">
+        <div class="pat-cell">
+          <span class="pat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h8l4 4v14H5V5a2 2 0 0 1 2-2z"/><polyline points="15 3 15 7 19 7"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
+          <div class="pat-name">Document Q&amp;A</div><div class="pat-track">Consulting · Legal · Healthcare</div><div class="pat-body">Point it at a contract, protocol, or report — and ask.</div>
+        </div>
+        <div class="pat-cell">
+          <span class="pat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+          <div class="pat-name">Corporate / policy bot</div><div class="pat-track">HR · Ops · Customer Service</div><div class="pat-body">The handbook, the SOP, the same ten questions everyone asks — like Lumière's WhatsApp queue.</div>
+        </div>
+        <div class="pat-cell">
+          <span class="pat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/></svg></span>
+          <div class="pat-name">Internal knowledge search</div><div class="pat-track">Finance · Ops</div><div class="pat-body">Wikis, shared drives, the Confluence nobody can navigate.</div>
+        </div>
+        <div class="pat-cell">
+          <span class="pat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></span>
+          <div class="pat-name">Product knowledge base</div><div class="pat-track">Marketing · Sales</div><div class="pat-body">Specs, pricing, the playbook — so reps stop guessing. Lumière's menu and delivery zones are exactly this.</div>
+        </div>
+      </div>
+
+      <div class="rule mt-4"></div>
+      <p class="mt-3">Don't boil the ocean. Start with one high-impact function drowning in repeat questions. Prove the retrieval is accurate. Earn that team's trust. <em>Then</em> scale. The teams that fail tried to ingest the whole company on day one.</p>
+    </div>
+    <div class="folio">13<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 14 — RAG VS FINE-TUNING (content/display) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Deploy</span><span class="dot">·</span><span class="topic">RAG or fine-tuning?</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow cool">The decision matrix · what changes vs. what stays</span>
+      <h1>RAG vs fine-tuning, in <em class="terra" style="font-style: italic;">one grid.</em></h1>
+
+      <div class="matrix-wrap">
+        <div class="matrix-xaxis">
+          <span>What you're changing → <strong style="color: var(--ink);">FACTS</strong></span>
+          <span>What you're changing → <strong style="color: var(--ink);">BEHAVIOR</strong></span>
+        </div>
+        <div class="matrix-yaxis">
+          <span style="padding: 0.4em 0;">Static<br>(rarely changes) ↑</span>
+          <span style="padding: 0.4em 0;">Dynamic<br>(changes often) ↓</span>
+        </div>
+        <div class="matrix">
+          <!-- Top-left: static facts -->
+          <div class="matrix-cell either">
+            <span class="mc-tag">Either works</span>
+            <span class="mc-name">Static facts</span>
+            <span class="mc-eg">Lumière's founding story, French-technique baking principles. RAG fits; fine-tune fits — pick the cheaper one.</span>
+          </div>
+          <!-- Top-right: static behavior -->
+          <div class="matrix-cell secondary">
+            <span class="mc-tag">Fine-tune</span>
+            <span class="mc-name">Static behavior</span>
+            <span class="mc-eg">House voice. Always reply in the brand's warm-formal tone. JSON output every time. Train it once.</span>
+          </div>
+          <!-- Bottom-left: dynamic facts -->
+          <div class="matrix-cell primary">
+            <span class="mc-tag">RAG ← Today</span>
+            <span class="mc-name">Dynamic facts</span>
+            <span class="mc-eg">This week's offers, new Gurgaon branch, allergen updates, delivery zones. Update the document — never retrain the model.</span>
+          </div>
+          <!-- Bottom-right: dynamic behavior -->
+          <div class="matrix-cell both">
+            <span class="mc-tag">Both (hybrid)</span>
+            <span class="mc-name">Dynamic behavior</span>
+            <span class="mc-eg">Rare. A bot whose tone must adapt per customer. RAG for context, fine-tune for voice scaffolding.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="matrix-foot">
+        <em>One honesty line:</em> fine-tuning does <em>not</em> remove being wrong — it makes the model wrong in your brand voice. Grounding is what gives an answer a source. And this rule is practitioner consensus, not settled law — expect honest debate at the edges.
+      </div>
+    </div>
+    <div class="folio">14<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 15 — KB DESIGN SHEET (content) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Deploy</span><span class="dot">·</span><span class="topic">The Method, Written Down</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">The real prize you walk out with</span>
+      <h1>The Knowledge Base <em class="terra" style="font-style: italic;">Design Sheet.</em></h1>
+      <p class="lede mt-3">The agent is today's demo. The sheet is the recipe — five fields you fill for the Lumière agent you just built, then reuse on any document at work.</p>
+
+      <div class="kb-grid">
+        <div class="kb-field headline"><span class="kb-n">★</span><span class="kb-body"><strong>Where on the RAG dial?</strong> One sentence — "mine is level-1 CAG / level-2 vanilla / level-3 hybrid" — and why.</span></div>
+        <div class="kb-field"><span class="kb-n">01</span><span class="kb-body"><strong>Chunk strategy</strong> — how you'd split Lumiere_KB.md: by section, branch, or topic.</span></div>
+        <div class="kb-field"><span class="kb-n">02a</span><span class="kb-body"><strong>Structural tags</strong> — section labels so retrieval finds the right piece (e.g. [CustomOrders], [Allergens], [Delivery]).</span></div>
+        <div class="kb-field"><span class="kb-n">02b</span><span class="kb-body"><strong>Semantic tags</strong> — the question(s) each section answers (e.g. "Can I get a same-day cake?").</span></div>
+        <div class="kb-field"><span class="kb-n">03</span><span class="kb-body"><strong>Query range</strong> — what this agent should answer, and what it must refuse (e.g. competitor pricing, revenue, GPS tracking).</span></div>
+        <div class="kb-field"><span class="kb-n">04</span><span class="kb-body"><strong>Grounding + refusal prompt</strong> — your final custom-instructions text.</span></div>
+      </div>
+    </div>
+    <div class="folio">15<sup>/16</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 16 — CLOSE — synthesis + reflection + S5 bridge + colophon -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Session 04</span><span class="dot">·</span><span class="topic">Close</span></div>
+      <span class="pub-title">Generative AI for Non-Coders</span>
+    </div>
+    <div class="slide-body">
+      <p class="display"><span class="drop">N</span>ot a smarter model. A <span class="terra"><em style="font-style: italic;">grounded</em></span> one.</p>
+      <p class="lede mt-4">Five builds — feed, cite, refuse, tune, ship. A Lumière Knowledge Agent that answers from the document, names its source, refuses what it doesn't know, and handles both plain questions and exact pincodes. And the recipe written down, so you do it again Monday on a document no one has seen.</p>
+
+      <div class="grid g-2 mt-4" style="gap: var(--s-4); align-items: start;">
+        <div>
+          <div class="byline mb-2" style="color: var(--ink-mute);">— Take-home, two sentences each —</div>
+          <p style="font-family:'Fraunces',serif; font-style:italic; font-size:1.05rem; color:var(--ink); line-height:1.5;">One document at work you'll ground an agent on this week, and the first question you'll want it to answer. One point on the RAG dial your most common use-case lands on — and why.</p>
+        </div>
+        <div>
+          <div class="byline mb-2" style="color: var(--terra);">— Next session —</div>
+          <p style="font-family:'Fraunces',serif; font-style:italic; font-size:1.05rem; color:var(--ink); line-height:1.5;">Session 5 — <strong style="color:var(--ink);">Agent Architecture: how agents think, remember &amp; act.</strong> Today you gave the agent a brain made of Lumière's documents; next we give it the will to use that brain on its own.</p>
+        </div>
+      </div>
+
+      <div class="colophon">
+        <div class="by">
+          Written &amp; facilitated by
+          <span class="name">Shantanu Chandra</span>
+          <span class="linkedin">linkedin.com/in/chandrashantanu</span>
+        </div>
+        <div class="course-mark">
+          EdYoda<br>
+          <span class="terra">GenAI &amp; AI Agents</span><br>
+          for Non-Coders · S04
+        </div>
+      </div>
+    </div>
+    <div class="folio">16<sup>/16</sup></div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">Prev</button>
+  <button onclick="next()">Next</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const MASTER_KEY = 'genai_s4_slide_master';
+  let current = 0;
+
+  function show(index) {
+    current = Math.max(0, Math.min(totalSlides - 1, index));
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+    try { localStorage.setItem('genai_s4_learner_slide', String(current)); } catch (e) {}
+
+    // Break-clock: start on .break-slide, stop otherwise. Detect by class, not index.
+    if (slides[current] && slides[current].classList.contains('break-slide')) {
+      startBreakClock();
+    } else {
+      stopBreakClock();
+    }
+  }
+
+  function next() { if (current < totalSlides - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(totalSlides - 1);
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  // Break-clock — 10-min countdown, restarts each time we land on a .break-slide.
+  // Goes amber under 2 min, red under 30s via .warn/.danger modifiers on .break-clock.
+  let breakInterval = null;
+  function startBreakClock() {
+    stopBreakClock();
+    let total = 10 * 60;
+    const el = document.getElementById('breakClock');
+    if (!el) return;
+    function tick() {
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      el.classList.toggle('warn', total <= 120 && total > 30);
+      el.classList.toggle('danger', total <= 30);
+      total--;
+      if (total < 0) { stopBreakClock(); el.textContent = '00:00'; }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function stopBreakClock() {
+    if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+    const el = document.getElementById('breakClock');
+    if (el) el.classList.remove('warn', 'danger');
+  }
+
+  // Pair with presenter deck. Both decks MUST have identical slides.length —
+  // if the clamp ever triggers, the symmetry contract was broken.
+  // See memory: edyoda_facilitation_patterns.md § 3.
+  const PRINT_KEY = 'genai_s4_print_request';
+  let lastPrintStamp = '';
+  window.addEventListener('storage', (e) => {
+    if (e.key === MASTER_KEY) {
+      const v = parseInt(e.newValue, 10);
+      if (isNaN(v)) return;
+      const target = Math.min(v, totalSlides - 1);
+      if (target !== current) show(target);
+      return;
+    }
+    if (e.key === PRINT_KEY && e.newValue && e.newValue !== lastPrintStamp) {
+      // Presenter pressed P → open Chrome's Save-as-PDF dialog on THIS tab.
+      // The @media print CSS forces landscape 3:2 one-slide-per-page.
+      lastPrintStamp = e.newValue;
+      printAsPdf();
+    }
+  });
+
+  // Chrome's Save-as-PDF dialog pre-populates the filename from document.title.
+  // Set it to "Session {N} - <session name>" right before print, restore after.
+  const PDF_FILENAME = 'Session 4 - RAG: Giving Agents a Brain of Your Own Data';
+  const ORIGINAL_TITLE = document.title;
+
+  // Auto-scale: if any slide's content is taller than the print page can hold,
+  // shrink that slide's .slide-body with transform: scale() so nothing clips.
+  // The measurement uses the exact print geometry (13.333in × 7.5in @ 96dpi)
+  // so it matches what Chrome will render in the PDF.
+  function fitSlidesForPrint() {
+    const slides = document.querySelectorAll('.slide');
+    const SLIDE_W = 1280;      // 13.333in @ 96dpi
+    const SLIDE_H = 720;       // 7.5in  @ 96dpi
+    const PAD_TOP = 38.4;      // 0.4in
+    const PAD_X = 57.6;        // 0.6in
+    const PAD_BOTTOM = 48;     // 0.5in
+    const CONTENT_H = SLIDE_H - PAD_TOP - PAD_BOTTOM;
+
+    // Snapshot inline styles so we can restore them after measurement.
+    const snapshots = [];
+    slides.forEach(slide => {
+      snapshots.push({ el: slide, cssText: slide.style.cssText });
+      slide.style.cssText = `
+        position: absolute !important;
+        left: -10000px !important;
+        top: 0 !important;
+        width: ${SLIDE_W}px !important;
+        height: ${SLIDE_H}px !important;
+        padding: ${PAD_TOP}px ${PAD_X}px ${PAD_BOTTOM}px !important;
+        display: flex !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        transform: none !important;
+      `;
+    });
+    // Force a synchronous reflow so the off-screen measurement is accurate.
+    void document.body.offsetHeight;
+
+    slides.forEach(slide => {
+      const body = slide.querySelector('.slide-body');
+      if (!body) return;
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+      const naturalHeight = body.scrollHeight;
+      if (naturalHeight > CONTENT_H) {
+        const scale = CONTENT_H / naturalHeight;
+        body.style.transformOrigin = 'top left';
+        body.style.transform = `scale(${scale.toFixed(4)})`;
+        body.style.width = `${(100 / scale).toFixed(2)}%`;
+      }
+    });
+
+    // Restore inline styles (CSS rules re-apply for print).
+    snapshots.forEach(s => { s.el.style.cssText = s.cssText; });
+  }
+
+  function resetSlideFit() {
+    document.querySelectorAll('.slide-body').forEach(body => {
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+    });
+  }
+
+  function printAsPdf() {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+    setTimeout(() => { window.print(); }, 150);
+  }
+
+  // Also handle direct Cmd+P / Ctrl+P on the learner deck.
+  window.addEventListener('beforeprint', () => {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+  });
+  window.addEventListener('afterprint',  () => {
+    document.title = ORIGINAL_TITLE;
+    resetSlideFit();
+  });
+
+  // Init: follow presenter if a master is already set, otherwise resume own position.
+  (function init() {
+    try {
+      const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
+      if (!isNaN(master) && master >= 0) { show(Math.min(master, totalSlides - 1)); return; }
+      const saved = parseInt(localStorage.getItem('genai_s4_learner_slide') || '0', 10);
+      if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
+    } catch (e) {}
+    show(0);
+  })();
+</script>
+</body>
+</html>

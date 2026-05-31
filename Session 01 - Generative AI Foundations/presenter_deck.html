@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ===================== TOPBAR ===================== */
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+
+  .topbar .title .accent { color: var(--accent); }
+
+  .clock-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+  }
+
+  .clock-box {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    gap: 2px;
+  }
+  .clock-box .label {
+    color: var(--text-dim);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+
+  .topbar .grow { flex: 1; }
+
+  .topbar button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary {
+    background: var(--accent);
+    color: #062420;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .topbar button.primary:hover { background: #7df1de; }
+
+  .topbar .slide-counter {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2);
+    border-left: 1px solid var(--border);
+  }
+
+  /* ===================== MAIN LAYOUT ===================== */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    height: calc(100vh - 64px - 56px);
+  }
+
+  .panel-left {
+    overflow-y: auto;
+    padding: var(--s-3) var(--s-4);
+    border-right: 1px solid var(--border);
+  }
+
+  .panel-right {
+    overflow-y: auto;
+    background: var(--bg-1);
+    padding: var(--s-3);
+  }
+
+  /* Scrollbars */
+  .panel-left::-webkit-scrollbar,
+  .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track,
+  .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb,
+  .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover,
+  .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===================== BOTTOMBAR ===================== */
+  .bottombar {
+    height: 56px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-2);
+    flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1;
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 var(--s-2);
+    border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  /* ===================== SLIDE CONTENT ===================== */
+  .timing-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-bottom: var(--s-3);
+    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .timing-bar .block-title {
+    font-weight: 500;
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--s-2);
+  }
+  .slide-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: var(--s-3);
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .section {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+
+  .section .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .section h3 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+  .section.bridge .quote { border-left-color: #f472b6; }
+  .section.deeper .quote { border-left-color: #60a5fa; }
+
+  .quote {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.6;
+    padding-left: 12px;
+    border-left: 2px solid var(--warm);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .section p {
+    font-size: 0.94rem;
+    line-height: 1.6;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list {
+    counter-reset: step;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .step-list > li {
+    counter-increment: step;
+    padding-left: 36px;
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    background: #060810;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--accent);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-section { margin-bottom: var(--s-3); }
+
+  .right-section h4 {
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .preview-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title {
+    font-size: 0.92rem;
+    font-weight: 500;
+    margin: 4px 0 2px;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .preview-card .when {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 16px;
+    text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.4rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .timer-controls {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .timer-controls button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .quick-key kbd {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    font-weight: 500;
+    min-width: 22px;
+    text-align: center;
+    box-shadow: 0 1px 0 var(--border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session 1</span></span>
+
+  <div class="clock-divider"></div>
+
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 2:00</span>
+  </div>
+
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+
+  <div class="grow"></div>
+
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 40</span>
+</div>
+
+<div class="main">
+
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(180)">3m</button>
+          <button onclick="startExTimer(240)">4m</button>
+          <button onclick="startExTimer(360)">6m</button>
+          <button onclick="startExTimer(420)">7m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>3</kbd> <kbd>4</kbd> <kbd>6</kbd> <kbd>7</kbd> start timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA ===================== */
+const slides = [
+  {
+    num: 1, when: "Pre-start", duration: "—", tag: "title",
+    title: "Pre-start hook slide",
+    say: "(No speaking yet — slide is up 5 min before class with soft music)",
+    doSteps: [
+      "Have this slide up on shared screen 5 min before scheduled start.",
+      "Play soft instrumental music (optional).",
+      "Mute Slack, email, calendar notifications.",
+      "Have Parking Lot Google Doc link copied to clipboard."
+    ],
+    watch: "Look for people joining 1–2 min early — greet by name in chat as they arrive."
+  },
+  {
+    num: 2, when: "0:00 – 0:02", duration: "2 min", tag: "title",
+    title: "Cold open · one-word chat storm",
+    say: "Hi everyone — quick request before I say anything else. I don't want to start with introductions or housekeeping. I want to start with you. In one word in the chat, describe your current relationship with AI right now. Skeptical? Excited? Confused? Scared? Hopeful? Just one word. Type it in.",
+    afterPause: "Wait 30 seconds. Then read 6–8 out loud, BY NAME.",
+    sayAfter: "Thank you Priya, thank you Rajesh, thank you Anita, thank you Daniel. Look at this mix — skeptical sitting right next to excited. That's exactly where this class is going to land. By the end of the two hours, the skeptics will know what to be skeptical about specifically. And the excited folks will know where their excitement is justified and where it isn't.",
+    deeper: [
+      "If someone asks why this matters: starting with the learner before yourself is the single biggest engagement lever in adult virtual training. They've already attended 12 webinars where someone introduced themselves for 5 minutes. They've never been asked their feeling in word one.",
+      "If chat is quiet, the room is shy — that's information. Slow down for the first 15 minutes."
+    ],
+    note: "Research (Brinkerhoff): learners who type in the first 5 min are ~40% more likely to stay engaged.",
+    watch: "If only 2–3 people respond → say 'a few more please, I want to hear from everyone'. Then wait.",
+    bridge: "Now I'm going to push that a bit harder — let's see if any of you have a specific story."
+  },
+  {
+    num: 3, when: "0:02 – 0:04", duration: "2 min", tag: "title",
+    title: "Hook question",
+    say: "Now a harder one. Raise your hand with the emoji in chat if you've ever asked ChatGPT — or any AI — a question, gotten back a confident, well-written, professional-sounding answer… and then later realized it was completely wrong. Not a little off. Wrong.",
+    afterPause: "Wait. Hands will come. Read 3–4 of the responses aloud — by name.",
+    sayAfter: "Look at all those hands. This is the most important moment in the class so far, because it's the universal AI experience. Everyone has been burned. Doctors checking drug interactions. Lawyers asking about case law. Marketers fact-checking statistics. Everyone. And here's what nobody tells you — that 'confidently wrong' thing isn't a bug. It's how these systems are designed to behave. By minute 90 today, you'll know exactly why that happens at the mechanical level, and exactly which questions to NEVER ask an AI without a second source.",
+    deeper: [
+      "The technical term is 'hallucination' — covered in Topic 5, slide 29. Don't introduce the term yet. Let them feel the pain first.",
+      "If someone shares a specific story (they often will): acknowledge it, name it, and tee it up: 'Hold that example — we'll come back to it when we hit limitations.'"
+    ],
+    watch: "Even silent participants react to this — read the emojis aloud, validate the lived experience.",
+    bridge: "Two minutes of housekeeping, then we go live."
+  },
+  {
+    num: 4, when: "0:04 – 0:06", duration: "2 min", tag: "title",
+    title: "Norms slide",
+    say: "I want to set four expectations before we dive in. None of them are rules — they're invitations. The next two hours work better if we share a few defaults.",
+    doSteps: [
+      "Talk through each norm briskly — about 15 seconds each. Don't read the slide, paraphrase it.",
+      "Paste Parking Lot Google Doc link in chat NOW.",
+      "Ask: 'Anyone willing to be chat monitor? Just type YES.' Pick first volunteer, thank by name."
+    ],
+    sayAfter: "Last thing — I will give you a real ten-minute break at the 55-minute mark. Cameras off, you can step away from your screen entirely. I'll set a timer. This is not negotiable, because the research on virtual learning is brutally clear: without that break, the second hour is wasted. I'm not going to waste your second hour.",
+    deeper: [
+      "If someone asks about recording: it's being recorded, you'll share the link within 24 hours. Confirm.",
+      "If someone asks about slides: yes, both decks + workbook go out in the follow-up email."
+    ],
+    watch: "If no volunteer for chat monitor in 15 sec → say 'no worries, I'll watch chat myself.' Move on.",
+    bridge: "Okay — enough talking. Let me show you something."
+  },
+  {
+    num: 5, when: "0:06 – 0:08", duration: "2 min", tag: "demo",
+    title: "Predict the output · live ChatGPT demo",
+    say: "Before I tell you anything about how this class works, I'd rather show you. I'm going to share my screen, open ChatGPT, and type a question. Before I hit enter, I want you to predict the answer in the poll. Then we'll see what actually happens — and what it tells us about how these systems work.",
+    doSteps: [
+      "Share screen. Open ChatGPT.",
+      "Type 'How many R's are in the word strawberry?' — but do NOT hit enter yet.",
+      "Launch Poll 1.",
+      "After poll closes, hit enter. Read the answer aloud."
+    ],
+    sayAfter: "This is the methodology for the whole class. Predict → run it → understand WHY. Because honestly, you can read articles about AI all day. You'll forget them by tomorrow. But you will not forget watching the most-talked-about AI in human history fail to count the letters in 'strawberry'. That's a sticky moment — and we're going to have ten more of those today.",
+    deeper: [
+      "Why does it fail? It doesn't see letters. It sees TOKENS — chunks of text. 'Strawberry' is often a single token, so the model has nothing to count. We cover this in Topic 3 — point forward but don't explain now.",
+      "If asked 'why is this a famous example' — it's been in the news for two years, used as a test for every model release. Even GPT-5 sometimes gets it wrong."
+    ],
+    watch: "If ChatGPT gets it right (says 3): pivot — 'Today it got it right, but 6 months ago this exact question stumped GPT-4. We'll see why.' Then move on.",
+    bridge: "Quick 30-second intro about me, then we'll fly through the agenda and start."
+  },
+  {
+    num: 6, when: "0:08 – 0:10", duration: "2 min", tag: "title",
+    title: "Roadmap + 30-sec self-intro",
+    say: "Thirty seconds about me — I'm Shantanu, [your one-line credibility]. I've trained [X non-coders / built Y agents / led Z teams]. I'm not here to make you AI experts — I'm here to make you AI-fluent. There's a difference. Expert means you can build it. Fluent means you can use it, judge it, and avoid getting fooled by it. That's what we're after today.",
+    doSteps: [
+      "Show the 6-topic visual.",
+      "8 seconds per topic, no more.",
+      "Land on: 'By minute 110, you will have prompted 3 AI models, watched one hallucinate live, and built one prompt-based tool to use at your job tomorrow.'"
+    ],
+    sayAfter: "Six topics. Two hours. The first half is how it works — evolution, milestones, mechanics. The second half is where it breaks and what comes next. And throughout, you'll do as much as I talk. Roughly 60% of this class is you typing, comparing, voting, building. Let's start.",
+    note: "You did NOT introduce yourself before minute 8. That's deliberate — instructor intros are the #1 attention-killer in virtual training first impressions.",
+    watch: "If you're at 0:12, skip the EdYoda preview tease next time and start Topic 1 NOW.",
+    bridge: "Topic 1 starts now. Forget the slide titles — let me just show you something."
+  },
+  {
+    num: 7, when: "0:10 – 0:14", duration: "4 min", tag: "title",
+    title: "Topic 1 title — What is Generative AI?",
+    say: "If I asked you to define Generative AI right now, most of you would give me some version of 'it's ChatGPT' or 'it's the AI that writes stuff'. That's not wrong. But it misses what's actually new. Before I give you a definition, I want to show you the difference between AI as we've known it for sixty years and AI as it is in 2026. One example. One screen. Watch.",
+    note: "Brief slide. Transition fast — the demo on next slide is what matters.",
+    bridge: "Sharing my screen now."
+  },
+  {
+    num: 8, when: "0:10 – 0:14", duration: "4 min", tag: "demo",
+    title: "Translator demo — Hindi idiom",
+    say: "I'm going to take a sentence in Hindi — and don't worry if you don't speak Hindi, the point lands either way — and I'm going to translate it two different ways. First with Google Translate, which has been around since 2006 and uses a statistical, more rule-based approach. Then with ChatGPT. Both are AI. They are not the same KIND of AI.",
+    doSteps: [
+      "Open Google Translate. Paste: मेरा दिल बाग बाग हो गया।",
+      "Show result: 'My heart has become garden garden' — confusing.",
+      "Switch to ChatGPT. Paste: 'Translate this Hindi phrase AND explain its cultural meaning: मेरा दिल बाग बाग हो गया।'",
+      "Read ChatGPT's response aloud."
+    ],
+    sayAfter: "Now look at the difference. Google Translate did exactly what it was built to do — it mapped words in one language to the most statistically likely words in another. Word in, word out. Functional. Useful. But meaningless. ChatGPT did something fundamentally different. It understood that 'heart become garden' is an idiom — it preserved the metaphor, explained the cultural context, and produced a translation that carries the SOUL of the original sentence, not just the syllables. That is the leap from rule-based to generative. It's not that the new AI is better at the same task. It's that it's doing a different task entirely.",
+    deeper: [
+      "Hindi speakers in the room will nod hard at this — the phrase literally means 'my heart has become garden garden', and the idiomatic meaning is 'I'm overjoyed, my heart is blooming'. The repetition of बाग बाग is what makes it poetic.",
+      "If asked 'doesn't Google Translate use AI now?' — yes, it does, since 2016 it uses neural networks. But it's optimized for fast, literal translation. ChatGPT is optimized for understanding. Different goal, different result."
+    ],
+    watch: "Non-Hindi speakers will get it from the visual difference. Acknowledge: 'For those who don't speak Hindi — this is a real cultural idiom about feeling overjoyed. ChatGPT got the soul of it.'",
+    bridge: "So how did we get here? Four stages over seventy years."
+  },
+  {
+    num: 9, when: "0:14 – 0:18", duration: "4 min", tag: "title",
+    title: "4 stages of AI evolution",
+    say: "AI didn't appear in 2022 with ChatGPT. It's been around since the 1950s. What changed is the KIND of AI we use. I'll walk you through four stages — about 30 seconds each — and at the end you'll understand why your grandmother's spam filter and ChatGPT are technically both 'AI' but live in completely different universes.",
+    doSteps: [
+      "Rule-based (1950s–1980s): if-then recipes. Hand-written by engineers. Vending machine logic — same input always gives the same output. Used for tax software, chess programs.",
+      "Machine Learning (1990s–2010s): instead of writing rules, you show the system thousands of examples and it figures out the rules itself. Spam filter that learns from every email you mark as spam. Netflix recommendations.",
+      "Deep Learning (2010s): neural networks with many layers. Made image recognition and speech recognition actually work. This is when Siri and Alexa got useful. AlphaGo beat the world champion at Go in 2016.",
+      "Foundation Models (2020+): trained on essentially the entire public internet. Can do tasks they were never specifically trained for. Translate, summarize, write code, explain physics — all from one model. This is what we mean by 'Generative AI'."
+    ],
+    sayAfter: "Notice the trajectory: each stage requires LESS human instruction and produces MORE general capability. Rule-based: humans write every rule. Machine learning: humans show examples. Deep learning: humans provide raw data. Foundation models: humans just have a conversation. The work moved from the engineer to the data to the user. That's the real story of AI's last seventy years.",
+    deeper: [
+      "If asked when AI 'started': 1956, Dartmouth Conference, the term 'artificial intelligence' was coined.",
+      "If asked why progress was slow until 2010s: not enough compute, not enough data. Both exploded with cloud computing and smartphones."
+    ],
+    note: "Strict 30 sec per stage. Don't get sucked into history.",
+    bridge: "All that history compresses into one analogy you'll remember tomorrow."
+  },
+  {
+    num: 10, when: "0:16 – 0:18", duration: "2 min", tag: "title",
+    title: "Recipe book vs. master chef",
+    say: "If you remember nothing else from the first topic, remember this. Rule-based AI is a recipe book. It knows exactly one hundred dishes. You ask for dish #47, you get dish #47, perfectly, every time. You ask for something not in the book, you get nothing. Generative AI is a master chef. The chef has read a thousand cookbooks. You describe what you want — 'something warm, slightly spicy, vegetarian, my grandmother would like it' — and the chef invents a new dish. Maybe brilliant. Maybe weird. But new. That's the difference. The recipe book retrieves. The chef creates.",
+    sayAfter: "And here's the subtle but important thing: the chef will sometimes confidently invent a recipe that doesn't quite work. We'll get to that in Topic 5. For now, just hold onto the image — recipe book versus chef.",
+    deeper: "If someone asks 'so is generative AI always better?' — no. For predictable, repetitive, regulated tasks (tax calculation, password validation, deterministic workflows) rule-based is faster, cheaper, and auditable. You want generative AI when the input space is open-ended. You want rules when correctness matters more than creativity.",
+    note: "Pause for 3 seconds after delivering this. Let it land.",
+    bridge: "Enough talking from me. Your turn. Open ChatGPT."
+  },
+  {
+    num: 11, when: "0:18 – 0:25", duration: "7 min", tag: "exercise",
+    title: "Exercise 1 · The poem",
+    say: "Your turn to be the chef. Open ChatGPT in a tab. I'm pasting a prompt in chat in a second. All you're going to do is ask it to write a four-line poem about your job. Not what you wish you did — what you actually do. Take four minutes. Then I want you to paste your favorite line into chat. Just one line, the one that made you smile or made you think 'huh, that's actually accurate'.",
+    doSteps: [
+      "Paste exercise prompt in Zoom chat.",
+      "Start the 4-minute timer (key: 4).",
+      "While they work — silently switch your screen to ChatGPT in a fresh tab, do the exercise too with YOUR role."
+    ],
+    prompt: "Go to chat.openai.com. Type:\n\"Write a 4-line poem about my job as a [your role]. Make it warm and slightly funny.\"\n\nTake 4 minutes. Then paste your favorite line in chat.",
+    sayAfter: "Reading some of these out — Sneha got a poem about being a radiologist that rhymes 'scan' with 'plan'. Rajesh got a haiku about month-end variance reviews. Each of these poems did not exist five minutes ago. They didn't get pulled from a database. ChatGPT generated them, for your specific job, in your specific tone, in real time. That's GENERATION. Not retrieval. Not search. Generation. And the same machinery that wrote those poems is what writes the marketing copy, the clinical notes, the legal summaries — every Generative AI application is some version of this trick, scaled up.",
+    deeper: "If a learner says 'mine was kind of bad' — that's also useful! It shows that the model has a personality, makes choices, sometimes misreads tone. That's the chef being a chef. Not every dish lands.",
+    watch: "Time check at 0:25: if you're at 0:27, cut readouts from 5 to 3. Move on.",
+    bridge: "Now that you've seen ONE model do this, let's see what the others can do."
+  },
+  {
+    num: 12, when: "0:25 – 0:28", duration: "3 min", tag: "title",
+    title: "Topic 2 title — Key Milestones",
+    say: "Topic two. The AI landscape. There are roughly two dozen large language models in serious use today, but five families matter for your work life — ChatGPT, Claude, Gemini, Llama, and the image models like DALL·E. Here's what I am NOT going to do: I'm not going to spend ten minutes reading you release dates and parameter counts. You'll forget all of it by lunch. What we're going to do instead is have you experience the difference yourself. In about three minutes, you'll have all three big chatbots open side by side, asking them the same question. That's how you'll remember which one to reach for.",
+    note: "Brief title slide. Get into the next slide quickly.",
+    bridge: "Quick 30-second look at the cast of characters."
+  },
+  {
+    num: 13, when: "0:25 – 0:28", duration: "30 sec", tag: "title",
+    title: "5 model families grid",
+    say: "Quick scan. GPT-3 in 2020 was the first time a machine wrote a paragraph that sounded human. DALL·E in 2021 was the first time a machine drew a picture from a sentence. GPT-4 in 2023 added vision — you could show it an image and ask questions about it. Gemini, also 2023, is Google's answer, deeply wired into Workspace. Claude and Llama in 2023 and 2024 — Claude is the safety-focused one with the longest memory, Llama is the open-source one that runs inside companies that can't send their data to the cloud. We'll see the practical differences in the exercise.",
+    note: "Show for 30 seconds max. The Speed Dating exercise teaches the differences better than the lecture.",
+    bridge: "Time to compare them yourself. Three tabs."
+  },
+  {
+    num: 14, when: "0:28 – 0:38", duration: "10 min", tag: "exercise",
+    title: "Exercise 2 · Speed dating · ChatGPT vs Claude vs Gemini",
+    say: "This is the exercise that will outlast this class. You will use this technique for the rest of your AI life. It's called comparison prompting. You take the same exact question, paste it into multiple models, and see which one gives the best answer for THAT specific question. I'm going to give you a prompt designed for your job. Pick the role that fits — marketing, finance, or doctor — paste it into all three, and just notice the differences. Are the questions they ask back smart? Is the structure useful? Could you actually send this to your boss?",
+    doSteps: [
+      "Paste the exercise prompt in chat.",
+      "Start the 6-min timer (key: 6).",
+      "While they work — open ChatGPT, Claude, Gemini side-by-side on YOUR screen. Do the exercise too.",
+      "At 6 min, launch Poll 2 (which model gave the answer you'd trust?)."
+    ],
+    prompt: "Open 3 tabs: ChatGPT, Claude.ai, Gemini.\nPaste this IDENTICAL prompt into all three:\n\n\"I'm a [marketing manager / finance analyst / doctor]. Explain in 4 short bullet points why our quarterly revenue dipped 12%. Assume nothing. Ask me 2 clarifying questions BEFORE answering.\"\n\nCompare. Vote in poll.",
+    sayAfter: "Notice — they're all 'right'. None of them are broken. They're just different. Different defaults, different personalities, different strengths. The skill isn't picking the 'best' model in some abstract sense. The skill is knowing which model to reach for given THIS question, THIS deadline, THIS audience.",
+    deeper: [
+      "If asked 'which is the best overall' — there isn't one. Industry benchmarks flip every few months. The honest answer: open all three, try the same prompt, pick based on what worked.",
+      "If a learner only has access to one (e.g. corporate firewall) — fine. The exercise still teaches the prompting muscle."
+    ],
+    watch: "Doctor in room: have them swap to 'Summarize this patient complaint into a SOAP note format. Ask me 2 clarifying questions first. Patient: 55yo F, intermittent chest pain, 3 weeks, no radiation, worse with stress.'",
+    bridge: "Poll's in. Let me tell you what each one is actually best at."
+  },
+  {
+    num: 15, when: "0:38 – 0:40", duration: "2 min", tag: "title",
+    title: "What each model unlocks (debrief)",
+    say: "Here are the poll results — and here's how I'd translate that into a model-picking heuristic you can actually use at work.",
+    doSteps: [
+      "ChatGPT: think 'general drafting assistant'. Brainstorming, first drafts, structuring messy thoughts. The Swiss Army knife.",
+      "Claude: think 'thoughtful analyst'. Long documents — contracts, research papers, transcripts. Has the longest memory of any consumer chatbot. Best for nuance and tone.",
+      "Gemini: think 'Google native'. If your team lives in Docs, Sheets, Gmail, Drive — Gemini is already there, can read your files, draft replies in your inbox.",
+      "DALL·E and Midjourney: marketing visuals, mockups, social media imagery. Not for ideation — for production.",
+      "Llama: usually invisible to you. Runs inside hospitals, banks, government agencies that legally cannot send data to OpenAI or Google. Open source. Your IT team probably has opinions."
+    ],
+    sayAfter: "Think of it like a small consulting team on retainer. ChatGPT is your generalist who can do anything but isn't best at anything. Claude is your senior associate who reads the whole 80-page deck before responding. Gemini is your assistant who already has access to all your files. DALL·E is your designer on call. And Llama is the security-cleared contractor your IT team approved. You don't fire four of them and keep one. You pick the right one for the task.",
+    deeper: "If asked about cost: all five have free tiers for individuals. Paid tiers are ~$20/month and let you upload files, use better models, and get higher limits. For business, every one has an enterprise plan with data-privacy guarantees.",
+    watch: "Time check at 0:40: hard pivot. Don't let this run.",
+    bridge: "You now know WHICH model to pick. Next: HOW it actually works under the hood — in plain English."
+  },
+  {
+    num: 16, when: "0:40 – 0:42", duration: "2 min", tag: "title",
+    title: "Topic 3 title — How LLMs Work",
+    say: "Topic three. Now I'm going to take you under the hood — but in plain English, no math, no jargon. Three words. Tokens, context windows, temperature. These are the three terms you'll see in every AI article, every pricing page, every settings panel. Most people fake it. By minute 55, you won't have to. You'll have FELT all three. And these fifteen minutes will probably be the most useful technical fluency you take from today, because once you know these three things, every AI product page suddenly makes sense.",
+    note: "This is the marquee technical block — the 'screenshot moment' of the class. Slow down slightly here, this content sticks.",
+    bridge: "First one. Tokens."
+  },
+  {
+    num: 17, when: "0:42 – 0:44", duration: "2 min", tag: "title",
+    title: "Tokens explained",
+    say: "Quick mental shift. When you read a sentence, you see words. When an AI reads the same sentence, it doesn't see words. It sees TOKENS. A token is just a chunk of text — sometimes a whole word, sometimes part of a word, sometimes a single character, sometimes a piece of an emoji. Think of it like LEGO bricks. The English word 'cat' is one brick. 'Antidisestablishmentarianism' is about six bricks. Your name is probably two or three bricks depending on how unusual it is. And the model never sees the whole word — it sees the brick sequence.",
+    sayAfter: "Why does this matter to you? Two reasons. One — pricing. AI APIs charge per token. Not per word. So if you're using AI for translation into Hindi or Arabic, you might pay three to five times more than the same content in English, because non-Latin scripts use more tokens. Two — limits. Every model has a maximum tokens per message. If you paste a 200-page document and it gets weird, that's why. You blew through the brick budget.",
+    deeper: [
+      "Why split into sub-word pieces? Vocabulary efficiency. English has ~170,000 words but you can build all of them from ~50,000 tokens. Manageable.",
+      "Rough rule: 1 token ≈ 4 characters ≈ 0.75 of a word in English. 1,000 tokens ≈ 750 words ≈ 1.5 pages of double-spaced text."
+    ],
+    note: "Analogy to memorize: 'Tokens are LEGO bricks. Your name might be 2 bricks. A long word might be 5. You're charged by the brick, not the sentence.'",
+    bridge: "Easier to see this than describe it. Open a tab with me."
+  },
+  {
+    num: 18, when: "0:44 – 0:46", duration: "2–4 min", tag: "demo",
+    title: "Tokens demo + micro-exercise",
+    say: "OpenAI runs a free tool that shows you tokens visually. No login. Watch me type a few things and you'll see the bricks colored differently for each token. Then you'll do the same.",
+    doSteps: [
+      "Share screen. Open platform.openai.com/tokenizer.",
+      "Type 'strawberry' → 1 token.",
+      "Type 'antidisestablishmentarianism' → 6 tokens.",
+      "Type your full name.",
+      "Type 🎉 → 1 token but 3–4 bytes.",
+      "Paste micro-exercise in chat. Wait 2 min. Read 3–4 numbers aloud."
+    ],
+    prompt: "Go to platform.openai.com/tokenizer. Type:\n- Your full name\n- A 3-paragraph email you sent last week\n- A Hindi/Tamil word in native script\n\nTell me your EMAIL's token count in chat.",
+    sayAfter: "Two huge takeaways. First — your 'short email' was probably 400 to 800 tokens. That's why if you're pasting whole email threads into ChatGPT, you'll hit limits fast. Second — and this is critical for an Indian audience — Hindi and Tamil words use 3 to 5 times MORE tokens than English. If your company is using AI APIs to serve Indian-language content at scale, your bill is silently 3-5x higher than the equivalent English content. Most procurement teams don't know this.",
+    deeper: "If asked about specific costs: GPT-4o is about $2.50 per million input tokens, $10 per million output. That's roughly $0.002 for a typical short prompt. Sounds like nothing — until you're running it 100,000 times a day.",
+    watch: "Hindi/Tamil words will surprise people — usually 3–5x more tokens than English. Call this out: 'This is why non-English LLM usage costs more.'",
+    bridge: "Tokens are the size of one message. Context window is the size of the whole conversation."
+  },
+  {
+    num: 19, when: "0:46 – 0:50", duration: "4 min", tag: "title",
+    title: "Context window — the whiteboard",
+    say: "Second term. Context window. Think of it as the model's working memory — the whiteboard it can look at while it's writing your reply. Everything you've typed, everything it's typed back, plus any files you've uploaded — all of it sits on this whiteboard. The whiteboard has a fixed size, measured in tokens. When the conversation fills the whiteboard, the oldest stuff gets erased to make room. That's when you notice ChatGPT 'forgetting' something from earlier — it didn't forget you, it ran out of whiteboard space.",
+    doSteps: [
+      "Show the 3 numbers: GPT-4o 128K, Claude 200K, Gemini 1.5 Pro 2M.",
+      "Translate: ~300 / ~500 / ~5,000 pages.",
+      "Ask aloud: 'Have any of you ever had ChatGPT forget something you said earlier in the same chat? Type YES or NO in chat.'"
+    ],
+    sayAfter: "Look at the chat — almost everyone says yes. Now you know why. The whiteboard filled up. Two things follow from this. One — for long documents, model choice matters a lot. A 300-page contract fits in Claude but doesn't fit in older GPT models. The contract lawyer who tries to summarize a merger doc in ChatGPT will get truncated nonsense. The same lawyer using Claude gets a clean summary. Same skill, different tool, completely different result. Two — for long conversations, start a NEW chat when you change topics. Don't let one chat run for weeks. The model loses the plot.",
+    deeper: [
+      "If asked 'why not just make the whiteboard infinite' — because attention scales quadratically. Doubling the context window roughly quadruples the cost of every message. There are diminishing returns and quality cliffs.",
+      "Gemini 1.5 Pro's 2 million tokens is genuinely impressive — that's roughly the entire Lord of the Rings trilogy in one prompt."
+    ],
+    bridge: "One more term. This one's a little surprising."
+  },
+  {
+    num: 20, when: "0:50 – 0:52", duration: "2 min", tag: "title",
+    title: "Temperature — the creativity dial",
+    say: "Third and last term. Temperature. This one's a little weird because most consumer chat apps hide it. But it's the most fun to play with. Temperature is the creativity dial of the model — a number, usually between zero and one. At zero, the model is boring and predictable: ask it 'what is two plus two' and it always says four, in roughly the same words. At one, the model is creative and unpredictable: ask it for a brand name and you'll get a different answer every time. Above one, you get nonsense.",
+    sayAfter: "Here's the practical wisdom. When you want correctness — math, code, fact retrieval — you want LOW temperature. The accountant brain. When you want exploration — brainstorming, naming, creative writing — you want HIGH temperature. The poet brain. Most consumer chat apps run around 0.7 by default, which is a compromise that's neither great for facts nor great for creativity. If you have access to an API or a developer tool, choosing temperature based on the task is one of the highest-leverage settings you can change.",
+    deeper: "If asked 'why don't ChatGPT and Claude expose this slider' — UX simplicity. They picked one default that's good enough for most queries. Power users go to the API or to playground tools.",
+    note: "Analogy: 'Temperature is the spiciness slider. Low = accountant brain. High = poet brain.'",
+    bridge: "Even without a slider, you can feel temperature. Watch."
+  },
+  {
+    num: 21, when: "0:52 – 0:55", duration: "3 min", tag: "demo",
+    title: "Temperature demo + micro-exercise",
+    say: "I'm going to do this twice. Same prompt. Two fresh ChatGPT chats. Watch.",
+    doSteps: [
+      "Open 2 fresh ChatGPT chats.",
+      "Same prompt in both: 'Give me a brand name for a sustainable coffee shop in Bangalore. One name only.'",
+      "Show different answers. 'High temperature.'",
+      "New chat: 'What is 2 + 2?' → 4. Again. → 4. 'Facts don't vary.'",
+      "Paste micro-exercise in chat. 90 seconds."
+    ],
+    prompt: "Open a NEW ChatGPT chat. Ask:\n\"Give me 5 creative names for a wellness clinic in Mumbai.\"\n\nThen open ANOTHER new chat. Ask the EXACT same thing.\nCompare. Notice they're different.",
+    sayAfter: "Different answers, every time. The model isn't broken — it's BEING creative. And now flip it. 'What is two plus two?' — same answer, every time. Same model, but it knows that creativity is inappropriate when correctness is the entire point. This is the most important takeaway of Topic 3: the model already kind of knows which kind of question you're asking. But you can override it — and an enormous part of being good at prompting is signaling clearly whether you want the accountant brain or the poet brain.",
+    deeper: "If a learner asks 'how do I set the temperature in ChatGPT' — you don't, directly. But you can prompt for it: 'Give me a precise, deterministic answer' nudges low temperature. 'Be wildly creative, give me unexpected ideas' nudges high. Same underlying model, different behavior.",
+    watch: "Time check at 0:55: HARD pivot to break. No exceptions.",
+    bridge: "Real break. Ten minutes. Cameras off. I'll see you back here sharp."
+  },
+  {
+    num: 22, when: "0:55 – 1:05", duration: "10 min", tag: "break",
+    title: "🟢 HARD BREAK · 10 min · NON-NEGOTIABLE",
+    say: "Okay — real break. Ten full minutes. Cameras off, mics off, screens off. Stand up, get water, look at something more than two feet away. The research on Zoom fatigue is genuinely brutal — staring at a grid of faces for an hour does something to your brain that an in-person meeting doesn't. So we take a real break or we lose the second hour. I'll be back at [exact clock time]. I'll start sharp.",
+    doSteps: [
+      "Put up the BREAK slide on the learner deck (it has a 10-min countdown timer).",
+      "Play music. Mute yourself.",
+      "Leave the room (in your house) for 7 min.",
+      "Come back at minute 8 of the break, sip water, prepare for Block 4."
+    ],
+    note: "WHY NON-NEGOTIABLE: Bailenson's research — Zoom-fatigue compounds non-linearly after 50 min. Skipping this break costs you the second hour."
+  },
+  {
+    num: 23, when: "1:05 – 1:07", duration: "2 min", tag: "title",
+    title: "Welcome back · energy reset",
+    say: "Welcome back. I want to do a quick energy check before we dive in — type ANY emoji in chat just so I know you're back at the keyboard. Doesn't matter which one.",
+    afterPause: "Wait 15 sec. Read 4–5 emojis aloud by name.",
+    sayAfter: "Great, good energy. Quick recap of where we are. First hour: how AI works — the evolution, the model landscape, the mechanics. Second hour, starting now, is where this gets practically important — how AI shows up in real businesses, where it breaks, and what to do about it. The first hour was the optimism. The second hour is the realism. Both matter equally for your job.",
+    deeper: "If emoji response is low (under half the room) — that's a sign of post-break attention dip. Slow down, raise vocal energy slightly, maybe add a 30-second standing stretch before continuing.",
+    watch: "If emoji count is low → 'I see [name], [name], [name]… a few more please.' Re-anchor presence.",
+    bridge: "Topic four. Let's zoom out and look at the whole industry."
+  },
+  {
+    num: 24, when: "1:07 – 1:12", duration: "5 min", tag: "title",
+    title: "Topic 4 title — The Value Chain",
+    say: "Topic four. We've been talking about AI as if it's one thing. It isn't. Every AI product you use is actually a stack of four layers, and each layer is built and sold by different companies, with different business models, different security implications, and different cost structures. Understanding this stack is the difference between someone who can be sold to easily and someone who asks the right questions before signing a contract. By the end of this topic — about 15 minutes — you'll be able to look at any 'AI product' your company is considering and reverse-engineer where it sits in the stack.",
+    bridge: "Four layers, bottom to top."
+  },
+  {
+    num: 25, when: "1:07 – 1:12", duration: "5 min", tag: "title",
+    title: "4-layer stack walk-through",
+    say: "Bottom up. Layer one — the raw model. The brain. GPT-4, Claude, Gemini, Llama. Built by maybe ten companies in the world. Insanely expensive — training one of these costs hundreds of millions of dollars. Layer two — platforms. The cloud infrastructure that wraps the model and makes it safe and scalable for enterprises. Azure OpenAI, AWS Bedrock, Google Vertex AI. This is where your company's data privacy, security, and compliance live. Layer three — applications. The actual tools you and I use. ChatGPT the app, Microsoft Copilot in Word, Notion AI, GitHub Copilot, your bank's chatbot. Layer four — outcomes. The actual business result. Hours saved. Errors prevented. Customer questions answered without a human. Revenue created.",
+    doSteps: [
+      "Layer 1 — Models: raw brain. GPT-4, Claude, Gemini, Llama.",
+      "Layer 2 — Platforms: cloud infrastructure for secure use. Azure OpenAI, AWS Bedrock, Vertex AI.",
+      "Layer 3 — Applications: the actual tools. ChatGPT app, Copilot, Notion AI, GitHub Copilot.",
+      "Layer 4 — Outcomes: business value. Faster proposals, fewer hours, lower support cost."
+    ],
+    sayAfter: "Here's the practical takeaway. Most of you live at layer three — you use applications. But the moment your company is considering buying or building anything 'AI', you need to know layers one and two. Because the questions that matter — 'Where does our data go? Which model is behind this? Can it be swapped out? What happens to our content if the vendor changes?' — those questions live at layers one and two. The salesperson will only show you layer four. Your job is to ask about layers one and two before you sign.",
+    deeper: [
+      "If asked about cost split: typically the model provider takes 60-70% of the revenue, the platform takes 15-20%, the application takes the rest. Understanding this explains why so many AI startups are racing to build their own models — to capture more margin.",
+      "Real example: Notion AI runs on top of GPT-4 via OpenAI's API. If OpenAI raises prices, Notion's margins shrink. If OpenAI changes models, Notion's behavior changes overnight. This is why some serious enterprise customers prefer Layer 2 platforms (Azure OpenAI) — more guarantees, more control."
+    ],
+    bridge: "You're about to do this analysis yourself. Breakout rooms in 30 seconds."
+  },
+  {
+    num: 26, when: "1:12 – 1:20", duration: "8 min", tag: "exercise",
+    title: "Exercise 3 · Reverse-engineer the stack · in pairs",
+    say: "Pairs. Six minutes. I'm sending you into breakout rooms of two — and yes, pairs, not bigger groups, because pairs force everyone to participate. There's no hiding in a pair. Pick ONE AI tool from the list I'll paste — pick whichever you know best, or whichever one most resembles something your company uses. Then together, figure out: which model is probably running underneath it? Which platform does it sit on? And what business outcome does it actually deliver? Use ChatGPT or Google to help — yes, you can use AI to research AI.",
+    doSteps: [
+      "Paste exercise in chat.",
+      "Send everyone into breakout rooms of 2 (NOT bigger — pairs force participation).",
+      "Set 6-min timer (key: 6).",
+      "Pull back. Call on 3 pairs by name, 30 sec each."
+    ],
+    prompt: "PAIRS · 6 min. Pick ONE tool:\n- Microsoft Copilot · Notion AI · GitHub Copilot · bank WhatsApp bot · Harvey AI\n\nFigure out:\n1. Which MODEL powers it?\n2. Which PLATFORM does it run on?\n3. What OUTCOME does it deliver?\n\nUse ChatGPT or Google to help. Come back with one answer.",
+    sayAfter: "Notice what you just did. You took five popular AI products that you probably use every day, and in six minutes, you mapped their entire stack. That's the muscle. From now on, when a vendor pitches you 'an AI solution', the first three questions out of your mouth should be: which model, which platform, what outcome. If they can't answer those three things crisply, walk away. If they can — now you can negotiate, compare, and make a real decision.",
+    deeper: [
+      "Quick answers if a pair asks: Microsoft Copilot runs on GPT-4 via Azure OpenAI. Notion AI uses GPT-4 via OpenAI API. GitHub Copilot uses a custom OpenAI Codex variant. Harvey AI runs on GPT-4 with custom legal fine-tuning, via OpenAI's enterprise platform. Bank WhatsApp bots vary wildly — some custom, some Llama, some GPT.",
+      "If asked 'what about Indian banks specifically' — most large Indian banks use a combination of in-house Llama deployments (for compliance) plus Azure OpenAI for general queries. Same stack model, different layer 1 choices based on RBI data residency rules."
+    ],
+    watch: "Time check at 1:20: move. If running long, cut to 2 pair-reports instead of 3.",
+    bridge: "Now the part of the class nobody at the AI conferences will tell you. Where this all breaks."
+  },
+  {
+    num: 27, when: "1:20 – 1:22", duration: "2 min", tag: "title",
+    title: "Topic 5 title — Limitations",
+    say: "Topic five. This is the part nobody selling you AI puts on their landing page. These models have four hard limitations — not bugs that'll be fixed next quarter, actual structural limits of how the technology works. I'm going to show you each one, live, on this screen, in the next fifteen minutes. By the time we're done, you'll have a framework for knowing exactly which kinds of tasks to trust AI with, and which kinds to handle yourself or with a human reviewer. This topic is the closest thing to a survival skill in the entire course.",
+    note: "Pace shift: provocative, slightly cautionary tone. Don't smile too much.",
+    bridge: "Four limits. Quick map first, then one demo each."
+  },
+  {
+    num: 28, when: "1:20 – 1:22", duration: "1 min", tag: "title",
+    title: "4 limitations grid",
+    say: "Quick map. Hallucination — the model confidently invents things that aren't true. Static knowledge — the model only knows what it was trained on, and the training stopped at a specific date. No memory — every new conversation starts from zero. No action — the model can describe what to do, but cannot actually do it in the real world. We're going to see all four happen in the next twelve minutes.",
+    note: "Show grid for 30 sec. Then dive into Hallucination demo.",
+    bridge: "Hallucination first. The most dangerous one."
+  },
+  {
+    num: 29, when: "1:22 – 1:26", duration: "4 min", tag: "demo",
+    title: "Demo · Hallucination · the fake court case",
+    say: "I'm going to ask ChatGPT about an Indian Supreme Court case. Pay close attention to how it sounds. Confidence, structure, specific names, specific paragraph numbers. This is the moment most people get fooled.",
+    doSteps: [
+      "Share screen. ChatGPT (free tier).",
+      "Paste prompt about 'Mehta vs. Sharma' fake case.",
+      "Read the response aloud as it streams in.",
+      "Pause. Then deliver the reveal: 'This case does not exist. I made it up.'"
+    ],
+    prompt: "Tell me about the 2019 Indian Supreme Court case 'Mehta vs. Sharma' on cryptocurrency regulation. Cite the bench and key judgment paragraphs.",
+    sayAfter: "Pause for a second. This case does not exist. I invented the name on my flight here. There is no Mehta versus Sharma cryptocurrency case. The model just wrote you four paragraphs of fake legal judgment — with fake judges, fake paragraph numbers, fake reasoning — in a tone so confident that ninety percent of professionals would have taken it at face value. This is HALLUCINATION. It's not the model lying — lying requires intent. It's the model doing exactly what it's designed to do, which is generate plausible-looking text. When you give it a prompt that looks like a legal query, it generates text that looks like a legal answer. Whether the answer is true is, mechanically, irrelevant to the model.",
+    deeper: [
+      "Why does it happen? The model is trained to predict the next plausible word given previous words. Truthfulness is not the training objective. Plausibility is.",
+      "Real cost: in 2023, a New York lawyer was sanctioned by a federal court for submitting a brief containing six hallucinated case citations. He used ChatGPT. He did not verify. His name is in the public record. Don't be him.",
+      "For the doctor: same thing happens with medical citations. PubMed IDs, trial names, dosages — model will confidently fabricate. Always cross-check against primary source."
+    ],
+    watch: "If it doesn't hallucinate: have a screenshot ready of a previous fake-case answer. Show that. 'Yesterday it gave me this. Today it didn't. Models update — that's exactly why you should always verify.'",
+    bridge: "Second limit. This one is easier to spot, but easier to underestimate."
+  },
+  {
+    num: 30, when: "1:26 – 1:30", duration: "4 min", tag: "demo",
+    title: "Demo · Static knowledge",
+    say: "Watch what happens when I ask about something recent.",
+    doSteps: [
+      "Same ChatGPT (free tier, no web).",
+      "Ask about most recent Indian election + seat count.",
+      "Watch it give stale or hedged answer.",
+      "Now switch to Gemini OR ChatGPT with browse on.",
+      "Same prompt. Get the live answer."
+    ],
+    prompt: "Who won the most recent Indian general election and what was the seat count?",
+    sayAfter: "This is STATIC KNOWLEDGE. Every one of these models has what's called a training cutoff date — a specific point in time, usually six to eighteen months in the past, when the company stopped feeding it new data. After that date, the model knows nothing. It's like talking to a brilliant person who fell into a coma in early 2024 and woke up today. They'll happily answer your questions about events from after they were unconscious, but they're guessing. The fix is tools — connecting the model to live web search, to your company's database, to today's news. But you have to KNOW the limitation exists to even ask for the tool. The most dangerous version of this is when a user assumes the model knows about a regulation that was passed last month — and acts on outdated advice.",
+    deeper: [
+      "If asked 'why don't they just keep training' — cost. Each training run is hundreds of millions of dollars and takes months. Models retrain in big batches, not continuously.",
+      "ChatGPT-4o cutoff is around October 2023. Claude Sonnet around April 2024. Gemini varies. Web-search-enabled versions sidestep this for general queries but still hallucinate about your internal company data."
+    ],
+    bridge: "Third limit. This one is the most counterintuitive."
+  },
+  {
+    num: 31, when: "1:30 – 1:34", duration: "4 min", tag: "demo",
+    title: "Demo · No memory across sessions",
+    say: "I'm going to introduce myself to ChatGPT as someone, get confirmation, then open a fresh chat and ask it to remember me. Watch what happens.",
+    doSteps: [
+      "Fresh ChatGPT chat. Type: 'My name is Priya. I'm a marketing director at an Indian D2C skincare brand. Remember this.'",
+      "Get confirmation.",
+      "Open NEW chat window (or use Incognito).",
+      "Ask: 'What's my name and what do I do?'",
+      "Watch it not know."
+    ],
+    sayAfter: "Look at that. In the first chat, it cheerfully said 'got it, Priya'. In the second chat — same model, same account, just a new conversation — it has no idea who Priya is. This is NO MEMORY. Every new conversation starts from absolute zero. ChatGPT's 'Memory' feature you may have seen is a band-aid — it's just secretly pasting facts into the start of new chats. Underneath, the model itself has no continuity. Why does this matter? Consulting and finance — you cannot 'train' ChatGPT on your client by chatting with it over weeks. The next analyst inherits zero institutional knowledge. Healthcare — every conversation about a patient starts blank, you can never assume the model 'knows the chart'. And for everyone: if you're using AI for long-running projects, you have to manually re-establish context every single time. That's a productivity tax most teams haven't budgeted for.",
+    deeper: [
+      "Memory across sessions is solved by what we'll cover in Session 2 — agents with persistent memory layers (databases, vector stores). The chatbot itself remains stateless. The system around it remembers.",
+      "If asked 'what about ChatGPT Memory' — useful for personal preferences (your name, your writing style), terrible for business context (long projects, client data). Wrong tool for the job."
+    ],
+    watch: "If ChatGPT memory is ON for your account, it might remember across chats. Use Incognito tab for second chat to guarantee fresh slate.",
+    bridge: "Fourth limit. This one sets up the entire next topic."
+  },
+  {
+    num: 32, when: "1:34 – 1:38", duration: "4 min", tag: "demo",
+    title: "Demo · No action · the setup for Topic 6",
+    say: "Final limit, and this one's a clean lead into Topic 6. I'm going to ask ChatGPT to actually DO something — not write about it, do it. Book a flight. Add a calendar entry. Send an email.",
+    doSteps: [
+      "Same ChatGPT.",
+      "Paste the flight-booking prompt.",
+      "Watch it write detailed 'Here's what I would do… Step 1: visit MakeMyTrip…' instructions.",
+      "Point out: 'It told you HOW to do it. It did not DO anything.'"
+    ],
+    prompt: "Book me a flight from Delhi to Bangalore for next Tuesday morning, add it to my Google Calendar, and email the itinerary to my assistant rajesh@company.com.",
+    sayAfter: "Read that response carefully. It told me HOW to book a flight. 'Step one — visit MakeMyTrip, step two — enter your dates'. Beautifully written instructions for ME to do the work. Nothing was booked. Nothing was scheduled. Nothing was sent. This is NO ACTION. The model can think about doing things. It can describe doing things. It cannot DO things — because it has no hands. No calendar API. No email send button. No access to any system outside its own conversation. And this is the single biggest gap between what most people THINK AI can do — based on the marketing — and what it actually does today. People watch a slick demo and assume the AI is acting in the world. It almost never is. What's acting is the system AROUND the AI. Hold that thought. We're about to fix exactly this limitation. That fix is the entire next topic.",
+    deeper: "The reason this matters so much: 'no action' is what separates AI as a research tool (write me an essay) from AI as a productivity revolution (handle my inbox, run my reports, manage my pipeline). Bridging this gap is what the entire 'agents' movement is about — Session 2.",
+    note: "This slide LEADS directly into Topic 6. Don't pause for Q&A here — momentum is critical.",
+    bridge: "Roll straight into Topic 6. No pause."
+  },
+  {
+    num: 33, when: "1:38 – 1:42", duration: "4 min", tag: "title",
+    title: "Topic 6 title — The Hard Ceiling of Chatbots",
+    say: "Last topic. This is the climax of the class. I'm going to give ChatGPT a real, multi-step, real-world request — the kind of thing your manager might actually ask you on a Monday morning. Six clear sub-tasks. And we're going to watch, in real time, how far a single chatbot conversation actually gets — and where it slams into a wall.",
+    bridge: "Sharing screen. Watch this prompt carefully — count the verbs."
+  },
+  {
+    num: 34, when: "1:38 – 1:42", duration: "4 min", tag: "demo",
+    title: "Demo · The bakery campaign · multi-step failure",
+    say: "Imagine you run a small bakery in Mumbai. Your manager — or in this case you ARE the manager — wants to launch a new product line. There are six things that need to happen. I'm going to type all six into ChatGPT, one prompt, and we're going to watch which ones it can actually do.",
+    doSteps: [
+      "Share screen. ChatGPT.",
+      "Type the bakery prompt SLOWLY so they read along.",
+      "Hit enter. Watch the response.",
+      "Walk through each of 6 steps. Mark on screen: ✅ / ⚠️ / ❌."
+    ],
+    prompt: "I run a small bakery in Mumbai. Help me launch a new product line. I need you to: (1) research what's trending in the Mumbai bakery scene this month, (2) draft three Instagram posts, (3) generate three images for those posts, (4) schedule them across the next week, (5) email the schedule to my partner sneha@bakery.com, and (6) set a reminder to review performance in 30 days.",
+    sayAfter: "Let me walk through what just happened. Step one — research trends. It either gave you generic advice from its training data or politely said 'I can't browse the web'. Step two — draft three Instagram posts. This it did beautifully. Step three — generate images. Maybe partial, depending on tier. Step four, five, six — scheduling, emailing, setting reminders. All zero. All instructions for YOU to do. Out of six tasks, the chatbot completed maybe one and a half. The rest required hands, eyes, calendar access, email access, web access — none of which a single LLM call has. And here's the punchline: this is what every chatbot looks like under the hood. The slick demos you see on Twitter where 'AI plans your whole week' — that's not a chatbot. That's something else. That's what we're about to define.",
+    deeper: [
+      "If asked 'what about ChatGPT plugins / GPTs / actions' — exactly the point. Those are the early version of agents. They give the chatbot tools. We'll see a fully-formed version in two minutes.",
+      "The bakery example is intentionally small business — relatable, low-stakes, clear failure modes. The same pattern scales to 'plan a marketing campaign' or 'process a loan application'."
+    ],
+    watch: "If ChatGPT cleverly says 'Step 1: I cannot do real-time research, but here are general trends…' — call it out: 'Notice — it's PRETENDING to do step 1 by giving general info. It didn't actually look up THIS month.'",
+    bridge: "One line that captures the entire problem."
+  },
+  {
+    num: 35, when: "1:41 – 1:42", duration: "1 min", tag: "title",
+    title: "Brain in a jar — the punchline",
+    say: "Slow down for this line. A chatbot. Is a brain. In a jar. It can think. It can write. But it cannot browse the web. It cannot remember you from yesterday. It cannot schedule a meeting. It cannot send an email. It cannot check a database. It is, fundamentally, a brain disconnected from the world. (Pause.) An Agent is what you get when you give that brain hands, eyes, and a calendar. That's the whole insight of the agentic revolution in one sentence. Every demo you'll see in the next two years that makes you go 'wait, can AI really DO that now' — the answer is yes, BECAUSE someone built an agent around the brain.",
+    deeper: "This line is the headline of the entire course. Session 1 ends here conceptually. Session 2 is implementation. If a learner remembers only one sentence from today, this is the sentence.",
+    note: "Deliver slowly. Pause for 2 seconds after this line. This is the most important line of the class.",
+    bridge: "And to make this concrete — quick preview of what that actually looks like."
+  },
+  {
+    num: 36, when: "1:42 – 1:46", duration: "4 min", tag: "demo",
+    title: "Live preview · Agent Builder",
+    say: "Quick four-minute preview. I'm going to switch to a tool called Agent Builder — and don't worry about the specific tool, the concept is what matters. I have a pre-built agent already configured. I'm going to give it the same bakery task we just gave ChatGPT, and we're going to watch the difference.",
+    doSteps: [
+      "Switch to your pre-loaded Agent Builder tab.",
+      "Show your pre-built demo agent (Patient Intake / Lead Qualifier / Variance Explainer).",
+      "Click 1: System Prompt — 'Look, plain English.'",
+      "Click 2: Tools — 'This is where it gets hands.'",
+      "Click 3: Run it. Show it complete what ChatGPT just failed."
+    ],
+    sayAfter: "Look at the difference. Same underlying language model. Same task. But because this agent has TOOLS attached — web search, calendar API, email integration, memory — the same brain can now actually act in the world. It searched for trends. It drafted the posts. It scheduled them. It emailed Sneha. It set the reminder. From one failure to six completions. The brain didn't get smarter. We gave it hands. That's the whole game. And in Session 2 — which is next week — you'll build one of these yourself. From scratch. Without writing a single line of code.",
+    deeper: [
+      "If asked about other agent platforms: Zapier Central, Make.com, n8n, custom GPTs, Anthropic Claude with MCP, Microsoft Copilot Studio. The market is exploding. The concepts are the same across all of them.",
+      "If asked 'is this safe' — that's the right question and the next class spends real time on it. Agents that can actually act in the world need guardrails — permissions, approvals, audit logs. We'll cover all of that."
+    ],
+    watch: "If the live demo fails: have a 60-sec screen recording as backup. 'In the interest of time, here's the demo I recorded yesterday.'",
+    bridge: "Before we wrap — one last thing. Your turn. Build something."
+  },
+  {
+    num: 37, when: "1:46 – 1:53", duration: "7 min", tag: "exercise",
+    title: "FINAL · Build sprint · the take-home prompt",
+    say: "Final exercise of the day, and possibly the most useful one. I want every single one of you to leave this class with one prompt — written down, in your own words, for your own job — that you can paste into ChatGPT or Claude tomorrow morning and immediately get value from. I'm pasting a template in chat. Five lines. Role, task, context, constraints, output. Fill it in for one task you do every single week. Take seven minutes. Then I want you to paste your PROMPT — not the answer — in chat. We'll read a few aloud.",
+    doSteps: [
+      "Paste the exercise + template in chat.",
+      "Start the 7-min timer (key: 7).",
+      "Read 3–4 strong prompts aloud as they come in.",
+      "Praise STRUCTURE — 'Sneha gave it a role AND a constraint. That's the discipline.'"
+    ],
+    prompt: "Pick ONE task you do at work weekly. Write a prompt for it.\n\nTemplate:\nROLE: You are a [expert role].\nTASK: I need you to [specific task].\nCONTEXT: My situation is [brief background].\nCONSTRAINTS: Keep it [tone, length, format].\nOUTPUT: Give me [exact format you want].\n\nPaste your PROMPT (not the answer) in chat.",
+    sayAfter: "Reading some of these — Sneha's prompt is excellent because she gave it a ROLE and a CONSTRAINT. That's the entire prompting discipline in two words. Most people give an AI a vague task and get vague output. The professionals give it a specific role, a specific task, specific constraints — and they get back something they can actually use. The five-line template you just filled out — keep it. Reuse it. Adapt it. This single template will probably be the most leveraged thing you take from today, because every other AI tool you use for the next year accepts roughly the same shape of input.",
+    deeper: "If a learner says 'mine didn't work great' — that's iteration. Prompt engineering is rewriting. Show them how to add one more constraint and re-run. Three iterations gets to a usable prompt 80% of the time.",
+    watch: "Time check at 1:53: CLOSE HARD. If running over, cut readouts to 2.",
+    bridge: "Two-minute recap, then we close."
+  },
+  {
+    num: 38, when: "1:53 – 1:55", duration: "2 min", tag: "title",
+    title: "Recap · the 6 takeaways",
+    say: "Quick recap. If you remember six things from this class, remember these:",
+    doSteps: [
+      "Evolution — recipe book to master chef. AI moved from following human rules to inventing answers.",
+      "Milestones — five model families, each with a different specialty. Pick the model for the task, not the brand.",
+      "Mechanics — tokens are LEGO bricks, context is the whiteboard, temperature is the creativity dial.",
+      "Value chain — models, platforms, apps, outcomes. Knowing the stack lets you ask vendors smart questions.",
+      "Limitations — hallucination, static knowledge, no memory, no action. Each one has a workaround if you know it exists.",
+      "Chatbot ceiling — a brain in a jar. Powerful, but disconnected from the world."
+    ],
+    sayAfter: "And here is the line that ties the whole class together — and the line that bridges to Session 2. Every limitation you saw today has a fix. Every single one. The fix is called an Agent. An Agent is a chatbot with tools, memory, and the ability to act. That is what we are building together next session — from scratch, no code, hands on keyboards. You'll leave Session 2 with an agent that actually works.",
+    bridge: "Next session preview, then your parking lot questions."
+  },
+  {
+    num: 39, when: "1:55 – 1:58", duration: "3 min", tag: "title",
+    title: "Session 2 teaser + parking lot Q&A",
+    say: "Quick word on Session 2. We're going to take the exact bakery task you just watched ChatGPT fail at — and you're going to build the agent that completes it. End-to-end. Live. No code. By the end of Session 2 you'll have a working agent, configured for your industry — marketing, finance, or healthcare — that you can keep using. Now — I promised a parking lot. Let me open it and answer the top three questions.",
+    doSteps: [
+      "Open Parking Lot Google Doc on screen.",
+      "Answer top 3 questions. Each in 45 sec or less.",
+      "For longer ones: 'Great question — I'll put a written answer in the doc by tomorrow morning.'"
+    ],
+    sayAfter: "Any question I didn't answer here goes into the parking lot doc as a written reply by tomorrow morning. I read every one.",
+    deeper: "Three classic questions that may come up: (1) 'Will AI take my job' — short answer: it'll change tasks within your job before it replaces the whole job. The people who learn to use AI well are not the ones being replaced. (2) 'Is my data safe' — depends entirely on which tier you're using. Free consumer tiers train on your inputs. Enterprise tiers do not. Check before pasting client data. (3) 'How do I get my team to adopt this' — by giving them one specific, high-leverage use case (like the prompt they wrote today) and helping them succeed at that one thing, before expanding.",
+    bridge: "Final 90 seconds. Homework, then goodbye."
+  },
+  {
+    num: 40, when: "1:58 – 2:00", duration: "2 min", tag: "title",
+    title: "Homework · close · goodbye",
+    say: "One small piece of homework before next session. Reply to today's class email with two things. One — one process at your job that GenAI could improve today. Two sentences. Two — one place at your job where its limitations would make it dangerous to deploy without guardrails. Two sentences. I read every reply, and I'll use them to tailor Session 2 to the actual scenarios you care about.",
+    sayAfter: "Genuine thank you for these two hours. I know two hours of video calls is brutal. You showed up, you typed in chat, you compared three models, you watched ChatGPT confidently lie to you, and you wrote a prompt you can use tomorrow. That's a real day's work. I'll see you for Session 2 — same time, same link, and we're building your first agent. Take care.",
+    doSteps: [
+      "Wave. Stop recording. End meeting."
+    ],
+    note: "Post-class: within 24 hrs, send: the workbook · the parking lot answers · the calendar invite for Session 2."
+  }
+];
+
+/* ===================== SAFE DOM RENDERING ===================== */
+const slidePane = document.getElementById('slidePane');
+
+function el(tag, opts = {}) {
+  const e = document.createElement(tag);
+  if (opts.cls) e.className = opts.cls;
+  if (opts.text) e.textContent = opts.text;
+  return e;
+}
+
+function makeSection(cls, title, contentBuilder) {
+  const section = el('div', { cls: `section ${cls}` });
+  const header = el('div', { cls: 'header' });
+  const h = el('h3', { text: title });
+  header.appendChild(h);
+  section.appendChild(header);
+  contentBuilder(section);
+  return section;
+}
+
+function renderSlide(s) {
+  while (slidePane.firstChild) slidePane.removeChild(slidePane.firstChild);
+
+  const bar = el('div', { cls: 'timing-bar' });
+  bar.appendChild(el('span', { cls: 'time-pill', text: s.when }));
+  bar.appendChild(el('span', { cls: 'duration', text: s.duration }));
+  bar.appendChild(el('span', { cls: 'block-title', text: `Slide ${String(s.num).padStart(2, '0')} of 40` }));
+  slidePane.appendChild(bar);
+
+  slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
+  slidePane.appendChild(el('h1', { text: s.title }));
+
+  if (s.say) {
+    slidePane.appendChild(makeSection('say', 'Say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.say }));
+    }));
+  }
+
+  if (s.doSteps) {
+    slidePane.appendChild(makeSection('do', 'Do', (sec) => {
+      const ol = el('ol', { cls: 'step-list' });
+      s.doSteps.forEach(step => ol.appendChild(el('li', { text: step })));
+      sec.appendChild(ol);
+    }));
+  }
+
+  if (s.prompt) {
+    slidePane.appendChild(makeSection('prompt-section', 'Paste in chat', (sec) => {
+      sec.appendChild(el('div', { cls: 'prompt-box', text: s.prompt }));
+    }));
+  }
+
+  if (s.afterPause) {
+    slidePane.appendChild(makeSection('watch', 'Pause for', (sec) => {
+      sec.appendChild(el('p', { text: s.afterPause }));
+    }));
+  }
+
+  if (s.sayAfter) {
+    slidePane.appendChild(makeSection('say', 'Then say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.sayAfter }));
+    }));
+  }
+
+  if (s.watch) {
+    slidePane.appendChild(makeSection('watch', 'Watch for · contingency', (sec) => {
+      sec.appendChild(el('p', { text: s.watch }));
+    }));
+  }
+
+  if (s.deeper) {
+    slidePane.appendChild(makeSection('deeper', 'Deeper context · use if asked', (sec) => {
+      if (Array.isArray(s.deeper)) {
+        s.deeper.forEach(d => sec.appendChild(el('p', { text: d })));
+      } else {
+        sec.appendChild(el('p', { text: s.deeper }));
+      }
+    }));
+  }
+
+  if (s.bridge) {
+    slidePane.appendChild(makeSection('bridge', 'Bridge to next slide', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.bridge }));
+    }));
+  }
+
+  if (s.note) {
+    slidePane.appendChild(makeSection('note', 'Note to self', (sec) => {
+      sec.appendChild(el('p', { text: s.note }));
+    }));
+  }
+}
+
+let current = 0;
+function show(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  renderSlide(slides[current]);
+  document.getElementById('slideCounter').textContent = `${String(current + 1).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  document.getElementById('nowNum').textContent = `SLIDE ${String(slides[current].num).padStart(2, '0')} / 40`;
+  document.getElementById('nowTitle').textContent = slides[current].title;
+  document.getElementById('nowWhen').textContent = slides[current].when;
+
+  const nxt = slides[current + 1];
+  document.getElementById('nextNum').textContent = nxt ? `SLIDE ${String(nxt.num).padStart(2, '0')} / 40` : '—';
+  document.getElementById('nextTitle').textContent = nxt ? nxt.title : 'End of deck';
+  document.getElementById('nextWhen').textContent = nxt ? nxt.when : '—';
+
+  const nxt2 = slides[current + 2];
+  document.getElementById('next2Num').textContent = nxt2 ? `SLIDE ${String(nxt2.num).padStart(2, '0')} / 40` : '—';
+  document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
+  document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
+
+  try { localStorage.setItem('genai_slide_master', String(current)); } catch (e) {}
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+function goSlide(i) { show(i); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') toggleClassClock();
+  if (e.key === 'b' || e.key === 'B') goSlide(21);
+  if (e.key === '3') startExTimer(180);
+  if (e.key === '4') startExTimer(240);
+  if (e.key === '6') startExTimer(360);
+  if (e.key === '7') startExTimer(420);
+});
+
+/* ===================== CLOCKS ===================== */
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${pad(m)}:${pad(s)}`;
+}
+function fmtClass(secs) {
+  const m = Math.floor(Math.abs(secs) / 60);
+  const s = Math.abs(secs) % 60;
+  const sign = secs < 0 ? '-' : '';
+  return `${sign}${pad(m)}:${pad(s)}`;
+}
+
+function updateRealClock() {
+  const d = new Date();
+  document.getElementById('realClock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+let classStartTs = null;
+let paused = false;
+let pausedAt = 0;
+let pausedAccum = 0;
+
+function startClass() {
+  if (classStartTs === null) {
+    classStartTs = Date.now();
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  } else {
+    toggleClassClock();
+  }
+}
+function toggleClassClock() {
+  if (classStartTs === null) { startClass(); return; }
+  if (!paused) {
+    pausedAt = Date.now();
+    paused = true;
+    document.getElementById('startBtn').textContent = '▶ Resume';
+  } else {
+    pausedAccum += Date.now() - pausedAt;
+    paused = false;
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  }
+}
+function resetClass() {
+  if (confirm('Reset class clock?')) {
+    classStartTs = null;
+    paused = false;
+    pausedAccum = 0;
+    document.getElementById('startBtn').textContent = '▶ Start Class';
+    updateClassClock();
+  }
+}
+function classElapsedSecs() {
+  if (classStartTs === null) return 0;
+  const now = paused ? pausedAt : Date.now();
+  return Math.floor((now - classStartTs - pausedAccum) / 1000);
+}
+function plannedSecsForCurrent() {
+  const w = slides[current].when;
+  if (!w || w === "Pre-start") return 0;
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return 0;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+function updateClassClock() {
+  const elapsed = classElapsedSecs();
+  document.getElementById('classClock').textContent = `${fmt(elapsed)} / 2:00`;
+
+  const planned = plannedSecsForCurrent();
+  if (classStartTs === null || planned === 0) {
+    document.getElementById('paceLabel').textContent = '—';
+    document.getElementById('paceLabel').className = 'big ok';
+    return;
+  }
+  const delta = elapsed - planned;
+  const labelEl = document.getElementById('paceLabel');
+  if (Math.abs(delta) < 60) {
+    labelEl.textContent = 'on time';
+    labelEl.className = 'big ok';
+  } else if (delta > 0) {
+    labelEl.textContent = `+${fmtClass(delta)} late`;
+    labelEl.className = delta > 180 ? 'big danger' : 'big warn';
+  } else {
+    labelEl.textContent = `${fmtClass(delta)} early`;
+    labelEl.className = 'big ok';
+  }
+}
+setInterval(updateClassClock, 1000);
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval = null;
+let exSecs = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exSecs = secs;
+  const block = document.getElementById('timerBlock');
+  const disp = document.getElementById('exTimer');
+  function tick() {
+    disp.textContent = fmt(exSecs);
+    block.classList.remove('warn', 'danger');
+    if (exSecs <= 30) block.classList.add('danger');
+    else if (exSecs <= 60) block.classList.add('warn');
+    if (exSecs <= 0) { stopExTimer(); return; }
+    exSecs--;
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+function openLearnerDeck() {
+  window.open('learner_deck.html', '_blank');
+}
+
+show(0);
+</script>
+</body>
+</html>

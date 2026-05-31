@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Carousel — Agents hallucinate confidently · A Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --warn:         #a16207;
+    --danger:       #991b1b;
+    --calm:         #14532d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #2a2724;
+    font-family: 'Geist', sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px;
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .square {
+    width: 1080px;
+    height: 1080px;
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .square::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  .square::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(26, 24, 20, 0.10) 100%);
+  }
+
+  .square-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 80px 90px;
+  }
+
+  .running-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-mute);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .running-head .left { display: flex; gap: 24px; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  .folio {
+    position: absolute;
+    bottom: 30px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 140px;
+    line-height: 0.8;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    z-index: 0;
+    opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em;
+    vertical-align: top;
+    margin-left: 0.15em;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  .swipe {
+    position: absolute;
+    bottom: 38px;
+    left: 80px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terra);
+    z-index: 5;
+    font-weight: 500;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: 36px;
+    position: relative;
+    padding-left: 2em;
+  }
+  .eyebrow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1.5em;
+    height: 1px;
+    background: var(--terra);
+  }
+
+  h1, .display, .mega {
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    font-weight: 300;
+  }
+
+  h1 {
+    font-size: 78px;
+    line-height: 1.02;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+  }
+
+  .display {
+    font-size: 104px;
+    line-height: 0.98;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+  }
+
+  .mega {
+    font-size: 132px;
+    line-height: 0.92;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  em.terra-em { font-style: italic; color: var(--terra); }
+  em.blue-em { font-style: italic; color: var(--ink-blue); }
+  em.danger-em { font-style: italic; color: var(--danger); }
+  em.calm-em { font-style: italic; color: var(--calm); }
+
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 22ch;
+    font-variation-settings: 'opsz' 60;
+  }
+
+  .lede-block {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 30ch;
+    margin-top: 36px;
+    font-variation-settings: 'opsz' 60;
+  }
+  .lede-block strong { color: var(--ink); font-weight: 400; }
+  .lede-block em { font-style: italic; color: var(--terra); }
+
+  .drop {
+    float: left;
+    font-family: 'Fraunces', serif;
+    font-size: 5.6em;
+    line-height: 0.82;
+    font-weight: 400;
+    color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  .rule-double { height: 6px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: 32px 0; }
+
+  /* ===================== CHANGE CARDS (2–6) ===================== */
+  .change-num {
+    font-family: 'Fraunces', serif;
+    font-size: 280px;
+    line-height: 0.85;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    position: absolute;
+    right: 80px;
+    top: 140px;
+    opacity: 0.10;
+    z-index: 0;
+  }
+
+  .change-divider {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 0;
+    margin-top: 48px;
+    align-items: stretch;
+  }
+  .change-divider .col .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 22px;
+    font-weight: 500;
+  }
+  .change-divider .col.after .label { color: var(--terra); }
+  .change-divider .col .head {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 14px;
+    font-variation-settings: 'opsz' 60;
+  }
+  .change-divider .col .desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    font-variation-settings: 'opsz' 30;
+  }
+  .change-divider .vdiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .change-divider .vdiv .arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    color: var(--terra);
+    line-height: 1;
+  }
+  .change-divider .vdiv .vline {
+    width: 1px;
+    flex: 1;
+    background: linear-gradient(180deg, transparent 0%, var(--rule) 20%, var(--rule) 80%, transparent 100%);
+  }
+
+  /* ===================== LOOP DIAGRAM (Card 6) ===================== */
+  .loop-diagram {
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .loop-diagram svg { overflow: visible; }
+
+  /* ===================== FUNNEL (Card 7) ===================== */
+  .funnel {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 2px solid var(--ink);
+  }
+  .funnel-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 28px;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .funnel-row .q-num {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+  }
+  .funnel-row .q-text {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 60;
+  }
+  .funnel-row .q-text em {
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 16px;
+    display: block;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+  .funnel-row .q-answer {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 10px 18px;
+    font-weight: 600;
+  }
+  .funnel-row .q-answer.terra { background: var(--terra); }
+  .funnel-foot {
+    margin-top: 28px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 36;
+  }
+  .funnel-foot strong { color: var(--terra); font-weight: 500; font-style: normal; }
+
+  /* ===================== QUOTE CARD (Card 8) =====================
+     The .pull-quote uses a decorative ::before quote glyph.
+     RCA fix: previously the glyph was positioned `left: -0.6em` outside
+     the quote's box, which bled past the slide's padding edge whenever
+     the parent font-size was overridden upward (slide 2 uses 82px).
+     New approach: indent the quote text via padding-left so the glyph
+     sits INSIDE the quote's bounding box, not outside it. Glyph
+     position is now expressed in absolute px tied to the indent. */
+  .pull-quote {
+    font-family: 'Fraunces', serif;
+    font-size: 76px;
+    line-height: 1.05;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    font-style: italic;
+    margin: 36px 0 28px;
+    position: relative;
+    padding-left: 1.1em;
+  }
+  .pull-quote::before {
+    content: '\201C';
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    font-size: 1.4em;
+    color: var(--terra);
+    font-style: normal;
+    line-height: 1;
+    opacity: 0.55;
+  }
+  .pull-quote em { color: var(--terra); font-style: italic; }
+  .quote-sub {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    max-width: 38ch;
+    font-variation-settings: 'opsz' 36;
+  }
+  .quote-sub strong {
+    color: var(--ink);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .quote-attrib {
+    margin-top: 22px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+  }
+
+  /* ===================== STAT STRIP (Card 9) ===================== */
+  .stat-strip {
+    margin-top: 40px;
+    padding-top: 26px;
+    border-top: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .stat-strip .cell {
+    padding: 0 18px;
+    border-right: 1px dotted var(--rule);
+    text-align: center;
+  }
+  .stat-strip .cell:last-child { border-right: none; }
+  .stat-strip .cell .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .stat-strip .cell .val {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144;
+  }
+  .stat-strip .cell .val .unit {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-left: 3px;
+    font-variation-settings: 'opsz' 30;
+  }
+  .stat-strip .cell .note {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-top: 6px;
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 24;
+  }
+
+  .track-list {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 36px;
+  }
+  .track-list .track {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 14px;
+    align-items: baseline;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .track-list .track .n {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--terra);
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .track-list .track .t {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 36;
+  }
+  .track-list .track .t em {
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 14px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ===================== CTA CARD (Card 10) ===================== */
+  .closing .body {
+    justify-content: space-between !important;
+    padding: 40px 0 0 !important;
+  }
+  .closing-stamp {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: 28px;
+  }
+  .ask-primary { margin-bottom: 32px; }
+  .ask-primary .ask-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 72px;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+    max-width: 14ch;
+  }
+  .ask-primary .ask-headline em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .ask-primary .ask-action {
+    margin-top: 28px;
+    display: inline-block;
+    padding: 14px 28px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .ask-primary .ask-action span.kw { color: var(--terra); font-weight: 600; }
+  .ask-primary .ask-help {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-mute);
+    margin-top: 18px;
+    line-height: 1.45;
+    max-width: 32ch;
+    font-variation-settings: 'opsz' 30;
+  }
+  .ask-secondary {
+    padding: 24px 0;
+    border-top: 1px dotted var(--rule);
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+  .ask-secondary .a-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--terra);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+    flex-shrink: 0;
+  }
+  .ask-secondary .a-text {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+  }
+  .ask-secondary .a-text em {
+    font-style: italic;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .sig-block {
+    padding-top: 32px;
+    border-top: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+    padding-bottom: 6px;
+  }
+  .sig-block .sig-name {
+    font-family: 'Fraunces', serif;
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'opsz' 80;
+  }
+  .sig-block .sig-role {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-mute);
+    margin-top: 12px;
+    font-variation-settings: 'opsz' 24;
+    max-width: 32ch;
+    line-height: 1.4;
+  }
+  .sig-block .sig-li {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .sig-block .sig-li .li-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .sig-block .sig-li .li-url {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .sig-block .sig-li .li-url .handle { color: var(--terra); }
+  .sig-block .sig-li .li-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+
+  /* ===================== COVER (Card 1) ===================== */
+  .cover-slide .body {
+    justify-content: flex-end;
+    padding-bottom: 0;
+  }
+  .cover-byline {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .cover-footer {
+    margin-top: 32px;
+    padding-top: 22px;
+    border-top: 1px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+  .cover-footer .terra { color: var(--terra); }
+
+  /* ===================== HR-SCREENER REWRITE — new component styles ===================== */
+
+  /* Three-node pipeline diagram (slide 2, also reused on cover) */
+  .pipeline {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  .pipeline .node {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--terra);
+    padding: 28px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pipeline .node .n-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+  }
+  .pipeline .node .n-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+    font-variation-settings: 'opsz' 60;
+  }
+  .pipeline .node .n-job {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 30;
+    margin-top: auto;
+  }
+  .pipeline .arrow {
+    align-self: center;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    color: var(--terra);
+    line-height: 1;
+  }
+
+  /* Single-node detail card (slides 3, 4, 5) */
+  .node-detail {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  .node-detail .side {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    padding: 30px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .node-detail .side.in { border-left: 3px solid var(--ink-mute); }
+  .node-detail .side.out { border-left: 3px solid var(--terra); }
+  .node-detail .side .io-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .node-detail .side.out .io-label { color: var(--terra); }
+  .node-detail .side .io-content {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  .node-detail .side .io-content .field {
+    display: block;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .node-detail .side .io-content .field:last-child { border-bottom: none; }
+  .node-detail .side .io-content .field .k {
+    color: var(--ink-mute);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+  .node-detail .side .io-content .field .v {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .node-detail .arrow-col {
+    align-self: center;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    color: var(--terra);
+    line-height: 1;
+  }
+  .node-detail .arrow-col .arrow-label {
+    display: block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-top: 8px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  /* Big number badge for "Node N" mast (top-right of slides 3-5) */
+  .node-badge {
+    position: absolute;
+    top: 140px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-size: 260px;
+    line-height: 0.85;
+    color: var(--terra);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    opacity: 0.10;
+    z-index: 0;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+
+  /* Expected vs Actual (slide 6 — the failure) */
+  .vs-cards {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .vs-card {
+    padding: 26px 28px;
+    border: 1px solid var(--rule);
+    background: var(--paper-cream);
+  }
+  .vs-card.expected { border-left: 3px solid var(--calm); }
+  .vs-card.actual {
+    border-left: 3px solid var(--danger);
+    background: rgba(153, 27, 27, 0.04);
+  }
+  .vs-card .vs-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .vs-card.expected .vs-label { color: var(--calm); }
+  .vs-card.actual .vs-label { color: var(--danger); }
+  .vs-card .vs-head {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 18px;
+    font-variation-settings: 'opsz' 60;
+  }
+  .vs-card .vs-list {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .vs-card .vs-list .row {
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: block;
+  }
+  .vs-card .vs-list .row:last-child { border-bottom: none; }
+  .vs-card .vs-list .row .glitch {
+    color: var(--danger);
+    text-decoration: line-through;
+    text-decoration-color: rgba(153, 27, 27, 0.5);
+  }
+  .vs-card .vs-foot {
+    margin-top: 16px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 24;
+  }
+  .vs-card.actual .vs-foot { color: var(--danger); }
+
+  /* Platform-access matrix (slide 7) */
+  .platforms {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 28px;
+  }
+  .platform {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .platform:nth-child(-n+2) { border-top: 2px solid var(--ink); }
+  .platform .p-icon {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--ink);
+    font-weight: 500;
+    text-align: center;
+  }
+  .platform .p-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.2;
+    font-variation-settings: 'opsz' 60;
+  }
+  .platform .p-name em {
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 13px;
+    display: block;
+    margin-top: 3px;
+    font-weight: 300;
+  }
+  .platform .p-status {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .platform .p-status.blocked { background: var(--danger); color: var(--paper); }
+  .platform .p-status.paid { background: var(--warn); color: var(--paper); }
+  .platform .p-status.open { background: var(--calm); color: var(--paper); }
+  .platform .p-status.tos { background: var(--ink-mute); color: var(--paper); }
+
+  /* Numbered tip list (slide 9 — what you do instead) */
+  .tip-list {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .tip {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    padding: 22px 0;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .tip:last-child { border-bottom: 1px solid var(--rule); }
+  .tip .t-num {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+  }
+  .tip .t-body .t-head {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    color: var(--ink);
+    line-height: 1.25;
+    font-variation-settings: 'opsz' 60;
+    margin-bottom: 6px;
+  }
+  .tip .t-body .t-head em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .tip .t-body .t-desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 30;
+  }
+
+  /* Defence-slide layout (slides 7, 8, 9 in new arc) */
+  .defence-num {
+    position: absolute;
+    top: 130px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-size: 240px;
+    line-height: 0.85;
+    color: var(--terra);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    opacity: 0.10;
+    z-index: 0;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .defence-num .of {
+    font-size: 0.35em;
+    color: var(--ink-mute);
+    opacity: 0.6;
+    margin-left: 0.1em;
+  }
+
+  .snippet-block {
+    margin-top: 28px;
+    padding: 26px 30px;
+    background: var(--ink);
+    color: var(--paper);
+    border-left: 4px solid var(--terra);
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    line-height: 1.7;
+    position: relative;
+  }
+  .snippet-block .s-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .snippet-block .s-code {
+    white-space: pre-wrap;
+    color: var(--paper);
+  }
+  .snippet-block .s-code em {
+    color: #f5c69a;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .snippet-block .s-foot {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(245, 239, 230, 0.18);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: rgba(245, 239, 230, 0.75);
+    line-height: 1.45;
+    font-variation-settings: 'opsz' 30;
+  }
+
+  /* Mechanism diagram — slide 3 ("why agents fill the gap") */
+  .mechanism {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .mechanism .step {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 22px 28px;
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+  }
+  .mechanism .step.failure {
+    border-left-color: var(--danger);
+    background: rgba(153, 27, 27, 0.05);
+  }
+  .mechanism .step .m-num {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--ink-mute);
+    font-weight: 300;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .mechanism .step.failure .m-num { color: var(--danger); }
+  .mechanism .step .m-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 60;
+  }
+  .mechanism .step .m-text em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .mechanism .step.failure .m-text em { color: var(--danger); }
+  .mechanism .step .m-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .mechanism .step.failure .m-tag {
+    color: var(--paper);
+    background: var(--danger);
+    padding: 5px 10px;
+    font-weight: 600;
+  }
+
+  /* Compressed HR-proof slide (slide 4 — the build, on one slide) */
+  .build-card {
+    margin-top: 36px;
+    padding: 32px;
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--ink);
+  }
+  .build-card .bc-head {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .build-card .bc-pipeline {
+    display: grid;
+    grid-template-columns: 1fr 24px 1fr 24px 1fr;
+    gap: 0;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .build-card .bc-node {
+    padding: 16px 18px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--terra);
+    text-align: center;
+  }
+  .build-card .bc-node .bcn-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .build-card .bc-node .bcn-name {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.15;
+    font-variation-settings: 'opsz' 60;
+  }
+  .build-card .bc-arrow {
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    color: var(--terra);
+    line-height: 1;
+  }
+  .build-card .bc-flow {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    text-align: center;
+    font-variation-settings: 'opsz' 30;
+    border-top: 1px dotted var(--rule);
+    padding-top: 18px;
+  }
+  .build-card .bc-flow strong {
+    color: var(--ink);
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  /* "URL pattern" code block — slide 8 hallucination receipt */
+  .hallucination-receipt {
+    margin: 28px 0;
+    padding: 22px 26px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--danger);
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  .hallucination-receipt .r-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--danger);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .hallucination-receipt .url {
+    color: var(--ink);
+  }
+  .hallucination-receipt .url .fake {
+    color: var(--danger);
+    background: rgba(153, 27, 27, 0.08);
+    padding: 1px 4px;
+  }
+
+  /* ===================== TOOLBAR / PRINT ===================== */
+  @media print {
+    @page {
+      size: 11.25in 11.25in;
+      margin: 0;
+    }
+    html, body {
+      background: white !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 11.25in;
+    }
+    .stage {
+      gap: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+    }
+    .square {
+      width: 11.25in !important;
+      height: 11.25in !important;
+      box-shadow: none !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .square:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    .toolbar { display: none !important; }
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    .square::before {
+      background-image: none !important;
+      opacity: 0 !important;
+    }
+    .square::after {
+      opacity: 1 !important;
+    }
+  }
+
+  .toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(245, 239, 230, 0.96);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 10px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .toolbar button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background 200ms ease;
+  }
+  .toolbar button:hover { background: var(--terra); }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>10 slides · 1080 × 1080</span>
+  <button onclick="window.print()">⤓ Export PDF</button>
+</div>
+
+<div class="stage">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER : universal hook -->
+  <!-- ====================================================== -->
+  <div class="square cover-slide">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 02</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+
+      <!-- Hero illustration: pipeline → glitched output.
+           Footer-safe layout: the flex slot has 0 vertical padding so its full
+           height goes to the SVG. SVG is sized smaller (440 high) to leave
+           room for the headline + cover-footer below. margin-top:40px on the
+           SVG pushes the overflow:visible arc apex (which extends 40px above
+           the SVG box) clear of the running-head divider above. -->
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 0;">
+        <svg viewBox="0 0 720 500" width="640" height="440" style="overflow: visible; margin-top: 40px;">
+          <defs>
+            <filter id="cover-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+              <feOffset dx="0" dy="4"/>
+              <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+              <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#991b1b" stroke-width="1" opacity="0.35"/>
+            </pattern>
+          </defs>
+
+          <!-- Top arc label (original semicircle, restored).
+               Geometry: chord 540, radius 270 → apex at y = 230 - 270 = -40
+               (above viewBox). Renders via overflow:visible on the SVG; the
+               SVG's margin-top:50px in the parent flex slot pushes this apex
+               clear of the running-head divider above. -->
+          <path id="arc-top-c" d="M 90 230 A 270 270 0 0 1 630 230" fill="none"/>
+          <text font-family="Geist Mono, monospace" font-size="20" letter-spacing="8" fill="#a8a092" font-weight="500">
+            <textPath href="#arc-top-c" startOffset="50%" text-anchor="middle">EMPTY UPSTREAM  ·  CONFIDENT OUTPUT</textPath>
+          </text>
+
+          <!-- The pipeline: source → agent → output -->
+          <g filter="url(#cover-shadow)">
+            <!-- SOURCE (empty / blocked) -->
+            <rect x="60" y="200" width="160" height="100" rx="6" fill="#faf6ef" stroke="#991b1b" stroke-width="2" stroke-dasharray="6 4"/>
+            <text x="140" y="232" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="3" fill="#991b1b" font-weight="600">SOURCE</text>
+            <text x="140" y="258" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="18" fill="#991b1b">returned nothing</text>
+            <text x="140" y="280" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#8a8478">— blocked / null / 403 —</text>
+
+            <text x="245" y="260" text-anchor="middle" font-family="Fraunces, serif" font-size="34" fill="#b8431b">→</text>
+
+            <!-- AGENT (kept going) -->
+            <rect x="270" y="200" width="180" height="100" rx="6" fill="#faf6ef" stroke="#1a1814" stroke-width="2"/>
+            <line x1="270" y1="206" x2="450" y2="206" stroke="#b8431b" stroke-width="3"/>
+            <text x="360" y="234" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="3" fill="#b8431b" font-weight="600">AGENT</text>
+            <text x="360" y="262" text-anchor="middle" font-family="Fraunces, serif" font-size="20" fill="#1a1814" font-weight="400">kept going</text>
+            <text x="360" y="282" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="12" fill="#8a8478">no null-handling</text>
+
+            <text x="475" y="260" text-anchor="middle" font-family="Fraunces, serif" font-size="34" fill="#b8431b">→</text>
+
+            <!-- OUTPUT (fabricated) -->
+            <g transform="translate(500, 200)">
+              <rect x="0" y="0" width="160" height="100" rx="6" fill="#faf6ef" stroke="#991b1b" stroke-width="2"/>
+              <rect x="0" y="0" width="160" height="100" rx="6" fill="url(#hatch)"/>
+              <text x="80" y="32" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="3" fill="#991b1b" font-weight="600">OUTPUT</text>
+              <text x="80" y="58" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="18" fill="#991b1b">invented</text>
+              <text x="80" y="82" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#8a8478">plausible · false</text>
+            </g>
+          </g>
+
+          <!-- Caption beneath (process-flow narration, complementary to the
+               confessional headline below; intentionally NOT echoing the teach) -->
+          <text x="360" y="380" text-anchor="middle" font-family="Geist Mono, monospace" font-size="14" letter-spacing="5" fill="#b8431b" font-weight="600">EMPTY SOURCE  →  INVENTED OUTPUT  →  SHIPPED</text>
+        </svg>
+      </div>
+
+      <!-- Headline + meta -->
+      <div style="flex-shrink: 0;">
+        <div class="cover-byline">Field Notes · No. 02 · A Generative AI Field Guide</div>
+        <h1 style="font-size: 58px; line-height: 1.04; max-width: 24ch;">
+          I shipped an AI agent that <em class="terra-em">invented</em> its own job candidates.
+        </h1>
+        <p style="font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: var(--ink-mute); margin-top: 20px; max-width: 36ch; line-height: 1.4; font-variation-settings: 'opsz' 36;">Three nodes. Two hours. The failure mode every production agent eventually meets — and the four defences that ship them anyway.</p>
+        <div class="cover-footer">
+          <span>A Field Guide to Generative AI · No. 02</span>
+          <span class="terra">01 / 10 · Swipe →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — THE THESIS : universal, stated once, cleanly -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The fundamental</span><span class="dot">·</span><span>One line</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body" style="justify-content: center;">
+        <span class="eyebrow">The fundamental</span>
+        <p class="pull-quote" style="font-size: 82px; line-height: 1.04;">
+          When the upstream source returns <em>nothing,</em> an LLM agent fills the gap. <em>With anything plausible.</em>
+        </p>
+        <p class="quote-sub" style="max-width: 44ch; margin-top: 36px;">
+          This is not a bug. It is the <strong>default behaviour</strong> of any agent that wraps an LLM and does not explicitly handle empty input. Production agents fail here more than anywhere else.
+        </p>
+        <div class="quote-attrib">— The failure mode behind most agent regrets</div>
+      </div>
+      <div class="swipe">02 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">2<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — THE MECHANISM : why this happens -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The mechanism</span><span class="dot">·</span><span>Why it happens</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">The mechanism</span>
+        <h1>LLMs complete <em class="terra-em">patterns.</em> Empty input is still a pattern.</h1>
+
+        <div class="mechanism">
+          <div class="step">
+            <div class="m-num">01</div>
+            <div class="m-text">Your prompt sets up a <em>shape</em> the model has seen before.</div>
+            <div class="m-tag">setup</div>
+          </div>
+          <div class="step">
+            <div class="m-num">02</div>
+            <div class="m-text">The upstream tool / API / source returns <em>null, blocked, or 403</em>.</div>
+            <div class="m-tag">trigger</div>
+          </div>
+          <div class="step failure">
+            <div class="m-num">03</div>
+            <div class="m-text">Without explicit "stop here" guardrails, the model <em>completes the pattern anyway</em> — from training data, from priors, from anything that fits.</div>
+            <div class="m-tag">hallucinate</div>
+          </div>
+          <div class="step">
+            <div class="m-num">04</div>
+            <div class="m-text">Output looks correct in shape, in tone, in structure. <em>It isn't.</em></div>
+            <div class="m-tag">ship it</div>
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 28px; max-width: 46ch;">
+          The model isn't lying. It's doing what it was trained to do — <strong>complete the next token</strong>. The bug is in the pipeline around it.
+        </p>
+      </div>
+      <div class="swipe">03 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">3<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — THE PROOF : HR Screener in 3 nodes, on one slide -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>A real case</span><span class="dot">·</span><span>Proof</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">A real case</span>
+        <h1 style="font-size: 60px;">We built a 3-node HR screener. <em class="terra-em">Same failure, exact shape.</em></h1>
+
+        <div class="build-card">
+          <div class="bc-head">— The pipeline · no code · three LLM nodes wired in sequence —</div>
+          <div class="bc-pipeline">
+            <div class="bc-node">
+              <div class="bcn-num">Node 01</div>
+              <div class="bcn-name">Profile Search</div>
+            </div>
+            <div class="bc-arrow">→</div>
+            <div class="bc-node">
+              <div class="bcn-num">Node 02</div>
+              <div class="bcn-name">Skill Extractor</div>
+            </div>
+            <div class="bc-arrow">→</div>
+            <div class="bc-node">
+              <div class="bcn-num">Node 03</div>
+              <div class="bcn-name">Candidate Scorer</div>
+            </div>
+          </div>
+          <div class="bc-flow">
+            Inputs <strong>location · years · job title</strong> → Node 1 searches the web for 5 profiles → Node 2 extracts the top 5 skills for the title → Node 3 scores the 5 profiles against the 5 skills and returns a <strong>ranked shortlist</strong>.
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 28px; max-width: 48ch;">
+          On paper, clean. In production, Node 1 hit a wall — and the agent obeyed the fundamental from slide&nbsp;2.
+        </p>
+      </div>
+      <div class="swipe">04 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">4<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — THE RECEIPT : what we expected vs what we got -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The receipt</span><span class="dot">·</span><span>Side by side</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">The receipt</span>
+        <h1>Node 1 returned <em class="danger-em">nothing.</em> Node 3 ranked them <em class="terra-em">anyway.</em></h1>
+
+        <div class="vs-cards">
+          <div class="vs-card expected">
+            <div class="vs-label">— What we expected —</div>
+            <div class="vs-head">5 real profiles · verifiable URLs</div>
+            <div class="vs-list">
+              <span class="row">linkedin.com/in/ananya-kumar-eng</span>
+              <span class="row">linkedin.com/in/raj-vora-react</span>
+              <span class="row">linkedin.com/in/sneha-iyer-fe</span>
+              <span class="row">linkedin.com/in/karthik-bn-ux</span>
+              <span class="row">linkedin.com/in/priya-rao-web</span>
+            </div>
+            <div class="vs-foot">Real people. Real public profiles. Real data.</div>
+          </div>
+          <div class="vs-card actual">
+            <div class="vs-label">— What we got —</div>
+            <div class="vs-head">5 fabricated profiles · all plausible · all false</div>
+            <div class="vs-list">
+              <span class="row"><span class="glitch">linkedin.com/in/alex-frontend-2024</span></span>
+              <span class="row"><span class="glitch">linkedin.com/in/sarah-react-blr</span></span>
+              <span class="row"><span class="glitch">linkedin.com/in/m-johnson-sde</span></span>
+              <span class="row"><span class="glitch">linkedin.com/in/dev-banerjee-fe</span></span>
+              <span class="row"><span class="glitch">linkedin.com/in/p-sharma-react</span></span>
+            </div>
+            <div class="vs-foot">None exist. Plausibility is not truth.</div>
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 24px; max-width: 50ch;">
+          The pipeline produced a <em>ranked shortlist</em> — of people who don't exist. A senior recruiter, given this output, would have wasted a week.
+        </p>
+      </div>
+      <div class="swipe">05 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">5<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 06 — GENERALISE : your data is somebody else's protected asset -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Generalise</span><span class="dot">·</span><span>Beyond HR</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">Generalise</span>
+        <h1>Your data is almost always <em class="terra-em">somebody else's protected asset.</em></h1>
+
+        <div class="platforms">
+          <div class="platform">
+            <div class="p-icon">in</div>
+            <div class="p-name">LinkedIn <em>profiles, jobs, posts</em></div>
+            <div class="p-status blocked">Blocked</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">𝕏</div>
+            <div class="p-name">Twitter / X <em>tweets, users</em></div>
+            <div class="p-status paid">Paid API</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">▢</div>
+            <div class="p-name">Indeed / Naukri <em>job postings</em></div>
+            <div class="p-status tos">ToS-blocked</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">⌥</div>
+            <div class="p-name">Glassdoor <em>reviews</em></div>
+            <div class="p-status tos">ToS-blocked</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">⚑</div>
+            <div class="p-name">GitHub <em>public profiles, repos</em></div>
+            <div class="p-status open">Open API</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">◉</div>
+            <div class="p-name">Reddit <em>posts, comments</em></div>
+            <div class="p-status paid">Paid API</div>
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 28px; max-width: 50ch;">
+          The web you remember was scrapable. The web that matters in 2026 isn't. <em>Design for that before you build.</em>
+        </p>
+      </div>
+      <div class="swipe">06 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">6<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 07 — DEFENCE #1 : Force null-handling -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Defence</span><span class="dot">·</span><span>One of four</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="defence-num">01<span class="of">/04</span></div>
+      <div class="body">
+        <span class="eyebrow">Defence 01 · Null-handling</span>
+        <h1>Make "<em class="terra-em">return empty</em>" an explicit option.</h1>
+
+        <div class="snippet-block">
+          <span class="s-label">— Add to every node that calls an external source —</span>
+          <div class="s-code">If the source returns <em>no results</em>, <em>partial results</em>, or an
+<em>error</em>, you MUST return exactly: { "status": "empty",
+"reason": "&lt;one line&gt;" }.
+
+Do NOT invent URLs, names, dates, or facts to fill the gap.
+Do NOT proceed to downstream reasoning on empty input.</div>
+          <div class="s-foot">This single block stops roughly 80% of "the agent made it up" failures. Tested across recruitment, research, and competitive-intel pipelines.</div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 24px; max-width: 48ch;">
+          Models are excellent at following explicit refusal instructions. They are terrible at <em>inferring</em> when they should refuse.
+        </p>
+      </div>
+      <div class="swipe">07 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">7<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 08 — DEFENCE #2 : Constrain the source -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Defence</span><span class="dot">·</span><span>Two of four</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="defence-num">02<span class="of">/04</span></div>
+      <div class="body">
+        <span class="eyebrow">Defence 02 · Constrain the source</span>
+        <h1>Pick the source <em class="terra-em">before</em> you write the prompt.</h1>
+
+        <div class="snippet-block">
+          <span class="s-label">— Replace open "search the web" with a named source —</span>
+          <div class="s-code"><em>WEAK:</em>  "Search the web for senior frontend candidates in Bengaluru."
+
+<em>STRONG:</em>  "Query <em>only</em> the GitHub Public REST API at api.github.com/search/users
+        for users with location:Bengaluru and language:JavaScript.
+        Return their public github URL, name, and bio.
+        If the API rate-limits or returns no users, return { "status": "empty" }."</div>
+          <div class="s-foot">A named, allowed source removes the model's freedom to "find" data from anywhere — including its imagination.</div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 24px; max-width: 48ch;">
+          Open prompts produce open hallucinations. <em>Constrained prompts produce constrained output</em> — including honest emptiness.
+        </p>
+      </div>
+      <div class="swipe">08 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">8<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 09 — DEFENCES #3 + #4 : Validator + Reliable upstream -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Defence</span><span class="dot">·</span><span>Three &amp; four</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="defence-num">03<span class="of">/04</span></div>
+      <div class="body">
+        <span class="eyebrow">Defence 03 · A validator node</span>
+        <h1 style="font-size: 56px;">Put a <em class="terra-em">checker</em> between research and reasoning.</h1>
+
+        <div class="snippet-block" style="margin-top: 20px;">
+          <span class="s-label">— A 1-node check, added between Node 1 and Node 2 —</span>
+          <div class="s-code">For every URL in the input, perform a <em>HEAD request</em>.
+If status != 200, drop the row.
+If fewer than N valid rows remain, return { "status": "insufficient", "found": N }.
+
+Pass through ONLY verified rows to the next node.</div>
+        </div>
+
+        <div style="margin-top: 32px; padding-top: 26px; border-top: 1px solid var(--rule);">
+          <span class="eyebrow" style="margin-bottom: 18px;">Defence 04 · Pick reliable upstream</span>
+          <p class="lede-block" style="margin-top: 0; max-width: 50ch;">
+            Your first three production agents should run on <strong>data you own</strong> or <strong>APIs you control</strong>. Save scraped-web problems for after you've shipped the failure modes once.
+          </p>
+        </div>
+      </div>
+      <div class="swipe">09 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">9<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 10 — CTA -->
+  <!-- ====================================================== -->
+  <div class="square closing">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>End Notes</span><span class="dot">·</span><span>No. 10</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+
+      <div class="body">
+
+        <div>
+          <div class="closing-stamp">— A workshop that fixes this —</div>
+          <div class="ask-primary">
+            <h1 class="ask-headline">Next: <em>Defensive Prompting</em> for agents.</h1>
+            <p class="ask-help">Null-handling, validator nodes, constrained sources. Two hours. Build your own agent. No code. Dates in the comments.</p>
+            <div class="ask-action">DM <span class="kw">"seat"</span> to join the next session</div>
+          </div>
+
+          <div class="ask-secondary">
+            <span class="a-mark">&</span>
+            <span class="a-text">Or DM <em>"defences"</em> for the one-page cheat sheet — slides 7–9 in a single printable PDF with copy-ready prompt blocks.</span>
+          </div>
+        </div>
+
+        <div class="sig-block">
+          <div>
+            <div class="sig-name">Shantanu Chandra</div>
+            <div class="sig-role">Teaching AI fluency to professionals who don't write code. Field notes from live workshops with senior operators.</div>
+          </div>
+          <div class="sig-li">
+            <div class="li-label">— Connect —</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="li-icon">in</div>
+              <div class="li-url">linkedin.com/in/<span class="handle">chandrashantanu</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

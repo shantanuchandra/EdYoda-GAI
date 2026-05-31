@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ===================== TOPBAR ===================== */
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+
+  .topbar .title .accent { color: var(--accent); }
+
+  .clock-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+  }
+
+  .clock-box {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    gap: 2px;
+  }
+  .clock-box .label {
+    color: var(--text-dim);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+
+  .topbar .grow { flex: 1; }
+
+  .topbar button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary {
+    background: var(--accent);
+    color: #062420;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .topbar button.primary:hover { background: #7df1de; }
+
+  .topbar .slide-counter {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2);
+    border-left: 1px solid var(--border);
+  }
+
+  /* ===================== MAIN LAYOUT ===================== */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    height: calc(100vh - 64px - 56px);
+  }
+
+  .panel-left {
+    overflow-y: auto;
+    padding: var(--s-3) var(--s-4);
+    border-right: 1px solid var(--border);
+  }
+
+  .panel-right {
+    overflow-y: auto;
+    background: var(--bg-1);
+    padding: var(--s-3);
+  }
+
+  /* Scrollbars */
+  .panel-left::-webkit-scrollbar,
+  .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track,
+  .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb,
+  .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover,
+  .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===================== BOTTOMBAR ===================== */
+  .bottombar {
+    height: 56px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-2);
+    flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1;
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 var(--s-2);
+    border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  /* ===================== SLIDE CONTENT ===================== */
+  .timing-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-bottom: var(--s-3);
+    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .timing-bar .block-title {
+    font-weight: 500;
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--s-2);
+  }
+  .slide-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin: 0;
+    flex: 1;
+  }
+
+  /* Title row — h1 + optional workbook pill */
+  .title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-2);
+    margin-bottom: var(--s-3);
+  }
+  .workbook-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--purple-soft);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    border-radius: 999px;
+    color: var(--purple);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .workbook-pill .wp-icon {
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+  .workbook-pill .wp-text {
+    line-height: 1.2;
+  }
+
+  /* Follow-up paragraphs in say/sayAfter blocks */
+  .quote-followup {
+    margin-top: 10px;
+    padding-top: 0;
+  }
+
+  .section {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+
+  .section .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .section h3 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+  .section.bridge .quote { border-left-color: #f472b6; }
+  .section.deeper .quote { border-left-color: #60a5fa; }
+
+  .quote {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.6;
+    padding-left: 12px;
+    border-left: 2px solid var(--warm);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .section p {
+    font-size: 0.94rem;
+    line-height: 1.6;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list {
+    counter-reset: step;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .step-list > li {
+    counter-increment: step;
+    padding-left: 36px;
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    position: relative;
+    background: #060810;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 48px 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--accent);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+  .prompt-copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .prompt-copy:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent-line);
+  }
+  .prompt-copy.copied {
+    background: var(--green-soft);
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-section { margin-bottom: var(--s-3); }
+
+  .right-section h4 {
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .preview-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title {
+    font-size: 0.92rem;
+    font-weight: 500;
+    margin: 4px 0 2px;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .preview-card .when {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 16px;
+    text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.4rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .timer-controls {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .timer-controls button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .quick-key kbd {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    font-weight: 500;
+    min-width: 22px;
+    text-align: center;
+    box-shadow: 0 1px 0 var(--border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session 2</span></span>
+
+  <div class="clock-divider"></div>
+
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 2:00</span>
+  </div>
+
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+
+  <div class="grow"></div>
+
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 28</span>
+</div>
+
+<div class="main">
+
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(180)">3m</button>
+          <button onclick="startExTimer(300)">5m</button>
+          <button onclick="startExTimer(360)">6m</button>
+          <button onclick="startExTimer(420)">7m</button>
+          <button onclick="startExTimer(480)">8m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>3</kbd> <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> <kbd>8</kbd> <kbd>0</kbd> start timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA =====================
+   28 slides total — slide-for-slide parity with learner deck.
+   Both decks share the same 1-28 numbering, same break slot, same tags.
+   Block titles by slide num:
+   1-5   = BLOCK 0 · OPENING (1 hook · 2 one-word check-in · 3 croissant + Promise · 4 norms + roadmap · 5 The One Rule)
+   6-11  = BLOCK 1 · CONCEPT SPRINT (6 = 5 Gaps · 7 = Loop · 8 = Maturity · 9 = Funnel · 10 = Cost · 11 = Patterns)
+   12-15 = BLOCK 2 · BUILD PART 1 (12 walkthrough · 13 pick track · 14 STEP A · 15 STEP B)
+   16    = HARD BREAK
+   17-20 = BLOCK 3 · BUILD PART 2 (17 checkpoints · 18 STEP C · 19 STEP D · 20 STEP E)
+   21-25 = BLOCK 4 · PATTERN DEBRIEF (21 frame · 22 Lens 1 · 23 Lens 2 · 24 Lens 3 · 25 Lens 4)
+   26    = Peer Demos
+   27    = BLOCK 5 · What's Next + Bridge to S3
+   28    = BLOCK 5 · Close · 3-Line Crescendo
+   Gap numbering (severity-grouped, mirrors learner slide 6):
+   #1 Memory (Crit) · #2 Multi-step (Crit) · #3 Tools (High) · #4 Autonomy (High) · #5 Planning (Med)
+   Build closes them: Step A → #3 · Step C → #4 · Step D → #1 · Step E → #2 + #5
+*/
+const slides = [
+  {
+    num: 1, when: "Pre-start", duration: "—", tag: "title", block: "BLOCK 0 · OPENING",
+    title: "Why Agents? The Case for Autonomous AI · Pre-start hook slide",
+    say: "(No speaking yet — slide is up 5 min before class with soft instrumental music. Welcoming, not awkward silence.)",
+    doSteps: [
+      "Have this slide up on shared screen 5 min before scheduled start.",
+      "Play soft instrumental music (optional).",
+      "Mute Slack, email, calendar notifications.",
+      "Confirm 4 backup AI Pattern Advisor agents (one per track: Marketing/Sales, Finance/Consulting, Doctor/Healthcare, Generic) are pre-built and one click away in your facilitator account.",
+      "Pre-load 4 tabs: EdYoda Agent Builder (logged in, demo agent open) · ChatGPT (with Bakery Campaign prompt from Session 1 in clipboard) · Claude.ai · Gemini."
+    ],
+    watch: "Look for people joining 1–2 min early — greet by name in chat as they arrive. With a small cohort (~6), this matters more.",
+    note: "Opening hook line on the slide: 'Last session you watched a chatbot fail 4 out of 6 steps. Today you build the thing that doesn't.'"
+  },
+  {
+    num: 2, when: "0:00 – 0:02", duration: "2 min", tag: "title", block: "BLOCK 0 · OPENING",
+    title: "Cold open · One-word check-in",
+    say: "Welcome back, everyone. Before I say anything else — quick one in the chat. In one word, how did Session 1 land for you? Useful? Overwhelming? Surprising? Sticky? Just one word. Type it in.",
+    afterPause: "Wait 30 seconds. Read every response out loud, by name. With this room size, everyone gets that moment.",
+    sayAfter: "Thank you Priya, thank you Rajesh, thank you Anita, thank you Daniel… 'sticky', 'useful', 'a lot' — I'll take it. That's exactly the right baseline for today.",
+    doSteps: [
+      "Paste in chat (also visible on learner deck): 'In one word, how did Session 1 land for you? Useful · Overwhelming · Surprising · Sticky · Other. Just one word. Type it in.'",
+      "Wait 30 seconds for the one-word chat storm. Read every response by name.",
+      "With a small cohort (~6), go verbal — call each learner by name and ask for their word if chat is quiet."
+    ],
+    prompt: "IN ONE WORD — how did Session 1 land for you?\nUseful · Overwhelming · Surprising · Sticky · Other.\nJust one word. Type it in chat.",
+    watch: "If only 2–3 people respond → say 'a few more please, I want to hear from everyone'. Then wait. Don't skip — the chat-storm in the first 90 seconds predicts engagement for the rest of the session.",
+    note: "Same opener-shape as Session 1 — learners who type in the first 90 seconds stay engaged. Re-using the cold-open ritual signals continuity: we're picking up where we left off, not starting over. The learner deck mirrors this prompt on its own slot 2 so off-camera learners can see what's being asked.",
+    bridge: "Hold the energy — pivot to the bakery callback."
+  },
+  {
+    num: 3, when: "0:02 – 0:06", duration: "4 min", tag: "title", block: "BLOCK 0 · OPENING",
+    title: "S1 callback · the bakery that failed · The Promise",
+    say: "Quick one — hands up in the chat, drop a croissant if you remember the bakery campaign from Session 1. That was the demo where I asked ChatGPT to plan a bakery launch — six things in a row: research the trends, draft the copy, remember the partner's name, schedule the posts across a week, set a 30-day reminder, run the whole thing end-to-end. It got two of the six. It drafted copy. It vaguely searched. Then it stopped — because a chatbot can't actually open your calendar, can't remember anything between conversations, and can't take action on its own. That's the gap we're closing today.\n\nSo here's the deal for the next two hours. By the end, you'll know exactly the five things a chatbot can't do that an agent can — those are the five gaps. You'll learn a four-question framework that tells you, for any business problem you ever see again, whether you need a chatbot, a retrieval system, an agent, or a multi-agent setup. You'll see why this is a business problem and not just a tech problem — there are real numbers on the cost of staying on chatbots, and we'll look at them in twenty minutes.\n\nAnd the big one — you'll walk out of here with your own working agent. Yours. On your screen. Customised to your job. No code. This is session 2 of 8 in the course, and session 3 — next week — is Prompt Engineering, where we make sure the agent you build today does what you actually meant.",
+    doSteps: [
+      "Press Copy on the prompt block below. Paste into Zoom chat.",
+      "Wait 15 seconds. Read 3–4 croissants by name as they come in.",
+      "Land the bridge line: 'Hold that scene in your head — that's the problem we're solving today.'",
+      "Then deliver the Promise narration in the 'Say' block above (~2.5 min). Pace yourself — don't sprint."
+    ],
+    prompt: "🥐 in chat — if you remember the bakery campaign from Session 1.\n(The one that failed 4 of 6 steps.)",
+    watch: "If the croissants don't come → 'A few more please, anyone? Even one croissant. I want to hear from you.' Then move on. Don't burn 90 seconds on a recall prompt. The Promise is the load-bearing 2.5 min of this slide, not the recall.",
+    note: "Two beats on this slide — the callback (~90 sec) and the Promise (~2.5 min). The learner deck shows: croissant cue at the top, the Promise (what-they-walk-out-with list + two cited stat cards) editorial card below. The two anchor stats on the learner side are: 42% of companies abandoned most AI initiatives in 2025 (Fullview, citing MIT/RAND) and 74% of organisations achieve first-year ROI when they get the pattern match right (McKinsey State of AI 2025). You don't need to read them aloud — the Promise narration covers them in plain English. The full sourced stat strip lives on slide 10.",
+    bridge: "Now the rules of engagement — four norms, four moves."
+  },
+  {
+    num: 4, when: "0:06 – 0:09", duration: "3 min", tag: "title", block: "BLOCK 0 · OPENING",
+    title: "Norms · Roadmap · Concepts → Build → Debrief → Done",
+    say: "Four norms first, briskly. Cameras encouraged but optional. Chat freely. Mics muted unless I call on you. A real ten-minute break partway through — promise. And new for today — you will spend more time in the Builder than watching me. That's by design. Bring your hands.",
+    doSteps: [
+      "Walk the 6-norm grid briskly (~60 sec): Cameras · Chat · Mics · Break · Stuck questions · NEW for today (more Builder time).",
+      "Pivot to Roadmap (~90 sec): show the one-arrow flow — Concepts → Build → Debrief → Done.",
+      "Name the build artifact: 'The thing you're building is called the AI Pattern Advisor — an agent that takes any business problem you describe and tells you which AI pattern fits.'",
+      "Name the four tracks: Marketing/Sales · Finance/Consulting · Doctor/Healthcare · Generic. 'You pick yours when we get there.'"
+    ],
+    watch: "Keep this slide under 3 min. Norms are common ground — don't re-teach what learners already know from Session 1. The roadmap is the load-bearing part.",
+    note: "The learner deck shows the same 6-norm grid + the one-arrow Roadmap. Same shape, paper-mode visual. Don't dwell on norms — the engagement signal you want is the chat-storm from slide 2, not nodding through a norms table.",
+    bridge: "One rule for today. Land it slow."
+  },
+  {
+    num: 5, when: "0:09 – 0:10", duration: "1 min", tag: "title", block: "BLOCK 0 · OPENING",
+    title: "The One Rule",
+    say: "One rule for today. You will not leave with notes. You will leave with a working agent.",
+    sayAfter: "Six ideas next, twenty minutes. Your job is to recognise, not memorise — every one of these comes back during the build. Ready?",
+    doSteps: [
+      "Pause two seconds before speaking. Let the slide settle.",
+      "Deliver the 'Say' line at a slower-than-normal cadence. Eye contact through the camera.",
+      "Pause two seconds after. Don't fill the silence.",
+      "Then deliver the 'Then say' pivot line and advance to Sprint 1."
+    ],
+    watch: "Time check: by the end of this slide you should be at the 10-minute mark. If you're past it, cut one of the cold-open readouts next time. Never cut The One Rule — it's the contract for the session.",
+    note: "Single-line editorial slide on the learner side — pull-quote feel, lots of whitespace. The pace of delivery (slow, even, with pauses) is what makes the line land, not extra words.",
+    bridge: "Six ideas. Twenty minutes. Recognize, not memorize. Every one of these comes back during the build."
+  },
+  {
+    num: 6, when: "0:10 – 0:13", duration: "3 min", tag: "demo", block: "BLOCK 1 · CONCEPT SPRINT",
+    title: "Sprint 1 · The 5 Gaps That Agents Close",
+    say: "Let's go back to where Session 1 ended. The bakery campaign. I'm going to run the exact same prompt I ran last week, live, in a plain chatbot — and we're going to watch it fail in the same five ways. The point isn't to make ChatGPT look bad. It's to name exactly what it can't do, so when you build your own agent in an hour, you know which problems you're actually fixing.",
+    doSteps: [
+      "Switch to your ChatGPT tab.",
+      "Press Copy on the prompt block below and paste it into ChatGPT. Hit send.",
+      "Let it run on screen. Don't narrate while it's typing — let the room watch it fail in real time.",
+      "When it finishes, switch back to this slide. The 5-Gaps matrix on the learner deck maps directly onto what just failed.",
+      "Walk the matrix row by row, naming each gap with its number — see the 'Then say' block below for the exact words."
+    ],
+    prompt: "I run a small bakery called Lumière in Mumbai. My partner Sneha and I are launching a new line of croissants next month. Can you:\n1. Research what bakery trends are hot in Mumbai this month\n2. Draft three social media posts in Sneha's voice (she's funny and a bit sarcastic)\n3. Remember her voice for next time we work together\n4. Schedule the three posts across the launch week\n5. Set a 30-day reminder to check how the launch went\n6. Send me a summary email when you've done all five",
+    sayAfter: "Look at what it couldn't do. Gap #1 Memory — it can't remember Sneha. The next time you open this chat, that context is gone. Critical. Gap #2 Multi-step — six asks in one prompt, it did two of them and stopped. Critical. Gap #3 Tools — it can't actually open the web to research live Mumbai trends, so it made up trends from training data. High. Gap #4 Autonomy — it can't schedule anything across a week on its own; it needs you to do every keystroke. High. Gap #5 Planning — it can't set a 30-day reminder. There's no calendar attached. Medium.\n\nFive gaps. Memory. Multi-step. Tools. Autonomy. Planning. Two Critical, two High, one Medium. These are the five things a chatbot can't do — and the five things an agent fixes.\n\nWe'll close Gap #3 in Step A, Gap #4 in Step C, Gap #1 in Step D, and Gaps #2 and #5 together in Step E.",
+    note: "Analogy (memorize): A chatbot is a smart intern who forgets you between conversations, can't open any apps, and won't do anything without you typing the next instruction. An agent fixes all five. The gap numbering (1 Memory, 2 Multi-step, 3 Tools, 4 Autonomy, 5 Planning) is severity-grouped on the learner slide — Critical → High → Medium. Every concept callout in Block 2 + 3 refers back to a specific Gap #. Lens 1 scorecard (slide 20) walks them in the same order.",
+    watch: "If ChatGPT behaves differently today (e.g., browses by default) → pivot to a slide screenshot from Session 1. 'In Session 1 this is what happened. Today the model behaved differently — that's exactly why agents matter.'",
+    bridge: "Next: how does an agent's loop actually differ from a chatbot's?"
+  },
+  {
+    num: 7, when: "0:13 – 0:16", duration: "3 min", tag: "demo", block: "BLOCK 1 · CONCEPT SPRINT",
+    title: "Sprint 2 · The Agent Loop — Goal → Plan → Act → Observe → Reflect → Iterate",
+    say: "If you only remember one thing from today, remember this loop. Six steps. This is the heartbeat of every agent you'll ever build, including the one you're going to build in forty minutes.\n\nHere's the difference. A chatbot does one thing: you give it a prompt, it gives you a response, and then it just sits there. Nothing happens next. It's a vending machine — one coin, one snack, done.\n\nAn agent works differently. You don't give it a prompt — you give it a goal. Something you actually want to get done. Step one, Goal: 'send me a weekly sales summary every Friday at 9am.' Step two, Plan: the agent breaks the goal into smaller steps on its own — fetch the CRM data, calculate the numbers, write the report, schedule the email. Step three, Act: it actually calls a tool to do the first step. Step four, Observe: it reads what came back from the tool — did the CRM return data, or did it fail? Step five, Reflect: it checks its own work against the goal. Am I closer? Am I stuck? Do I need to try a different approach? Step six, Iterate: if the goal isn't met, it loops back to Plan and tries the next step. It keeps going until the job is actually done.\n\nThink of it like a project manager instead of a vending machine. You give a PM a goal — 'launch this product' — they figure out what needs to happen, do the work, check whether it landed, and adjust. That's the agent loop.\n\nNow let me show you what this looks like on a real agent, running live in EdYoda Agent Builder.",
+    doSteps: [
+      "On the learner slide they see the loop visual (six steps with arrows, last → first showing it loops back).",
+      "Switch to EdYoda Agent Builder. Open the pre-built demo agent's trace log on a tiny goal you ran before class (e.g., the 'Weekly Sales Summary' example).",
+      "Walk through the trace pausing on each of the 6 steps as the agent executes — point at the actual log lines on screen. Use these exact words so learners hear the loop being named:",
+      "'Goal — there it is, the agent received the assignment.' Point at the first log line.",
+      "'Plan — see the agent breaking it into ordered sub-tasks?' Point at the plan output.",
+      "'Act — it just called a tool. That's a real API call, not a conversation.' Point at the tool-call log.",
+      "'Observe — see this line? That's the agent reading what the tool returned.' Point at the tool-response log.",
+      "'Reflect — and this is where the agent decides: am I done, or do I loop again?' Point at the reasoning step.",
+      "'Iterate — and back to the top. It's planning the next step now.' Show the second iteration starting.",
+      "When the agent finishes, land the line: 'Six steps. Every agent you'll ever build runs this loop. The one you'll build in forty minutes runs this loop.'"
+    ],
+    note: "Analogy that lands: chatbot = vending machine (one coin, one snack, no follow-up). Agent = project manager (you give it a goal, it plans, executes, checks results, adjusts). Use both — the contrast is what makes it stick. The trace-log walkthrough on EdYoda Agent Builder is the most important demo of Block 1; it's the first time learners see an agent actually run. Slow down here, especially on the Reflect step — that's the step learners hardest to grok abstractly.",
+    watch: "If the pre-built demo agent breaks live → play your 30-sec backup screen recording. Don't debug live. If the trace log is small and hard to read on share-screen, increase browser zoom to 150% before this slide.",
+    bridge: "Not every agent is the same kind of agent. There's a ladder."
+  },
+  {
+    num: 8, when: "0:16 – 0:19", duration: "3 min", tag: "title", block: "BLOCK 1 · CONCEPT SPRINT",
+    title: "Sprint 3 · The Agent Maturity Model — L0 → L1 → L2 → L3",
+    say: "Not every agent is actually an agent. There's a ladder, and the rung you're on determines what's possible.\n\nThe easiest way to picture this is self-driving cars. L0 is you driving — hands on the wheel, eyes on the road, you do everything. L1 is lane assist — the car helps a little, but you're still driving. L2 is the car drives on the highway while you supervise — you're still there, but you can take your hands off for stretches. L3 is the car drives itself across the city, with multiple systems coordinating.\n\nSame ladder applies to AI. L0 is a chatbot — single turn, no memory, no tools. Like an FAQ bot on a website. You ask, it answers, that's the end. L1 is a copilot — it can use one or two tools and pull information, but a human approves every step. GitHub Copilot suggesting code that you accept or reject — that's L1. A sales email assistant drafting an email that you send — also L1.\n\nL2 is a real agent. It plans, it remembers, it uses multiple tools, and it completes multi-step work on its own with bounded autonomy. A recruitment screening agent that reads 200 résumés, scores them, and schedules interviews — that's L2. The AI Pattern Advisor you're going to build today is L2.\n\nL3 is multi-agent — multiple specialists working in parallel, coordinated by an orchestrator. An end-to-end market research pipeline where a scout finds sources, an analyst reads them, and a writer drafts the report — that's L3.\n\nHere's the line I want you to remember. Most enterprises today are sitting at L0 or L1. The competitive advantage in the next two years is in moving to L2 — which is exactly one configuration change away. That's the move you're going to make on your own screen in the next forty minutes.\n\nIf you look at this ladder and think 'we're at L0' — that's honesty, not failure. That's where everyone starts. The whole point of today is that L2 is reachable.",
+    doSteps: [
+      "On the learner slide they see the maturity ladder with four rungs and progress bars (25%, 50%, 75%, 100%).",
+      "Walk down the rungs on the slide as you deliver the 'Say' block — ~20 seconds per rung.",
+      "Land the line: 'Most enterprises are at L0–L1. The competitive advantage is in moving to L2–L3. You'll all be running an L2 yourself by the end of today.'",
+      "Don't ask the room to type their L-level in chat — it's not in the learner deck, and the answer is mostly 'L0–L1' for everyone. Save the 30 seconds for Sprint 4."
+    ],
+    note: "Two anchors on this slide. (1) The self-driving analogy — it's the most-screenshotted moment of the session because it makes the abstract levels concrete in 10 seconds. Deliver it before the L0–L3 walk, not after. (2) The 'L0 is honesty, not failure' framing — if someone in the room is visibly skeptical, name it directly. The verbatim 'Most enterprises are at Level 0–1' line comes back in Lens 2 (slide 23) — same words.",
+    bridge: "Now the most useful slide of the day — how do you decide which pattern a problem needs?"
+  },
+  {
+    num: 9, when: "0:19 – 0:22", duration: "3 min", tag: "exercise", block: "BLOCK 1 · CONCEPT SPRINT",
+    title: "Sprint 4 · The 4-Question Decision Funnel",
+    say: "This is the most useful framework of the day. When any business problem lands on your desk — a colleague asks 'can AI do this?' — you have four patterns to choose from: Chatbot, RAG, Agent, Multi-Agent. The mistake most teams make is reaching for whichever pattern is hottest right now. The discipline is to walk down four questions in order and stop at the first yes.\n\nQuestion one — does the answer to the problem already exist in a fixed document or database? Like a policy doc, a knowledge base, a manual. If yes, you don't need an agent. You need RAG — retrieval-augmented generation — which is basically a smart search over your documents. Stop there.\n\nQuestion two — does the task need only a single response, with no follow-up action? Like 'write me a product description, once.' If yes, it's a Chatbot. Stop.\n\nQuestion three — does the task require multiple steps, memory across runs, or calling tools? If yes, you need an Agent. Stop.\n\nQuestion four — does the task need multiple specialised capabilities running in parallel, like a research scout and a writer and an editor all working at once? If yes, Multi-Agent.\n\nThe rule is: stop at the first yes. Don't skip questions. Most teams jump straight to Q3 or Q4 because agents are the exciting thing, and then they overbuild for a problem that was actually a RAG or a chatbot. Don't bring a chainsaw to butter your toast.\n\nNow let's try it. On your workbook page — and on the learner slide — there are four scenarios. Take thirty seconds, classify each one in your head as R, C, A, or M. I'll then read each scenario and you type your letter in chat.",
+    doSteps: [
+      "On the learner slide they see the four stacked funnel questions + a TRY IT card with four numbered scenarios and empty answer slots.",
+      "Give learners ~30 seconds to read the scenarios and write their own answers in the workbook before opening it up.",
+      "Press Copy on the prompt block below. Paste into chat.",
+      "Read the scenarios one by one, ~15 sec gap between each for chat to respond.",
+      "Call out the right answer by name after each scenario lands — see the 'Answer key' note below."
+    ],
+    prompt: "Type your answer in chat — one letter per scenario:\n\n1. Answer customer questions about return policy.        →  ?\n2. Generate a one-time product description.              →  ?\n3. Screen 200 resumes and schedule interviews.            →  ?\n4. Run a competitive intelligence report.                  →  ?\n\n(R = RAG · C = Chatbot · A = Agent · M = Multi-Agent)",
+    sayAfter: "The answers, in order — Return policy: RAG, because the answer lives in a policy document, no action needed. Product description: Chatbot, single response, one-shot. Screen 200 résumés and schedule interviews: Agent, multi-step, tool use, memory of who's been contacted. Competitive intelligence report: Multi-Agent — you want a scout finding sources, an analyst reading them, a writer drafting, all coordinated.\n\nFour scenarios, four patterns, one framework. Teams that use this discipline get the pattern right about 95% of the time. Teams that don't, overbuild — they reach for Multi-Agent when a chatbot would have shipped on Friday.\n\nHold onto this funnel. It's the decision logic embedded in the system prompt of the agent you're about to build.",
+    note: "ANSWER KEY (do not paste in chat — these are for you to call out by name as answers land): (1) Customer return policy questions = R (RAG — fixed knowledge). (2) Generate a one-time product description = C (Chatbot — single response). (3) Screen 200 résumés + schedule interviews = A (Agent — multi-step + tools + memory). (4) Run a competitive intelligence report = M (Multi-Agent — parallel specialties). The 95% framework-discipline number is a soft claim — say it confidently but don't promise it as a measured stat. The funnel is the decision logic encoded in the pre-written system prompt for the AI Pattern Advisor — learners aren't just learning a framework, they're about to encode it.",
+    watch: "If the sprint runs long, skip the mini-exercise next time — move the scenarios to the workbook only.",
+    bridge: "Why does any of this matter on a Monday morning? Because there's a real business cost attached to staying on chatbots."
+  },
+  {
+    num: 10, when: "0:22 – 0:25", duration: "3 min", tag: "title", block: "BLOCK 1 · CONCEPT SPRINT",
+    title: "Sprint 5 · The Real Business Cost of NOT Using Agents",
+    say: "Why does any of this matter on a Monday morning? Because using only chatbots in 2026 is like using a calculator in a spreadsheet world — it works, but you're doing all the integration in your head, by hand, every time. And the numbers are starting to back this up.\n\nLook at the three failure scenarios on the learner slide — Missed Context in customer support, No Follow-Through in sales, Zero Persistence in data management. Each one is the cost of staying on chatbots when the work actually needs an agent.\n\nBut the bigger story is in the survey data. Two thirds of organisations have started experimenting with AI agents, but McKinsey's 2025 State of AI found that only 39 percent of those organisations are reporting actual EBIT impact at the enterprise level — most of the value is stuck in pilots.\n\nAnd the cost of getting it wrong is real: in 2025, forty-two percent of companies abandoned most of their AI initiatives, up from seventeen percent the year before. That's not because AI doesn't work. It's because they reached for the wrong pattern — they tried to make a chatbot do an agent's job, or they overbuilt a multi-agent system for a problem that needed RAG.\n\nThe teams that get the pattern match right see real numbers — Articsledge's 2026 ROI benchmarks found that mature agent deployments deliver thirty-five to fifty percent time reduction by month twelve, with typical payback in six to eighteen months.\n\nThe point isn't the exact percentages. The point is the cost of NOT moving carefully is now larger than the cost of moving carefully. That math flipped this year.",
+    doSteps: [
+      "On the learner slide they see the three failure-scenario cards (Missed Context · No Follow-Through · Zero Persistence) and a strip of stat cards with linked sources.",
+      "Walk the three failure scenarios in the 'Say' block above — these are illustrative business pain points, not measured stats.",
+      "Then point at the stat strip on the learner deck. Read 2–3 of the numbers slowly, with eye contact. Don't rush.",
+      "Land the bridge to Sprint 6: 'The teams that move carefully — that get the pattern match right — see the gains. The teams that don't, abandon their AI projects. The four-question funnel from Sprint 4 is what separates the two.'"
+    ],
+    sayAfter: "Read those numbers on your own time after class — every one of them is sourced and linked on your slide. The point on a Monday morning is this: chatbots have a ceiling, and the gap between teams who recognise that ceiling and teams who don't is widening fast.",
+    note: "Verified sources (every number on the learner slide is linked): 42% AI-project abandonment in 2025 → Fullview AI Statistics 2025 (citing MIT/RAND research). 74% achieving first-year ROI, 62% experimenting with agents → McKinsey State of AI 2025 (Nov 2025). 35-50% time reduction at mature deployment (12+ months) → Articsledge AI Agent ROI Benchmarks 2026. 47% of enterprise users made a major decision on hallucinated content in 2024 → Fullview. The previously-shown numbers ($175K-$250K, 4.2h, 73%, 2.4x, 45%, 78%) were unsourced — they have been removed. Don't reintroduce them.",
+    bridge: "Last sprint. Five patterns. The shapes every agent system takes."
+  },
+  {
+    num: 11, when: "0:25 – 0:30", duration: "5 min", tag: "title", block: "BLOCK 1 · CONCEPT SPRINT",
+    title: "Sprint 6 · The 5 Agentic Architecture Patterns + Sprint Close",
+    say: "Last sprint. Five patterns — these are the five shapes every agent system you'll ever encounter takes. I want you to recognise them, not memorise them. Think of these like recipes.\n\nThe first one — Single Agent — is the base recipe. One brain, a couple of tools, sequential work. Example: an email drafting agent that reads your inbox, writes drafts, and saves them for review. This is what you're going to build today.\n\nThe other four are variations on this recipe. RAG Agent is a single agent plus a document store — it grounds its answers in your specific documents instead of relying on what it learned during training. Example: a support FAQ bot that answers from your knowledge base.\n\nTool-Calling Agent is a single agent plus external integrations — it reads from and writes to other systems. Example: a CRM sync agent that pulls leads from Salesforce and writes them to HubSpot.\n\nOrchestrator-Worker is multi-agent — one planning agent coordinates several specialist agents running in parallel. Example: a market research pipeline where a scout finds sources, an analyst reads them, and a writer drafts the report.\n\nAnd Human-in-the-Loop is any pattern with a mandatory checkpoint where a person approves before the agent moves on — used for high-stakes or regulated work. Example: a financial-approval agent that prepares everything but pauses for a human signature before sending money.\n\nFive patterns. Once you can build the base recipe — the Single Agent with tool-calling — the others are configuration. You add a document store, you get RAG. You add specialists in parallel, you get Orchestrator-Worker. You add a checkpoint, you get Human-in-the-Loop. The foundation is the same.\n\nSo here's the recap of the last twenty minutes. The five gaps. The six-step loop. The four-rung ladder. The four-question funnel. The business cost. The five patterns. That's the vocabulary for the rest of today — and for any AI conversation you walk into for the next year.\n\nNow stop watching me. The EdYoda Agent Builder link is in chat. Open it, log in, and we build yours starting at the top of the next minute.",
+    doSteps: [
+      "On the learner slide they see a 3×2 grid of five pattern cards. Walk the room through them in the order above, ~20 seconds each.",
+      "Land the sprint-close summary line: 'Gaps, loop, ladder, funnel, cost, patterns. That's the vocabulary.'",
+      "Press Copy on the prompt block below. Paste the actual EdYoda Agent Builder URL into chat (replace the placeholder in the prompt with the real link before class).",
+      "Watch chat: confirm 60–70% of names show movement to the Builder before advancing to Block 2."
+    ],
+    sayAfter: "Now that you can identify patterns, the next layer is mastering the language of agent communication — Prompt Engineering. That's Session 3.",
+    prompt: "🛠 EdYoda Agent Builder: [paste your EdYoda Agent Builder link here]\nOpen it now. Log in. We start the build at the top of the next minute.",
+    note: "Recipe analogy reinforced — patterns are recipes; you're learning the base recipe (sandwich), then the others are variations (burger, wrap, bento box). Sprint 6 is the last bit of concept teaching for the next hour — pace yourself, but don't drag. The 'sayAfter' line is the Session 3 bridge — deliver verbatim. Bridge to Session 3 returns again at the close (slide 27).",
+    watch: "Watch chat now: confirm 60–70% of names show movement to the Builder. If 3+ learners are stuck on login, address it room-wide for 60 sec ('drop the error in chat — I'll handle common ones now, the rest at the break'), then keep moving. You're flying solo — no TA. If the sprint block ran long, cut Sprint 4 mini-exercise next time — move R/C/A/M to the workbook only.",
+    bridge: "Stop watching me. Build yours."
+  },
+  {
+    num: 12, when: "0:30 – 0:34", duration: "4 min", tag: "demo", block: "BLOCK 2 · BUILD PART 1",
+    title: "EdYoda Builder Walkthrough · 4 places to know",
+    workbook: "Workbook · How to use this in the room (p. 2)",
+    say: "Before you touch anything — let me orient you. The platform has five tabs, but for today we only use four of them, plus one button at the top right. I'll point at each one. Don't open anything yet. Just learn where things live so when I say 'go to Configure → No-Code', you know where to click.\n\nThe FIRST place is the Overview tab. That's the agent's identity — its name, its description (which is really the agent's role), its welcome message, and one toggle for whether you let users attach files in chat. You write the description once when you create the agent. You'll come back here only to tweak the welcome line.\n\nThe SECOND place — and this is the load-bearing one — is the Configure tab, set to No-Code mode. This is where you'll spend most of your build. You're going to build a pipeline of nodes. Each node is a small LLM brain with one job, and its output feeds straight into the next node. Today you'll build five nodes. Let me show you my five right now — my Bakery Launch Agent. Trend Scout, Audience Profiler, Campaign Planner, Reminder Drafter, Summary Composer. Five small jobs in order. That's the shape you're going to build for your own track.\n\nThe THIRD place is the RAG Docs tab. This is how you give your agent memory. You upload a document — your company, your audience, your stack, whatever context matters — and the agent retrieves from that document on every run. There is no separate 'Memory' toggle on this platform. The document IS the memory. We use this in Step D, after the break.\n\nThe FOURTH place is the Logs tab. After you publish, every conversation with your agent shows up here. You won't need it during the build today, but it's where you'll go this week when you want to know what your agent actually did on a real problem.\n\nAnd the one BUTTON — top right corner — is Share Config. Once you publish, this gives you a public chat URL. That URL is how you and your colleagues actually use the agent in real life. It's also our recovery plan today — if your account breaks at any point, I'll share the URL of my Bakery Agent and you can ride along on the platform while we fix yours in the background.\n\nFour places, one button. No code. Now stop watching me — your turn.",
+    doSteps: [
+      "Share screen with your pre-built Bakery Launch Agent open.",
+      "Point at each tab + the Share Config button as you cover it in the 'Say' block.",
+      "When you reach 'let me show you my five', open the Bakery Agent's Configure → No-Code and scroll through the 5 nodes."
+    ],
+    note: "The platform actually has five tabs (Overview, Configure, RAG Docs, Logs) plus Share Config as a header button, and Configure has two sub-modes (Code, No-Code). For Session 2 we only use the No-Code sub-mode — Code is for Python devs. Don't confuse learners by mentioning Code today. The Code mode comes back in Session 5 (n8n + workflows) and Session 6 (Builder deep-build). The walkthrough should be sparse — don't teach the node pipeline mechanics yet, just point at where things live. The actual teaching happens in Steps A through E.",
+    watch: "If EdYoda Agent Builder is fully down → pivot to longer concept block: extend Block 1 to ~40 min, add a 10-min 'build it on paper' exercise in the workbook. Live build becomes homework with a recorded walkthrough. If the Bakery Agent demo is slow to load → switch to the public chat URL of the bakery agent instead of the builder UI.",
+    bridge: "Pick your track first. Then BUILD STEP A — create the agent and add Node 1."
+  },
+  {
+    num: 13, when: "0:34 – 0:38", duration: "4 min", tag: "exercise", block: "BLOCK 2 · BUILD PART 1",
+    title: "Pick Your Track · Same agent shape, different words",
+    workbook: "Workbook · Tracks 1–4 (pp. 4–7)",
+    say: "Quick decision. Four tracks on screen, one for each broad work shape — Marketing/Sales, Finance/Consulting, Doctor/Healthcare, and Generic for everything else. Pick the one closest to your day job. If two of them fit, pick the one you'd actually use this week, not the one that sounds most interesting in the abstract.\n\nOnce you've picked, open the workbook to your track's page. Marketing is page 4. Finance is page 5. Healthcare is page 6. Generic is page 7. Each track has copy-ready system prompts for all five nodes you're going to build — so you won't be writing prompts from scratch today. You'll be tailoring them.\n\nEvery track builds the same agent shape — the AI Pattern Advisor — with the same five-node spine. The only thing that changes between tracks is the vocabulary in the prompts and the safety guardrails. So pick once, stay in that track for the rest of the session.",
+    doSteps: [
+      "Press Copy on the prompt block below. Paste into chat.",
+      "Wait 30 seconds. With a small cohort, go by name — call each learner's pick + page: 'Priya — marketing, page 4. Rajesh — finance, page 5.'",
+      "Confirm everyone has the workbook open on their track's page before you advance to Step A."
+    ],
+    prompt: "PICK YOUR TRACK — type the number in chat:\n1. Marketing/Sales — AI Pattern Advisor for marketing/sales workflows\n2. Finance/Consulting — AI Pattern Advisor for finance workflows\n3. Doctor/Healthcare — AI Pattern Advisor for clinical workflows\n4. Generic — AI Pattern Advisor for general knowledge-work workflows\n\nThen open your workbook to your track's page (4–7).",
+    note: "Same agent shape, different words. Every track is the AI Pattern Advisor — the four-question funnel encoded as decision logic. The only difference is the vocabulary in the system prompt. Learners pick once and stay in that track for the whole build.",
+    watch: "If a learner types 'I do both marketing and sales' → 'Pick the one you'd use first this week.' If a learner is silent → call them by name directly. With ~6 people, you cannot let anyone drift here.",
+    bridge: "BUILD STEP A. Skeleton agent — system prompt and the first tool. Ten minutes on the clock."
+  },
+  {
+    num: 14, when: "0:38 – 0:48", duration: "10 min", tag: "exercise", block: "BLOCK 2 · BUILD PART 1",
+    title: "BUILD STEP A · Create the agent + Node 1 (Web Search Tool Agent)",
+    workbook: "Workbook · Step A on your track page (pp. 4–7)",
+    say: "Ten minutes. We build together. Two pieces today, in this order — first you create the agent, then you add Node 1.\n\nThe agent itself is just the shell. Name, description, welcome message — that's it. You'll fill those from your track page. Once you click Create, the platform drops you on the agent's detail page.\n\nNode 1 is where the actual work starts. Its job is one thing only: read whatever business problem the user types in, and use the web to research current best practices for solving that kind of problem. That's the first gap you're closing today — Gap #3, Tools. Your agent is about to do something the Sprint-1 chatbot couldn't do: actually browse the live internet.\n\nOne important rule for Step A — do NOT click Proceed (Generate Code) at the end. We're going to run Step B with just this one node so you can see what one stage of the pipeline actually returns. Proceed happens at the END of Step B, not now.",
+    doSteps: [
+      "Press 0 to start the 10-minute exercise timer.",
+      "Share your screen. Build alongside the room — every click on screen.",
+      "Sparse narration every 90 sec while learners build. Examples: 'Notice the prompt explicitly says use web search — that's what triggers the real web tool.' · 'One node so far. Four more coming by Step E.'",
+      "When ~80% have saved Node 1, deliver the concept callout: 'You just closed Gap #3, Tools — your agent can read the live internet. The Sprint-1 chatbot couldn't. That's the first High-severity gap from Sprint 1, done.'"
+    ],
+    prompt: "🛠 BUILD STEP A (10 min):\n1. Agents list → click + New.\n2. Fill the modal:\n   • Agent Name: [YourName]'s AI Pattern Advisor — [Track]\n   • Description: paste the role line from your track page\n   • Welcome Message: paste the welcome line from your track page\n   • Framework: anthropic\n3. Click Create Agent → Confirm & Create.\n4. On the agent page, open Configure → No-Code.\n5. Node 1:\n   • Name: Web Search Tool Agent\n   • Model: Claude Sonnet 4.6\n   • Max Tokens: 1024\n   • System Prompt: paste Node 1's prompt from your track page.\n6. Stop here. We run Step B before adding Node 2.",
+    note: "Anchor to Sprint 1 — Gap #3 (Tools). Step A builds the first node of the pipeline — research only. The pipeline mental model matters: 'one node, one job.' Don't let learners try to cram the whole AI Pattern Advisor into Node 1. The Bakery Launch Agent demo you showed in slide 12 is the reference shape — same five-node spine, different domain.",
+    watch: "Common stumbles + one-line fixes — 'Where's the No-Code mode?' → Configure tab, then click the No-Code chip next to Code. · 'Paste came in weird' → paste as plain text, Cmd+Shift+V Mac / Ctrl+Shift+V Windows. · Login/account issue → tell them to follow along on your shared screen; share your published Bakery Agent URL so they can experiment in parallel; you'll help fix their login during the break. Don't stop the room. · 'Which workbook page?' → Marketing 4, Finance 5, Healthcare 6, Generic 7. · 'Agent did something weird' → point them at the per-track troubleshooting table on their workbook page before you intervene.",
+    deeper: [
+      "If a learner can't get to a saved agent by the end of Step A → tell them to work from the workbook on paper; you'll clone the backup agent into their account during the break and they'll join Step C with the skeleton.",
+      "Watch chat like a hawk. You're flying solo — no TA. Push learners to the per-track troubleshooting table on their workbook page before you intervene; intervene directly only when they're truly stuck.",
+      "Concept callout is the unlock moment. Pause. Let learners look at their own screen — not yours."
+    ],
+    bridge: "BUILD STEP B. First run. Hit Run, watch the trace, paste the pattern in chat. Six minutes."
+  },
+  {
+    num: 15, when: "0:48 – 0:55", duration: "6 min", tag: "exercise", block: "BLOCK 2 · BUILD PART 1",
+    title: "BUILD STEP B · First run — proof of life",
+    workbook: "Workbook · Step B on your track page (pp. 4–7)",
+    say: "Six minutes, three clicks. Click Proceed in the No-Code editor — that materialises your one-node pipeline as runnable code. Click Publish Agent — that gives you a public chat URL. Open the URL and paste your track's starter problem. Watch Node 1 fire.\n\nBefore you click anything, a heads-up about timing. When you hit Publish, and again when you send your first message, the agent might take ten to thirty seconds — sometimes longer — before it starts responding. That is normal. Here's why: when an LLM-based service hasn't been used for a while, the container that runs it goes to sleep to save compute. The first request after a sleep has to spin that container back up, load the model into memory, and connect to web search. That's the warm-up. After the first response, every subsequent message is fast — usually under three seconds. So if your screen looks frozen for thirty seconds on the first run, do not refresh, do not panic. Just wait. The cost of that wait is paid once, then you're hot.\n\nSecond heads-up. This is not the full AI Pattern Advisor yet — it's just Node 1. The classifier is Node 2, which we add after the break. So when you get the output, you're going to see structured research — problem restated, current practice, tools named, sources — not a pattern recommendation. That's expected. If you're confused because your agent didn't say 'Agent' or 'RAG', that's not a bug. It just hasn't been built yet.\n\nWhat we're confirming in Step B is that the pipeline plumbing works end-to-end: your prompt arrives, Node 1 runs, web search fires, structured output comes back. Once that's working for everyone, we take the break and grow the pipeline after.",
+    doSteps: [
+      "Press 6 to start the 6-minute exercise timer.",
+      "Share screen. Click Proceed (Generate Code) → Publish Agent → open the Share Config URL in a new tab.",
+      "Paste your demo agent's starter problem. Send. Wait through any warm-up delay without filling the silence — let learners see it's normal.",
+      "When your trace returns, point at it briefly: 'There — Node 1 returned. Structured research. Web search call in the trace.' Then tell the room their turn.",
+      "Read 3–4 headline insights by name as learners post them.",
+      "Concept callout (verbatim): 'That's the six-step agent loop from Sprint 2 — running on Node 1. Goal, Plan, Act, Observe, Reflect, output. One node, one loop. After the break we add Node 2 and the pipeline grows.'",
+      "Pre-break anchor: '👍 in chat if your published URL returned a real output.' If ≥80% thumbs → break. If <80% → 'Stay 2 min into the break — I'll walk you through Proceed + Publish. Or grab my Bakery Agent URL and ride along while we fix yours.'"
+    ],
+    prompt: "🛠 BUILD STEP B (6 min):\n1. Configure → No-Code → click Proceed (Generate Code).\n2. Click Publish Agent (top right).\n3. Copy the public chat URL from Share Config. Open it in a new tab.\n4. Paste your track's starter problem from the workbook (pp. 4–7).\n5. First response may take 15–60 sec while the model warms up — wait, don't refresh.\n6. Paste in chat: the HEADLINE INSIGHT line from your Node 1 output.",
+    note: "Anchor to Sprint 2 — the six-step loop, now running on a real node. Critical mechanic: on this platform, you MUST click Proceed (Generate Code) after editing the No-Code editor before the agent runs. If a learner forgets this step, their published URL will produce empty output. The most common Step B failure is publishing without proceeding. The chat interface is on the public URL, not inside the builder — make sure learners are testing on the URL, not staring at the No-Code editor expecting a chat box. The warm-up explanation matters: without it, learners will refresh during the first-run delay and break their own session.",
+    watch: "If Node 1 doesn't search the web (just summarises from training) → confirm the literal phrase 'use web search' appears in the system prompt. If the published URL produces empty output → learner skipped Proceed (Generate Code). If a learner says the published URL won't load → wait 30 sec, the publish step takes a few seconds to propagate; refresh the URL tab only after that. If only 3 of 6 post a headline by the 4-min mark → call the silent ones by name in chat.",
+    deeper: [
+      "Concept callout maps directly to Sprint 2: Goal → Plan → Act (Web Search) → Observe (read results) → Reflect (structure output) → output. Don't paraphrase — re-using the exact sequence makes Sprint 2 sticky.",
+      "Pre-break anchor doubles as your green-light check. If <80% thumbs, your break job is to walk stuck learners through Proceed+Publish in DMs and confirm their published URLs return real output before Block 3 starts.",
+      "Why the warm-up wait matters as a learning moment: it's the same cold-start problem every serverless deployment has. Worth naming so learners understand that real-world agents have this characteristic — it's not an EdYoda quirk. If a learner asks 'will my colleagues hit this delay too?' the answer is: only on the first request after a long idle. Frequent users stay warm."
+    ],
+    bridge: "Real ten-minute break. Cameras off. Get up. Stretch. Water. Come back ready to add Node 2 and grow the pipeline."
+  },
+  {
+    num: 16, when: "0:55 – 1:05", duration: "10 min", tag: "break", block: "BREAK",
+    title: "🟢 HARD BREAK · 10 minutes · NON-NEGOTIABLE",
+    say: "Real ten-minute break. Cameras off. Get up. Stretch. Water. We come back at the exact clock time on screen. I'll start sharp.",
+    doSteps: [
+      "Both decks now show a synchronized 10-min countdown — learner deck displays the big Fraunces clock, your sidebar shows the same timer (auto-starts the moment you land on this slide).",
+      "Play music. Mute yourself.",
+      "USE THE BREAK TO WORK, NOT REST: DM stragglers. Clone backup agents from your facilitator account into stuck learners' accounts (one click per track in EdYoda Builder). Confirm their test run fires.",
+      "If 2+ learners are stuck on the same issue → plan a 30-second mention at the top of Block 3 so everyone benefits from the answer.",
+      "Come back when the sidebar timer hits ~01:30 — sip water, prepare the build checkpoint visual for the Block 3 open."
+    ],
+    note: "Why non-negotiable: Same Bailenson Zoom-fatigue research as Session 1 — screen fatigue compounds non-linearly after roughly an hour. Skipping this break costs you the second hour, which is the harder hour (memory + second tool + multi-step + pattern debrief). The break is not a courtesy. It's the design.",
+    watch: "Honor the break. Do NOT start Block 3 early even if everyone's ready — the rest is the work."
+  },
+  {
+    num: 17, when: "1:05 – 1:08", duration: "3 min", tag: "title", block: "BLOCK 3 · BUILD PART 2",
+    title: "Build Checkpoints · Three more steps to L2",
+    say: "Welcome back. Before the break you published a one-node agent — it searches, it returns structured research. That's a real piece of working software, but it's not yet the AI Pattern Advisor. The next thirty minutes is where the pipeline becomes the real thing.\n\nThree moves in front of you. Step C adds Node 2, the classifier — that's the agent deciding for itself, which closes the Autonomy gap. Step D uploads a RAG doc so the agent knows your real context, which closes the Memory gap. Step E adds three more nodes — Implementation Sketch, Risk & Compliance, Executive Brief — so one user prompt runs the whole five-node chain end-to-end. That's the Multi-step and Planning gaps, closed together.\n\nKeep this checkpoint visual in the corner of your eye for the rest of the block. After each step we'll come back to it and tick a box. When all four are green, your published agent is at L2 — the line you came to cross.",
+    doSteps: [
+      "Wait 15 sec for rocket emojis on the learner slide cue. Don't drag — momentum.",
+      "If you spotted 2+ learners stuck on the same issue during the break, deliver the 30-second mention now so everyone benefits."
+    ],
+    note: "This slide is a frame, not a teach. Keep it under 3 minutes. The checkpoint visual is the spine of Block 3 — every concept callout in Steps C/D/E refers back to it. Quick wins back-to-back; don't let the energy dip between unlocks.",
+    watch: "If <5 of 6 rocket emojis after 60 sec → name the silent ones in chat. 'Daniel, you back?' If a learner DMs that their published URL broke during the break → most likely they edited Node 1 and forgot Proceed; have them click Proceed + Republish (30 sec) and confirm the URL returns real output before Step C starts.",
+    bridge: "BUILD STEP C. Add Node 2 — the Classifier. The first sign of real autonomy."
+  },
+  {
+    num: 18, when: "1:08 – 1:16", duration: "8 min", tag: "exercise", block: "BLOCK 3 · BUILD PART 2",
+    title: "BUILD STEP C · Add Node 2 — the Pattern Classifier",
+    workbook: "Workbook · Step C on your track page (pp. 4–7)",
+    say: "Eight minutes. One node added. Here's the move.\n\nRight now your pipeline has Node 1 — research only. The output is good but it doesn't yet decide anything. Node 2 fixes that. Node 2 takes whatever Node 1 returned and applies the four-question funnel from Sprint 4 — RAG, Chatbot, Agent, or Multi-Agent. Stop at the first yes. Don't skip questions. Output the structured recommendation with pattern, maturity level, rationale, risk flag.\n\nWhat changes for you, as a person? Nothing in the middle. You give the agent a problem, hit send, and the chain runs Node 1 then Node 2 then returns the classification. You don't read Node 1's output and decide what to do next — the pipeline does that for itself. That's Gap #4 from Sprint 1, Autonomy, closed. The chatbot needed you between every step. Your agent doesn't.\n\nOne mechanical thing I'll repeat because it bites everyone the first time: after you add Node 2, you MUST click Proceed (Generate Code) again. The platform needs to rebuild the pipeline code. If you skip Proceed, your published URL silently keeps running the old one-node pipeline and you'll think Node 2 is broken when actually it just hasn't been deployed yet. Add the node, click Proceed, then refresh your chat URL.",
+    doSteps: [
+      "Press 8 to start the 8-minute exercise timer.",
+      "Share screen. On your demo agent: + Add Node → fill Node 2 from workbook → Proceed (Generate Code) → refresh your chat URL → re-run starter problem.",
+      "Point at the trace: Node 1 returns research, Node 2 picks up its output, returns the structured classification.",
+      "Read every pattern by name as learners post. Land the concept callout (verbatim, Gap #4 Autonomy): 'Node 1 read the problem. Node 2 classified it. Two nodes, one button-press, no human in the middle. Bounded autonomy — Gap #4 closed. Second High-severity gap done.'"
+    ],
+    prompt: "🛠 BUILD STEP C (8 min):\n1. Configure → No-Code → click + Add Node.\n2. Node 2:\n   • Name: Pattern Classifier\n   • Model: Claude Sonnet 4.6\n   • Max Tokens: 1024\n   • System Prompt: paste Node 2 from your workbook page (pp. 4–7).\n3. Click Proceed (Generate Code). Wait for the success indicator.\n4. Open your published chat URL (refresh it). Re-run the SAME starter problem from Step B.\n5. Paste in chat: the PATTERN your agent classified (RAG / Chatbot / Agent / Multi-Agent).",
+    note: "Anchor to Sprint 1 — Gap #4 (Autonomy). The mental model shift: in Step A we made the agent useful (it can search). In Step C we make the agent autonomous (it can decide without us). The visual cue is the 'output feeds next node' label in the No-Code editor — point at it on the share-screen. Critical: learners MUST click Proceed (Generate Code) after adding Node 2, otherwise the published URL still runs the old one-node pipeline.",
+    watch: "Stumbles + fixes — Node 2's output ignores Node 1 → confirm the literal line 'The Web Search Tool Agent's output is your input' (or equivalent) appears in Node 2's prompt. · Agent classifies everything as 'Multi-Agent' → Node 2 is skipping to Q4. Confirm 'Stop at the first YES' is still in the prompt. · Published URL still shows one-node output → learner forgot Proceed (Generate Code). · 'Can't find + Add Node' → scroll down past Node 1 in the No-Code editor; the button is at the bottom.",
+    deeper: [
+      "Update the checkpoint visual in your head: Node 2 just turned green on the pipeline. You'll re-show it implicitly via the bridge line into Step D.",
+      "If a track has only one learner (often the lone doctor) → DM them now and again before Step E. Solo-track learners drift fastest in this block."
+    ],
+    bridge: "BUILD STEP D. Memory. Upload a RAG doc and the agent stops being a goldfish."
+  },
+  {
+    num: 19, when: "1:16 – 1:23", duration: "7 min", tag: "exercise", block: "BLOCK 3 · BUILD PART 2",
+    title: "BUILD STEP D · Upload a RAG Doc — give the agent your real context",
+    workbook: "Workbook · Step D + RAG Docs reference (pp. 4–8)",
+    say: "Seven minutes. Before you do anything, watch the goldfish.\n\nI'm going to re-run my demo agent's starter problem with NO RAG doc uploaded. You'll see Node 2 give a perfectly reasonable but completely generic answer — it has no idea who I am, what company I work at, what stack I use. That's the chatbot ceiling from Sprint 1 — fresh slate every run, nothing carries.\n\nNow watch what changes when I upload one short document about my real context. Same problem, same two nodes, no other change. Suddenly the recommendation references my actual company by name, my actual stack, my actual constraints. It grounds itself in MY world.\n\nThat's the move. And here's the key thing about this platform — there is no Persistent Memory toggle. The document IS the memory. You upload it once to the RAG Docs tab, and the agent retrieves from it on every future run, forever. The doc becomes the agent's long-term context. The next colleague who runs your agent inherits everything you wrote in that doc. You're not just building an agent — you're building an asset.\n\nFor the next seven minutes: open the RAG Docs tab on YOUR agent. Use the template on workbook page 8. Fill in your real company, audience, stack, top three priorities. Save it as a .txt or .pdf. Upload it. Re-run your starter problem. Tell me back one specific phrase from your new output that proves the agent used your doc — a company name, a tool, a constraint you wrote down.",
+    doSteps: [
+      "Press 7 to start the 7-minute exercise timer.",
+      "Share screen. Re-run starter problem WITHOUT RAG doc → read aloud → 'goldfish, generic'.",
+      "Upload RAG doc → re-run same problem → read aloud → 'now grounded in my world'.",
+      "Tell the room their turn. Read 3-4 'one specific phrase' lines by name as they post.",
+      "Concept callout (verbatim, Gap #1 Memory): 'That phrase came from your RAG doc. Context survives. Gap #1 Memory — closed. First Critical gap done.'"
+    ],
+    prompt: "🛠 BUILD STEP D (7 min):\n1. Open the RAG Docs tab on your agent.\n2. Use the template on workbook page 8. Fill it in with your real:\n   • Company name\n   • Audience\n   • Brand voice (marketing) / Key metrics (finance) / Red-flag protocols (healthcare) / Stack (generic)\n   • Top 3 priorities this quarter\n3. Save as a .txt or .pdf file. Upload it.\n4. Re-run the SAME starter problem on your published chat URL.\n5. Paste in chat: ONE specific phrase from the new output that proves the agent used your RAG doc.",
+    note: "Anchor to Sprint 1 — Gap #1 (Memory). The platform has NO 'Persistent Memory' toggle — that's the old curriculum. The mental model is: doc = memory. Upload once, agent retrieves forever. The before/after demo (re-run WITHOUT doc, then WITH doc) is the cleanest unlock of the day — don't skip it. It makes the upload feel like a teaching moment, not a config change. The 'asset' line is the verbatim payoff — deliver exactly.",
+    watch: "Stumbles + fixes — RAG Docs upload won't finish → don't debug live. Have a short pre-prepared RAG doc you can share with the room as a placeholder. Move on; circle back at the break. · 'My output didn't change' → confirm the doc is listed on the RAG Docs tab; confirm the system prompts in Node 2 reference using the company context. Add the line 'Use the company context from RAG Docs to ground the rationale' to Node 2 if needed. · Vague RAG doc → 'Specific over abstract. Name your stack. Name your audience. Generic docs make generic outputs.'",
+    deeper: [
+      "Critical pre-work during this step: start DM'ing 3 learners privately for the peer demo. 'Would you be willing to demo at the debrief? Two minutes, your screen, your agent.' Pick for variety, not virtuosity — ideally one per track.",
+      "If you're running over and the block is tight → combine Steps C and D into a 12-min hands-on next time. Don't skip the before/after demo."
+    ],
+    bridge: "BUILD STEP E. The climax. Three more nodes — and the pipeline ships end-to-end."
+  },
+  {
+    num: 20, when: "1:23 – 1:35", duration: "12 min", tag: "exercise", block: "BLOCK 3 · BUILD PART 2",
+    title: "BUILD STEP E · Nodes 3 → 4 → 5, then publish",
+    workbook: "Workbook · Step E on your track page (pp. 4–7)",
+    say: "Twelve minutes. This is the climax.\n\nRight now your pipeline has two nodes — research and classify. By the end of this step it has five, and one prompt from the user runs the entire chain end-to-end. The three new nodes are: Node 3 turns the classification into a concrete implementation plan. Node 4 surfaces the risks and compliance concerns. Node 5 composes everything above into a single executive brief — the artifact your colleague can paste straight into Slack on Monday.\n\nOn my screen first. I'm going to run my Bakery Launch Agent against a single launch brief — the Monsoon Croissant. Five nodes will fire in order. I'm not going to narrate it. Just watch the trace. When the Summary Composer outputs the final brief, that's your turn.\n\nThen — open your workbook to your track page. Node 3, Node 4, Node 5 system prompts are all there, copy-ready. Add the three nodes in order, click Proceed (Generate Code), click Republish. Open your published chat URL and re-run your starter problem. All five nodes should fire. From your Node 5 output, find the NEXT STEP FOR THE FOUNDER line and paste it in chat. That's what we'll read out.\n\nWhat you're closing in this step: Gap #2 Multi-step reasoning and Gap #5 Planning, together. Five gaps from Sprint 1, five for five closed.",
+    doSteps: [
+      "Press 0 to start the 10-minute exercise timer (12 min total — 2 for your Bakery demo + 10 for the room).",
+      "On YOUR screen, open the public chat URL of your Bakery Launch Agent. Paste the Monsoon Croissant brief. Hit send. DON'T NARRATE — let the five nodes fire in silence.",
+      "When the Summary Composer outputs the final brief, one line only: 'Five nodes. One prompt. Zero from me. Your turn.'",
+      "Walk the room every 90 sec. Read 3-4 'next step for the founder' lines by name as learners post.",
+      "Concept callout (verbatim, Gaps #2 + #5): 'Five nodes, in order, each feeding the next. One prompt from you. Every step was a decision your agent made on its own. Gap #2 Multi-step reasoning — closed. Gap #5 Planning — closed. Five for five.' PAUSE.",
+      "Build Anchor: 'One line in chat — what's the most surprising thing your published agent just did?' Read every answer by name. Then: 'Step back from your screen for thirty seconds. Just look at it. You built a five-node agent. From a blank canvas. In an hour. No code.' Ten seconds of real silence."
+    ],
+    prompt: "🛠 BUILD STEP E (10 min) — The Real Test:\n1. Configure → No-Code → click + Add Node three times to add Nodes 3, 4, 5.\n2. From your workbook page (pp. 4–7), paste in order:\n   • Node 3 (Implementation Sketch)\n   • Node 4 (Risk & Compliance)\n   • Node 5 (Executive Brief)\n3. Click Proceed (Generate Code).\n4. Click Publish Agent (or Republish if already published).\n5. Open your published chat URL. Paste your starter problem.\n6. Watch all 5 nodes fire in order.\n7. Paste in chat: the NEXT STEP FOR THE FOUNDER line from your Node 5 output.",
+    note: "Anchor to Sprint 1 — Gaps #2 (Multi-step reasoning) + #5 (Planning), and back to the L2 definition from Sprint 3. The bakery demo is the emotional anchor: five nodes, one prompt, a full launch brief. When the learners' pipelines show all 5 nodes firing AND the final output is a structured brief — that's the L2 line. PAUSE after the concept callout. The silence is the unlock. Don't fill it. The 'step back from your screen' line lands the build emotionally before the debrief.",
+    watch: "Common Step E failures: (1) Forgot to click Proceed after adding nodes 3–5 → published URL still runs old 2-node pipeline. Fix: have them click Proceed, then Republish, then re-open the URL. (2) Node 5 brief is too long → Node 5 prompt's length cap got dropped. Have them add 'Hard cap: 250 words' to Node 5. (3) One node is producing weird output that breaks downstream nodes → don't debug it live, have them temporarily remove that node and re-run with the other 4. If a learner's agent does something brilliant or dumb → stop and screen-share their result with permission. Failures debugged live are gold. If the block runs long → don't sacrifice the silence after the concept callout. Cut Lens 4 in Block 4 instead.",
+    deeper: [
+      "Surprising-thing reactions + your one-line responses: 'It asked me a clarifying question first!' → 'That's the agent reflecting before acting. Hold that — it shows up in the debrief.' · 'Node 3 contradicted Node 1' → 'That's the agent doing what a real consultant does — pressure-testing its own research. Hold that thought — we'll name it in the debrief.' · 'The Node 5 brief was actually usable' → 'Five nodes in a row, each doing one job well. That's the unlock.' · 'It used my company name and stack from the RAG doc' → 'That's memory paying compound interest. Every future run is smarter than the last.'",
+      "By now you should have DM'd your 3 peer-demo volunteers. Confirm with each: 'You're up first. Two minutes. Share your published chat URL, run a fresh problem, narrate what each node returns.' If anyone balked, ask the room verbally when you get to Block 4 — someone always says yes.",
+      "The 'step back from your screen' line and the 10 seconds of silence are sacred. This is the emotional climax of the session. Eye contact through the camera. Don't rush it."
+    ],
+    bridge: "Hard pivot to debrief. You built a five-node pipeline. Now let's name what you built — through the four lenses from the start of class."
+  },
+  {
+    num: 21, when: "1:35 – 1:37", duration: "2 min", tag: "title", block: "BLOCK 4 · PATTERN DEBRIEF",
+    title: "Pattern Debrief Frame · 4 Lenses",
+    say: "You built it. Now let's name what you built. Two minutes ago you had an agent. Now look at it through the four lenses from the start of class — and you'll see why those frameworks weren't academic. They were a map.",
+    doSteps: [
+      "Show the four-lens overview slide. Briefly preview each lens: 5 Gaps Scorecard · Maturity Ladder · 4-Question Funnel · Pattern You Built.",
+      "Set expectation: 90 sec per lens, eight minutes total.",
+      "Pivot immediately into Lens 1."
+    ],
+    note: "The frame is short on purpose. The unlock happens IN each lens, not in the preview. Keep this slide under 60 seconds — the four lens slides do the work.",
+    watch: "Hard pivot from build to debrief. If you're running late, cut Lens 4 — combine the patterns into close as a single line.",
+    bridge: "Lens 1. The five gaps from Session 1 — your scorecard."
+  },
+  {
+    num: 22, when: "1:37 – 1:39", duration: "90 sec", tag: "title", block: "BLOCK 4 · PATTERN DEBRIEF",
+    title: "Lens 1 · The 5 Gaps Scorecard",
+    say: "Lens one. The same matrix from Sprint 1, in the same order. Read it with me, gap by gap. #1 Memory — Critical — you turned on persistent memory in Step D. #2 Multi-step — Critical — Step E's trace log proves it. #3 Tools — High — two of them, Web Search and your action tool. #4 Autonomy — High — from Step C onwards it acted without per-step approval. #5 Planning — Medium — Step E forced it to decompose a goal. Five for five. You closed every gap from Session 1 in ninety minutes.",
+    doSteps: [
+      "Show the same 5-gap matrix from Sprint 1, now with green checks filled in. Same order as slide 4 — Memory · Multi-step · Tools · Autonomy · Planning.",
+      "Walk row by row in canonical order: #1 Memory ✅ (Step D, persistent on) · #2 Multi-step ✅ (Step E, trace log) · #3 Tools ✅ (Steps A + C, 2 added) · #4 Autonomy ✅ (Step C onwards, acted without per-step approval) · #5 Planning ✅ (Step E, 3+ step goal).",
+      "Land the line: 'Five for five. Two Critical, two High, one Medium. You closed every gap from Session 1 in ninety minutes.'"
+    ],
+    note: "This is the most cathartic slide of the day. Slow down. Each ✅ is the literal result of one of the build steps they just did. The connection back to Session 1 is the entire point.",
+    bridge: "Lens 2. Where did you land on the maturity ladder?"
+  },
+  {
+    num: 23, when: "1:39 – 1:41", duration: "90 sec", tag: "title", block: "BLOCK 4 · PATTERN DEBRIEF",
+    title: "Lens 2 · The Maturity Ladder · L2",
+    say: "Lens two. Where on the ladder is the agent you just built? L1, L2, or L3? Type it in chat.",
+    afterPause: "Wait for chat. Most will say L2. Read every answer by name.",
+    sayAfter: "L2. Correct. You built a Level 2 agent — one brain, multiple tools, bounded autonomy. Notice you didn't try to build L3. You didn't need to. L2 solves probably 80% of the workflows you'd actually want to automate at work. And here's the verbatim line from Sprint 3 — most enterprises are at Level 0–1 today. The competitive advantage is in moving to Level 2–3. You just made that move on your screen.",
+    doSteps: [
+      "Re-show the maturity ladder from Sprint 3 with L2 highlighted/glowing.",
+      "Ask the chat question. Wait. Read every answer by name.",
+      "Re-deliver EdYoda's verbatim key insight: 'Most enterprises are at Level 0–1 today. The competitive advantage is in moving to Level 2–3.'"
+    ],
+    note: "Re-using the exact verbatim line from Sprint 3 is intentional. The repetition turns a slide insight into a memorable claim. Don't paraphrase.",
+    bridge: "Lens 3. Walk your agent through the funnel."
+  },
+  {
+    num: 24, when: "1:41 – 1:43", duration: "90 sec", tag: "title", block: "BLOCK 4 · PATTERN DEBRIEF",
+    title: "Lens 3 · The 4-Question Funnel applied to your agent",
+    say: "Lens three. Walk through with me. Your agent — does the answer exist in a fixed document? No. Does it just need a single response? No. Does it need multiple steps, memory, tools? Yes — Agent. You're in the Agent quadrant of the funnel. Not RAG. Not chatbot. Agent. Next time someone at work says 'let's use AI for X' — put it through this funnel first. Pattern matching success rate when teams use this discipline: 95%.",
+    doSteps: [
+      "Re-show the 4-question funnel from Sprint 4 with the Agent path highlighted.",
+      "Walk through the questions Q1→Q4 for THEIR agent. Land on Agent at Q3.",
+      "Re-deliver the 95% verbatim line. Same line as Sprint 4. Same reason."
+    ],
+    note: "The repeat of the 95% line is intentional — it makes the funnel quotable. Learners will paraphrase it back to colleagues next week.",
+    bridge: "Lens 4. The pattern you built — and where to go from here."
+  },
+  {
+    num: 25, when: "1:43 – 1:45", duration: "90 sec", tag: "title", block: "BLOCK 4 · PATTERN DEBRIEF",
+    title: "Lens 4 · The Pattern You Built · Single Agent + Tool-Calling",
+    say: "Lens four. You built Single Agent plus Tool-Calling — the foundation pattern from EdYoda's five. Look at where you can go from here. Hit the same wall twice? Reach for the Reflection loop. Need to ground in proprietary documents? RAG Agent pattern. Need parallel specialists? Orchestrator-Worker pattern. High-stakes or regulated? Human-in-the-Loop pattern. You don't need any of these yet. But now you know what they're called and when to reach for them. That's the literacy.",
+    doSteps: [
+      "Re-show the 5-pattern grid from Sprint 6. Highlight Single Agent + Tool-Calling.",
+      "Walk the 'when you hit this → reach for this' table: Same wall twice → Reflection · Proprietary docs → RAG · Parallel specialists → Orchestrator-Worker · High-stakes → Human-in-the-Loop.",
+      "Land: 'You don't need any of these yet. But now you know what they're called and when to reach for them. That's the literacy.'"
+    ],
+    note: "This lens is the launchpad for self-directed learning after class. Each pattern name is a Google-search-ready term they can dig into on their own.",
+    watch: "If you're running over → cut this lens, fold the patterns into the close as a single sentence.",
+    bridge: "Three peer demos. Two minutes each. Show-and-tell."
+  },
+  {
+    num: 26, when: "1:45 – 1:52", duration: "7 min", tag: "exercise", block: "BLOCK 4 · PATTERN DEBRIEF",
+    title: "Peer Demos · 3 Show-and-Tells",
+    say: "Three peer demos. Two minutes each. The folks I DM'd during Step E — Priya, Rajesh, Daniel — you're up first. Thirty seconds — your name, role, what your agent does. Sixty seconds — share screen, run it live, narrate the trace log as it fires. Then I'll react and name the pattern. Let's go.",
+    doSteps: [
+      "Call the first volunteer by name. 30 sec intro + 60 sec live run + 30 sec your pattern-naming reaction.",
+      "Demo 1 (pick a Marketing/Sales agent if possible).",
+      "Demo 2 (pick a Finance/Consulting or Doctor/Healthcare agent for variety).",
+      "Demo 3 (pick the third track — variety, not virtuosity).",
+      "After each demo, name the pattern explicitly: 'Look — Priya's agent reflected when the search returned nothing useful and retried with a different query. That's the Reflection pattern emerging spontaneously.'",
+      "If a picked volunteer balks → ask the room verbally, someone usually says yes. Worst case: screenshot of your own agent's run."
+    ],
+    note: "Pick for VARIETY, not VIRTUOSITY. The point isn't the best agent — it's three different shapes of solution. In a small cohort (≤6), you're effectively asking half the room — that's a feature, not a bug.",
+    watch: "If a peer demo breaks live: 30-sec recovery — 'Agents break — let's debug together for 60 sec, then I'll show mine.' NEVER let dead air stretch. Hard move to close after the third demo.",
+    bridge: "You have an agent. You'll go back to work tomorrow. What now?"
+  },
+  {
+    num: 27, when: "1:52 – 1:58", duration: "6 min", tag: "title", block: "BLOCK 5 · CLOSE",
+    title: "What's Next + Bridge to Session 3 · Three Moves This Month",
+    say: "You have an agent. You'll go back to work tomorrow. What now? Three things. This week — run your agent five times on real business problems. Track time saved on workbook page 11. The next two weeks — iterate the system prompt. Treat it like a junior employee you're coaching. The next month — show it to one colleague. Find one workflow they'd want classified. Build the second. You don't need another course to do any of this. You need thirty minutes a week and a real problem.",
+    doSteps: [
+      "Show the three next-steps stacked on slide. Walk them briskly.",
+      "1. This week → run 5x on real problems, track time saved (workbook page 11).",
+      "2. Next 2 weeks → iterate system prompt, coach it like a junior employee.",
+      "3. Next month → show one colleague, build their AI Pattern Advisor.",
+      "Land: 'You don't need another course. You need thirty minutes a week and a real problem.'",
+      "Open Q&A (~3 min): 'Three minutes of open Q&A — anything I can't answer in 45 sec, I'll reply to by email tomorrow.' Answer 2–3 questions. Defer the deeper ones to email.",
+      "Deliver the Session 3 bridge verbatim (see 'Then say' section).",
+      "Paste the take-with-you reflection in chat (see 'Paste in chat' section).",
+      "When ready for the crescendo, ADVANCE to slide 28 (the learner deck will follow automatically). Don't deliver the 3-line arc from this slide."
+    ],
+    sayAfter: "And — quick preview of where we're going. Session 3 is Prompt Engineering and Context Engineering for Agents. You'll learn how to communicate with agents precisely enough to make them reliable. Today you built one. Next time, we make sure it does what you actually meant. Take with you — reply to today's email by Friday. One business problem at your job you'll classify with your AI Pattern Advisor this month. One workflow you won't automate with an agent — because it's a chatbot job, a RAG job, or too sensitive for an agent today. Two sentences each. I read every reply.",
+    prompt: "Take with you (reply to today's email by Friday):\n1. ONE business problem at your job you'll classify with your AI Pattern Advisor this month.\n2. ONE workflow you WON'T automate with an agent — because it's a chatbot job, a RAG job, or too sensitive for an agent today.\n\nTwo sentences each. I read every reply.",
+    note: "Sacred line on this slide — Session 3 bridge, deliver verbatim: 'Session 3 is Prompt Engineering and Context Engineering for Agents. You'll learn how to communicate with agents precisely enough to make them reliable. Today you built one. Next time, we make sure it does what you actually meant.' This is the bookend to Session 1's 'brain in a jar' line. The 3-line crescendo lives on the NEXT slide — advance when you're ready to deliver it.",
+    watch: "If you're running over → cut 'What's Next' to 2 min (skip points 2 and 3). Keep the Session 3 bridge intact. If Q&A runs long → defer to email rather than skipping. Always reach slide 28 — the crescendo is non-negotiable.",
+    bridge: "Advance to slide 28 — the crescendo."
+  },
+  {
+    num: 28, when: "1:58 – 2:00", duration: "2 min", tag: "title", block: "BLOCK 5 · CLOSE",
+    title: "Close · The 3-Line Crescendo",
+    say: "Three lines. Slowly. Eye contact through the camera. Two seconds between each.",
+    doSteps: [
+      "PAUSE for two seconds before speaking. Let the slide settle.",
+      "Line 1 (slow, even): 'Last session, a chatbot was a brain in a jar.' — PAUSE 2 seconds.",
+      "Line 2 (slightly warmer): 'Today, you gave it hands.' — PAUSE 2 seconds.",
+      "Line 3 (forward-looking): 'Next time, we teach it to listen.' — PAUSE 2 seconds.",
+      "Position line: 'Two down. Six more to go. The arc gets sharper from here.'",
+      "Close: 'You did the hard part — you showed up, you stayed, you built. Go run your agent on something real this week. That's the only homework that matters.'",
+      "Sign-off: 'Thank you. See you for Session 3. Bye.' Wave. Stop recording. End the meeting.",
+      "Post-class within 24 hrs: send the workbook · any unanswered Q&A · the calendar invite for Session 3 (Prompt Engineering & Context Engineering for Agents)."
+    ],
+    note: "This is the slide learners screenshot. The whole 8-session arc rides on the rhythm here. If you rush this slide, you erase the build. If you over-perform it, you sound like a TED talk. Just say the words. Look at the camera. Let the silence work.",
+    watch: "If you're running over by more than 2 min, you can cut the position line ('Two down. Six more to go.') but NEVER cut the 3-line arc. The arc is the close.",
+    bridge: "End of deck. End of session."
+  }
+];
+
+/* ===================== SAFE DOM RENDERING ===================== */
+const slidePane = document.getElementById('slidePane');
+
+function el(tag, opts = {}) {
+  const e = document.createElement(tag);
+  if (opts.cls) e.className = opts.cls;
+  if (opts.text) e.textContent = opts.text;
+  return e;
+}
+
+function makeSection(cls, title, contentBuilder) {
+  const section = el('div', { cls: `section ${cls}` });
+  const header = el('div', { cls: 'header' });
+  const h = el('h3', { text: title });
+  header.appendChild(h);
+  section.appendChild(header);
+  contentBuilder(section);
+  return section;
+}
+
+function renderSlide(s) {
+  while (slidePane.firstChild) slidePane.removeChild(slidePane.firstChild);
+
+  const bar = el('div', { cls: 'timing-bar' });
+  bar.appendChild(el('span', { cls: 'time-pill', text: s.when }));
+  bar.appendChild(el('span', { cls: 'duration', text: s.duration }));
+  bar.appendChild(el('span', { cls: 'block-title', text: s.block || `Slide ${String(s.num).padStart(2, '0')} of ${slides.length}` }));
+  slidePane.appendChild(bar);
+
+  slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
+  // Title row: h1 + optional workbook pill
+  const titleRow = el('div', { cls: 'title-row' });
+  titleRow.appendChild(el('h1', { text: s.title }));
+  if (s.workbook) {
+    const pill = el('span', { cls: 'workbook-pill' });
+    pill.appendChild(el('span', { cls: 'wp-icon', text: '📖' }));
+    pill.appendChild(el('span', { cls: 'wp-text', text: s.workbook }));
+    titleRow.appendChild(pill);
+  }
+  slidePane.appendChild(titleRow);
+
+  if (s.say) {
+    slidePane.appendChild(makeSection('say', 'Say', (sec) => {
+      const paras = String(s.say).split(/\n\n+/);
+      paras.forEach((p, i) => {
+        sec.appendChild(el('div', { cls: i === 0 ? 'quote' : 'quote quote-followup', text: p.trim() }));
+      });
+    }));
+  }
+
+  if (s.doSteps) {
+    slidePane.appendChild(makeSection('do', 'Do', (sec) => {
+      const ol = el('ol', { cls: 'step-list' });
+      s.doSteps.forEach(step => ol.appendChild(el('li', { text: step })));
+      sec.appendChild(ol);
+    }));
+  }
+
+  if (s.prompt) {
+    slidePane.appendChild(makeSection('prompt-section', 'Paste in chat', (sec) => {
+      const box = el('div', { cls: 'prompt-box', text: s.prompt });
+      const btn = el('button', { cls: 'prompt-copy', text: 'Copy' });
+      btn.type = 'button';
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const text = s.prompt;
+        const done = () => {
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1400);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(() => {
+            // Fallback: select + execCommand
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); done(); } finally { ta.remove(); }
+          });
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); done(); } finally { ta.remove(); }
+        }
+      });
+      box.appendChild(btn);
+      sec.appendChild(box);
+    }));
+  }
+
+  if (s.afterPause) {
+    slidePane.appendChild(makeSection('watch', 'Pause for', (sec) => {
+      sec.appendChild(el('p', { text: s.afterPause }));
+    }));
+  }
+
+  if (s.sayAfter) {
+    slidePane.appendChild(makeSection('say', 'Then say', (sec) => {
+      const paras = String(s.sayAfter).split(/\n\n+/);
+      paras.forEach((p, i) => {
+        sec.appendChild(el('div', { cls: i === 0 ? 'quote' : 'quote quote-followup', text: p.trim() }));
+      });
+    }));
+  }
+
+  if (s.watch) {
+    slidePane.appendChild(makeSection('watch', 'Watch for · contingency', (sec) => {
+      sec.appendChild(el('p', { text: s.watch }));
+    }));
+  }
+
+  if (s.deeper) {
+    slidePane.appendChild(makeSection('deeper', 'Deeper context · use if asked', (sec) => {
+      if (Array.isArray(s.deeper)) {
+        s.deeper.forEach(d => sec.appendChild(el('p', { text: d })));
+      } else {
+        sec.appendChild(el('p', { text: s.deeper }));
+      }
+    }));
+  }
+
+  if (s.bridge) {
+    slidePane.appendChild(makeSection('bridge', 'Bridge to next slide', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.bridge }));
+    }));
+  }
+
+  if (s.note) {
+    slidePane.appendChild(makeSection('note', 'Note to self', (sec) => {
+      sec.appendChild(el('p', { text: s.note }));
+    }));
+  }
+}
+
+/* ===================== NAVIGATION ===================== */
+const TOTAL = slides.length;
+const BREAK_INDEX = slides.findIndex(s => s.tag === 'break');
+
+let current = 0;
+function show(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  renderSlide(slides[current]);
+  document.getElementById('slideCounter').textContent = `${String(current + 1).padStart(2, '0')} / ${TOTAL}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  document.getElementById('nowNum').textContent = `SLIDE ${String(slides[current].num).padStart(2, '0')} / ${TOTAL}`;
+  document.getElementById('nowTitle').textContent = slides[current].title;
+  document.getElementById('nowWhen').textContent = slides[current].when;
+
+  const nxt = slides[current + 1];
+  document.getElementById('nextNum').textContent = nxt ? `SLIDE ${String(nxt.num).padStart(2, '0')} / ${TOTAL}` : '—';
+  document.getElementById('nextTitle').textContent = nxt ? nxt.title : 'End of deck';
+  document.getElementById('nextWhen').textContent = nxt ? nxt.when : '—';
+
+  const nxt2 = slides[current + 2];
+  document.getElementById('next2Num').textContent = nxt2 ? `SLIDE ${String(nxt2.num).padStart(2, '0')} / ${TOTAL}` : '—';
+  document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
+  document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
+
+  try { localStorage.setItem('genai_s2_slide_master', String(current)); } catch (e) {}
+
+  // Auto-start the 10-min break timer when landing on the break slide.
+  // Stop any running exercise timer when leaving the break slide back into content.
+  if (slides[current].tag === 'break') {
+    startExTimer(600);
+  } else if (exSecs > 540) {
+    // If a 10-min timer is running and we navigated AWAY from break early,
+    // stop it so the facilitator doesn't carry a phantom break countdown.
+    stopExTimer();
+  }
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+function goSlide(i) { show(i); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') toggleClassClock();
+  if (e.key === 'b' || e.key === 'B') { if (BREAK_INDEX >= 0) goSlide(BREAK_INDEX); }
+  if (e.key === '3') startExTimer(180);
+  if (e.key === '5') startExTimer(300);
+  if (e.key === '6') startExTimer(360);
+  if (e.key === '7') startExTimer(420);
+  if (e.key === '8') startExTimer(480);
+  if (e.key === '0') startExTimer(600);
+  if (e.key === 'p' || e.key === 'P') exportLearnerPDF();
+});
+
+/* ===================== EXPORT LEARNER → PDF =====================
+   Signals the paired learner tab to open its own Chrome Save-as-PDF dialog.
+   If no learner tab is open, opens one first then resends after a render delay.
+   Learner @page CSS forces landscape 16:9 one-slide-per-page. */
+function exportLearnerPDF() {
+  const PRINT_KEY = 'genai_s2_print_request';
+  const stamp = Date.now().toString();
+  try { localStorage.setItem(PRINT_KEY, stamp); } catch (e) {}
+  const w = window.open('learner_deck.html', 'edyoda_s2_learner_deck');
+  if (w) {
+    setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);
+  }
+}
+
+/* ===================== CLOCKS ===================== */
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${pad(m)}:${pad(s)}`;
+}
+function fmtClass(secs) {
+  const m = Math.floor(Math.abs(secs) / 60);
+  const s = Math.abs(secs) % 60;
+  const sign = secs < 0 ? '-' : '';
+  return `${sign}${pad(m)}:${pad(s)}`;
+}
+
+function updateRealClock() {
+  const d = new Date();
+  document.getElementById('realClock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+let classStartTs = null;
+let paused = false;
+let pausedAt = 0;
+let pausedAccum = 0;
+
+function startClass() {
+  if (classStartTs === null) {
+    classStartTs = Date.now();
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  } else {
+    toggleClassClock();
+  }
+}
+function toggleClassClock() {
+  if (classStartTs === null) { startClass(); return; }
+  if (!paused) {
+    pausedAt = Date.now();
+    paused = true;
+    document.getElementById('startBtn').textContent = '▶ Resume';
+  } else {
+    pausedAccum += Date.now() - pausedAt;
+    paused = false;
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  }
+}
+function resetClass() {
+  if (confirm('Reset class clock?')) {
+    classStartTs = null;
+    paused = false;
+    pausedAccum = 0;
+    document.getElementById('startBtn').textContent = '▶ Start Class';
+    updateClassClock();
+  }
+}
+function classElapsedSecs() {
+  if (classStartTs === null) return 0;
+  const now = paused ? pausedAt : Date.now();
+  return Math.floor((now - classStartTs - pausedAccum) / 1000);
+}
+function plannedSecsForCurrent() {
+  const w = slides[current].when;
+  if (!w || w === "Pre-start") return 0;
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return 0;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+function updateClassClock() {
+  const elapsed = classElapsedSecs();
+  document.getElementById('classClock').textContent = `${fmt(elapsed)} / 2:00`;
+
+  const planned = plannedSecsForCurrent();
+  if (classStartTs === null || planned === 0) {
+    document.getElementById('paceLabel').textContent = '—';
+    document.getElementById('paceLabel').className = 'big ok';
+    return;
+  }
+  const delta = elapsed - planned;
+  const labelEl = document.getElementById('paceLabel');
+  if (Math.abs(delta) < 60) {
+    labelEl.textContent = 'on time';
+    labelEl.className = 'big ok';
+  } else if (delta > 0) {
+    labelEl.textContent = `+${fmtClass(delta)} late`;
+    labelEl.className = delta > 180 ? 'big danger' : 'big warn';
+  } else {
+    labelEl.textContent = `${fmtClass(delta)} early`;
+    labelEl.className = 'big ok';
+  }
+}
+setInterval(updateClassClock, 1000);
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval = null;
+let exSecs = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exSecs = secs;
+  const block = document.getElementById('timerBlock');
+  const disp = document.getElementById('exTimer');
+  function tick() {
+    disp.textContent = fmt(exSecs);
+    block.classList.remove('warn', 'danger');
+    if (exSecs <= 30) block.classList.add('danger');
+    else if (exSecs <= 60) block.classList.add('warn');
+    if (exSecs <= 0) { stopExTimer(); return; }
+    exSecs--;
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+function openLearnerDeck() {
+  window.open('learner_deck.html', '_blank');
+}
+
+show(0);
+</script>
+</body>
+</html>

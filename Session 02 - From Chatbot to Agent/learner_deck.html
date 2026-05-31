@@ -1,0 +1,3454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session 2 (Learner)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===================== EDITORIAL DESIGN TOKENS ===================== */
+  :root {
+    /* Paper palette — warm, never cold */
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    /* Two accents, used like editorial highlights */
+    --terra:        #b8431b;       /* deep terracotta */
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;       /* deep editorial blue */
+    --ink-blue-soft: rgba(30, 58, 95, 0.08);
+
+    /* Risk / status — used sparingly */
+    --warn:         #a16207;
+    --warn-soft:    rgba(161, 98, 7, 0.10);
+    --danger:       #991b1b;
+    --danger-soft:  rgba(153, 27, 27, 0.08);
+    --calm:         #14532d;
+    --calm-soft:    rgba(20, 83, 45, 0.08);
+
+    /* Spacing — generous, mathematical */
+    --s-1:  0.5rem;
+    --s-2:  1rem;
+    --s-3:  1.5rem;
+    --s-4:  2rem;
+    --s-5:  3rem;
+    --s-6:  4.5rem;
+    --s-7:  6rem;
+    --s-8:  9rem;
+
+    /* Type scale — anchored on a 1.25 ratio */
+    --t-eyebrow:    0.72rem;
+    --t-meta:       0.78rem;
+    --t-body:       1.05rem;
+    --t-lede:       1.35rem;
+    --t-h3:         1.5rem;
+    --t-h2:         2.5rem;
+    --t-h1:         clamp(2.8rem, 5.2vw, 4.8rem);
+    --t-display:    clamp(3.4rem, 6.6vw, 6.2rem);
+    --t-mega:       clamp(5rem, 11vw, 11rem);
+
+    /* Motion */
+    --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+    --dur:          480ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Paper grain — subtle, throughout */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  /* Vignette — barely there */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(26, 24, 20, 0.08) 100%);
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+  }
+
+  /* ===================== SLIDE LAYOUT ===================== */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.6vh 5vw 4.2vh;
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* Running header — old magazine style */
+  .running-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-eyebrow);
+    color: var(--ink-mute);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .running-head .left { display: flex; gap: 1.4em; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+  .running-head .left .topic { color: var(--ink-soft); }
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  /* Main canvas */
+  .slide-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--s-4) 0;
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Folio — bottom-right, oversized, low-contrast */
+  .folio {
+    position: absolute;
+    bottom: 1.2rem;
+    right: 5vw;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 8.5rem;
+    line-height: 0.8;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em;
+    vertical-align: top;
+    margin-left: 0.15em;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  /* ===================== TYPOGRAPHY ===================== */
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-eyebrow);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: var(--s-3);
+    position: relative;
+    padding-left: 1.8em;
+  }
+  .eyebrow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1.2em;
+    height: 1px;
+    background: var(--terra);
+  }
+  .eyebrow.cool { color: var(--ink-blue); }
+  .eyebrow.cool::before { background: var(--ink-blue); }
+  .eyebrow.warn { color: var(--warn); }
+  .eyebrow.warn::before { background: var(--warn); }
+  .eyebrow.danger { color: var(--danger); }
+  .eyebrow.danger::before { background: var(--danger); }
+  .eyebrow.calm { color: var(--calm); }
+  .eyebrow.calm::before { background: var(--calm); }
+
+  h1, h2, h3, .display, .mega {
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: var(--t-h1);
+    font-weight: 400;
+    line-height: 1.02;
+    font-variation-settings: 'opsz' 120, 'SOFT' 30;
+    margin-bottom: var(--s-4);
+  }
+
+  h2 {
+    font-size: var(--t-h2);
+    font-weight: 400;
+    line-height: 1.1;
+    font-variation-settings: 'opsz' 80;
+    margin-bottom: var(--s-3);
+  }
+
+  h3 {
+    font-size: var(--t-h3);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: var(--s-1);
+  }
+
+  .display {
+    font-size: var(--t-display);
+    font-weight: 300;
+    line-height: 1.05;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+    max-width: 18ch;
+  }
+
+  .mega {
+    font-size: var(--t-mega);
+    font-weight: 300;
+    line-height: 0.95;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    letter-spacing: -0.04em;
+  }
+
+  p, li {
+    font-size: var(--t-body);
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-size: var(--t-lede);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    font-variation-settings: 'opsz' 36;
+  }
+
+  .small-caps { font-variant: small-caps; letter-spacing: 0.08em; }
+
+  /* Inline emphasis */
+  .terra { color: var(--terra); }
+  .blue { color: var(--ink-blue); }
+  .marked {
+    background: linear-gradient(180deg, transparent 60%, var(--terra-soft) 60%);
+    padding: 0 0.05em;
+  }
+  .marked-blue { background: linear-gradient(180deg, transparent 60%, var(--ink-blue-soft) 60%); padding: 0 0.05em; }
+
+  /* Drop cap */
+  .drop {
+    float: left;
+    font-family: 'Fraunces', serif;
+    font-size: 5.2em;
+    line-height: 0.82;
+    font-weight: 400;
+    color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  /* ===================== EDITORIAL COMPONENTS ===================== */
+
+  /* Numbered marginalia */
+  .marginalia {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+  .marginalia .marg-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    line-height: 1;
+  }
+  .marginalia .marg-num.terra { color: var(--terra); }
+
+  /* Rules */
+  .rule { height: 1px; background: var(--rule); margin: var(--s-3) 0; }
+  .rule-double { height: 4px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: var(--s-3) 0; }
+  .rule-dot { height: 1px; background-image: linear-gradient(90deg, var(--ink-mute) 50%, transparent 50%); background-size: 6px 1px; background-repeat: repeat-x; margin: var(--s-3) 0; }
+
+  /* Pull quote */
+  .pull-quote {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.18;
+    color: var(--ink);
+    border-left: 2px solid var(--terra);
+    padding: var(--s-1) 0 var(--s-1) var(--s-3);
+    margin: var(--s-3) 0;
+    font-variation-settings: 'opsz' 80;
+    max-width: 28ch;
+  }
+
+  /* Code/prompt — like a magazine sidebar */
+  .prompt {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+    padding: var(--s-3) var(--s-3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .prompt::before {
+    content: 'PROMPT';
+    position: absolute;
+    top: -0.6em;
+    left: var(--s-3);
+    background: var(--paper);
+    padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .prompt.template::before { content: 'TEMPLATE'; }
+  .prompt.snippet::before { content: 'PASTE-READY'; color: var(--terra); }
+
+  /* Inline single-line chat prompt — the cue is the emoji, not a label */
+  .chat-cue {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-cream);
+  }
+  .chat-cue .emoji {
+    font-size: 2.4rem;
+    line-height: 1;
+  }
+  .chat-cue .text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  /* Take-home callout — the printed reflection prompt for after class */
+  .takehome {
+    border: 1px solid var(--terra);
+    background: var(--paper-warm);
+    padding: var(--s-3);
+    position: relative;
+    margin-top: var(--s-3);
+  }
+  .takehome::before {
+    content: 'TAKE WITH YOU · reply by Friday';
+    position: absolute;
+    top: -0.65em;
+    left: var(--s-3);
+    background: var(--paper);
+    padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--terra);
+    font-weight: 500;
+  }
+  .takehome ol {
+    padding-left: 1.2em;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .takehome li { margin-bottom: 0.6em; }
+
+  /* Citation footer on a stat card */
+  .stat-card .stat-cite {
+    margin-top: 0.5em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .stat-card .stat-cite a {
+    color: var(--ink-blue);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--ink-blue);
+  }
+  .stat-card .stat-cite a:hover {
+    color: var(--terra);
+    border-bottom-color: var(--terra);
+  }
+
+  /* Mini-exercise card — used on Sprint 4 for R/C/A/M practice */
+  .exercise-card {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink-blue);
+    background: var(--paper-cream);
+    padding: var(--s-3);
+    margin-top: var(--s-3);
+    position: relative;
+  }
+  .exercise-card::before {
+    content: 'TRY IT — classify each one';
+    position: absolute;
+    top: -0.65em;
+    left: var(--s-3);
+    background: var(--paper);
+    padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-blue);
+    font-weight: 500;
+  }
+  .exercise-card ol {
+    padding-left: 1.4em;
+    margin: 0.4em 0 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .exercise-card li {
+    margin-bottom: 0.5em;
+    padding-right: 5em;
+    position: relative;
+  }
+  .exercise-card li .answer-slot {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    color: var(--ink-mute);
+    border-bottom: 1px dashed var(--ink-mute);
+    padding: 0 0.4em;
+    min-width: 3.5em;
+    text-align: center;
+  }
+  .exercise-card .legend {
+    margin-top: var(--s-2);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--ink-mute);
+  }
+
+  /* Word chips — used on the cold-open one-word check-in slide */
+  .word-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+  }
+  .word-chips span {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    padding: 0.4em 1em;
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--ink);
+  }
+  .word-chips span.muted {
+    color: var(--ink-mute);
+    font-style: normal;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.85rem;
+    border-style: dashed;
+  }
+
+  /* Norms grid — Block 0 */
+  .norms-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+  .norm-card {
+    border: 1px solid var(--rule);
+    padding: var(--s-3);
+    background: var(--paper-cream);
+    position: relative;
+  }
+  .norm-card.featured {
+    border-color: var(--terra);
+    background: var(--paper-warm);
+  }
+  .norm-card .norm-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 0.4em;
+  }
+  .norm-card.featured .norm-label { color: var(--terra); }
+  .norm-card .norm-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 0.3em;
+    line-height: 1.15;
+  }
+  .norm-card .norm-desc {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* Roadmap one-arrow flow */
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+    flex-wrap: wrap;
+  }
+  .flow-arrow .step {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--ink);
+    padding: 0.3em 0.8em;
+    border-bottom: 2px solid var(--terra);
+  }
+  .flow-arrow .arrow {
+    font-family: 'Geist Mono', monospace;
+    font-size: 1.3rem;
+    color: var(--ink-mute);
+  }
+
+  /* Single-line editorial slide (The One Rule) */
+  .one-rule {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    padding: 0 5vw;
+  }
+  .one-rule .rule-eyebrow {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: var(--s-4);
+  }
+  .one-rule h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 3.8rem;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    max-width: 22ch;
+  }
+  .one-rule h1 em {
+    color: var(--terra);
+    font-style: italic;
+  }
+  .one-rule .rule-foot {
+    margin-top: var(--s-4);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* Inline code */
+  code {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.92em;
+    background: var(--paper-warm);
+    padding: 0.06em 0.4em;
+    border-radius: 2px;
+    color: var(--ink);
+  }
+
+  /* Tag/byline */
+  .byline {
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-eyebrow);
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+
+  /* Grid systems */
+  .grid { display: grid; gap: var(--s-3); }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+  .g-4 { grid-template-columns: repeat(4, 1fr); gap: var(--s-2); }
+  .g-5 { grid-template-columns: repeat(5, 1fr); gap: var(--s-2); }
+  .g-6 { grid-template-columns: repeat(6, 1fr); gap: var(--s-2); }
+
+  /* Numbered list — book-style */
+  .num-list {
+    list-style: none;
+    counter-reset: numl;
+  }
+  .num-list li {
+    counter-increment: numl;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule-soft);
+    padding-left: 3rem;
+    position: relative;
+  }
+  .num-list li:last-child { border-bottom: none; }
+  .num-list li::before {
+    content: counter(numl, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: var(--s-2);
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-meta);
+    color: var(--terra);
+    letter-spacing: 0.1em;
+  }
+
+  /* Editorial cards */
+  .ed-card {
+    border-top: 2px solid var(--ink);
+    padding: var(--s-3) 0;
+  }
+  .ed-card.terra { border-top-color: var(--terra); }
+  .ed-card.blue { border-top-color: var(--ink-blue); }
+  .ed-card.warn { border-top-color: var(--warn); }
+  .ed-card.danger { border-top-color: var(--danger); }
+  .ed-card.calm { border-top-color: var(--calm); }
+  .ed-card .src {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 0.6em;
+    font-weight: 500;
+  }
+  .ed-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.45rem;
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: var(--s-1);
+    font-variation-settings: 'opsz' 72;
+  }
+  .ed-card p { font-size: var(--t-body); color: var(--ink-soft); }
+
+  /* Stack rows */
+  .stack-row {
+    display: grid;
+    grid-template-columns: 4rem 1fr auto;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .stack-row:first-of-type { border-top: 1px solid var(--ink); }
+  .stack-row.featured { background: var(--terra-soft); padding: var(--s-2) var(--s-2); margin: 0 calc(-1 * var(--s-2)); }
+  .stack-row .stack-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .stack-row.featured .stack-num { color: var(--terra); }
+  .stack-row h3 { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 400; }
+  .stack-row p { font-family: 'Geist', sans-serif; font-size: 0.92rem; color: var(--ink-soft); margin-top: 0.2rem; }
+  .stack-row .tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid currentColor;
+  }
+  .stack-row .tag.terra { color: var(--terra); }
+  .stack-row .tag.warn { color: var(--warn); }
+  .stack-row .tag.danger { color: var(--danger); }
+  .stack-row .tag.calm { color: var(--calm); }
+  .stack-row .tag.blue { color: var(--ink-blue); }
+
+  /* Stat card */
+  .stat-card {
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--ink);
+  }
+  .stat-card.featured { border-top: 2px solid var(--terra); }
+  .stat-card .stat-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+  .stat-card .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 4.4rem;
+    font-weight: 300;
+    line-height: 0.95;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.03em;
+    margin: var(--s-2) 0 var(--s-1);
+    font-variation-settings: 'opsz' 144;
+  }
+  .stat-card.featured .stat-num { color: var(--terra); }
+  .stat-card.danger .stat-num { color: var(--danger); }
+  .stat-card.warn .stat-num { color: var(--warn); }
+  .stat-card .stat-foot {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+
+  /* Maturity row */
+  .maturity-row {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr 8rem;
+    gap: var(--s-3);
+    align-items: center;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .maturity-row:first-of-type { border-top: 1px solid var(--ink); }
+  .maturity-row .level-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: var(--ink-faint);
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .maturity-row.featured { background: var(--terra-soft); padding: var(--s-2); margin: 0 calc(-1 * var(--s-2)); }
+  .maturity-row.featured .level-mark { color: var(--terra); }
+  .maturity-row.passed { opacity: 0.55; }
+  .maturity-row h3 { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 400; margin: 0; }
+  .maturity-row .desc { font-size: 0.95rem; color: var(--ink-soft); margin-top: 0.15em; }
+  .maturity-row .example {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--ink-mute);
+    margin-top: 0.4em;
+    letter-spacing: 0.04em;
+  }
+  .maturity-row .here-badge {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terra);
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--terra);
+    display: inline-block;
+    margin-left: 0.6em;
+    transform: translateY(-3px);
+  }
+  .maturity-row .pct {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--ink-mute);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    text-align: right;
+  }
+  .maturity-row.featured .pct { color: var(--terra); }
+
+  /* Question / funnel card */
+  .qcard {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-3);
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+  .qcard:last-child { border-bottom: 1px solid var(--rule); }
+  .qcard .qnum {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+  }
+  .qcard .qtext {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink);
+    line-height: 1.35;
+    font-variation-settings: 'opsz' 48;
+  }
+  .qcard .routes {
+    margin-top: 0.5em;
+    display: flex;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+  }
+  .route-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: 0.25em 0.6em;
+    border: 1px solid var(--rule);
+  }
+  .route-tag.ok { color: var(--calm); border-color: var(--calm); }
+  .route-tag.no { color: var(--ink-mute); }
+  .route-tag.terra { color: var(--terra); border-color: var(--terra); }
+  .qcard.path { background: var(--terra-soft); padding: var(--s-2); margin: 0 calc(-1 * var(--s-2)); }
+  .qcard.faded { opacity: 0.5; }
+  .qcard .exit-note {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--terra);
+    margin-top: 0.6em;
+  }
+
+  /* Pattern list (right column of funnel) */
+  .pattern-list { padding-top: 0.4em; }
+  .pat-row {
+    padding: 0.85em 0;
+    border-bottom: 1px solid var(--rule-soft);
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: var(--s-2);
+    align-items: baseline;
+  }
+  .pat-row:last-child { border-bottom: none; }
+  .pat-row .name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .pat-row .desc { font-size: 0.92rem; color: var(--ink-soft); }
+  .pat-row.faded { opacity: 0.45; }
+  .pat-row.win { background: var(--terra-soft); padding: 0.85em var(--s-2); margin: 0 calc(-1 * var(--s-2)); }
+  .pat-row.win .name { color: var(--terra); }
+
+  /* Architecture pattern card */
+  .arch-card {
+    border-top: 2px solid var(--ink);
+    padding: var(--s-2) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+  }
+  .arch-card.today { border-top-color: var(--terra); }
+  .arch-card.upgrade { border-top-color: var(--ink-blue); }
+  .arch-card .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-1);
+  }
+  .arch-card .name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .arch-card.today .name { color: var(--terra); }
+  .arch-card .badge-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid currentColor;
+  }
+  .arch-card.today .badge-tag { color: var(--terra); }
+  .arch-card.upgrade .badge-tag { color: var(--ink-blue); }
+  .arch-card .arch-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .arch-card .arch-desc {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+  .arch-card .arch-when {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--ink);
+    margin-top: 0.3em;
+  }
+  .arch-card .arch-ex {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+    margin-top: auto;
+    padding-top: 0.4em;
+    border-top: 1px dotted var(--rule);
+  }
+
+  /* Cover */
+  .cover {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-6);
+    align-items: end;
+    height: 100%;
+    padding: var(--s-5) 0 var(--s-3);
+  }
+  .cover .vol {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    align-self: stretch;
+    border-right: 1px solid var(--rule);
+    padding-right: var(--s-2);
+  }
+  .cover .cover-main h1.cover-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.5rem, 7vw, 6.4rem);
+    font-weight: 300;
+    line-height: 0.94;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    max-width: 16ch;
+  }
+  .cover .cover-byline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-3);
+    max-width: 50ch;
+    line-height: 1.4;
+  }
+  .cover .cover-foot {
+    margin-top: var(--s-5);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--ink);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+  }
+  .cover .pill-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em 1.2em;
+    margin-top: var(--s-3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--terra);
+  }
+  .cover .pill-strip span::before { content: '— '; color: var(--ink-faint); }
+
+  /* Blockquote slide */
+  .blockquote-slide {
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 8vw;
+    padding-right: 8vw;
+  }
+
+  /* Topic divider */
+  .topic-divider {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+    height: 100%;
+    align-content: center;
+    text-align: left;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-left: 8vw;
+  }
+  .topic-divider .chapter-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .topic-divider .chapter-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(4rem, 9vw, 8rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144, 'SOFT' 60, 'WONK' 1;
+    max-width: 14ch;
+  }
+  .topic-divider .chapter-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin-top: var(--s-3);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 48;
+  }
+
+  /* ===================== EXERCISE SLIDE (Build Step) ===================== */
+  .exercise-slide .slide-body {
+    max-width: 1200px;
+    justify-content: flex-start;
+    padding-top: var(--s-3);
+  }
+  .exercise-flag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding-bottom: var(--s-2);
+    border-bottom: 2px solid var(--terra);
+    margin-bottom: var(--s-4);
+  }
+  .exercise-flag .ex-letter {
+    font-family: 'Fraunces', serif;
+    font-size: 3rem;
+    font-weight: 400;
+    color: var(--terra);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+  .exercise-flag .ex-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .exercise-flag .ex-duration {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+  }
+  .ex-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.5rem, 4.6vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+    font-variation-settings: 'opsz' 144, 'SOFT' 40;
+    max-width: 22ch;
+  }
+  .ex-steps {
+    list-style: none;
+    counter-reset: exs;
+    max-width: 60rem;
+  }
+  .ex-steps li {
+    counter-increment: exs;
+    padding: 0.85em 0 0.85em 3.5rem;
+    border-bottom: 1px solid var(--rule-soft);
+    position: relative;
+    font-size: 1.18rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .ex-steps li::before {
+    content: counter(exs, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.95em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--terra);
+    letter-spacing: 0.12em;
+    font-weight: 500;
+  }
+  .ex-steps li:last-child { border-bottom: none; }
+  .ex-steps li strong { color: var(--ink); font-weight: 600; }
+  .ex-steps li code {
+    font-size: 0.92rem;
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    padding: 0.15em 0.5em;
+  }
+  .ex-followup {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    margin-top: var(--s-4);
+    max-width: 60ch;
+    line-height: 1.45;
+  }
+  .ex-timer {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 5vw;
+    font-family: 'Geist Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--terra);
+    letter-spacing: 0.1em;
+    z-index: 5;
+    border-top: 1px solid var(--terra);
+    padding-top: 0.4em;
+  }
+  /* Exercise folio sits to the LEFT so it doesn't fight the timer */
+  .exercise-slide .folio {
+    right: auto;
+    left: 5vw;
+    text-align: left;
+  }
+
+  /* ===================== SLIDE-SPECIFIC ELEMENTS ===================== */
+
+  /* Gap row (Sprint 1) */
+  .gap-row {
+    display: grid;
+    grid-template-columns: 11rem 1fr 6rem;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .gap-row:first-child { border-top: 1px solid var(--ink); }
+  .gap-row .gap-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+  }
+  .gap-row .gap-name .gap-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--terra);
+    padding: 0.15em 0.4em;
+    border: 1px solid var(--terra);
+    border-radius: 3px;
+    line-height: 1;
+    align-self: center;
+  }
+  .gap-row .gap-desc { font-size: 0.95rem; color: var(--ink-soft); }
+  .gap-row .gap-sev {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: right;
+    color: var(--ink-mute);
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid currentColor;
+    align-self: end;
+  }
+  .gap-row .gap-sev.critical { color: var(--danger); }
+  .gap-row .gap-sev.high { color: var(--warn); }
+  .gap-row .gap-sev.medium { color: var(--ink-blue); }
+
+  /* Agent loop (Sprint 2) — circular flow visualisation */
+  .loop-flow {
+    position: relative;
+    margin-top: var(--s-4);
+    padding: var(--s-3) var(--s-4) calc(var(--s-4) + 60px);
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+  .loop-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+    gap: var(--s-1);
+    align-items: stretch;
+  }
+  .loop-step {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--terra);
+    padding: var(--s-2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .loop-step.iter {
+    border-top-color: var(--ink-blue);
+    background: linear-gradient(180deg, rgba(30, 58, 95, 0.06), var(--paper));
+  }
+  .loop-step .ls-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    color: var(--terra);
+    text-transform: uppercase;
+  }
+  .loop-step.iter .ls-num { color: var(--ink-blue); }
+  .loop-step .ls-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0.3em 0 0.4em;
+    line-height: 1.1;
+  }
+  .loop-step .ls-desc {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--ink-mute);
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+  }
+  .loop-arrow {
+    align-self: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--terra);
+    line-height: 1;
+    padding: 0 0.15em;
+  }
+  .loop-loopback {
+    position: absolute;
+    left: var(--s-4);
+    right: var(--s-4);
+    bottom: var(--s-3);
+    height: 44px;
+    pointer-events: none;
+  }
+  .loop-loopback svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .loop-loopback .lb-label {
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%);
+    background: var(--paper-cream);
+    padding: 0 0.8em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-blue);
+  }
+
+  /* Compare strip (Chatbot vs Agent) */
+  .compare-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--ink);
+  }
+  .compare-strip .col h4 {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 0.5em;
+  }
+  .compare-strip .col h4.terra { color: var(--terra); }
+  .compare-strip .col p {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  /* Failure card (Sprint 5) */
+  .failure-card {
+    border-top: 2px solid var(--warn);
+    padding: var(--s-2) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+  }
+  .failure-card.danger { border-top-color: var(--danger); }
+  .failure-card .scenario {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--warn);
+  }
+  .failure-card.danger .scenario { color: var(--danger); }
+  .failure-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin: 0.1em 0;
+  }
+  .failure-card .domain {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .failure-card .fc-body {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0.3em 0;
+  }
+  .failure-card .fc-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 0.4em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .failure-card .fc-metric .val {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--warn);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .failure-card.danger .fc-metric .val { color: var(--danger); }
+  .failure-card .fc-loss {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+    border-top: 1px dotted var(--rule);
+  }
+  .failure-card .fc-loss strong { color: var(--warn); font-weight: 600; font-style: normal; }
+  .failure-card.danger .fc-loss strong { color: var(--danger); }
+
+  /* Tracks panel */
+  .track-card {
+    border-top: 2px solid var(--ink);
+    padding: var(--s-2) 0;
+  }
+  .track-card.featured { border-top-color: var(--terra); }
+  .track-card .t-badge {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    font-variant-numeric: oldstyle-nums;
+    line-height: 1;
+  }
+  .track-card .t-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 0.3em 0 0.2em;
+  }
+  .track-card .t-desc {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.03em;
+    line-height: 1.5;
+  }
+  .track-card .t-desc strong { color: var(--ink); font-weight: 600; }
+
+  /* Builder panels (slide 12) */
+  .panel-card {
+    border-top: 2px solid var(--ink);
+    padding: var(--s-2) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+  }
+  .panel-card.dim { opacity: 0.55; border-top-color: var(--ink-faint); }
+  .panel-card .p-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    color: var(--terra);
+    text-transform: uppercase;
+  }
+  .panel-card.dim .p-num { color: var(--ink-mute); }
+  .panel-card .p-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .panel-card .p-desc {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .panel-card .p-aside {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.06em;
+    margin-top: auto;
+    padding-top: 0.5em;
+    border-top: 1px dotted var(--rule);
+  }
+
+  /* Checkpoint list */
+  .checkpoint {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    gap: var(--s-3);
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .checkpoint:first-child { border-top: 1px solid var(--ink); }
+  .checkpoint .cp-icon {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--ink-faint);
+  }
+  .checkpoint.done .cp-icon { color: var(--calm); }
+  .checkpoint.next .cp-icon { color: var(--terra); }
+  .checkpoint.next { background: var(--terra-soft); padding: var(--s-2); margin: 0 calc(-1 * var(--s-2)); }
+  .checkpoint .cp-stage {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .checkpoint.done .cp-stage { color: var(--calm); }
+  .checkpoint.next .cp-stage { color: var(--terra); }
+  .checkpoint .cp-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-top: 0.1em;
+  }
+  .checkpoint.done .cp-name { color: var(--ink-soft); }
+  .checkpoint .cp-state {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid currentColor;
+  }
+  .checkpoint.done .cp-state { color: var(--calm); }
+  .checkpoint.next .cp-state { color: var(--terra); }
+
+  /* Lens chip row */
+  .lens-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+  .lens-chip {
+    border-top: 2px solid var(--terra);
+    padding-top: var(--s-1);
+  }
+  .lens-chip .l-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    color: var(--terra);
+    text-transform: uppercase;
+  }
+  .lens-chip .l-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-top: 0.2em;
+    line-height: 1.2;
+  }
+
+  /* Scored row (debrief lens 1) */
+  .scored-row {
+    display: grid;
+    grid-template-columns: 2.5rem 11rem 1fr 6rem;
+    gap: var(--s-3);
+    padding: 0.85em 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .scored-row:first-child { border-top: 1px solid var(--ink); }
+  .scored-row .sr-check {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    color: var(--calm);
+    line-height: 1;
+  }
+  .scored-row .sr-gap {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .scored-row .sr-gap .gap-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--terra);
+    padding: 0.15em 0.4em;
+    border: 1px solid var(--terra);
+    border-radius: 3px;
+    line-height: 1;
+    align-self: center;
+  }
+  .scored-row .sr-act {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+  .scored-row .sr-state {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--calm);
+    text-align: right;
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid var(--calm);
+    align-self: end;
+  }
+
+  /* Big-stat callout (5/5) */
+  .big-stat {
+    margin-top: var(--s-4);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-4);
+    align-items: center;
+    padding: var(--s-3);
+    background: var(--terra-soft);
+    border-left: 3px solid var(--terra);
+  }
+  .big-stat .bs-num {
+    font-family: 'Fraunces', serif;
+    font-size: 5.5rem;
+    font-weight: 300;
+    color: var(--terra);
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-variation-settings: 'opsz' 144;
+  }
+  .big-stat .bs-text {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--ink);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 48;
+    max-width: 50ch;
+  }
+  .big-stat .bs-text strong { color: var(--terra); font-weight: 500; font-style: normal; }
+
+  /* Volunteer slots (peer demos) */
+  .vol-card {
+    border-top: 2px solid var(--ink);
+    padding: var(--s-2) 0;
+    text-align: left;
+  }
+  .vol-card .v-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+  }
+  .vol-card .v-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-top: 0.5em;
+  }
+  .vol-card .v-cue {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink);
+    line-height: 1.6;
+    margin: 0.4em 0;
+  }
+  .vol-card .v-timer {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--terra);
+    letter-spacing: 0.1em;
+    border-top: 1px dotted var(--rule);
+    padding-top: 0.4em;
+    margin-top: 0.5em;
+  }
+
+  /* Move list (What's Next) */
+  .move-row {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: var(--s-3);
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .move-row:first-child { border-top: 1px solid var(--ink); }
+  .move-row .m-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+  }
+  .move-row .m-when {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--terra);
+  }
+  .move-row .m-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-top: 0.3em;
+    font-variation-settings: 'opsz' 48;
+  }
+  .move-row .m-text strong { color: var(--terra); font-style: normal; font-weight: 500; }
+
+  /* Bridge to next session */
+  .bridge {
+    margin-top: var(--s-4);
+    padding: var(--s-3);
+    border: 1px solid var(--terra);
+    background: var(--paper-cream);
+  }
+  .bridge .b-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    color: var(--terra);
+    text-transform: uppercase;
+  }
+  .bridge .b-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-top: 0.5em;
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 60;
+  }
+  .bridge .b-text strong { color: var(--terra); font-weight: 500; }
+
+  /* Crescendo (close slide) */
+  .crescendo .line {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    line-height: 1.05;
+    margin-bottom: var(--s-3);
+    font-variation-settings: 'opsz' 144, 'SOFT' 40;
+  }
+  .crescendo .line.l-1 {
+    font-size: clamp(2rem, 3.4vw, 2.8rem);
+    color: var(--ink-mute);
+  }
+  .crescendo .line.l-2 {
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    color: var(--ink-soft);
+  }
+  .crescendo .line.l-3 {
+    font-size: clamp(3.2rem, 5.4vw, 4.8rem);
+    color: var(--terra);
+    font-variation-settings: 'opsz' 144, 'SOFT' 60, 'WONK' 1;
+  }
+  .crescendo .line em { font-style: italic; }
+  .close-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--ink-soft);
+    margin-top: var(--s-4);
+    font-variation-settings: 'opsz' 60;
+  }
+
+  /* Insight bar (subtle footer note) */
+  .insight {
+    margin-top: var(--s-3);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--terra);
+    padding-left: var(--s-2);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 48;
+    max-width: 70ch;
+  }
+  .insight strong { color: var(--terra); font-weight: 500; }
+
+  /* Footnote (bottom of slide) */
+  .footnote {
+    margin-top: var(--s-3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding-top: var(--s-1);
+    border-top: 1px dotted var(--rule);
+    max-width: 80ch;
+  }
+  .footnote.terra { color: var(--terra); }
+
+  /* Utility */
+  .center { text-align: center; }
+  .mt-1 { margin-top: var(--s-1); }
+  .mt-2 { margin-top: var(--s-2); }
+  .mt-3 { margin-top: var(--s-3); }
+  .mt-4 { margin-top: var(--s-4); }
+  .mt-5 { margin-top: var(--s-5); }
+  .mt-6 { margin-top: var(--s-6); }
+  .mb-2 { margin-bottom: var(--s-2); }
+  .mb-3 { margin-bottom: var(--s-3); }
+
+  /* ===================== NAV ===================== */
+  .nav {
+    position: fixed;
+    bottom: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.4rem;
+    z-index: 100;
+    background: rgba(245, 239, 230, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+  body:hover .nav { opacity: 0.5; }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: transparent;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.84rem;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-family: 'Geist Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: background var(--dur) var(--ease);
+  }
+  .nav button:hover { background: var(--paper-warm); color: var(--ink); }
+  .nav .counter {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    padding: 5px 10px;
+    letter-spacing: 0.06em;
+  }
+
+  /* Progress thread */
+  .progress-thread {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--terra);
+    z-index: 200;
+    transition: width var(--dur) var(--ease);
+  }
+
+  /* Break slide — Session 1 parity */
+  .break-slide {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .break-slide .slide-body {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .break-clock {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(7rem, 16vw, 14rem);
+    font-weight: 300;
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144;
+    margin: var(--s-3) 0;
+  }
+  .break-clock.warn { color: var(--warn); }
+  .break-clock.danger { color: var(--danger); }
+  .break-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: var(--s-2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .nav, .progress-thread { transition: none !important; }
+  }
+
+  @media (max-width: 900px) {
+    .g-3, .g-4, .g-5, .g-6 { grid-template-columns: 1fr 1fr; }
+    .cover { grid-template-columns: 1fr; }
+    .cover .vol { display: none; }
+  }
+
+  /* ===================== PRINT / PDF EXPORT =====================
+     Mirror of Session 1's print CSS — proven to produce a faithful PDF that
+     matches the on-screen view. Page is 13.333in × 7.5in (true 16:9 = 1280×720
+     px @ 96dpi), which means the existing fluid clamp() type scale lands at the
+     same sizes it does in a typical browser window. DO NOT override h1/lede/etc
+     sizes here — the fluid scale is the source of truth. */
+  @media print {
+    @page {
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+    html, body {
+      width: 13.333in;
+      height: auto;
+      background: var(--paper) !important;
+      overflow: visible !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .deck {
+      width: 13.333in;
+      height: auto;
+      position: static;
+    }
+    /* Show ALL slides for print, one per page */
+    .slide {
+      position: relative !important;
+      inset: auto !important;
+      width: 13.333in !important;
+      height: 7.5in !important;
+      display: flex !important;
+      opacity: 1 !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      overflow: hidden;
+      padding: 0.4in 0.6in 0.5in !important;
+    }
+    .slide:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    /* Hide on-screen navigation */
+    .nav, .progress-thread { display: none !important; }
+    /* Strip the paper grain — it bloats the PDF by ~100MB. Keep the warm bg + vignette. */
+    body::before { background-image: none !important; opacity: 0 !important; }
+    /* Force color preservation */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread" style="width: 0%"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER -->
+  <!-- ====================================================== -->
+  <div class="slide active" data-slide="1">
+    <div class="cover">
+      <div class="vol">Session Two · Two Hours · Live</div>
+      <div class="cover-main">
+        <div class="byline" style="margin-bottom: var(--s-4); color: var(--terra);">— Starting Shortly —</div>
+        <h1 class="cover-title">Why Agents? The case for <em style="font-style: italic; color: var(--terra);">autonomous AI</em>.</h1>
+        <p class="cover-byline">
+          In the next two hours you'll name the five gaps in your chatbot, run a four-question funnel against any business problem, and build your first agent — no code — that does what a chatbot cannot.
+        </p>
+        <div class="pill-strip">
+          <span>Identify Gaps</span>
+          <span>Classify Patterns</span>
+          <span>Quantify ROI</span>
+          <span>Build an Agent</span>
+        </div>
+        <div class="cover-foot">
+          <span>No. 02 / From Chatbot to Agent</span>
+          <span>Reading time: 120 min</span>
+        </div>
+      </div>
+    </div>
+    <div class="folio">1<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — COLD OPEN · ONE-WORD CHECK-IN -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="2">
+    <div class="running-head"><div class="left"><span>Block 0 · Opening</span><span class="dot">·</span><span class="topic">Cold open · 0:00–0:02</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Cold open · 2 min</span>
+      <h1>In one word — <em style="font-style: italic;" class="terra">how did Session 1 land for you</em>?</h1>
+      <p class="lede mt-3">Before we say anything else. One word in the chat. Pick the one closest to honest — the facilitator reads every reply by name.</p>
+
+      <div class="word-chips">
+        <span>Useful</span>
+        <span>Overwhelming</span>
+        <span>Sticky</span>
+        <span>Surprising</span>
+        <span>Skeptical</span>
+        <span>Curious</span>
+        <span class="muted">Other → type it</span>
+      </div>
+
+      <p class="footnote mt-4">No wrong answers. Pick the chip closest to true, or type your own.</p>
+    </div>
+    <div class="folio">2<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — S1 CALLBACK + THE PROMISE -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="3">
+    <div class="running-head"><div class="left"><span>Block 0 · Opening</span><span class="dot">·</span><span class="topic">Promise · 0:02–0:06</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow danger">The bakery that failed · the gap we close</span>
+      <h1>4 of 6 steps it couldn't do. <em style="font-style: italic;" class="terra">Today you build the thing that doesn't.</em></h1>
+
+      <div class="chat-cue mt-3">
+        <span class="emoji">🥐</span>
+        <span class="text">…if you remember the bakery campaign from Session 1. (The one ChatGPT failed on 4 of 6 steps.)</span>
+      </div>
+
+      <div class="grid g-2 mt-5" style="gap: var(--s-4);">
+        <div>
+          <div class="byline mb-2">— What you walk out with today —</div>
+          <ol style="padding-left: 1.2em; font-size: 1.02rem; line-height: 1.7; color: var(--ink);">
+            <li>The <strong>five gaps</strong> every chatbot has — named, numbered, severity-ranked.</li>
+            <li>The <strong>four-question funnel</strong> for Chatbot · RAG · Agent · Multi-Agent.</li>
+            <li>The <strong>real business cost</strong> of staying on chatbots — three failure scenarios.</li>
+            <li>A working <strong>AI Pattern Advisor</strong> agent on your screen — yours, role-customized, no code.</li>
+          </ol>
+          <p class="byline" style="color: var(--terra); margin-top: var(--s-3);">— Session 2 of 8 · The case for autonomous AI</p>
+        </div>
+        <div>
+          <div class="byline mb-2">— Why it matters now —</div>
+          <div class="grid g-2" style="gap: var(--s-2);">
+            <div class="stat-card featured">
+              <div class="stat-label">Companies abandoning AI projects</div>
+              <div class="stat-num">42<span style="font-size: 0.5em;">%</span></div>
+              <div class="stat-foot">in 2025 — up from 17% in 2024</div>
+              <div class="stat-cite">Source · <a href="https://www.fullview.io/blog/ai-statistics" target="_blank" rel="noopener">Fullview AI Statistics 2025</a></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Achieving first-year ROI on AI</div>
+              <div class="stat-num">74<span style="font-size: 0.5em;">%</span></div>
+              <div class="stat-foot">when the pattern match is right</div>
+              <div class="stat-cite">Source · <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">McKinsey State of AI 2025</a></div>
+            </div>
+          </div>
+          <div class="pull-quote mt-4">Every failure has a fix. That fix is called an agent — when you reach for the right pattern.</div>
+          <p class="byline" style="color: var(--terra); margin-top: var(--s-3);">— Session 1, final slide</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">3<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — NORMS + ROADMAP -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="4">
+    <div class="running-head"><div class="left"><span>Block 0 · Opening</span><span class="dot">·</span><span class="topic">Norms + Roadmap · 0:06–0:09</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">House rules + the path through</span>
+      <h1>Four norms. <em style="font-style: italic;" class="terra">Four moves.</em></h1>
+
+      <div class="norms-grid">
+        <div class="norm-card">
+          <div class="norm-label">— Cameras —</div>
+          <div class="norm-name">Encouraged, optional</div>
+          <div class="norm-desc">No one called out for off-camera.</div>
+        </div>
+        <div class="norm-card">
+          <div class="norm-label">— Chat —</div>
+          <div class="norm-name">Use it freely</div>
+          <div class="norm-desc">Questions, reactions, jokes — welcome.</div>
+        </div>
+        <div class="norm-card">
+          <div class="norm-label">— Mics —</div>
+          <div class="norm-name">Muted unless called</div>
+          <div class="norm-desc">Or unmute to share. Either works.</div>
+        </div>
+        <div class="norm-card">
+          <div class="norm-label">— Break —</div>
+          <div class="norm-name">Real 10 min, ~halfway</div>
+          <div class="norm-desc">Cameras off. Stretch. Water. Non-negotiable.</div>
+        </div>
+        <div class="norm-card">
+          <div class="norm-label">— Stuck questions —</div>
+          <div class="norm-name">Ask live</div>
+          <div class="norm-desc">Longer answers come by email after class.</div>
+        </div>
+        <div class="norm-card featured">
+          <div class="norm-label">— NEW for today —</div>
+          <div class="norm-name">More Builder than slide</div>
+          <div class="norm-desc">You spend more time in EdYoda Agent Builder than watching the screen. Bring your hands.</div>
+        </div>
+      </div>
+
+      <div class="flow-arrow">
+        <span class="step">Concepts</span>
+        <span class="arrow">→</span>
+        <span class="step">Build</span>
+        <span class="arrow">→</span>
+        <span class="step">Debrief</span>
+        <span class="arrow">→</span>
+        <span class="step">Done</span>
+      </div>
+
+      <p class="footnote center mt-3" style="text-align: center;">Twenty minutes of concepts. Sixty-five minutes of build. Ten minutes of debrief. Then close. The thing you build is called the <strong>AI Pattern Advisor</strong> — same shape for everyone, role-customized for Marketing/Sales · Finance/Consulting · Doctor/Healthcare · Generic.</p>
+    </div>
+    <div class="folio">4<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — THE ONE RULE -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="5">
+    <div class="running-head"><div class="left"><span>Block 0 · Opening</span><span class="dot">·</span><span class="topic">The One Rule · 0:09–0:10</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="one-rule">
+      <div class="rule-eyebrow">— One rule for today —</div>
+      <h1>You will not leave with <em>notes</em>.<br>You will leave with a <em>working agent</em>.</h1>
+      <div class="rule-foot">Six sprints next. Twenty minutes. Recognize, not memorize.</div>
+    </div>
+    <div class="folio">5<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 06 — SPRINT 1 · THE 5 GAPS -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="6">
+    <div class="running-head"><div class="left"><span>Block 1 · Concept Sprint</span><span class="dot">·</span><span class="topic">Sprint 01</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Sprint 01 · Core concept</span>
+      <h1>The five gaps <em style="font-style: italic;" class="terra">agents close</em>.</h1>
+      <p class="lede mt-3">What chatbots cannot do — and how autonomous AI agents fix each limitation. Ordered by severity. Numbered in the order we'll close them as a class today.</p>
+
+      <div class="grid mt-4" style="gap: 0;">
+        <div class="gap-row">
+          <span class="gap-name"><span class="gap-num">#1</span>Memory gap</span>
+          <span class="gap-desc">Chatbot forgets everything after the session ends. <strong style="color:var(--terra);">Agent persists context across runs, hours, days.</strong></span>
+          <span class="gap-sev critical">Critical</span>
+        </div>
+        <div class="gap-row">
+          <span class="gap-name"><span class="gap-num">#2</span>Multi-step reasoning</span>
+          <span class="gap-desc">Chatbot handles one instruction at a time. <strong style="color:var(--terra);">Agent manages chains of dependent decisions.</strong></span>
+          <span class="gap-sev critical">Critical</span>
+        </div>
+        <div class="gap-row">
+          <span class="gap-name"><span class="gap-num">#3</span>Tools gap</span>
+          <span class="gap-desc">Chatbot only produces text. <strong style="color:var(--terra);">Agent calls APIs, reads files, writes to real systems.</strong></span>
+          <span class="gap-sev high">High</span>
+        </div>
+        <div class="gap-row">
+          <span class="gap-name"><span class="gap-num">#4</span>Autonomy gap</span>
+          <span class="gap-desc">Chatbot waits for input on every step. <strong style="color:var(--terra);">Agent continues until the goal is complete.</strong></span>
+          <span class="gap-sev high">High</span>
+        </div>
+        <div class="gap-row">
+          <span class="gap-name"><span class="gap-num">#5</span>Planning gap</span>
+          <span class="gap-desc">Chatbot answers one question. <strong style="color:var(--terra);">Agent decomposes goals into ordered steps with a time horizon.</strong></span>
+          <span class="gap-sev medium">Medium</span>
+        </div>
+      </div>
+
+      <p class="insight">Each gap is a class of work your chatbot silently refuses to do. Naming them is half the fix — closing them is the rest of today. Watch for <strong>Gap&nbsp;#3</strong> in Step A, <strong>Gap&nbsp;#4</strong> in Step C, <strong>Gap&nbsp;#1</strong> in Step D, and <strong>Gaps&nbsp;#2 + #5</strong> in Step E.</p>
+    </div>
+    <div class="folio">6<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 07 — SPRINT 2 · AGENT LOOP -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="7">
+    <div class="running-head"><div class="left"><span>Block 1 · Concept Sprint</span><span class="dot">·</span><span class="topic">Sprint 02</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Sprint 02 · The mechanic</span>
+      <h1>From <em style="font-style: italic;">prompt → response</em> to <em style="font-style: italic;" class="terra">goal → plan → act → observe → reflect → iterate</em>.</h1>
+
+      <div class="loop-flow">
+        <div class="loop-row">
+          <div class="loop-step">
+            <div class="ls-num">— 01 —</div>
+            <div class="ls-name">Goal</div>
+            <div class="ls-desc">The outcome you hand over. Not a question — an assignment.</div>
+          </div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-step">
+            <div class="ls-num">— 02 —</div>
+            <div class="ls-name">Plan</div>
+            <div class="ls-desc">Decomposes the goal into ordered steps.</div>
+          </div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-step">
+            <div class="ls-num">— 03 —</div>
+            <div class="ls-name">Act</div>
+            <div class="ls-desc">Calls a tool — search, read, write, send.</div>
+          </div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-step">
+            <div class="ls-num">— 04 —</div>
+            <div class="ls-name">Observe</div>
+            <div class="ls-desc">Reads what came back. Did the tool succeed?</div>
+          </div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-step">
+            <div class="ls-num">— 05 —</div>
+            <div class="ls-name">Reflect</div>
+            <div class="ls-desc">Compares result to goal. Closer? Stuck?</div>
+          </div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-step iter">
+            <div class="ls-num">— 06 —</div>
+            <div class="ls-name">Iterate</div>
+            <div class="ls-desc">Loops back to plan — or stops when goal is met.</div>
+          </div>
+        </div>
+        <div class="loop-loopback">
+          <svg viewBox="0 0 1000 44" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 970 0 Q 970 38 500 38 Q 30 38 30 0" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4 5"/>
+            <polygon points="30,0 24,12 36,12" fill="#1e3a5f"/>
+          </svg>
+          <span class="lb-label">↺ loops back · until the goal is met</span>
+        </div>
+      </div>
+
+      <div class="compare-strip">
+        <div class="col">
+          <h4>Chatbot · the vending machine</h4>
+          <p>You press a button, you get one thing. No follow-through, no second move.</p>
+        </div>
+        <div class="col">
+          <h4 class="terra">Agent · the project manager</h4>
+          <p>You give a goal, they plan, execute, check the result, adjust, finish.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">7<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 08 — SPRINT 3 · MATURITY MODEL -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="8">
+    <div class="running-head"><div class="left"><span>Block 1 · Concept Sprint</span><span class="dot">·</span><span class="topic">Sprint 03</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Sprint 03 · The map</span>
+      <h1>The agent maturity model — <em style="font-style: italic;" class="terra">Level 0 to Level 3</em>.</h1>
+      <p class="lede mt-3">Progressive evolution from basic chatbots to coordinated multi-agent systems.</p>
+
+      <div class="mt-4">
+        <div class="maturity-row">
+          <span class="level-mark">L0</span>
+          <div>
+            <h3>Chatbot</h3>
+            <div class="desc">Single turn. No memory. No tools. The interface most people equate with "AI".</div>
+            <div class="example">Example · FAQ bot on a website</div>
+          </div>
+          <span class="pct">25%</span>
+        </div>
+        <div class="maturity-row">
+          <span class="level-mark">L1</span>
+          <div>
+            <h3>Copilot</h3>
+            <div class="desc">Suggests next steps inline. Human reviews and approves every action.</div>
+            <div class="example">Example · GitHub Copilot · sales email assistant</div>
+          </div>
+          <span class="pct">50%</span>
+        </div>
+        <div class="maturity-row featured">
+          <span class="level-mark">L2</span>
+          <div>
+            <h3>Agent <span class="here-badge">Today's build</span></h3>
+            <div class="desc">Plans, uses tools, persists memory, completes multi-step goals on its own.</div>
+            <div class="example">Example · AI Pattern Advisor · recruitment screener</div>
+          </div>
+          <span class="pct">75%</span>
+        </div>
+        <div class="maturity-row">
+          <span class="level-mark">L3</span>
+          <div>
+            <h3>Multi-Agent</h3>
+            <div class="desc">An orchestrator coordinates specialised agents working in parallel.</div>
+            <div class="example">Example · research pipeline · scout → analyst → writer</div>
+          </div>
+          <span class="pct">100%</span>
+        </div>
+      </div>
+
+      <p class="insight mt-4">Most enterprises sit at <strong>L0–L1</strong>. The competitive advantage is in moving to <strong>L2</strong> — which is exactly where you'll be by the end of this session.</p>
+    </div>
+    <div class="folio">8<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 09 — SPRINT 4 · 4-QUESTION FUNNEL -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="9">
+    <div class="running-head"><div class="left"><span>Block 1 · Concept Sprint</span><span class="dot">·</span><span class="topic">Sprint 04</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow warn">Sprint 04 · The discipline</span>
+      <h1>The four-question funnel — <em style="font-style: italic;" class="terra">chatbot, RAG, agent, multi-agent</em>.</h1>
+
+      <div class="grid g-2 mt-4" style="gap: var(--s-4);">
+        <div>
+          <div class="byline mb-2">— Ask in order. One survives. —</div>
+          <div class="qcard">
+            <span class="qnum">1</span>
+            <div>
+              <div class="qtext">Does the answer exist in a fixed document or database?</div>
+              <div class="routes">
+                <span class="route-tag ok">Yes → RAG</span>
+                <span class="route-tag no">No → continue</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard">
+            <span class="qnum">2</span>
+            <div>
+              <div class="qtext">Is one response — with no follow-up action — enough?</div>
+              <div class="routes">
+                <span class="route-tag ok">Yes → Chatbot</span>
+                <span class="route-tag no">No → continue</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard">
+            <span class="qnum">3</span>
+            <div>
+              <div class="qtext">Does it require multiple steps, memory, or tool use?</div>
+              <div class="routes">
+                <span class="route-tag ok">Yes → Agent</span>
+                <span class="route-tag no">No → continue</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard">
+            <span class="qnum">4</span>
+            <div>
+              <div class="qtext">Does it need multiple specialised capabilities in parallel?</div>
+              <div class="routes">
+                <span class="route-tag terra">Yes → Multi-Agent</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="byline mb-2">— The four shapes —</div>
+          <div class="pattern-list">
+            <div class="pat-row">
+              <span class="name">RAG</span>
+              <span class="desc">Document retrieval. Grounded answers from a fixed corpus.</span>
+            </div>
+            <div class="pat-row">
+              <span class="name">Chatbot</span>
+              <span class="desc">Single response. One question, one reply, no follow-through.</span>
+            </div>
+            <div class="pat-row">
+              <span class="name">Agent</span>
+              <span class="desc">Multi-step tasks. Plans, uses tools, persists memory.</span>
+            </div>
+            <div class="pat-row">
+              <span class="name">Multi-Agent</span>
+              <span class="desc">Parallel execution. Specialists orchestrated toward one goal.</span>
+            </div>
+          </div>
+          <p class="insight mt-3">Three questions eliminate. Only one path survives. Most teams skip this discipline and overbuild — <strong>95%</strong> pattern-matching success when you don't.</p>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <ol>
+          <li>Answer customer questions about return policy.<span class="answer-slot">_____</span></li>
+          <li>Generate a one-time product description.<span class="answer-slot">_____</span></li>
+          <li>Screen 200 resumes and schedule interviews.<span class="answer-slot">_____</span></li>
+          <li>Run a competitive intelligence report.<span class="answer-slot">_____</span></li>
+        </ol>
+        <div class="legend">R = RAG &nbsp;·&nbsp; C = Chatbot &nbsp;·&nbsp; A = Agent &nbsp;·&nbsp; M = Multi-Agent</div>
+      </div>
+    </div>
+    <div class="folio">9<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 10 — SPRINT 5 · BUSINESS COST -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="10">
+    <div class="running-head"><div class="left"><span>Block 1 · Concept Sprint</span><span class="dot">·</span><span class="topic">Sprint 05</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow danger">Sprint 05 · The price</span>
+      <h1>The cost of <em style="font-style: italic;" class="terra">staying</em> on chatbots.</h1>
+      <p class="lede mt-3">Three failure shapes you'll recognise from your own work — and the survey data on what they're costing the market.</p>
+
+      <div class="grid g-3 mt-4">
+        <div class="failure-card">
+          <div class="scenario">— Missed context —</div>
+          <h3>Support that forgets</h3>
+          <div class="domain">Customer support</div>
+          <div class="fc-body">Agent gives wrong advice because it has no memory of prior interactions. Tickets escalate. CSAT drops.</div>
+        </div>
+        <div class="failure-card">
+          <div class="scenario">— No follow-through —</div>
+          <h3>Deals that stall</h3>
+          <div class="domain">Sales process</div>
+          <div class="fc-body">Chatbot drafts a proposal but cannot send it, cannot track it, cannot schedule the follow-up. Cycles extend, deals go cold.</div>
+        </div>
+        <div class="failure-card danger">
+          <div class="scenario">— Zero persistence —</div>
+          <h3>Workflows that reset</h3>
+          <div class="domain">Operations &amp; compliance</div>
+          <div class="fc-body">Session times out, all context is lost mid-workflow. The work that just got done has to be redone — by hand.</div>
+        </div>
+      </div>
+
+      <div class="grid g-3 mt-5" style="gap: var(--s-2);">
+        <div class="stat-card warn">
+          <div class="stat-label">Companies abandoning AI projects</div>
+          <div class="stat-num">42<span style="font-size: 0.5em;">%</span></div>
+          <div class="stat-foot">in 2025 — up from 17% in 2024 (MIT / RAND, 2025)</div>
+          <div class="stat-cite">Source · <a href="https://www.fullview.io/blog/ai-statistics" target="_blank" rel="noopener">Fullview AI Statistics 2025</a></div>
+        </div>
+        <div class="stat-card featured">
+          <div class="stat-label">Achieving first-year ROI on AI</div>
+          <div class="stat-num">74<span style="font-size: 0.5em;">%</span></div>
+          <div class="stat-foot">of organisations report ROI in year one</div>
+          <div class="stat-cite">Source · <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">McKinsey State of AI 2025</a></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Experimenting with AI agents</div>
+          <div class="stat-num">62<span style="font-size: 0.5em;">%</span></div>
+          <div class="stat-foot">of organisations — high-performers are 3× more likely to be scaling</div>
+          <div class="stat-cite">Source · <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">McKinsey State of AI 2025</a></div>
+        </div>
+      </div>
+
+      <div class="grid g-2 mt-3" style="gap: var(--s-2);">
+        <div class="stat-card">
+          <div class="stat-label">Time reduction · mature agent deployments</div>
+          <div class="stat-num">35–50<span style="font-size: 0.5em;">%</span></div>
+          <div class="stat-foot">at 12+ months. Typical deployments land 20–35% by month 5–6.</div>
+          <div class="stat-cite">Source · <a href="https://www.articsledge.com/post/ai-agent-roi" target="_blank" rel="noopener">Articsledge AI Agent ROI Benchmarks 2026</a></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Enterprise AI users who made a major decision on a hallucinated answer</div>
+          <div class="stat-num">47<span style="font-size: 0.5em;">%</span></div>
+          <div class="stat-foot">in 2024 — the cost of skipping the pattern-match discipline</div>
+          <div class="stat-cite">Source · <a href="https://www.fullview.io/blog/ai-statistics" target="_blank" rel="noopener">Fullview AI Statistics 2025</a></div>
+        </div>
+      </div>
+
+      <p class="footnote mt-3">The math flipped this year. The cost of <em>not</em> moving carefully is now larger than the cost of moving — but only if you move with discipline. Most of the 42% who abandoned their AI projects reached for the wrong pattern.</p>
+    </div>
+    <div class="folio">10<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 11 — SPRINT 6 · 5 ARCHITECTURE PATTERNS -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="11">
+    <div class="running-head"><div class="left"><span>Block 1 · Concept Sprint</span><span class="dot">·</span><span class="topic">Sprint 06</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Sprint 06 · The shapes</span>
+      <h1>Five agentic <em style="font-style: italic;" class="terra">architecture patterns</em>.</h1>
+      <p class="lede mt-3">Five proven shapes for building autonomous AI systems — and when to use each.</p>
+
+      <div class="grid g-3 mt-4">
+        <div class="arch-card today">
+          <div class="head"><div class="name">Single Agent</div><span class="badge-tag">Today's build</span></div>
+          <div class="arch-tag">— Self-contained —</div>
+          <div class="arch-desc">One LLM + tools + memory for sequential tasks.</div>
+          <div class="arch-when">When the task is self-contained and sequential.</div>
+          <div class="arch-ex">→ Email drafting agent</div>
+        </div>
+        <div class="arch-card">
+          <div class="head"><div class="name">RAG Agent</div><span class="badge-tag">Docs</span></div>
+          <div class="arch-tag">— Document-based —</div>
+          <div class="arch-desc">Single agent with knowledge-base retrieval.</div>
+          <div class="arch-when">When the task requires grounding in documents.</div>
+          <div class="arch-ex">→ Support FAQ bot</div>
+        </div>
+        <div class="arch-card">
+          <div class="head"><div class="name">Tool-Calling Agent</div><span class="badge-tag">API</span></div>
+          <div class="arch-tag">— API integration —</div>
+          <div class="arch-desc">Agent with external API integrations.</div>
+          <div class="arch-when">When the task reads or writes external systems.</div>
+          <div class="arch-ex">→ CRM data sync</div>
+        </div>
+        <div class="arch-card">
+          <div class="head"><div class="name">Orchestrator-Worker</div><span class="badge-tag">Multi</span></div>
+          <div class="arch-tag">— Multi-agent —</div>
+          <div class="arch-desc">One planning agent coordinates specialists.</div>
+          <div class="arch-when">When the task has parallel workstreams.</div>
+          <div class="arch-ex">→ Market research pipeline</div>
+        </div>
+        <div class="arch-card">
+          <div class="head"><div class="name">Human-in-the-Loop</div><span class="badge-tag">High-stakes</span></div>
+          <div class="arch-tag">— Checkpoint approval —</div>
+          <div class="arch-desc">Agent pauses at checkpoints for human approval.</div>
+          <div class="arch-when">When the task is high-stakes or regulated.</div>
+          <div class="arch-ex">→ Financial approvals</div>
+        </div>
+        <div class="arch-card upgrade">
+          <div class="head"><div class="name">Up next</div><span class="badge-tag">Bridge</span></div>
+          <div class="arch-tag">— Build comes next —</div>
+          <div class="arch-desc">Concepts named. Time to build the Single-Agent + Tool-Calling pattern — the one underneath every other shape.</div>
+          <div class="arch-when">Block 2 begins now.</div>
+          <div class="arch-ex">→ Your AI Pattern Advisor</div>
+        </div>
+      </div>
+
+      <div class="chat-cue mt-4">
+        <span class="emoji">🛠</span>
+        <span class="text">Open EdYoda Agent Builder — the link is in chat. Log in. We start the build at the top of the next minute.</span>
+      </div>
+    </div>
+    <div class="folio">11<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 12 — EDYODA BUILDER WALKTHROUGH -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="12">
+    <div class="running-head"><div class="left"><span>Block 2 · Build Part 1</span><span class="dot">·</span><span class="topic">Builder orientation</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Builder orientation</span>
+      <h1>Four places to know. <em style="font-style: italic;" class="terra">One button.</em></h1>
+      <p class="lede mt-3">The EdYoda Agent Builder. Don't open it yet — just learn the shape so you know where everything lives when we start.</p>
+
+      <div class="grid g-4 mt-4">
+        <div class="panel-card">
+          <div class="p-num">— Tab 01 —</div>
+          <div class="p-name">Overview</div>
+          <div class="p-desc">Agent identity — name, description (role), welcome message.</div>
+          <div class="p-aside">What it IS · written once</div>
+        </div>
+        <div class="panel-card featured">
+          <div class="p-num">— Tab 02 —</div>
+          <div class="p-name">Configure → No-Code</div>
+          <div class="p-desc">The pipeline of nodes. This is where most of the build lives.</div>
+          <div class="p-aside">What it DOES · 5 nodes today</div>
+        </div>
+        <div class="panel-card">
+          <div class="p-num">— Tab 03 —</div>
+          <div class="p-name">RAG Docs</div>
+          <div class="p-desc">Upload docs the agent retrieves from. <em>This IS the memory.</em></div>
+          <div class="p-aside">Persistent context · one upload</div>
+        </div>
+        <div class="panel-card dim">
+          <div class="p-num">— Tab 04 —</div>
+          <div class="p-name">Logs</div>
+          <div class="p-desc">Run history. Look here after you publish — not during the build.</div>
+          <div class="p-aside">Observe · later, not now</div>
+        </div>
+      </div>
+
+      <p class="footnote terra mt-3">+ the <strong>Share Config</strong> button (top right) — your published agent's public chat URL lives there. That's how you and your colleagues actually use the agent. It's also the recovery plan today.</p>
+    </div>
+    <div class="folio">12<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 13 — PICK YOUR TRACK -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="13">
+    <div class="running-head"><div class="left"><span>Block 2 · Build Part 1</span><span class="dot">·</span><span class="topic">Pick your track</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Track selection</span>
+      <h1>Same agent shape. <em style="font-style: italic;" class="terra">Different words.</em></h1>
+      <p class="lede mt-3">You're building the <strong style="color:var(--terra);">AI Pattern Advisor</strong> — an agent that classifies any business problem into the right AI pattern. Pick the track closest to your day job.</p>
+
+      <div class="grid g-4 mt-5">
+        <div class="track-card">
+          <span class="t-badge">01</span>
+          <div class="t-name">Marketing/Sales</div>
+          <div class="t-desc"><strong>AI Pattern Advisor</strong> for marketing &amp; sales workflows.</div>
+        </div>
+        <div class="track-card">
+          <span class="t-badge">02</span>
+          <div class="t-name">Finance/Consulting</div>
+          <div class="t-desc"><strong>AI Pattern Advisor</strong> for financial workflows.</div>
+        </div>
+        <div class="track-card">
+          <span class="t-badge">03</span>
+          <div class="t-name">Doctor/Healthcare</div>
+          <div class="t-desc"><strong>AI Pattern Advisor</strong> for clinical workflows.</div>
+        </div>
+        <div class="track-card featured">
+          <span class="t-badge" style="color: var(--terra);">04</span>
+          <div class="t-name">Generic</div>
+          <div class="t-desc"><strong>AI Pattern Advisor</strong> for general knowledge-work.</div>
+        </div>
+      </div>
+
+      <p class="footnote terra">Type your track number in chat. Then open the workbook to your track's page (4–7).</p>
+    </div>
+    <div class="folio">13<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 14 — BUILD STEP A · SKELETON AGENT -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide" data-slide="14">
+    <div class="running-head"><div class="left"><span>Block 2 · Build Part 1</span><span class="dot">·</span><span class="topic">Build Step A</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-letter">A</span>
+        <div>
+          <div class="ex-label">Build Step · Hands-on</div>
+          <div class="ex-duration">Ten minutes</div>
+        </div>
+      </div>
+      <h2 class="ex-title">Create the agent + <em style="font-style: italic;" class="terra">Node 1 (Web Search Tool Agent)</em>.</h2>
+      <ol class="ex-steps">
+        <li>On the Agents list, click <strong>+ New</strong>. Fill the modal:
+          <ul>
+            <li>Agent Name: <code>[YourName]'s AI Pattern Advisor — [Track]</code></li>
+            <li>Description: paste the <strong>role line</strong> from your workbook page (4–7)</li>
+            <li>Welcome Message: paste the <strong>welcome line</strong> from your workbook page</li>
+            <li>Framework: <code>anthropic</code></li>
+          </ul>
+        </li>
+        <li>Click <strong>Create Agent → Confirm &amp; Create</strong>.</li>
+        <li>On the agent page, open <strong>Configure → No-Code</strong>.</li>
+        <li>Configure Node 1: Name = <code>Web Search Tool Agent</code> · Model = Claude Sonnet 4.6 · Max Tokens = 1024 · System Prompt = paste Node 1's prompt from your workbook page.</li>
+        <li>Stop here. <strong>Do not click Proceed yet</strong> — we run Step B before adding more nodes.</li>
+      </ol>
+      <p class="ex-followup">One node, one job — research. After this step your agent can use web search, which the chatbot in Sprint 1 couldn't. <strong>Gap #3 Tools — closed.</strong></p>
+    </div>
+    <div class="folio">14<sup>/28</sup></div>
+    <div class="ex-timer">⏱ 10 minutes</div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 15 — BUILD STEP B · FIRST RUN -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide" data-slide="15">
+    <div class="running-head"><div class="left"><span>Block 2 · Build Part 1</span><span class="dot">·</span><span class="topic">Build Step B</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-letter">B</span>
+        <div>
+          <div class="ex-label">Build Step · Hands-on</div>
+          <div class="ex-duration">Six minutes</div>
+        </div>
+      </div>
+      <h2 class="ex-title">First run — <em style="font-style: italic;" class="terra">proof of life</em>.</h2>
+      <ol class="ex-steps">
+        <li>Configure → No-Code → click <strong>Proceed (Generate Code)</strong>.</li>
+        <li>Click <strong>Publish Agent</strong> (top right).</li>
+        <li>Copy the <strong>public chat URL</strong> from Share Config. Open it in a new tab.</li>
+        <li>Paste your track's <strong>starter problem</strong> (workbook page 4–7) into the chat.</li>
+        <li>First response may take <strong>15–60 seconds</strong> on a cold start — wait, don't refresh.</li>
+        <li>Watch Node 1 fire — web search → structured research output (problem restated, current practice, tools, sources).</li>
+        <li>Paste the <strong>HEADLINE INSIGHT line</strong> from your Node 1 output in chat.</li>
+      </ol>
+      <p class="ex-followup">Just one node so far. Research only — no classification yet. That's Node 2's job, after the break. <strong>Don't worry if the output isn't a pattern recommendation — it isn't supposed to be.</strong></p>
+    </div>
+    <div class="folio">15<sup>/28</sup></div>
+    <div class="ex-timer">⏱ 6 minutes</div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 16 — HARD BREAK -->
+  <!-- ====================================================== -->
+  <div class="slide break-slide" data-slide="16">
+    <div class="running-head"><div class="left"><span>Session 02</span><span class="dot">·</span><span class="topic">— Intermission —</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <div class="break-label">— Break —</div>
+      <div class="break-clock" id="breakClock">10:00</div>
+      <p class="lede center mt-5" style="font-size: 1.6rem;">Stand up. Water. Stretch.</p>
+      <p class="byline mt-4" style="color: var(--terra); letter-spacing: 0.18em;">— Memory, action, multi-step. See you on the other side.</p>
+    </div>
+    <div class="folio">16<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 17 — BUILD CHECKPOINTS -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="17">
+    <div class="running-head"><div class="left"><span>Block 3 · Build Part 2</span><span class="dot">·</span><span class="topic">Checkpoints</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow calm">Progress tracker</span>
+      <h1>Three more steps to <em style="font-style: italic;" class="terra">L2</em>.</h1>
+      <p class="lede mt-3">You walked back from the break with a running L1. Now we upgrade. Keep this slide in the corner of your eye — we move through it together.</p>
+
+      <div class="chat-cue mt-3">
+        <span class="emoji">🚀</span>
+        <span class="text">…if you're back at your desk. We start Step C once most of the room is back.</span>
+      </div>
+
+      <div class="mt-4">
+        <div class="checkpoint done">
+          <span class="cp-icon">✓</span>
+          <div>
+            <div class="cp-stage">Done · before the break</div>
+            <div class="cp-name">Node 1 (Web Search Tool Agent) · published &amp; running</div>
+          </div>
+          <span class="cp-state">Complete</span>
+        </div>
+        <div class="checkpoint next">
+          <span class="cp-icon">◐</span>
+          <div>
+            <div class="cp-stage">Next · Step C</div>
+            <div class="cp-name">Add Node 2 — the Pattern Classifier</div>
+          </div>
+          <span class="cp-state">In progress</span>
+        </div>
+        <div class="checkpoint">
+          <span class="cp-icon">○</span>
+          <div>
+            <div class="cp-stage">Then · Step D</div>
+            <div class="cp-name">Upload a RAG Doc with your real context</div>
+          </div>
+          <span class="cp-state">Pending</span>
+        </div>
+        <div class="checkpoint">
+          <span class="cp-icon">○</span>
+          <div>
+            <div class="cp-stage">Then · Step E</div>
+            <div class="cp-name">Add Nodes 3, 4, 5 · Proceed · Republish</div>
+          </div>
+          <span class="cp-state">Pending</span>
+        </div>
+      </div>
+
+      <p class="footnote terra">When all four are checked, your published 5-node pipeline is live. That's L2 — the line you came to cross.</p>
+    </div>
+    <div class="folio">17<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 18 — BUILD STEP C · ACTION TOOL -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide" data-slide="18">
+    <div class="running-head"><div class="left"><span>Block 3 · Build Part 2</span><span class="dot">·</span><span class="topic">Build Step C</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-letter">C</span>
+        <div>
+          <div class="ex-label">Build Step · Hands-on</div>
+          <div class="ex-duration">Eight minutes</div>
+        </div>
+      </div>
+      <h2 class="ex-title">Add Node 2 — <em style="font-style: italic;" class="terra">the Pattern Classifier</em>.</h2>
+      <ol class="ex-steps">
+        <li>Configure → No-Code → click <strong>+ Add Node</strong>.</li>
+        <li>Configure Node 2: Name = <code>Pattern Classifier</code> · Model = Claude Sonnet 4.6 · Max Tokens = 1024 · System Prompt = paste Node 2 from your workbook page (4–7).</li>
+        <li>Click <strong>Proceed (Generate Code)</strong>.</li>
+        <li>Open your published chat URL. Re-run the same starter problem from Step B.</li>
+        <li>Paste in chat: the <strong>PATTERN</strong> your agent classified (RAG / Chatbot / Agent / Multi-Agent).</li>
+      </ol>
+      <p class="ex-followup">Node 1 researches. Node 2 decides — applying the 4-question funnel to Node 1's output. Two nodes, one button-press, no human in the middle. <strong>Gap #4 Autonomy — closed.</strong></p>
+    </div>
+    <div class="folio">18<sup>/28</sup></div>
+    <div class="ex-timer">⏱ 8 minutes</div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 19 — BUILD STEP D · MEMORY -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide" data-slide="19">
+    <div class="running-head"><div class="left"><span>Block 3 · Build Part 2</span><span class="dot">·</span><span class="topic">Build Step D</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-letter">D</span>
+        <div>
+          <div class="ex-label">Build Step · Hands-on</div>
+          <div class="ex-duration">Seven minutes</div>
+        </div>
+      </div>
+      <h2 class="ex-title">Upload a RAG Doc — <em style="font-style: italic;" class="terra">give the agent your real context</em>.</h2>
+      <ol class="ex-steps">
+        <li>Open the <strong>RAG Docs</strong> tab on your agent.</li>
+        <li>Use the template on <strong>workbook page 8</strong>. Fill it with your real company, audience, stack, top-3 priorities.</li>
+        <li>Save as <code>.txt</code> or <code>.pdf</code>. Click upload.</li>
+        <li>Re-run the SAME starter problem on your published chat URL.</li>
+        <li>Paste in chat: <strong>ONE specific phrase</strong> from the new output that proves the agent used your RAG doc.</li>
+      </ol>
+      <p class="ex-followup">On this platform there is no memory toggle. <strong>The doc IS the memory.</strong> Upload once, the agent retrieves from it on every future run. <strong>Gap #1 Memory — closed.</strong></p>
+    </div>
+    <div class="folio">19<sup>/28</sup></div>
+    <div class="ex-timer">⏱ 7 minutes</div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 20 — BUILD STEP E · MULTI-STEP GOAL -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide" data-slide="20">
+    <div class="running-head"><div class="left"><span>Block 3 · Build Part 2</span><span class="dot">·</span><span class="topic">Build Step E</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-letter">E</span>
+        <div>
+          <div class="ex-label">Build Step · Climax</div>
+          <div class="ex-duration">Ten minutes</div>
+        </div>
+      </div>
+      <h2 class="ex-title">Add Nodes 3, 4, 5 — <em style="font-style: italic;" class="terra">publish the pipeline</em>.</h2>
+
+      <ol class="ex-steps">
+        <li>Configure → No-Code → click <strong>+ Add Node</strong> three times.</li>
+        <li>From your workbook page (4–7), paste in order:
+          <ul>
+            <li><strong>Node 3</strong> — Implementation Sketch</li>
+            <li><strong>Node 4</strong> — Risk &amp; Compliance</li>
+            <li><strong>Node 5</strong> — Executive Brief</li>
+          </ul>
+        </li>
+        <li>Click <strong>Proceed (Generate Code)</strong>, then click <strong>Republish</strong>.</li>
+        <li>Open your published chat URL. Paste your starter problem. Watch <strong>all 5 nodes</strong> fire in order.</li>
+        <li>Paste in chat: the <strong>NEXT STEP FOR THE FOUNDER</strong> line from your Node 5 output.</li>
+      </ol>
+      <p class="ex-followup">Five nodes. One prompt. One published URL. The agent researches, decides, plans, flags risks, composes a brief — all on its own. <strong>Gaps #2 Multi-step + #5 Planning — closed. Five for five.</strong></p>
+    </div>
+    <div class="folio">20<sup>/28</sup></div>
+    <div class="ex-timer">⏱ 10 minutes</div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 21 — TRANSITION TO DEBRIEF -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="21">
+    <div class="running-head"><div class="left"><span>Block 4 · Pattern Debrief</span><span class="dot">·</span><span class="topic">Sense-making</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow cool">Sense-making</span>
+      <h1>You built it. <em style="font-style: italic;" class="terra">Now let's name what you built.</em></h1>
+      <p class="lede mt-3">Four lenses from the start of class. Map your agent onto each — this is how you'll explain it to your CTO on Monday.</p>
+
+      <div class="lens-row">
+        <div class="lens-chip">
+          <div class="l-num">— Lens 01 —</div>
+          <div class="l-name">5 Gaps Scorecard</div>
+        </div>
+        <div class="lens-chip">
+          <div class="l-num">— Lens 02 —</div>
+          <div class="l-name">Maturity Ladder</div>
+        </div>
+        <div class="lens-chip">
+          <div class="l-num">— Lens 03 —</div>
+          <div class="l-name">4-Question Funnel</div>
+        </div>
+        <div class="lens-chip">
+          <div class="l-num">— Lens 04 —</div>
+          <div class="l-name">Pattern You Used</div>
+        </div>
+      </div>
+
+      <p class="footnote">Same four frameworks you saw on the way in. Now run them backwards through what you built.</p>
+    </div>
+    <div class="folio">21<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 22 — DEBRIEF LENS 1 · 5 GAPS SCORECARD -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="22">
+    <div class="running-head"><div class="left"><span>Block 4 · Pattern Debrief</span><span class="dot">·</span><span class="topic">Lens 01 · 5 Gaps</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow calm">Lens 01 · 5 Gaps Scorecard</span>
+      <h1>Five for five. <em style="font-style: italic;" class="terra">In 90 minutes.</em></h1>
+      <p class="lede mt-3">Remember the five chatbot gaps from slide 6? Walk through what your agent now does for each one.</p>
+
+      <div class="mt-4">
+        <div class="scored-row">
+          <span class="sr-check">✓</span>
+          <span class="sr-gap"><span class="gap-num">#1</span>Memory</span>
+          <span class="sr-act">You enabled persistent memory in Step D — the agent remembers across runs.</span>
+          <span class="sr-state">Closed</span>
+        </div>
+        <div class="scored-row">
+          <span class="sr-check">✓</span>
+          <span class="sr-gap"><span class="gap-num">#2</span>Multi-step</span>
+          <span class="sr-act">Step E proved it — the trace log shows each step referencing the last.</span>
+          <span class="sr-state">Closed</span>
+        </div>
+        <div class="scored-row">
+          <span class="sr-check">✓</span>
+          <span class="sr-gap"><span class="gap-num">#3</span>Tools</span>
+          <span class="sr-act">You added two — Web Search in Step A, an action tool in Step C.</span>
+          <span class="sr-state">Closed</span>
+        </div>
+        <div class="scored-row">
+          <span class="sr-check">✓</span>
+          <span class="sr-gap"><span class="gap-num">#4</span>Autonomy</span>
+          <span class="sr-act">From Step C onwards it acted without per-step approval — you handed it the goal, it ran.</span>
+          <span class="sr-state">Closed</span>
+        </div>
+        <div class="scored-row">
+          <span class="sr-check">✓</span>
+          <span class="sr-gap"><span class="gap-num">#5</span>Planning</span>
+          <span class="sr-act">Step E forced a three-step-plus goal — the agent decomposed the work itself.</span>
+          <span class="sr-state">Closed</span>
+        </div>
+      </div>
+
+      <div class="big-stat">
+        <div class="bs-num">5⁄5</div>
+        <div class="bs-text"><strong>All five gaps closed</strong> in ninety minutes — no code, one builder, a working agent. That is the bar.</div>
+      </div>
+    </div>
+    <div class="folio">22<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 23 — DEBRIEF LENS 2 · MATURITY LADDER -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="23">
+    <div class="running-head"><div class="left"><span>Block 4 · Pattern Debrief</span><span class="dot">·</span><span class="topic">Lens 02 · Maturity</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Lens 02 · Maturity ladder</span>
+      <h1><em style="font-style: italic;" class="terra">L2.</em> You are here.</h1>
+      <p class="lede mt-3">The maturity ladder from earlier today. Your agent plans, uses tools, persists memory, completes multi-step goals on its own — that's Level 2 by definition.</p>
+
+      <div class="mt-4">
+        <div class="maturity-row passed">
+          <span class="level-mark">L0</span>
+          <div>
+            <h3>Chatbot</h3>
+            <div class="desc">Single turn. No memory. No tools.</div>
+            <div class="example">✓ Passed — you left this behind on slide 6.</div>
+          </div>
+          <span class="pct">25%</span>
+        </div>
+        <div class="maturity-row passed">
+          <span class="level-mark">L1</span>
+          <div>
+            <h3>Copilot</h3>
+            <div class="desc">Suggests next steps. Human approves every action.</div>
+            <div class="example">✓ Passed — this was your state at the break.</div>
+          </div>
+          <span class="pct">50%</span>
+        </div>
+        <div class="maturity-row featured">
+          <span class="level-mark">L2</span>
+          <div>
+            <h3>Agent <span class="here-badge">✓ You are here</span></h3>
+            <div class="desc">Plans, uses tools, persists memory, completes multi-step goals on its own.</div>
+            <div class="example">→ Your AI Pattern Advisor lives here.</div>
+          </div>
+          <span class="pct">75%</span>
+        </div>
+        <div class="maturity-row passed">
+          <span class="level-mark">L3</span>
+          <div>
+            <h3>Multi-Agent</h3>
+            <div class="desc">An orchestrator coordinates specialised agents in parallel.</div>
+            <div class="example">Not today — you'd add this if one agent isn't enough.</div>
+          </div>
+          <span class="pct">100%</span>
+        </div>
+      </div>
+
+      <p class="footnote terra">L2 solves probably 80% of the workflows you'd want to automate at work. Don't over-engineer.</p>
+    </div>
+    <div class="folio">23<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 24 — DEBRIEF LENS 3 · 4-QUESTION FUNNEL -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="24">
+    <div class="running-head"><div class="left"><span>Block 4 · Pattern Debrief</span><span class="dot">·</span><span class="topic">Lens 03 · Funnel</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow warn">Lens 03 · Decision funnel</span>
+      <h1>Through the funnel: <em style="font-style: italic;" class="terra">Agent.</em></h1>
+      <p class="lede mt-3">Take your AI Pattern Advisor through the four-question funnel from slide 9. Watch where you land.</p>
+
+      <div class="grid g-2 mt-4" style="gap: var(--s-4);">
+        <div>
+          <div class="qcard faded">
+            <span class="qnum">1</span>
+            <div>
+              <div class="qtext">Does the answer exist in a fixed document or database?</div>
+              <div class="routes">
+                <span class="route-tag no">Yes → RAG</span>
+                <span class="route-tag terra">No → continue ↓</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard faded">
+            <span class="qnum">2</span>
+            <div>
+              <div class="qtext">Is one response — no follow-up — enough?</div>
+              <div class="routes">
+                <span class="route-tag no">Yes → Chatbot</span>
+                <span class="route-tag terra">No → continue ↓</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard path">
+            <span class="qnum">3</span>
+            <div>
+              <div class="qtext">Does it require multiple steps, memory, or tool use?</div>
+              <div class="routes">
+                <span class="route-tag ok"><strong>Yes → Agent ✓</strong></span>
+              </div>
+              <div class="exit-note">→ You stop here. This is your agent.</div>
+            </div>
+          </div>
+          <div class="qcard faded">
+            <span class="qnum">4</span>
+            <div>
+              <div class="qtext">Does it need multiple specialised capabilities in parallel?</div>
+              <div class="routes">
+                <span class="route-tag no">Not reached — you exited at Q3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="byline mb-2">— Where you landed —</div>
+          <div class="pattern-list">
+            <div class="pat-row faded">
+              <span class="name">RAG</span>
+              <span class="desc">You don't have a fixed corpus — the problem space is open.</span>
+            </div>
+            <div class="pat-row faded">
+              <span class="name">Chatbot</span>
+              <span class="desc">A single reply wouldn't solve a multi-step classification.</span>
+            </div>
+            <div class="pat-row win">
+              <span class="name">Agent ✓</span>
+              <span class="desc"><strong style="color: var(--ink);">Your AI Pattern Advisor.</strong> Plans, uses tools, persists context.</span>
+            </div>
+            <div class="pat-row faded">
+              <span class="name">Multi-Agent</span>
+              <span class="desc">Save it for when one agent isn't enough — not today.</span>
+            </div>
+          </div>
+          <p class="insight mt-3">The funnel killed two options and survived one. That is the discipline. Use it before saying "let's use AI for X" at work.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">24<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 25 — DEBRIEF LENS 4 · PATTERN YOU BUILT -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="25">
+    <div class="running-head"><div class="left"><span>Block 4 · Pattern Debrief</span><span class="dot">·</span><span class="topic">Lens 04 · Pattern</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow cool">Lens 04 · Pattern used</span>
+      <h1><em style="font-style: italic;" class="terra">Single Agent + Tool-Calling.</em> The foundation pattern.</h1>
+      <p class="lede mt-3">Two patterns from slide 11, fused. Everything else is an upgrade you bolt on <em>when you hit a wall — not before.</em></p>
+
+      <div class="grid g-3 mt-4">
+        <div class="arch-card today">
+          <div class="head"><div class="name">Single Agent</div><span class="badge-tag">You built this ✓</span></div>
+          <div class="arch-tag">— Self-contained —</div>
+          <div class="arch-desc">One LLM + tools + memory for sequential tasks.</div>
+          <div class="arch-when">→ Foundation pattern. The base every upgrade builds on.</div>
+          <div class="arch-ex">→ Your AI Pattern Advisor</div>
+        </div>
+        <div class="arch-card today">
+          <div class="head"><div class="name">Tool-Calling</div><span class="badge-tag">You built this ✓</span></div>
+          <div class="arch-tag">— API integration —</div>
+          <div class="arch-desc">Agent with external API integrations — the "hands" you added.</div>
+          <div class="arch-when">→ Foundation pattern. What made your agent act.</div>
+          <div class="arch-ex">→ Your two tools</div>
+        </div>
+        <div class="arch-card upgrade">
+          <div class="head"><div class="name">Reflection</div><span class="badge-tag">Upgrade · Add</span></div>
+          <div class="arch-tag">— Self-review —</div>
+          <div class="arch-desc">Agent reviews its own output before returning it.</div>
+          <div class="arch-when">When you hit the same wall twice — add this.</div>
+          <div class="arch-ex">→ Quality check loop</div>
+        </div>
+        <div class="arch-card upgrade">
+          <div class="head"><div class="name">RAG Agent</div><span class="badge-tag">Upgrade · Add</span></div>
+          <div class="arch-tag">— Document grounding —</div>
+          <div class="arch-desc">Add a knowledge base; ground answers in documents.</div>
+          <div class="arch-when">When you need to ground in a fixed corpus — add this.</div>
+          <div class="arch-ex">→ Policy / SOP retrieval</div>
+        </div>
+        <div class="arch-card upgrade">
+          <div class="head"><div class="name">Orchestrator-Worker</div><span class="badge-tag">Upgrade · Add</span></div>
+          <div class="arch-tag">— Multi-agent —</div>
+          <div class="arch-desc">A planning agent coordinates specialist agents.</div>
+          <div class="arch-when">When parallel workstreams emerge — split this.</div>
+          <div class="arch-ex">→ Research → Analysis → Write</div>
+        </div>
+        <div class="arch-card upgrade">
+          <div class="head"><div class="name">Human-in-the-Loop</div><span class="badge-tag">Upgrade · Add</span></div>
+          <div class="arch-tag">— Approval gate —</div>
+          <div class="arch-desc">Agent pauses at checkpoints for human approval.</div>
+          <div class="arch-when">When the action is high-stakes — add a gate.</div>
+          <div class="arch-ex">→ Financial / clinical sign-off</div>
+        </div>
+      </div>
+
+      <p class="footnote">You don't need any of these upgrades yet. But now you know what they're called — and when to reach for them.</p>
+    </div>
+    <div class="folio">25<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 26 — PEER DEMOS PLACEHOLDER -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="26">
+    <div class="running-head"><div class="left"><span>Block 4 · Pattern Debrief</span><span class="dot">·</span><span class="topic">Peer demos</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow warn">Show &amp; tell</span>
+      <h1>Three of you. <em style="font-style: italic;" class="terra">Two minutes each.</em></h1>
+      <p class="lede mt-3">Show your agent run live. Name. Role. What it does. Run. Narrate the trace log. That is the whole thing.</p>
+
+      <div class="grid g-3 mt-5">
+        <div class="vol-card">
+          <span class="v-num">01</span>
+          <div class="v-label">— Volunteer 01 —</div>
+          <div class="v-cue">Name · Track · What it does · Live run · Trace narration</div>
+          <div class="v-timer">⏱ 2:00 max</div>
+        </div>
+        <div class="vol-card">
+          <span class="v-num">02</span>
+          <div class="v-label">— Volunteer 02 —</div>
+          <div class="v-cue">Name · Track · What it does · Live run · Trace narration</div>
+          <div class="v-timer">⏱ 2:00 max</div>
+        </div>
+        <div class="vol-card">
+          <span class="v-num">03</span>
+          <div class="v-label">— Volunteer 03 —</div>
+          <div class="v-cue">Name · Track · What it does · Live run · Trace narration</div>
+          <div class="v-timer">⏱ 2:00 max</div>
+        </div>
+      </div>
+
+      <p class="footnote">If your agent breaks on stage — that is a feature, not a bug. We debug together for sixty seconds.</p>
+    </div>
+    <div class="folio">26<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 27 — WHAT'S NEXT + BRIDGE TO SESSION 3 -->
+  <!-- ====================================================== -->
+  <div class="slide" data-slide="27">
+    <div class="running-head"><div class="left"><span>Block 5 · What's Next</span><span class="dot">·</span><span class="topic">Go do this</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Go do this</span>
+      <h1>Three moves <em style="font-style: italic;" class="terra">this month</em>.</h1>
+      <p class="lede mt-3">The build is done. The habit is what matters now.</p>
+
+      <div class="mt-4">
+        <div class="move-row">
+          <span class="m-num">01</span>
+          <div>
+            <div class="m-when">This week</div>
+            <p class="m-text">Run your agent <strong>five times</strong> on real business problems. Track time saved (workbook page 11).</p>
+          </div>
+        </div>
+        <div class="move-row">
+          <span class="m-num">02</span>
+          <div>
+            <div class="m-when">Next two weeks</div>
+            <p class="m-text">Iterate the system prompt. Treat it like a <strong>junior employee you're coaching</strong> — specific feedback, not vibes.</p>
+          </div>
+        </div>
+        <div class="move-row">
+          <span class="m-num">03</span>
+          <div>
+            <div class="m-when">Next month</div>
+            <p class="m-text">Show it to one colleague. Find ONE workflow <em>they'd</em> want classified. <strong>Build the second.</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bridge">
+        <div class="b-label">→ Next · Session 03</div>
+        <div class="b-text"><strong>Prompt Engineering &amp; Context Engineering for Agents.</strong> Learn how to communicate with agents precisely enough to make them reliable — the discipline that turns today's working agent into a trustworthy one.</div>
+      </div>
+
+      <div class="takehome">
+        <ol>
+          <li><strong>ONE business problem at your job</strong> you'll classify with your AI Pattern Advisor this month. One sentence on the problem, one on the pattern you think it'll come back as.</li>
+          <li><strong>ONE workflow you WON'T automate with an agent</strong> — because it's a chatbot job, a RAG job, or too sensitive for an agent today. One sentence on the workflow, one on why it stays manual.</li>
+        </ol>
+      </div>
+
+      <p class="footnote mt-3">You don't need another course. You need thirty minutes a week and a real problem.</p>
+    </div>
+    <div class="folio">27<sup>/28</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 28 — CLOSE -->
+  <!-- ====================================================== -->
+  <div class="slide blockquote-slide" data-slide="28">
+    <div class="running-head"><div class="left"><span>EdYoda · GenAI · S2</span><span class="dot">·</span><span class="topic">— Close —</span></div><span class="pub-title">Generative AI for Non-Coders · Session 2</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">— Where we are in the arc —</span>
+
+      <div class="crescendo mt-3">
+        <div class="line l-1">Last session, a chatbot was a <em>brain in a jar.</em></div>
+        <div class="line l-2">Today, you gave it <em>hands.</em></div>
+        <div class="line l-3">Next time, we teach it to <em>listen.</em></div>
+      </div>
+
+      <p class="close-sub">Two down. Six more to go. The arc gets sharper from here.</p>
+
+      <div class="rule-double mt-5"></div>
+
+      <p class="lede" style="margin-top: var(--s-3);">Go run your agent on something real this week. That's the only homework that matters.</p>
+
+      <p class="byline mt-4" style="color: var(--terra);">— See you in Session 03 · Prompt Engineering &amp; Context Engineering for Agents.</p>
+    </div>
+    <div class="folio">28<sup>/28</sup></div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">← Prev</button>
+  <span class="counter" id="slideCounter">01 / 28</span>
+  <button onclick="next()">Next →</button>
+  <button onclick="goFirst()">⏮</button>
+  <button onclick="toggleFullscreen()">⛶</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let current = 0;
+
+  function show(index) {
+    current = Math.max(0, Math.min(totalSlides - 1, index));
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+    const counter = document.getElementById('slideCounter');
+    if (counter) {
+      counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+    }
+    try { localStorage.setItem('s2_learner_slide', String(current)); } catch (e) {}
+    if (window.location.hash !== `#${current + 1}`) {
+      try { history.replaceState(null, '', `#${current + 1}`); } catch (e) {}
+    }
+    // Break-clock: start when we land on a .break-slide, stop otherwise.
+    if (slides[current] && slides[current].classList.contains('break-slide')) {
+      startBreakClock();
+    } else {
+      stopBreakClock();
+    }
+  }
+
+  function next() { if (current < totalSlides - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+  function goFirst() { show(0); }
+  function goSlide(i) { show(i); }
+
+  // Break-clock — 10-minute countdown, restarts on each entry to the break slide.
+  let breakInterval = null;
+  function startBreakClock() {
+    stopBreakClock();
+    let total = 10 * 60;
+    const el = document.getElementById('breakClock');
+    if (!el) return;
+    function tick() {
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      // Visual urgency: warn under 2 min, danger under 30s
+      el.classList.toggle('warn', total <= 120 && total > 30);
+      el.classList.toggle('danger', total <= 30);
+      total--;
+      if (total < 0) { stopBreakClock(); el.textContent = '00:00'; }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function stopBreakClock() {
+    if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+    const el = document.getElementById('breakClock');
+    if (el) { el.classList.remove('warn', 'danger'); }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key))         { e.preventDefault(); prev(); }
+    if (e.key === 'Home') goFirst();
+    if (e.key === 'End')  goSlide(totalSlides - 1);
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  // Hash navigation
+  function handleHash() {
+    const m = window.location.hash.match(/^#(\d+)$/);
+    if (m) {
+      const idx = parseInt(m[1], 10) - 1;
+      if (!isNaN(idx) && idx >= 0 && idx < totalSlides) {
+        show(idx);
+        return true;
+      }
+    }
+    return false;
+  }
+  window.addEventListener('hashchange', handleHash);
+
+  // ===== Presenter→Learner pairing + print bridge =====
+  // The presenter writes two keys:
+  //   `genai_s2_slide_master`   — current slide index, follow it
+  //   `genai_s2_print_request`  — bumped timestamp; trigger Chrome's Save-as-PDF on this tab
+  // Both decks have 28 slides 1:1 aligned, so the clamp is just a safety net.
+  const PRINT_KEY = 'genai_s2_print_request';
+  let lastPrintStamp = '';
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'genai_s2_slide_master') {
+      const v = parseInt(e.newValue, 10);
+      if (isNaN(v)) return;
+      const target = Math.min(v, totalSlides - 1);
+      if (target !== current) show(target);
+      return;
+    }
+    if (e.key === PRINT_KEY && e.newValue && e.newValue !== lastPrintStamp) {
+      // Facilitator pressed P on the presenter → open Save-as-PDF here.
+      // @media print CSS forces landscape 3:2 one-slide-per-page.
+      lastPrintStamp = e.newValue;
+      printAsPdf();
+    }
+  });
+
+  // Chrome's Save-as-PDF dialog pre-populates the filename from document.title.
+  // Set it to "Session 2 - <session name>" right before print, restore after.
+  const PDF_FILENAME = 'Session 2 - Why Agents? The Case for Autonomous AI';
+  const ORIGINAL_TITLE = document.title;
+
+  // Per-page geometry for the print snapshot. Mirrors @page size in @media print
+  // (13.333in × 7.5in @ 96dpi = 1280 × 720 px) minus the slide's own padding
+  // (0.4in top + 0.5in bottom = 86.4px). The remaining height is the content budget;
+  // any .slide-body taller than this gets scaled down to fit so nothing clips.
+  const PRINT_PAGE_HEIGHT_PX = 720;
+  const PRINT_VERTICAL_PADDING_PX = 86.4;
+  const PRINT_CONTENT_BUDGET_PX = PRINT_PAGE_HEIGHT_PX - PRINT_VERTICAL_PADDING_PX;
+
+  function fitSlidesForPrint() {
+    // Temporarily force every slide into the print geometry (1280×720 + print
+    // padding) so scrollHeight reflects what Chrome will actually render in the
+    // PDF — not the current viewport. Measure each .slide-body; if its content
+    // exceeds the height budget, shrink with transform: scale() from the top edge.
+    const slides = document.querySelectorAll('.slide');
+    const SLIDE_W = 1280;      // 13.333in @ 96dpi
+    const SLIDE_H = 720;       // 7.5in @ 96dpi
+    const PAD_TOP = 38.4;      // 0.4in
+    const PAD_X = 57.6;        // 0.6in
+    const PAD_BOTTOM = 48;     // 0.5in
+    const CONTENT_W = SLIDE_W - 2 * PAD_X;
+    const CONTENT_H = SLIDE_H - PAD_TOP - PAD_BOTTOM;
+
+    // Snapshot inline styles so we can restore.
+    const snapshots = [];
+    slides.forEach(slide => {
+      snapshots.push({
+        el: slide,
+        cssText: slide.style.cssText,
+      });
+      slide.style.cssText = `
+        position: absolute !important;
+        left: -10000px !important;
+        top: 0 !important;
+        width: ${SLIDE_W}px !important;
+        height: ${SLIDE_H}px !important;
+        padding: ${PAD_TOP}px ${PAD_X}px ${PAD_BOTTOM}px !important;
+        display: flex !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        transform: none !important;
+      `;
+    });
+    // Force a synchronous reflow so the off-screen measurement is accurate.
+    void document.body.offsetHeight;
+
+    slides.forEach(slide => {
+      const body = slide.querySelector('.slide-body');
+      if (!body) return;
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+      const naturalHeight = body.scrollHeight;
+      if (naturalHeight > CONTENT_H) {
+        const scale = CONTENT_H / naturalHeight;
+        body.style.transformOrigin = 'top left';
+        body.style.transform = `scale(${scale.toFixed(4)})`;
+        body.style.width = `${(100 / scale).toFixed(2)}%`;
+      }
+    });
+
+    // Restore inline styles (CSS rules re-apply for print).
+    snapshots.forEach(s => { s.el.style.cssText = s.cssText; });
+  }
+
+  function resetSlideFit() {
+    document.querySelectorAll('.slide-body').forEach(body => {
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+    });
+  }
+
+  function printAsPdf() {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+    setTimeout(() => { window.print(); }, 150);
+  }
+
+  // Also handle direct Cmd+P / Ctrl+P on the learner deck.
+  window.addEventListener('beforeprint', () => {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+  });
+  window.addEventListener('afterprint',  () => {
+    document.title = ORIGINAL_TITLE;
+    resetSlideFit();
+  });
+
+  // Init: prefer hash, then presenter-broadcast slide, then localStorage, then first slide
+  (function init() {
+    if (handleHash()) return;
+    try {
+      // Highest priority for paired sessions: follow the presenter if a master is set.
+      const master = parseInt(localStorage.getItem('genai_s2_slide_master') || '', 10);
+      if (!isNaN(master) && master >= 0) {
+        show(Math.min(master, totalSlides - 1));
+        return;
+      }
+      const saved = parseInt(localStorage.getItem('s2_learner_slide') || '0', 10);
+      if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
+    } catch (e) {}
+    show(0);
+  })();
+</script>
+</body>
+</html>
