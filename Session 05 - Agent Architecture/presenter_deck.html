@@ -324,7 +324,7 @@
   <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
   <button onclick="resetClass()">↺ Reset</button>
   <button onclick="openLearnerDeck()">↗ Learner Deck</button>
-  <span class="slide-counter" id="slideCounter">01 / 24</span>
+  <span class="slide-counter" id="slideCounter">01 / 29</span>
 </div>
 
 <div class="main">
@@ -393,10 +393,10 @@
 
 <script>
 /* ===================== SLIDE DATA =====================
-   Session 5 · Agent Architecture — 24 slides, paired 1:1 to learner_deck.html.
-   BREAK_SLIDE_INDEX = 11 (0-based, slide 12 in 1-based numbering).
+   Session 5 · Agent Architecture — 29 slides, paired 1:1 to learner_deck.html.
+   BREAK_SLIDE_INDEX = 16 (0-based, slide 17 in 1-based numbering).
    ===================================================== */
-const BREAK_SLIDE_INDEX = 11;
+const BREAK_SLIDE_INDEX = 16;
 
 const slides = [
   {
@@ -405,277 +405,298 @@ const slides = [
     say: "Session 4 gave your agent a brain made of Lumière's own documents. Today we open that brain up and learn exactly how it thinks.",
     doSteps: [
       "Music up. Confirm names as people arrive.",
-      "Tabs ready: Lumière Knowledge Agent (Claude Projects), fresh Claude chat for the optional demo, learner workbook open to Exercise A, Lumiere_KB.md in a text editor as fallback.",
-      "Pre-class checklist done: ran Exercise A and B yourself, know which loop stages the Lumière agent skips."
+      "Tabs ready: Lumière Knowledge Agent (Claude Projects), fresh Claude chat for the optional demo, learner workbook open to Exercise A, the updated Lumiere_KB.md (now with branch coupons) in a text editor.",
+      "REMIND learners at the top: re-upload the latest Lumiere_KB.md into their Project — it gained a branch-coupons section and Exercise A uses it."
     ],
-    bridge: "When the clock starts: one-word check-in (learner slide 2 is the Course Story)."
+    bridge: "When the clock starts: one-word check-in, then the Course Story."
   },
   {
     num: 2, when: "0:00 – 0:05", duration: "5 min", tag: "title",
     title: "Opening — One-word check-in + The Course Story",
-    say: "Welcome back. Before anything else — type one word in the chat: how did Session 4 land for you? The Lumière agent, the whole build. One word.",
-    afterPause: "Read every response by name. Then: 'Before we go anywhere new — look how far you've come.' Walk the Course Story table one breath per row. Land on S5 last.",
+    say: "Welcome back. Before anything else — type one word in the chat: how did Session 4 land for you? One word.",
+    afterPause: "Read every response by name. Then walk the Course Story table one breath per row. Land on S5 last.",
     doSteps: [
       "Read every chat response by name.",
-      "Walk the Course Story table (learner slide 2): S1 fail → S2 screener → S3 prompts → S4 Lumière → S5 today.",
-      "Land on S5: 'Today we open one of these agents up and name every part.'"
+      "Walk the Course Story table: S1 fail → S2 screener → S3 prompts → S4 Lumière → S5 today.",
+      "Ask everyone to re-upload the latest Lumiere_KB.md now if they haven't (branch coupons added)."
     ],
-    watch: "If chat is silent after 20 sec: 'Any word — useful, dense, wild, broken. One word.'",
+    watch: "If chat is silent after 20 sec: 'Any word — useful, dense, wild, broken.'",
     bridge: "Advance to the bug — the hook for the whole session."
   },
   {
     num: 3, when: "0:05 – 0:08", duration: "3 min", tag: "title",
     title: "The Bug We'll Explain — invented LinkedIn URLs",
-    say: "I want to start somewhere specific. The HR Screener you built in Session 2 — 3 steps: search candidates, extract skills, score them. When the search came back empty, it hallucinated LinkedIn URLs. Made them up. That was NOT a Claude problem. It was an architecture problem — a missing piece in how it was built. Today you name that piece.",
+    say: "Start specific. Your HR Screener from Session 2 — search candidates, extract skills, score them. When the candidate search came back empty, it invented LinkedIn URLs. That was NOT an AI problem. It was an architecture problem — and today you'll name exactly which part failed and why.",
     doSteps: [
       "Show the bug slide (learner slide 3).",
-      "Pause after 'architecture problem.' Let it land.",
-      "Set the promise: 'By the end you'll know which piece was missing, why it caused the hallucination, and how to build it right.'"
+      "Pause after 'architecture problem.' Don't reveal the cause yet — that lands after the anatomy.",
+      "Promise: 'by the end you'll know which part was missing, why it caused the hallucination, and how to build it right.'"
     ],
-    watch: "If learners don't remember the screener: '3-step pipeline — search, extract skills, score. The LinkedIn URL hallucination.' Recognition should follow.",
-    note: "This is the emotional hook of the session. Don't rush it.",
-    bridge: "Three concepts, both agents the whole way. Norms first if you haven't — then Sprint 1."
+    watch: "If they don't remember the screener: '3-step pipeline — search, extract skills, score. The LinkedIn URL hallucination.'",
+    note: "Hold the cause back. Tease it; the anatomy + slide 10 deliver it as a TOOL problem.",
+    bridge: "First: the 5 parts every agent is made of."
   },
   {
-    num: 4, when: "0:08 – 0:18", duration: "10 min",
-    title: "Sprint 1 — Anatomy: Five Components",
-    say: "Every agent — any agent — is five parts around one brain. LLM, Memory, Tools, Planner, Executor. Remove any one and it breaks in a specific, predictable way.",
+    num: 4, when: "0:08 – 0:14", duration: "6 min",
+    title: "Sprint 1 — Anatomy: 5 Parts, One Brain",
+    say: "Every agent — any agent — is 5 parts around one brain. LLM, Memory, Tools, Planner, Executor. Remove any one and it breaks in a specific way.",
     doSteps: [
-      "Show the anatomy radial (learner slide 4). Name each component + one-line role.",
-      "Walk the failure column: no memory → forgets/invents · no tools → only talks · no planner → stuck · no executor → never runs · no LLM → no thinking.",
-      "Cover norms briefly here if not already done: cameras optional, chat open, real break, tool = Claude Projects.",
-      "State the One Rule: 'You came in knowing what agents do. You leave knowing how they work.'"
+      "Show the anatomy radial (learner slide 4). Name each part + one-line role; walk the failure column.",
+      "Cover norms here if not done: cameras optional, chat open, real break, tool = Claude Projects.",
+      "State the One Rule: 'You came in knowing what agents do. You leave knowing how they work.'",
+      "Tell them: 'we'll take each of the 5 parts one at a time — then come back to your screener.'"
     ],
-    watch: "Keep the radial on screen while you talk — point at each satellite as you name it.",
-    bridge: "Now map those five parts onto YOUR screener — and find the empty one.",
-    deeper: ["The five map to the EdYoda Builder tabs: Overview (LLM), RAG Docs (semantic memory), Configure (tools + planner + executor)."]
+    bridge: "Part 1 — the brain.",
+    deeper: ["The 5 map to the EdYoda Builder tabs: Overview (LLM), RAG Docs (memory), Configure (tools + planner + executor)."]
   },
   {
-    num: 5, when: "0:18 – 0:22", duration: "4 min",
-    title: "Sprint 1 — The Bug, Located: Memory was empty",
-    say: "Map the screener's five parts and one is blank. LLM — Claude, yes. Tools — web search, yes. Planner — your 3-step sequence, yes. Executor — the pipeline runner, yes. Memory — nothing. No memory was configured.",
-    afterPause: "When the search came back empty, there was no memory to record 'I searched, found nothing.' With nowhere to note the failure, it filled the gap with fake URLs. That's not a Claude problem. That's a design choice you didn't know you were making.",
+    num: 5, when: "0:14 – 0:16", duration: "2 min",
+    title: "Part 1 of 5 — LLM (the brain)",
+    say: "Part 1: the LLM. The brain — it reads the request, weighs the options, picks the next move. It's the only part that actually thinks. At Lumière, it's what reads a customer's WhatsApp message and works out what they really want. Take it away and there's no reasoning at all — just a fixed script.",
+    doSteps: ["Show the LLM component slide (learner slide 5).", "Keep it to ~90 seconds — one part, one breath."],
+    bridge: "Part 2 — what it knows."
+  },
+  {
+    num: 6, when: "0:16 – 0:18", duration: "2 min",
+    title: "Part 2 of 5 — Memory (what it knows)",
+    say: "Part 2: Memory. What it holds and recalls — the current chat, a returning customer's history, and a log of what it's already done so it doesn't repeat itself. At Lumière: 'your usual red velvet, like last month?' — and the log that stops a monitor re-alerting on a rule it saw yesterday. Take it away and it forgets every session.",
+    doSteps: ["Show the Memory component slide (learner slide 6).", "Foreshadow: 'hold onto memory — it comes back in the FSSAI monitor.'"],
+    bridge: "Part 3 — what it can do."
+  },
+  {
+    num: 7, when: "0:18 – 0:20", duration: "2 min",
+    title: "Part 3 of 5 — Tools (the hands)",
+    say: "Part 3: Tools. The hands — the only way an agent changes the world. It searches, queries a database, books a slot, sends an email. At Lumière, the slot-booker and the confirmation-sender. Take it away and it can only talk — it can describe booking a cake but never books one. Remember this part — it's the one that broke your screener.",
+    doSteps: ["Show the Tools component slide (learner slide 7).", "Plant the flag: 'this is the part the screener got wrong.'"],
+    bridge: "Part 4 — what to do, in what order.",
+    note: "This is the setup for the slide-10 reveal. Land 'the hands are the only way it acts.'"
+  },
+  {
+    num: 8, when: "0:20 – 0:22", duration: "2 min",
+    title: "Part 4 of 5 — Planner (what's next)",
+    say: "Part 4: the Planner. It breaks a goal into steps and orders them. For a Lumière order: check the spec, confirm the lead time, book the slot, send confirmation — in that order, not jumbled. Take it away and the agent freezes on anything that takes more than one step.",
+    doSteps: ["Show the Planner component slide (learner slide 8)."],
+    bridge: "Part 5 — the part that actually runs it."
+  },
+  {
+    num: 9, when: "0:22 – 0:24", duration: "2 min",
+    title: "Part 5 of 5 — Executor (runs the plan)",
+    say: "Part 5: the Executor. It takes the planner's steps and actually fires the tools in order, feeding each result back to the brain. At Lumière, it calls the slot-booker, waits for the booking ID, then triggers the confirmation — and stops if a step fails. Take it away and you have plans that never run.",
+    doSteps: ["Show the Executor component slide (learner slide 9).", "Recap in one breath: 'brain, memory, hands, plan, runner — 5 parts.'"],
+    bridge: "Now back to your screener — which of the 5 actually broke?"
+  },
+  {
+    num: 10, when: "0:24 – 0:28", duration: "4 min",
+    title: "Sprint 1 payoff — The Bug Was the TOOL (Gap #3)",
+    say: "Map the screener's 5 parts. LLM — Claude, fine. Planner — your 3 steps, fine. Executor — the runner, fine. The part that broke was the TOOL. The job needed real, verified LinkedIn profiles — but LinkedIn allows no scraping, no public API, no MCP. A generic web search physically can't get them. So the tool came back empty, and with no guardrail the model filled the hole with plausible fake URLs.",
+    afterPause: "It wasn't a memory problem. It was a tool problem — Gap #3. The fix it was missing wasn't memory; it was a refusal guardrail that says 'I can't verify these' instead of inventing.",
     doSteps: [
-      "Show the 'bug located' radial (learner slide 5) — Memory drawn in dashed red with ✕.",
-      "Walk the had/missing list on the right.",
-      "Land the key line about the design choice."
+      "Show the 'bug located' radial (learner slide 10) — Tools marked broken in dashed red.",
+      "Be explicit: 'LinkedIn gives no legal way to fetch profiles — so no tool could do this job.'",
+      "Name both halves: tool = the cause; missing refusal guardrail = why it became a hallucination."
     ],
-    note: "The dashed-red Memory node is the visual payoff. Point at it.",
-    bridge: "Memory is one fix. The other is the loop — how agents recover when something breaks."
+    watch: "Some learners may have heard 'memory' earlier in the course — correct it cleanly: 'the root cause here is the tool, not memory.'",
+    note: "This is a corrected teaching point. Lead with TOOL. Memory still matters later (the FSSAI monitor's log) — just not as this root cause.",
+    bridge: "Tools are one part. Next: how the parts run as a loop."
   },
   {
-    num: 6, when: "0:22 – 0:30", duration: "8 min",
+    num: 11, when: "0:28 – 0:34", duration: "6 min",
     title: "Sprint 2 — The Reasoning Loop",
     say: "A chatbot answers once and stops. An agent loops — six stages, repeating until the goal is met. Perceive, Reason, Plan, Act, Observe, Reflect. A great consultant doesn't quit when the first call fails — they try the next contact. The loop is that instinct, built in.",
     doSteps: [
-      "Show the loop ring (learner slide 6). Trace the circle clockwise, naming each stage.",
-      "Read the legend on the right — one line per stage.",
-      "Emphasize Reflect: 'this is the stage that decides whether to loop again.'"
+      "Show the loop ring (learner slide 11). Trace it clockwise, naming each stage.",
+      "Read the legend; emphasize Reflect as the stage that decides whether to loop again."
     ],
-    watch: "Point around the actual ring as you name stages — the circularity is the teaching.",
+    watch: "Point around the actual ring — the circularity is the teaching.",
     bridge: "Watch the loop save a real agent when an email bounces."
   },
   {
-    num: 7, when: "0:30 – 0:34", duration: "4 min",
+    num: 12, when: "0:34 – 0:38", duration: "4 min",
     title: "Sprint 2 — The Loop Recovers (invoice trace)",
-    say: "Overdue-invoice agent. 8am trigger. It plans, sends 14 reminders, observes — 13 delivered, 1 bounced. It reflects: goal not met. Loops back, finds a fresh contact in the CRM, resends. 14 of 14. The bounce didn't crash it or make it quit — it observed, reflected, replanned, finished.",
+    say: "Overdue-invoice agent. 8am trigger. It sends 14 reminders, observes 13 delivered and 1 bounced, reflects that the email on file is stale, loops back, finds a current contact in the CRM, resends — 14 of 14. The bounce wasn't a dead end; it was new information that triggered a better plan.",
     doSteps: [
-      "Show the invoice trace (learner slide 7). Walk left to right; land on the dashed replan-arc.",
-      "State the exit conditions: goal achieved · max iterations · human escalation. All three. Without them, loops forever and burns money."
+      "Show the recovery timeline (learner slide 12). Walk the dots left to right; land on the green 'loop back' band.",
+      "State exit conditions: goal achieved · max tries · human escalation. All three, or it loops forever."
     ],
-    note: "The replan-arc is the visual — trace it with your cursor.",
-    bridge: "Now the same loop on YOUR screener — with one box empty."
+    note: "The dotted timeline is the visual — trace it with your cursor; read the 'loop back' sentence aloud.",
+    bridge: "Now the same loop on your screener — but the tool can't win, and there's no stop sign."
   },
   {
-    num: 8, when: "0:34 – 0:38", duration: "4 min",
-    title: "Sprint 2 — The Gap, Drawn (HR screener trace)",
-    say: "Same six stages on your HR Screener. Perceive the job params. Reason — need 5 profiles. Plan — run the search. Act — searched, came back empty. Observe — no profiles. Reflect — nothing. There was no reflect step. No recovery. So it invented URLs to fill the gap.",
+    num: 13, when: "0:38 – 0:42", duration: "4 min",
+    title: "Sprint 2 — The Gap, Drawn (screener trace)",
+    say: "Same six stages on your screener — but here the tool can't succeed (no way to reach real LinkedIn data), and there's no refusal rule at Reflect. So at the final stage the two agents diverge: the invoice agent recovered; the screener, with nothing true to return and no guardrail, filled the gap with fake URLs.",
     doSteps: [
-      "Show the HR trace (learner slide 8) — Reflect cell drawn struck-through/empty in red.",
-      "Land the fix: 'one instruction — if the search returns nothing valid, say so and stop, never invent. That single line is the reflect step it never had.'"
+      "Show the gap slide (learner slide 13) — faded 'Reflect?' then the bad/good split.",
+      "Read both outcomes: invented URLs (no guardrail) vs 'I can't verify these — escalate' (with a guardrail).",
+      "Name it: tool = root cause (Gap #3); refusal guardrail = the missing safeguard."
     ],
-    watch: "Watch the room connect the empty Reflect box to the LinkedIn URLs. Wait for it.",
-    bridge: "Last concept before the exercise — the four kinds of memory."
+    watch: "This pays off slide 10. Keep the framing identical: tool failed, guardrail absent, hallucination resulted.",
+    bridge: "Last concept before the exercise — the 4 kinds of memory."
   },
   {
-    num: 9, when: "0:38 – 0:42", duration: "4 min",
-    title: "Sprint 3 — Four Memory Types",
-    say: "Memory isn't one thing. Four types, like an office: the desk is short-term — the current chat, cleared when it closes. The notebook is long-term — a database that persists across sessions. The archive is episodic — a log of past events. The library is semantic — a body of documents to answer from. That last one you built in Session 4: the RAG Docs ARE semantic memory.",
+    num: 14, when: "0:42 – 0:46", duration: "4 min",
+    title: "Sprint 3 — 4 Memory Types (with examples)",
+    say: "Memory isn't one thing — 4 types, like an office. Desk, short-term: 'earlier you said the cake's for Saturday.' Notebook, long-term: 'welcome back, Priya — your usual eggless red velvet?' Archive, episodic: the FSSAI monitor's log of rules it already alerted on. Library, semantic: the Lumiere_KB.md you grounded in S4 — now with the branch coupons. Each has a concrete Lumière job.",
     doSteps: [
-      "Show the memory icons (learner slide 9). Name each: desk, notebook, archive, library.",
-      "Point at Library: 'you've already built this one.'"
+      "Show the memory slide (learner slide 14). Name each type and read its Lumière example.",
+      "Point at Library: 'you built this one in S4 — and you just re-uploaded the updated version.'"
     ],
-    bridge: "Now see exactly what each of your two agents was missing.",
-    note: "The drawn icons carry the analogy — let them; don't over-explain in words."
+    bridge: "See what each of your two agents was missing.",
+    note: "The examples are the upgrade — read each one aloud, don't just name the type."
   },
   {
-    num: 10, when: "0:42 – 0:42", duration: "1 min",
-    title: "Sprint 3 — Side by Side (what each agent missed)",
-    say: "HR Screener had the desk only — missing the archive, which is why it had nowhere to log the empty search. Lumière agent had the library — missing the archive and notebook, which is why it answers the cake question perfectly but forgets every conversation. You've used two of the four already. Today you learn to design the rest.",
-    doSteps: [
-      "Show the side-by-side (learner slide 10).",
-      "Land: 'desk, notebook, archive, library — every office has all four, agents don't come with all four installed.'"
-    ],
-    bridge: "Concepts named. Time to get inside one. Open your workbook to Exercise A.",
-    note: "If running short, this slide can be 30 seconds — the insight is on the previous slide's icons."
+    num: 15, when: "0:46 – 0:47", duration: "1 min",
+    title: "Sprint 3 — Side by Side",
+    say: "HR Screener: had the desk, but the part that broke was the tool, not the archive. Lumière agent: had the library, missing the archive and notebook — it answers the cake question but forgets every conversation. You've used two of the four already; today you learn to design the rest.",
+    doSteps: ["Show the side-by-side (learner slide 15)."],
+    bridge: "Concepts named. Open your workbook to Exercise A.",
+    note: "Keep this to ~1 min — the memory examples on the previous slide did the work."
   },
   {
-    num: 11, when: "0:42 – 0:55", duration: "13 min", tag: "exercise",
-    title: "Exercise A — Loop Trace",
-    say: "Exercise A — 13 minutes. You're going to read an agent's mind. Two things to paste: the loop-trace instruction, then a three-part question. Instruction goes ABOVE the question — it shapes the whole response.",
-    prompt: "EXERCISE A — LOOP TRACE (13 min)\n\nStep 1: Open Lumière Knowledge Agent in Claude Projects.\n\nStep 2: Add this instruction ABOVE your question:\n\nBefore answering, trace your own reasoning step by step. Label each stage:\nPERCEIVE — what information did you receive?\nREASON — what did you interpret from it?\nPLAN — what sequence will you follow to answer?\nACT — what did you retrieve from your knowledge?\nOBSERVE — what did the results tell you?\nREFLECT — what would you do if one part of the answer was missing?\n\nStep 3: Then ask (copy exactly):\n\n\"A customer wants a 2kg eggless chocolate cake for this Saturday. They also want to know whether the 15% discount code applies to eggless cakes. And they want to know if the Andheri West branch delivers to their area. What is the full answer?\"\n\nStep 4: Fill the 6-box Loop Trace in your workbook.\nIf a stage is missing: write \"not visible — add to prompt.\"\n\nStep 5: Which stage did the agent skip? What breaks on a harder question?\n\nFallback: fresh Claude chat + attach Lumiere_KB.md with paperclip.",
+    num: 16, when: "0:47 – 0:55", duration: "13 min", tag: "exercise",
+    title: "Exercise A — Loop Trace (branch-coupon beat)",
+    say: "Exercise A — 13 minutes. Read your agent's mind. Paste the loop-trace instruction ABOVE the messy customer message. The customer mistypes a branch coupon AND asks if another branch's code works — watch the agent correct, refuse, and flag, all in one reply.",
+    prompt: "EXERCISE A — LOOP TRACE (13 min)\n\nStep 1: Re-upload the latest Lumiere_KB.md (branch coupons added), open your Lumière agent.\n\nStep 2: Paste ABOVE the question:\nBefore answering, trace your reasoning one stage at a time:\nPERCEIVE (list every request) / REASON (YES, NO, or PARTIAL each) /\nPLAN / ACT (quote the section) / OBSERVE / REFLECT (what to do if you can't answer).\n\nStep 3: Then the customer message:\n\"I want a 2kg eggless chocolate cake for pickup at your Bandra branch this\nSaturday. Can I use the 'BANDRA 10' code on it — or my friend said 'POWAI10'\ngives a better deal, does that work at Bandra? Also, can you deliver it to\nSector 90, Gurgaon, and is it safe for my child with a severe nut allergy?\"\n\nStep 4: Fill the 6-box trace in your workbook.",
     doSteps: [
-      "Paste Exercise A instructions in chat (full block above).",
-      "Start the 13-min timer.",
-      "Walk the room: instruction below the question → move it above. Stops at REASON → add 'be thorough on all six.' Clean 6-stage output → call out by name.",
-      "At ~12 min: '[Name] — which stage was missing or thin for you?'",
-      "Read 2–3 traces aloud by name. Converge on REFLECT as the weakest."
+      "Paste Exercise A instructions in chat. Start the 13-min timer.",
+      "Walk the room. Correct behaviours to look for: fixes 'BANDRA 10' -> BANDRA10; refuses POWAI10 at Bandra (branch codes don't cross); refuses Gurgaon delivery; refuses to certify nut-allergy safety; flags eggless-coupon eligibility as not specified.",
+      "At ~12 min: '[Name] — did your agent catch that POWAI10 doesn't work at Bandra?'",
+      "Read 2-3 traces aloud by name."
     ],
-    watch: "REFLECT will be thinnest for most. That's the right answer — it's the architecture lesson landing.",
+    watch: "If it accepts POWAI10 at Bandra or echoes 'BANDRA 10' unchanged — the agent didn't re-read the updated KB. Have them re-upload and retry.",
     bridge: "Loop Trace is Section 1 of the Architecture Card. Real break now."
   },
   {
-    num: 12, when: "0:55 – 1:05", duration: "10 min", tag: "break",
+    num: 17, when: "0:55 – 1:05", duration: "10 min", tag: "break",
     title: "🟢 HARD BREAK · 10 minutes · NON-NEGOTIABLE",
     say: "Real ten minutes. Cameras off. Mics off. Step away from the screen. Back at the exact clock time on screen. Go.",
     doSteps: [
       "Show the break slide (learner deck fires the countdown automatically).",
       "Mute yourself. Play music.",
-      "DM any learner whose REFLECT box was blank: 'Add — If any part of the answer is missing from the document, say what you'd search for next. That forces a reflection output.'",
-      "Return with: 'You just traced an agent's reasoning loop. Now we give it hands.'"
+      "DM any learner whose agent accepted the wrong-branch code — remind them to re-upload the updated KB.",
+      "Return with: 'You just traced an agent's reasoning. Now we give it hands.'"
     ],
     note: "Honor the break. Do NOT start Block 3 early."
   },
   {
-    num: 13, when: "1:05 – 1:15", duration: "10 min",
+    num: 18, when: "1:05 – 1:15", duration: "10 min",
     title: "Sprint 4 — Tools: The Agent's Hands",
-    say: "Tools are the agent's hands; the LLM is the mind that picks them up. Four families: Information — read, search, query. Action — write, send, update. Communication — notify, message. Computation — calculate, transform.",
+    say: "Tools are the agent's hands; the LLM is the mind that picks them up. Four families: Information (read, search, query), Action (write, send, update), Communication (notify, message), Computation (calculate, transform).",
     doSteps: [
-      "Show the tools radial (learner slide 13). Name each quadrant with examples.",
+      "Show the tools radial (learner slide 18). Name each quadrant with examples.",
       "Land the scope/permission principle.",
-      "Ask the room: 'Which of these would make your legal team nervous if it weren't scoped — and why?' Take 2–3."
+      "Ask: 'Which tool would make your legal team nervous if it weren't scoped?' Take 2-3."
     ],
     afterPause: "Scope every tool. Permission every tool. If you can't say in one sentence what a tool cannot do — it's not scoped enough.",
     watch: "Action tools (send/write) draw the nervous responses. Validate them.",
-    bridge: "Here's a real manifest — see how every tool has a limit."
+    bridge: "Here's a real manifest — every tool has a limit."
   },
   {
-    num: 14, when: "1:15 – 1:19", duration: "4 min",
+    num: 19, when: "1:15 – 1:19", duration: "4 min",
     title: "Sprint 4 — The Tool Manifest",
-    say: "A real recruitment-agent manifest. Resume Reader — read-only. Calendar API — recruiter's calendar only, not company-wide. Email Sender — templates only, no free text. ATS Writer — candidate records only, every write logged. Slack Notifier — one channel. Every row has a boundary it cannot cross. That's the point.",
+    say: "A real recruitment-agent manifest. Resume Reader — read-only. Calendar API — recruiter's calendar only. Email Sender — templates only, no free text. ATS Writer — candidate records only, logged. Slack Notifier — one channel. Every row has a boundary it cannot cross.",
     doSteps: [
-      "Show the manifest table (learner slide 14). Walk each row's scope + permission.",
-      "Land: 'the loop recovers from the wrong tool. It cannot undo a correctly-run tool with too-broad scope.'"
+      "Show the manifest table (learner slide 19). Walk each row's scope + permission.",
+      "Land: 'the loop recovers from the wrong tool; it cannot undo a correctly-run tool with too-broad scope.'"
     ],
     note: "This table is the model for Exercise B. Make the scope column the hero.",
-    bridge: "One more concept — how the agent thinks through the task — then you build your manifest."
+    bridge: "One more concept — how the agent thinks through a task."
   },
   {
-    num: 15, when: "1:19 – 1:23", duration: "4 min",
-    title: "Sprint 5 — Planning: Three Ways to Think",
-    say: "Same task, three ways an agent can think. ReAct — think, act, observe, repeat; improvises with live data. Chain-of-Thought — a pure reasoning chain, no tools. Self-Reflection — draft, critique itself, redraft. Pick by three questions: how complex, does it need live tools, how high the stakes. Answer those and the strategy picks itself.",
+    num: 20, when: "1:19 – 1:23", duration: "4 min",
+    title: "Sprint 5 — Planning: 3 Ways to Think",
+    say: "Same task, three ways to think. ReAct — think, act, observe, repeat; improvises with live data. Chain-of-Thought — a pure reasoning chain, no tools. Self-Reflection — draft, critique itself, redraft. Pick by three questions: how complex, does it need live tools, how high the stakes.",
     doSteps: [
-      "Show the planning mini-flows (learner slide 15). Point at each shape: zigzag, step-stack, draft-critique loop.",
+      "Show the planning mini-flows (learner slide 20). Point at each shape.",
       "State the 3-question selector."
     ],
-    afterPause: "You don't memorize the names. You answer three questions and the right strategy picks itself.",
-    note: "Keep to 4 min. The 3-question selector is the only thing that must land.",
-    bridge: "Now design the tool manifest for an agent YOU'd deploy."
+    afterPause: "You don't memorize the names. You answer three questions and the strategy picks itself.",
+    note: "Keep to 4 min. The 3-question selector is the thing that must land.",
+    bridge: "Now design the tool manifests for Lumière's two new agents."
   },
   {
-    num: 16, when: "1:23 – 1:40", duration: "17 min", tag: "exercise",
-    title: "Exercise B — Tool Manifest",
-    say: "Exercise B — 17 minutes. Design the employment contracts for your agent's hands. Pick a real agent you'd want at work. Use the Claude prompt to draft 5 tools — then narrow every scope and permission. The first draft is always too broad.",
-    prompt: "EXERCISE B — TOOL MANIFEST (17 min)\n\nStep 1: Think of a real agent you'd want at work. One sentence for its job.\n\nStep 2: Use this Claude prompt:\n\nI want to design an agent that [describe the job — one sentence].\nList 5 tools it would need.\nFor each tool:\n- Name it\n- Describe what it does in one sentence\n- Suggest the narrowest possible scope (what it explicitly cannot access)\n- Recommend the minimum permission (read / read+write / send / execute)\n- Tell me what breaks if this tool is removed\n\nStep 3: Edit into the Tool Manifest table in your workbook. Narrow scope, minimize permission.\n\nStep 4: Circle one tool that makes you nervous.",
+    num: 21, when: "1:23 – 1:40", duration: "17 min", tag: "exercise",
+    title: "Exercise B — Tool Manifest (Order Assistant + FSSAI Monitor)",
+    say: "Exercise B — 17 minutes, two manifests. First the Lumière Order Assistant (~7 min), then the harder FSSAI Regulation Monitor (~10 min). Write each tool in RCTFC, then narrow every scope and permission. The monitor must auto-apply only trivial updates and escalate every allergen/safety rule to a human.",
+    prompt: "EXERCISE B — TOOL MANIFEST (17 min)\n\nPart 1 (~7 min): Order Assistant — 5 tools, each in RCTFC\n(ROLE / CONTEXT / TASK / FORMAT / CONSTRAINTS = scope + min permission),\nplus 'what breaks if removed.'\n\nPart 2 (~10 min): FSSAI Regulation Monitor — must include:\n- TWO triggers (auto nightly + manual 'check now')\n- AUTO-APPLY + LOG only cosmetic/procedural; ESCALATE all allergen/\n  ingredient/safety to a human, never auto-apply\n- a Seen-Rules Log (episodic memory) so it never re-alerts twice\n\nThen circle the one tool that makes you nervous.",
     doSteps: [
-      "Paste Exercise B instructions in chat.",
-      "Start the 17-min timer.",
-      "Walk the room: 'access to CRM' = not a scope ('what can't it touch?'). 'full access' = not minimum. No nervous tool circled → 'look at your send/write tools.'",
-      "At ~15 min: '[Name] — what's your nervous tool and why?'",
-      "After all: 'Every nervous tool is a write or send tool. Narrow it or add a human approval gate.'"
+      "Paste Exercise B instructions. Start the 17-min timer.",
+      "Walk the room: 'access to CRM' = not a scope; 'full access' = not minimum; check the monitor has a named memory tool; confirm allergen/safety always escalates.",
+      "At ~15 min: '[Name] — what's your nervous tool?'",
+      "After all: 'Every nervous tool is a write or send tool. Narrow it or add a human gate.'"
     ],
-    watch: "Stuck on what to build? 'What's the most repetitive task at your job that looks something up then sends or files something? Start there.'",
+    watch: "If a learner lets the monitor auto-apply an allergen rule — stop them. That's the one hard line: allergen/safety always escalates.",
     bridge: "Tool Manifest is Section 2. Now — when one agent isn't enough."
   },
   {
-    num: 17, when: "1:40 – 1:47", duration: "7 min",
-    title: "Sprint 6 — Multi-Agent: Three Patterns",
-    say: "When one agent isn't enough, split the work three ways. Orchestrator-Worker — a manager delegating to specialists. Parallel Agents — many analysts splitting one big pile. Specialist Handoffs — a relay race, each runner one leg.",
+    num: 22, when: "1:40 – 1:47", duration: "7 min",
+    title: "Sprint 6 — Multi-Agent: 3 Patterns",
+    say: "When one agent isn't enough, split the work three ways. Orchestrator-Worker — a manager delegating to specialists. Parallel Agents — many analysts splitting one pile. Specialist Handoffs — a relay race, each runner one leg.",
     doSteps: [
-      "Show the multi-agent topologies (learner slide 17). Walk each drawn diagram: fan-out tree, queue-split-merge, relay chain.",
-      "Design question: 'faster with agents in parallel, or more reliable with one checking another? That picks the pattern.'"
+      "Show the topologies (learner slide 22). Walk each drawn diagram.",
+      "Design question: 'faster with agents in parallel, or more reliable with one checking another?'"
     ],
-    watch: "Keep this tight — the reveal on the next slide is the payoff.",
-    bridge: "Two of these you can picture in one photo each."
+    watch: "Keep tight — the reveal two slides on is the payoff.",
+    bridge: "Two of these you can picture in a photo."
   },
   {
-    num: 18, when: "1:47 – 1:49", duration: "2 min",
-    title: "Sprint 6 — The Analogies, For Real (photos)",
+    num: 23, when: "1:47 – 1:49", duration: "2 min",
+    title: "Sprint 6 — The Analogies (photos)",
     say: "A relay race and an assembly line. Specialist Handoffs is the relay — each runner runs one leg, then passes the baton. Parallel Agents is the assembly line — many identical items moving through at once.",
-    doSteps: [
-      "Show the photos slide (learner slide 18).",
-      "Tee up the reveal: 'one of these you already built in Session 2.'"
-    ],
-    bridge: "And the reveal — you built one of these without knowing it."
+    doSteps: ["Show the photos slide (learner slide 23).", "Tee up: 'one of these you already built.'"],
+    bridge: "The reveal — your screener was one of these."
   },
   {
-    num: 19, when: "1:49 – 1:50", duration: "1 min",
-    title: "Sprint 6 — The Reveal: your screener was a multi-agent system",
-    say: "Your HR Screener from Session 2 was a Specialist Handoffs pattern. Step 1 searched. Step 2 extracted the top skills. Step 3 scored. Three specialists in sequence, each handing to the next. You built a multi-agent architecture in Session 2 — you just didn't have the name. Now you do.",
-    doSteps: [
-      "Show the reveal slide (learner slide 19) — the 3-step relay diagram.",
-      "Pause. Let the recognition land."
-    ],
-    watch: "This is the payoff of four sessions of building. Watch for the recognition moment.",
-    bridge: "Now choose the pattern for YOUR agent."
+    num: 24, when: "1:49 – 1:50", duration: "1 min",
+    title: "Sprint 6 — The Reveal",
+    say: "Your HR Screener was a Specialist Handoffs pattern. Step 1 searched. Step 2 extracted skills. Step 3 scored. Three specialists in sequence, each handing to the next. You built a multi-agent architecture in Session 2 without the name for it. Now you have it.",
+    doSteps: ["Show the reveal slide (learner slide 24).", "Pause. Let the recognition land."],
+    watch: "The payoff of four sessions of building — watch for the recognition.",
+    bridge: "Now choose the pattern for Lumière's overseas expansion."
   },
   {
-    num: 20, when: "1:50 – 1:55", duration: "5 min", tag: "exercise",
-    title: "Exercise C — Pattern Choice",
-    say: "Exercise C — 5 minutes. Pattern choice for your own agent. Use the Claude prompt. I'll call on each of you while you work.",
-    prompt: "EXERCISE C — PATTERN CHOICE (5 min)\n\nStep 1: Use this Claude prompt:\n\nI want to build an agent that [describe the same job as Exercise B].\nWhich of these three patterns fits best — Orchestrator-Worker,\nParallel Agents, or Specialist Handoffs — and why?\nWalk me through the choice.\nThen tell me: what breaks if I use the wrong pattern?\n\nStep 2: Read the recommendation. Agree or push back. Write in your workbook:\n\"I'm using [pattern] because [one sentence].\nThe risk if I use the wrong pattern: [one sentence].\"",
+    num: 25, when: "1:50 – 1:55", duration: "5 min", tag: "exercise",
+    title: "Exercise C — Pattern Choice (London branch)",
+    say: "Exercise C — 5 minutes. Lumière opens a London branch — new regulator, the FSA, not FSSAI. One monitor isn't enough. Ask Claude which of the 3 patterns fits, and push back if it over-automates.",
+    prompt: "EXERCISE C — PATTERN CHOICE (5 min)\n\nKeeping multiple branches compliant across DIFFERENT regulators:\nOrchestrator-Worker, Parallel Agents, or Specialist Handoffs?\nWhy? What breaks if I pick wrong? Where must a human stay in the loop?\n\nStrong answer: one monitor per regulator (each with its own memory), an\norchestrator that only ROUTES by branch, and the allergen/safety human gate\nfiring inside every monitor.\n\nIf Claude says 'one agent manages the whole country launch' — push back.",
     doSteps: [
-      "Paste Exercise C instructions in chat. Start the 5-min timer.",
-      "Call on each learner by name: '[Name] — what pattern does Claude recommend? Do you agree?'",
-      "Praise disagreements — those are learners knowing their use case better than the model's first guess."
+      "Paste Exercise C instructions. Start the 5-min timer.",
+      "Call on each learner: '[Name] — which pattern, and where does the human stay?'",
+      "Praise anyone who pushes back on over-automation — that's the judgment being taught."
     ],
-    watch: "Very tight on time? Skip the prompt; ask each learner verbally which pattern and why. Choice still goes in the workbook.",
     bridge: "Three sections done. The Architecture Card is complete."
   },
   {
-    num: 21, when: "1:55 – 1:57", duration: "2 min",
+    num: 26, when: "1:55 – 1:57", duration: "2 min",
     title: "The Architecture Card — Complete",
-    say: "Flip to your workbook. Three sections. Loop Trace — you read a real agent's reasoning and found the weak stage. Tool Manifest — you scoped five tools and flagged the risky one. Pattern Choice — you picked the architecture and can defend it. That card is the blueprint for any agent you'd build. Not for Lumière. Not for a demo. For your job.",
-    doSteps: [
-      "Show the Architecture Card slide (learner slide 21).",
-      "Name all three sections and how each maps to S6."
-    ],
+    say: "Three sections in your workbook. Loop Trace — you read a real agent's reasoning and saw it correct, refuse, and flag. Tool Manifest — you scoped two agents and drew the allergen/safety human gate. Pattern Choice — you split the work for a second country. That card is the blueprint you build in Session 6.",
+    doSteps: ["Show the Architecture Card slide (learner slide 26).", "Map each section to S6."],
     bridge: "Step back and name what changed today."
   },
   {
-    num: 22, when: "1:57 – 1:58", duration: "1 min",
+    num: 27, when: "1:57 – 1:58", duration: "1 min",
     title: "Synthesis — Architecture is a Choice",
-    say: "The HR Screener hallucinated because of three gaps — no episodic memory, no reflect step, no exit condition. Those aren't bugs in the model. They're choices in the build. And a choice is something you can make. You now know how.",
-    doSteps: ["Show the synthesis slide (learner slide 22).", "Deliver the line slowly."],
+    say: "The screener hallucinated because the tool couldn't do the job and no guardrail caught it. That wasn't a bug in the model — it was a design choice. And a choice is something you can make. You now know how.",
+    doSteps: ["Show the synthesis slide (learner slide 27).", "Deliver slowly."],
     bridge: "One reference card to carry, then we close."
   },
   {
-    num: 23, when: "1:58 – 1:59", duration: "1 min",
+    num: 28, when: "1:58 – 1:59", duration: "1 min",
     title: "Carry This — the whole session on one card",
-    say: "Six things to keep: five components, six loop stages, three exit rules, four memory types, three planning strategies, three multi-agent patterns. And the one diagnostic that ties it together — any agent that doesn't record what happened when something fails will eventually invent a result. That's the memory gap, every time.",
-    doSteps: ["Show the quick-reference slide (learner slide 23).", "Read the diagnostic line as the takeaway."],
+    say: "Six things to keep: 5 parts, 6 loop stages, 3 exit rules, 4 memory types, 3 planning strategies, 3 multi-agent patterns. And the diagnostic that ties it together — when a tool can't do the job and there's no guardrail, an agent fills the gap with invention. Give it a real tool or a refusal rule.",
+    doSteps: ["Show the quick-reference slide (learner slide 28).", "Read the diagnostic line as the takeaway."],
     bridge: "Then the close — and where this goes next."
   },
   {
-    num: 24, when: "1:59 – 2:00", duration: "1 min",
+    num: 29, when: "1:59 – 2:00", duration: "1 min",
     title: "Close + Forward Bridge to Session 6",
-    say: "Five sessions. You watched an agent fail, built one that works, grounded it in documents, and today opened it up and named every part. Session 6: EdYoda Agent Builder — build and host your first agent. Bring the Architecture Card — the system prompt, the tools, the pattern all go in. See you there.",
+    say: "Five sessions. You watched an agent fail, built one that works, grounded it in documents, and today opened it up and named every part. Session 6: EdYoda Agent Builder — build and host your first agent. Bring the Architecture Card. See you there.",
     doSteps: [
-      "Show the close slide (learner slide 24).",
-      "Paste take-home in chat: 'Reply by Friday, two sentences each: 1. Which of the 5 components was missing from the S2 HR Screener, and what broke? 2. Which tool in your manifest gets a human approval gate, and what triggers it?'",
+      "Show the close slide (learner slide 29).",
+      "Paste take-home: '1. Which of the 5 parts failed in the S2 screener, and what did it invent? 2. Which tool in your manifest gets a human approval gate, and what triggers it?'",
       "Wave. Stop recording. End meeting."
     ],
-    note: "Post-class within 24h: workbook PDF + Google Doc link, individual take-home replies, S6 calendar invite."
+    note: "Post-class within 24h: workbook PDF + Google Doc link, take-home replies, S6 calendar invite."
   }
 ];
 
