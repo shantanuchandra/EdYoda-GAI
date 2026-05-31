@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ===================== TOPBAR ===================== */
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .topbar .title .accent { color: var(--accent); }
+  .clock-divider { width: 1px; height: 32px; background: var(--border); }
+  .clock-box { display: flex; flex-direction: column; line-height: 1.15; gap: 2px; }
+  .clock-box .label {
+    color: var(--text-dim); font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.14em; font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+  .topbar .grow { flex: 1; }
+  .topbar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary { background: var(--accent); color: #062420; border-color: var(--accent); font-weight: 600; }
+  .topbar button.primary:hover { background: #7df1de; }
+  .topbar .slide-counter {
+    color: var(--text-muted); font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2); border-left: 1px solid var(--border);
+  }
+
+  /* ===================== MAIN LAYOUT ===================== */
+  .main { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 64px - 56px); }
+  .panel-left { overflow-y: auto; padding: var(--s-3) var(--s-4); border-right: 1px solid var(--border); }
+  .panel-right { overflow-y: auto; background: var(--bg-1); padding: var(--s-3); }
+  .panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track, .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover, .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===================== BOTTOMBAR ===================== */
+  .bottombar {
+    height: 56px; background: var(--bg-1); border-top: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 var(--s-3); gap: var(--s-2); flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1; height: 4px; background: var(--surface); border-radius: 2px;
+    overflow: hidden; margin: 0 var(--s-2); border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%; background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  /* ===================== SLIDE CONTENT ===================== */
+  .timing-bar {
+    display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3);
+    padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration { color: var(--text-muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+  .timing-bar .block-title {
+    font-weight: 500; flex: 1; font-size: 0.88rem; color: var(--text-soft);
+    text-align: right; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--s-2);
+  }
+  .slide-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: var(--s-3); letter-spacing: -0.02em; color: var(--text);
+  }
+
+  .section {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 18px; margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+  .section .header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .section h3 {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+
+  .quote {
+    color: var(--text); font-size: 1rem; line-height: 1.6;
+    padding-left: 12px; border-left: 2px solid var(--warm); margin: 0; font-weight: 400;
+  }
+  .section p { font-size: 0.94rem; line-height: 1.6; color: var(--text-soft); margin-bottom: 6px; }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list { counter-reset: step; list-style: none; padding-left: 0; margin: 0; }
+  .step-list > li {
+    counter-increment: step; padding-left: 36px; position: relative;
+    padding-bottom: 10px; font-size: 0.94rem; line-height: 1.55; color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: 0; top: 2px; width: 26px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    background: #060810; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem; color: var(--accent); white-space: pre-wrap;
+    line-height: 1.6; margin-top: 4px;
+  }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-section { margin-bottom: var(--s-3); }
+  .right-section h4 {
+    font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .preview-card {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title { font-size: 0.92rem; font-weight: 500; margin: 4px 0 2px; color: var(--text); line-height: 1.35; }
+  .preview-card .when {
+    font-size: 0.74rem; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 18px 16px; text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    line-height: 1; letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    text-transform: uppercase; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .timer-controls { display: flex; gap: 4px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
+  .timer-controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+  .quick-key kbd {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text-soft); font-weight: 500;
+    min-width: 22px; text-align: center; box-shadow: 0 1px 0 var(--border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session 5</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 2:00</span>
+  </div>
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 20</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(300)">5m</button>
+          <button onclick="startExTimer(480)">8m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="startExTimer(720)">12m</button>
+          <button onclick="startExTimer(780)">13m</button>
+          <button onclick="startExTimer(1020)">17m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>5</kbd> 5m · <kbd>8</kbd> 8m · <kbd>1</kbd> 13m · <kbd>2</kbd> 17m timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break (slide 11)</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA =====================
+   Session 5 · Agent Architecture — 20 slides, paired 1:1 to learner_deck.html.
+   BREAK_SLIDE_INDEX = 10 (0-based, slide 11 in 1-based numbering).
+   ===================================================== */
+const BREAK_SLIDE_INDEX = 10;
+
+const slides = [
+  {
+    num: 1, when: "Pre-start", tag: "title",
+    title: "Agent Architecture — How Agents Think, Remember & Act",
+    say: "Session 4 gave your agent a brain made of Lumière's own documents. Today we open that brain up and learn exactly how it thinks.",
+    doSteps: [
+      "Music up. Confirm names as people arrive.",
+      "Tabs ready: Lumière Knowledge Agent (Claude Projects), fresh Claude chat for optional demo, learner workbook open to Exercise A, Lumiere_KB.md in a text editor as fallback.",
+      "Pre-class checklist done: ran Exercise A and B yourself, know which loop stages the Lumière agent skips."
+    ],
+    bridge: "When the clock starts, open with the one-word check-in, then the Course Story."
+  },
+  {
+    num: 2, when: "0:00 – 0:08", duration: "8 min", tag: "title",
+    title: "Opening — Course Story + The Hallucination Named",
+    say: "Welcome back. Quick one before I say anything else — type one word in the chat: how did Session 4 land for you? The Lumière agent, the knowledge base, the whole build. One word.",
+    afterPause: "Read every response by name. Then: 'Before we go anywhere new — let me show you how far we've actually come.' Walk the Course Story table one row at a time. One breath per row. Land on S5 last. Then: 'The HR Screener you built in Session 2 hallucinated LinkedIn URLs when Node 1 came back empty. Today we name exactly why. Not a Claude problem. An architecture problem.'",
+    doSteps: [
+      "Show the Course Story slide.",
+      "Walk each row — S1 through S4 — one breath per row.",
+      "Land on S5: 'Today we open that agent up and name every part.'",
+      "Pause after 'architecture problem.' Let it land."
+    ],
+    watch: "If learners don't remember the HR Screener specifically, say: '3-node pipeline — Node 1 searches, Node 2 extracts skills, Node 3 scores candidates. The LinkedIn URL hallucination.' Recognition should follow.",
+    note: "The hallucination callback is the emotional hook. Don't rush it. The pause after 'architecture problem' is load-bearing."
+  },
+  {
+    num: 3, when: "0:08 – 0:12", duration: "4 min", tag: "title",
+    title: "Norms + The One Rule",
+    say: "Quick norms — same room, same rules. Cameras optional. Chat open. Mics muted unless called on. Real 10-minute break halfway. Today's tool: Claude Projects — same one from Session 4. One rule: you came in knowing what agents can do. You leave knowing how they work. The Architecture Card is the proof.",
+    doSteps: [
+      "Walk norms table briskly.",
+      "State the One Rule.",
+      "Show the 3-phase arc: Autopsy → Inside the Loop → Design Your Own.",
+      "Remind: Lumière agent should already be open."
+    ],
+    bridge: "Three fast concepts. Same two agents the whole way. Let's go."
+  },
+  {
+    num: 4, when: "0:12 – 0:22", duration: "10 min",
+    title: "Sprint 1 — Anatomy: Five Components, One Machine",
+    say: "Every agent — any agent — is five parts. LLM, Memory, Tools, Planner, Executor. Five parts, one machine. Remove any one — something specific breaks.",
+    doSteps: [
+      "Show anatomy diagram. Walk each component name + one-line role.",
+      "Walk the failure column — pause on each: No memory → forgets/invents. No tools → can only talk. No planner → stuck. No executor → plans never run. No LLM → nothing at all.",
+      "Map to the HR Screener: LLM = Claude Sonnet. Memory = NOTHING (THE BUG). Tools = web search. Planner = 3-node sequence. Executor = pipeline runner.",
+      "Key line: 'The screener had no memory. That's not a Claude problem. That's a design choice you didn't know you were making.'"
+    ],
+    watch: "The HR Screener mapping is the payoff. Don't rush through it. Wait for the recognition moment.",
+    note: "If anyone asks why it hallucinated specifically — 'No episodic memory meant no place to log that search returned empty. So it filled the gap with invented data.'",
+    deeper: ["The five components map to the EdYoda Agent Builder tabs: Overview (LLM config), RAG Docs (semantic memory), Configure (tools + planner + executor in the node pipeline).", "This taxonomy is the skeleton the whole session hangs on — every later concept slots into one of these five."]
+  },
+  {
+    num: 5, when: "0:22 – 0:34", duration: "12 min",
+    title: "Sprint 2 — The Loop: Perceive → Reflect",
+    say: "Agents don't respond once. They loop. Six stages — repeat until goal met. Perceive, Reason, Plan, Act, Observe, Reflect. A great consultant doesn't give up when their first call fails. They try the next contact. The loop is that instinct — built in.",
+    doSteps: [
+      "Show loop diagram. Walk each stage name + one-line definition.",
+      "Show overdue-invoice trace slide. Walk 6 stages. Land on replan: 1 bounced → Salesforce lookup → resent → 14/14. The loop saved it.",
+      "Trace HR Screener verbally: PERCEIVE=job parameters · REASON=need 5 profiles · PLAN=web_search · ACT=called search, sparse results · OBSERVE=empty · REFLECT=nothing. No reflection node → hallucinated.",
+      "Exit conditions: 'When should it stop? Three. Goal achieved. Max iterations. Human escalation. All three. Your screener had none.'"
+    ],
+    watch: "Watch for the moment learners connect the empty REFLECT box to the LinkedIn URLs. Wait for it. That's the aha.",
+    note: "The invoice trace earns its full time. Don't cut it to save time elsewhere. It's the visual that makes the loop concrete.",
+    bridge: "Four memory types — naming the things you've already been using."
+  },
+  {
+    num: 6, when: "0:34 – 0:42", duration: "8 min",
+    title: "Sprint 3 — Memory: Desk · Notebook · Archive · Library",
+    say: "Four memory types. Each solves a different problem. Missing the wrong one breaks a specific thing. Desk is short-term — the prompt window, cleared when the chat closes. Notebook is long-term — a database that persists across sessions. Archive is episodic — logs and summaries of past interactions. Library is semantic — a vector database of domain knowledge. That last one: you built it in Session 4. The RAG Docs tab IS semantic memory.",
+    doSteps: [
+      "Show memory types slide. Walk each type, ~30 sec each.",
+      "Side-by-side: HR Screener — short-term only, missing episodic → no log when search failed → hallucinated.",
+      "Lumière agent — semantic (RAG Docs). No episodic, no long-term → answers the cake question correctly, forgets every conversation.",
+      "Key line: 'You built semantic memory in S4. You've been using short-term since S1. Today you learn the names for all four.'"
+    ],
+    afterPause: "Desk, notebook, archive, library. Every office has all four. Agents do too — they just don't come configured out of the box.",
+    note: "If Sprint 3 is running short at 0:40, cut the analogy. Keep the side-by-side — that's where the insight lands.",
+    bridge: "Concepts named. Time to get inside one. Open your workbook to Exercise A."
+  },
+  {
+    num: 7, when: "0:42 – 0:55", duration: "13 min", tag: "exercise",
+    title: "Exercise A — Loop Trace",
+    say: "Exercise A — 13 minutes. You're going to read an agent's mind. Two things to paste: the loop-trace instruction, then the question. Instruction goes ABOVE the question — it shapes the whole response.",
+    prompt: "EXERCISE A — LOOP TRACE (13 min)\n\nStep 1: Open Lumière Knowledge Agent in Claude Projects.\n\nStep 2: Add this instruction ABOVE your question:\n\nBefore answering, trace your own reasoning step by step. Label each stage:\nPERCEIVE — what information did you receive?\nREASON — what did you interpret from it?\nPLAN — what sequence will you follow to answer?\nACT — what did you retrieve from your knowledge?\nOBSERVE — what did the results tell you?\nREFLECT — what would you do if one part of the answer was missing?\n\nStep 3: Then ask (copy exactly):\n\n\"A customer wants a 2kg eggless chocolate cake for this Saturday. They also want to know whether the 15% discount code applies to eggless cakes. And they want to know if the Andheri West branch delivers to their area. What is the full answer?\"\n\nStep 4: Fill the 6-box Loop Trace in your workbook.\nIf a stage is missing: write \"not visible — add to prompt.\"\n\nStep 5: Which stage did the agent skip? What breaks on a harder question?\n\nFallback: fresh Claude chat + attach Lumiere_KB.md with paperclip.",
+    doSteps: [
+      "Paste Exercise A instructions in chat (full block above).",
+      "Start 13-min timer.",
+      "Walk the room: instruction pasted after question → move it before. Agent stops at REASON → prompt not strong enough, add 'Be thorough on every label.' Clean 6-stage output → call out by name.",
+      "At ~12 min: '[Name] — which stage was missing or thin for you?'",
+      "Read 2–3 traces aloud by name. Converge on REFLECT as the weakest."
+    ],
+    watch: "REFLECT will be the thinnest or missing stage for most learners. That's the right answer. That's the architecture lesson."
+  },
+  {
+    num: 8, when: "0:53 – 0:55", duration: "2 min",
+    title: "Pre-Break Anchor",
+    say: "If your loop trace has all 6 boxes filled — even the 'not visible' ones — that's the milestone. Loop Trace is Section 1 of your Architecture Card. Real break, now.",
+    doSteps: ["Advance to break slide.", "Set 10-min timer."]
+  },
+  {
+    num: 9, when: "0:54 – 0:55", duration: "1 min",
+    title: "Pre-Break buffer",
+    say: "Heading to break. Get cameras off.",
+    doSteps: ["Advance to break slide immediately."]
+  },
+  {
+    num: 10, when: "0:55", duration: "0 min",
+    title: "Break transition",
+    say: "Break.",
+    doSteps: ["Advance to break slide."]
+  },
+  {
+    num: 11, when: "0:55 – 1:05", duration: "10 min", tag: "break",
+    title: "🟢 HARD BREAK · 10 minutes · NON-NEGOTIABLE",
+    say: "Real ten minutes. Cameras off. Mics off. Step away from the screen. Back at the exact clock time on screen. Go.",
+    doSteps: [
+      "Show break slide. Learner deck fires the countdown clock automatically.",
+      "Mute yourself. Play music.",
+      "DM any learner whose REFLECT box was blank. Send: 'Try adding: If any part of the answer is missing from the document, say what you'd search for next — that forces a reflection output.'",
+      "When you return: 'Welcome back. You just traced an agent's reasoning loop. Now we give it hands.'"
+    ],
+    note: "Honor the break. Do NOT start Block 3 early."
+  },
+  {
+    num: 12, when: "1:05 – 1:15", duration: "10 min",
+    title: "Sprint 4 — Tools: The Agent's Hands",
+    say: "Tools are the agent's hands. The LLM is the mind that picks them up. Four categories: Information — read, search, query. Action — write, send, update. Communication — notify, message. Computation — calculate, transform.",
+    doSteps: [
+      "Show tools grid. Walk each category with examples.",
+      "Show Recruitment Agent manifest. Walk each row: Resume Reader (read-only) · Calendar API (read+write, one calendar) · Email Sender (templated only) · ATS Writer (write, audited) · Slack Notifier (post, one channel).",
+      "Ask the room: 'Which tool would make your legal team nervous if it weren't scoped — and why?' Get 2–3 responses.",
+      "Tool failure pattern: Wrong tool → error → reflect → right tool. Loop saves you. Unscoped write tool: damage already done."
+    ],
+    afterPause: "Scope every tool. Permission every tool. If you can't describe what a tool cannot do — it's not scoped enough.",
+    watch: "Calendar API and Email Sender usually draw the legal-nervous response. Validate both — both are correct.",
+    note: "If past 1:13, cut the tool-calling mechanics (5-step sequence). Keep the manifest walk and the legal question."
+  },
+  {
+    num: 13, when: "1:15 – 1:23", duration: "8 min",
+    title: "Sprint 5 — Planning: Three Ways to Think",
+    say: "Three ways an agent can think through a task. Same task — three different paths. ReAct: reason and act, interleaved. Chain-of-Thought: pure reasoning chain, no tools. Self-Reflection: draft, critique, redraft.",
+    doSteps: [
+      "Show planning strategies slide. Walk each strategy — name, flow, best-for.",
+      "One worked example: 'Should we expand into Southeast Asia?' — three paths, three outputs.",
+      "State 3-question selector: Task complexity (simple → CoT · live data → ReAct · high-stakes → Reflection) · Tool dependency (needs tools → ReAct · internal → CoT/Reflection) · Output quality (high-stakes → Reflection · CoT · speed → ReAct)."
+    ],
+    afterPause: "You don't memorize strategy names. You answer three questions and the right strategy picks itself.",
+    note: "Keep to 8 min. The 3-question selector is the only thing that needs to land."
+  },
+  {
+    num: 14, when: "1:23 – 1:40", duration: "17 min", tag: "exercise",
+    title: "Exercise B — Tool Manifest",
+    say: "Exercise B — 17 minutes. You're going to design the employment contracts for your agent's hands. Think of a real agent you'd want at work. Use the Claude prompt to generate a first draft — then narrow it. The first draft is always too broad on scope and too permissive on permission.",
+    prompt: "EXERCISE B — TOOL MANIFEST (17 min)\n\nStep 1: Think of a real agent you'd want at work.\nOne sentence to describe what it does.\n\nStep 2: Use this Claude prompt:\n\nI want to design an agent that [describe the job — one sentence].\nList 5 tools it would need.\nFor each tool:\n- Name it\n- Describe what it does in one sentence\n- Suggest the narrowest possible scope (what it explicitly cannot access)\n- Recommend the minimum permission level (read / read+write / send / execute)\n- Tell me what breaks if this tool is removed\n\nStep 3: Edit into the Tool Manifest table in your workbook.\nNarrow scope. Minimize permission.\n\nStep 4: Circle one tool that makes you nervous.",
+    doSteps: [
+      "Paste Exercise B instructions + prompt in chat.",
+      "Start 17-min timer.",
+      "Walk the room: 'access to CRM' = not a scope, prompt: 'what specifically can't it touch?' · 'full access' = not a permission, prompt: 'minimum needed to do the job.' · No nervous tool circled → 'Look at your write and send tools.'",
+      "At ~15 min: '[Name] — what's your nervous tool and why?'",
+      "After all nervous tools: 'Every nervous tool is a write or send tool. Narrow it or add a human approval gate.'"
+    ],
+    watch: "Learner who doesn't know what agent to design: 'What's the most repetitive task in your job that involves looking something up and then sending or filing something? Start there.'"
+  },
+  {
+    num: 15, when: "1:40 – 1:43", duration: "3 min",
+    title: "Optional: Self-Reflection Demo (CUT if behind at 1:40)",
+    say: "One fast live demo — Self-Reflection in a tool you already use.",
+    doSteps: [
+      "Open fresh Claude chat.",
+      "Prompt 1: 'Write a 2-sentence recommendation for whether Lumière Bakery should open a fourth branch in Pune.' Read draft aloud.",
+      "Prompt 2: 'Critique that recommendation. What's the weakest claim? What data is missing? What would make a CFO push back?' Read critique aloud.",
+      "Say: 'Draft. Critique. Redraft. The agent is its own reviewer. That's Self-Reflection — in a plain Claude chat, right now.'"
+    ],
+    note: "CUT THIS ENTIRELY if you're behind at 1:40. It is additive only. Do not let it eat Exercise C.",
+    watch: "If Claude returns a weak critique, add to the prompt: 'Be specific. Name at least one claim with no data source, one assumption that could be wrong, one question a skeptical CFO would ask immediately.'"
+  },
+  {
+    num: 16, when: "1:43 – 1:50", duration: "7 min",
+    title: "Sprint 6 — Multi-Agent: Three Patterns",
+    say: "When one agent isn't enough. Three patterns. Orchestrator-Worker: project manager delegating to specialists. Parallel Agents: multiple analysts splitting a shared queue. Specialist Handoffs: relay race, each runner specialized.",
+    doSteps: [
+      "Show multi-agent patterns slide. Walk each pattern + analogy.",
+      "THE CALLBACK: 'Your HR Screener from Session 2 was a Specialist Handoffs pattern. Node 1 searched. Node 2 extracted skills. Node 3 scored. Three specialists in sequence, each handing to the next. You built a multi-agent architecture in Session 2 without knowing what to call it. Now you know.'",
+      "PAUSE. Let that land.",
+      "Design question: 'Would your agent get faster with more agents running in parallel — or more reliable with one agent checking the other's work? That one question picks the pattern.'"
+    ],
+    watch: "The callback moment is the payoff of this session. Watch for recognition — learners realizing they already built the thing you just named.",
+    note: "Sprint 6 is deliberately short — 7 minutes. The callback earns all of it."
+  },
+  {
+    num: 17, when: "1:50 – 1:55", duration: "5 min", tag: "exercise",
+    title: "Exercise C — Pattern Choice",
+    say: "Exercise C — 5 minutes. Pattern choice for your own agent. Use the Claude prompt in your workbook. I'll call on each of you while you work.",
+    prompt: "EXERCISE C — PATTERN CHOICE (5 min)\n\nStep 1: Use this Claude prompt:\n\nI want to build an agent that [describe the job].\nWhich of these three patterns fits best — Orchestrator-Worker,\nParallel Agents, or Specialist Handoffs — and why?\nWalk me through the choice.\nThen tell me: what breaks if I use the wrong pattern?\n\nStep 2: Read the recommendation. Agree or push back.\nWrite in your workbook:\n\"I'm using [pattern] because [one sentence].\nThe risk if I use the wrong pattern: [one sentence].\"",
+    doSteps: [
+      "Paste Exercise C instructions in chat.",
+      "Start 5-min timer.",
+      "While they work, call on each learner by name: '[Name] — what pattern does Claude recommend? Do you agree?'",
+      "Praise disagreements: those are the moments learners know their use case better than the model's first answer."
+    ],
+    watch: "If running very tight (only 3 min), skip the Claude prompt entirely. Ask each learner verbally which pattern they'd pick and why. Pattern choice still goes in the workbook."
+  },
+  {
+    num: 18, when: "1:55 – 1:57", duration: "2 min",
+    title: "Synthesis — The Architecture Card",
+    say: "Step back. The HR Screener hallucinated LinkedIn URLs. We now know why — no episodic memory, no reflection node, no exit condition. Those aren't bugs in the code. They're gaps in the architecture. And architecture is a design decision — which means you can make it.",
+    doSteps: [
+      "Show Architecture Card summary slide.",
+      "Name all three sections: Loop Trace / Tool Manifest / Pattern Choice.",
+      "Key line: 'That card is not a demo exercise. It is the blueprint for any agent you want to build. Not for Lumière. Not for a demo. For your job.'"
+    ]
+  },
+  {
+    num: 19, when: "1:57 – 1:58", duration: "1 min",
+    title: "Forward Bridge",
+    say: "Session 6: EdYoda Agent Builder — Build and Host Your First Agent. Bring the Architecture Card. The system prompt in Section 1, the nodes in Section 2, the pattern in Section 3 — they all go into the Builder.",
+    doSteps: ["Show S6 bridge slide — one sentence only.", "Do not preview Builder mechanics."],
+    bridge: "Session 6: EdYoda Agent Builder — Build & Host Your First Agent."
+  },
+  {
+    num: 20, when: "1:58 – 2:00", duration: "2 min",
+    title: "Reflection + Goodbye",
+    say: "Five sessions. You've watched an agent fail, built one that works, grounded it in documents, and today opened it up and named every part. Two take-home questions — reply by Friday. See you for architecture in action — Session 6.",
+    doSteps: [
+      "Paste in chat: 'Reply by Friday — two sentences each: 1. Which of the 5 architecture components was missing from the S2 HR Screener, and what specifically broke because of it? 2. What's the one tool in your manifest you'd add a human approval gate to, and what's the trigger for escalation?'",
+      "Wave. Stop recording. End meeting.",
+      "Post-class within 24h: workbook PDF + Google Doc link, individual replies to take-home, calendar invite for S6."
+    ],
+    note: "Post-class within 24h: workbook PDF, individual take-home replies, S6 calendar invite."
+  }
+];
+
+/* ===================== ENGINE ===================== */
+let current = 0;
+const MASTER_KEY = 'genai_s5_slide_master';
+const PRINT_KEY  = 'genai_s5_print_request';
+
+function goSlide(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  render();
+  try { localStorage.setItem(MASTER_KEY, String(current)); } catch(e) {}
+  if (slides[current].tag === 'break') startExTimer(600);
+}
+function next() { if (current < slides.length - 1) goSlide(current + 1); }
+function prev() { if (current > 0) goSlide(current - 1); }
+
+function render() {
+  const s = slides[current];
+  const pane = document.getElementById('slidePane');
+  const tag = s.tag || '';
+  let html = '';
+
+  if (s.when) {
+    html += `<div class="timing-bar">
+      <span class="time-pill">${s.when}</span>
+      ${s.duration ? `<span class="duration">${s.duration}</span>` : ''}
+      <span class="block-title">Slide ${s.num} of ${slides.length}</span>
+    </div>`;
+  }
+  if (tag) html += `<div class="slide-tag ${tag}">${tag}</div>`;
+  html += `<h1>${s.title}</h1>`;
+
+  if (s.say) html += `<div class="section say"><div class="header"><h3>Say</h3></div><blockquote class="quote">${s.say}</blockquote></div>`;
+  if (s.afterPause) html += `<div class="section say"><div class="header"><h3>After pause</h3></div><p>${s.afterPause}</p></div>`;
+  if (s.sayAfter) html += `<div class="section say"><div class="header"><h3>Say after</h3></div><p>${s.sayAfter}</p></div>`;
+
+  if (s.doSteps && s.doSteps.length) {
+    const items = s.doSteps.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section do"><div class="header"><h3>Do</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+
+  if (s.watch) html += `<div class="section watch"><div class="header"><h3>Watch</h3></div><p>${s.watch}</p></div>`;
+  if (s.note)  html += `<div class="section note"><div class="header"><h3>Note</h3></div><p>${s.note}</p></div>`;
+  if (s.bridge) html += `<div class="section bridge"><div class="header"><h3>Bridge →</h3></div><p>${s.bridge}</p></div>`;
+  if (s.deeper && s.deeper.length) {
+    const items = s.deeper.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section deeper"><div class="header"><h3>Deeper (if asked)</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+  if (s.prompt) html += `<div class="section prompt-section"><div class="header"><h3>Paste in chat</h3></div><div class="prompt-box">${s.prompt}</div></div>`;
+
+  pane.innerHTML = html;
+
+  // Update counters and previews
+  document.getElementById('slideCounter').textContent = `${String(s.num).padStart(2,'0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  const np = (i) => slides[i] || null;
+  const now = np(current), nx = np(current + 1), nx2 = np(current + 2);
+  if (now) { document.getElementById('nowNum').textContent = `Slide ${now.num}`; document.getElementById('nowTitle').textContent = now.title; document.getElementById('nowWhen').textContent = now.when || '—'; }
+  if (nx)  { document.getElementById('nextNum').textContent = `Slide ${nx.num}`;  document.getElementById('nextTitle').textContent = nx.title;  document.getElementById('nextWhen').textContent = nx.when || '—'; }
+  else     { document.getElementById('nextNum').textContent = '—'; document.getElementById('nextTitle').textContent = '—'; document.getElementById('nextWhen').textContent = '—'; }
+  if (nx2) { document.getElementById('next2Num').textContent = `Slide ${nx2.num}`; document.getElementById('next2Title').textContent = nx2.title; document.getElementById('next2When').textContent = nx2.when || '—'; }
+  else     { document.getElementById('next2Num').textContent = '—'; document.getElementById('next2Title').textContent = '—'; document.getElementById('next2When').textContent = '—'; }
+}
+
+/* ===================== REAL CLOCK ===================== */
+function updateRealClock() {
+  const now = new Date();
+  document.getElementById('realClock').textContent =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+/* ===================== CLASS TIMER ===================== */
+let classStart = null, classPaused = true, classInterval = null;
+function startClass() {
+  if (classPaused) {
+    if (!classStart) classStart = Date.now();
+    else classStart = Date.now() - (classStart > 0 ? Date.now() - classStart : 0);
+    classPaused = false;
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+    classInterval = setInterval(tickClass, 1000);
+  } else {
+    classPaused = true;
+    clearInterval(classInterval);
+    document.getElementById('startBtn').textContent = '▶ Resume';
+  }
+}
+function resetClass() {
+  classPaused = true; clearInterval(classInterval); classStart = null;
+  document.getElementById('classClock').textContent = '0:00 / 2:00';
+  document.getElementById('paceLabel').textContent = '—';
+  document.getElementById('paceLabel').className = 'big';
+  document.getElementById('startBtn').textContent = '▶ Start Class';
+}
+function tickClass() {
+  if (!classStart) return;
+  const elapsed = Math.floor((Date.now() - classStart) / 1000);
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  document.getElementById('classClock').textContent =
+    `${m}:${String(s).padStart(2,'0')} / 2:00`;
+  const target = slides[current].when ? parseWhen(slides[current].when) : null;
+  if (target !== null) {
+    const diff = elapsed - target;
+    const label = document.getElementById('paceLabel');
+    if (diff > 180) { label.textContent = `+${Math.floor(diff/60)}m late`; label.className = 'big danger'; }
+    else if (diff > 60) { label.textContent = `+${diff}s`; label.className = 'big warn'; }
+    else { label.textContent = 'on time'; label.className = 'big ok'; }
+  }
+}
+function parseWhen(w) {
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return null;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval = null, exRemaining = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exRemaining = secs;
+  function tick() {
+    const m = Math.floor(exRemaining / 60), s = exRemaining % 60;
+    document.getElementById('exTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const b = document.getElementById('timerBlock');
+    b.classList.toggle('warn', exRemaining <= 120 && exRemaining > 30);
+    b.classList.toggle('danger', exRemaining <= 30);
+    exRemaining--;
+    if (exRemaining < 0) { stopExTimer(); document.getElementById('exTimer').textContent = '00:00'; }
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+/* ===================== KEYBOARD ===================== */
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') startClass();
+  if (e.key === 'b' || e.key === 'B') goSlide(BREAK_SLIDE_INDEX);
+  if (e.key === '5') startExTimer(300);
+  if (e.key === '8') startExTimer(480);
+  if (e.key === '1') startExTimer(780);  // 13m
+  if (e.key === '2') startExTimer(1020); // 17m
+  if (e.key === 'p' || e.key === 'P') printLearnerDeck();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+
+/* ===================== LEARNER DECK CONTROL ===================== */
+let learnerWin = null;
+function openLearnerDeck() {
+  const url = 'learner_deck.html';
+  if (!learnerWin || learnerWin.closed) {
+    learnerWin = window.open(url, 'genai_s5_learner');
+  } else {
+    learnerWin.focus();
+  }
+}
+
+// Override goSlide to also push to learner deck via localStorage
+const _goSlide = goSlide;
+window.goSlide = function(i) {
+  _goSlide(i);
+  try { localStorage.setItem(MASTER_KEY, String(current)); } catch(e) {}
+};
+
+function printLearnerDeck() {
+  if (!learnerWin || learnerWin.closed) {
+    learnerWin = window.open('learner_deck.html', 'genai_s5_learner');
+    setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch(e) {} }, 1500);
+  } else {
+    try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch(e) {}
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+// Init
+goSlide(0);
+</script>
+</body>
+</html>
