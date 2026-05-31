@@ -127,7 +127,7 @@ Replace the three placeholder slides in the data array with the real deck. The t
 
 The learner deck is **static — one `<section class="slide">` per slide**. The template includes:
 
-- A cover slide (`{{COVER_TITLE}}`, `{{COVER_BYLINE}}`)
+- A cover slide (`{{COVER_TITLE}}`, `{{COVER_BYLINE}}`) — **includes a customizable pre-class countdown timer** (`.preclass-timer`, default 5:00). The facilitator starts it before going live; `±` adjusts by a minute, Reset returns to the set base. It does NOT auto-start, is independent of the break clock, and is hidden in print/PDF. Keep it on every learner-deck cover.
 - A standard content slide (`{{SLIDE_2_*}}`)
 - A display/quote slide (`{{SLIDE_3_DISPLAY}}` with `{{DROP_CAP_LETTER}}`)
 - An exercise slide variant (`{{EXERCISE_LETTER}}`, `{{EXERCISE_DURATION}}`, `{{EXERCISE_PROMPT}}` — oversized terra Fraunces letter A/B/C/D/E, paste-ready code block, timer pinned bottom-right, folio shifts to bottom-left)

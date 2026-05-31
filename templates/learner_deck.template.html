@@ -286,6 +286,42 @@
     transition: width var(--dur) var(--ease);
   }
 
+  /* Pre-class countdown — customizable "we begin in N min" timer on the COVER slide.
+     Facilitator-run (does NOT auto-start). Default 5 min; ± adjusts by 1 min.
+     Independent of the break clock. Hidden in print. JS: preclassToggle / preclassAdjust / preclassReset. */
+  .preclass-timer {
+    margin-top: var(--s-4); padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+    display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
+  }
+  .preclass-timer .pt-clock {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(3.4rem, 7vw, 5.4rem); line-height: 0.9;
+    color: var(--terra); font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.03em; font-variation-settings: 'opsz' 144, 'SOFT' 40;
+    min-width: 4.5ch;
+  }
+  .preclass-timer .pt-clock.warn { color: var(--warn); }
+  .preclass-timer .pt-clock.danger { color: var(--danger); }
+  .preclass-timer .pt-label {
+    font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
+    display: block; margin-bottom: 0.3em;
+  }
+  .preclass-timer .pt-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .preclass-timer button {
+    font-family: 'Geist Mono', monospace; font-size: 0.82rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    color: var(--ink-soft); padding: 0.5em 0.9em; border-radius: 4px;
+    cursor: pointer; transition: all 200ms var(--ease);
+  }
+  .preclass-timer button:hover { border-color: var(--terra); color: var(--terra); background: var(--terra-soft); }
+  .preclass-timer button.pt-primary { background: var(--terra); border-color: var(--terra); color: var(--paper); }
+  .preclass-timer button.pt-primary:hover { background: #9e3a17; color: #fff; }
+  .preclass-timer .pt-adjust { font-size: 1rem; min-width: 2.4em; padding: 0.4em 0; text-align: center; }
+  .preclass-timer .pt-hint { font-size: 0.92rem; color: var(--ink-mute); font-style: italic; }
+
   /* Break slide — auto-countdown when navigated to. JS hook: startBreakClock(). */
   .break-slide { align-items: center; justify-content: center; text-align: center; }
   .break-slide .slide-body { align-items: center; justify-content: center; text-align: center; }
@@ -364,7 +400,7 @@
       break-after: auto;
     }
     /* Hide on-screen navigation */
-    .nav, .progress-thread { display: none !important; }
+    .nav, .progress-thread, .preclass-timer { display: none !important; }
     /* Strip the paper grain — it bloats the PDF by ~100MB. Keep the warm bg + vignette. */
     body::before { background-image: none !important; opacity: 0 !important; }
     /* Force color preservation */
@@ -394,6 +430,21 @@
         <p class="cover-byline">
           {{COVER_BYLINE — 1–2 sentences describing the promise of this session.}}
         </p>
+        <!-- Pre-class countdown — KEEP THIS on every learner-deck cover. Facilitator starts it
+             before going live; ± adjusts by a minute; Reset returns to the set base. -->
+        <div class="preclass-timer" id="preclassTimer">
+          <div>
+            <span class="pt-label">We begin in</span>
+            <div class="pt-clock" id="preclassClock">05:00</div>
+          </div>
+          <div class="pt-controls">
+            <button class="pt-adjust" onclick="preclassAdjust(-60)" title="minus 1 minute">−</button>
+            <button class="pt-primary" id="preclassStartBtn" onclick="preclassToggle()">Start</button>
+            <button class="pt-adjust" onclick="preclassAdjust(60)" title="plus 1 minute">+</button>
+            <button onclick="preclassReset()">Reset</button>
+          </div>
+          <span class="pt-hint">Set it, hit Start before you go live. ± adjusts by a minute.</span>
+        </div>
         <div class="cover-foot">
           <span>No. {{SESSION_NUMBER_PADDED}} / {{SESSION_SUBTITLE_SHORT}}</span>
           <span>Reading time: 120 min</span>
@@ -544,6 +595,51 @@
     const el = document.getElementById('breakClock');
     if (el) el.classList.remove('warn', 'danger');
   }
+
+  // Pre-class countdown — customizable "we begin in N min" timer on the cover slide.
+  // Facilitator-run (does NOT auto-start). Default 5 min; ± adjusts by 1 min.
+  // Independent of the break clock. Amber under 1 min, red under 15s. Hidden in print.
+  let preclassTotal = 5 * 60, preclassRemaining = 5 * 60, preclassInterval = null, preclassRunning = false;
+  function preclassRender() {
+    const el = document.getElementById('preclassClock');
+    if (!el) return;
+    const m = Math.floor(preclassRemaining / 60), s = preclassRemaining % 60;
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('warn', preclassRemaining <= 60 && preclassRemaining > 15);
+    el.classList.toggle('danger', preclassRemaining <= 15);
+  }
+  function preclassToggle() {
+    const btn = document.getElementById('preclassStartBtn');
+    if (preclassRunning) {
+      clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+      if (btn) btn.textContent = 'Resume';
+      return;
+    }
+    preclassRunning = true;
+    if (btn) btn.textContent = 'Pause';
+    preclassInterval = setInterval(() => {
+      preclassRemaining--;
+      if (preclassRemaining <= 0) {
+        preclassRemaining = 0; preclassRender();
+        clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+        if (btn) btn.textContent = 'Start';
+        return;
+      }
+      preclassRender();
+    }, 1000);
+  }
+  function preclassAdjust(delta) {
+    preclassTotal = Math.max(60, Math.min(60 * 60, preclassTotal + delta));
+    if (!preclassRunning) { preclassRemaining = preclassTotal; preclassRender(); }
+    else { preclassRemaining = Math.max(0, preclassRemaining + delta); preclassRender(); }
+  }
+  function preclassReset() {
+    clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+    preclassRemaining = preclassTotal;
+    const btn = document.getElementById('preclassStartBtn'); if (btn) btn.textContent = 'Start';
+    preclassRender();
+  }
+  preclassRender();
 
   // Pair with presenter deck. Both decks MUST have identical slides.length —
   // if the clamp ever triggers, the symmetry contract was broken.
