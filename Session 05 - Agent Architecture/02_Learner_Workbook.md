@@ -10,7 +10,7 @@ The **slides** carry the concepts — the five components, the loop, the memory 
 
 Everything today runs on **one story: Lumière Bakery** — the same system you grounded yesterday. You'll take that read-only Knowledge Agent and design two upgrades the bakery actually needs, ending with a completed **Agent Architecture Card** you'll build for real in Session 6.
 
-**Open before you start:** your **Lumière Knowledge Agent** in Claude Projects (from Session 4, with `Lumiere_KB.md` in its knowledge). No project? Fresh Claude chat, attach `Lumiere_KB.md` with the paperclip — every step works the same.
+**Open before you start:** your **Lumière Knowledge Agent** in Claude Projects (from Session 4). **Re-upload the latest `Lumiere_KB.md`** (in your S5 materials) into the Project's knowledge before you begin — the document gained a **branch-specific coupons** section since yesterday, and today's first exercise uses it. *(Re-uploading a changed document and watching the agent's answers update is exactly the dynamic-doc move you learned in Session 4.)* No project? Fresh Claude chat, attach the latest `Lumiere_KB.md` with the paperclip — every step works the same.
 
 **How to capture your answers:** wherever you see a grey box like this —
 
@@ -73,25 +73,28 @@ Then write the customer-facing reply.
 **3.** On the next line, paste this and **send**:
 
 ```text
-Hi! I need a 2kg eggless chocolate cake for this Saturday. Does the
-"LUMIER15" code still work on the eggless version? Can you deliver it to
-Sector 90, Gurgaon? And is it safe for my child who has a severe nut allergy?
+Hi! I want a 2kg eggless chocolate cake for pickup at your Bandra branch
+this Saturday. Can I use the "BANDRA 10" code on it — or my friend said
+"POWAI10" gives a better deal, does that work at Bandra? Also, can you
+deliver it to Sector 90, Gurgaon, and is it safe for my child with a
+severe nut allergy?
 ```
 
-*(Notice the customer typed the code wrong — "LUMIER15." A good agent should recognise what they meant and reply with the correct code, **LUMIERE15** — that's the REASON stage matching meaning, not just looking up an exact string.)*
+*(The customer fumbles two coupon details on purpose: the code is mistyped as "BANDRA 10" — the real one is **BANDRA10** — and they ask whether a **different branch's** code (POWAI10) works at Bandra. A good agent corrects the spelling AND knows a branch code is branch-specific. That's the REASON stage matching meaning and applying a rule, not just looking up a string.)*
 
 ### What you should see (verified against the document)
 
-The message hides **four** requests, and a good loop sorts them into *three different kinds* — that's the whole lesson:
+The message hides **five** requests, and a good loop sorts them into *different kinds* — that's the whole lesson:
 
 | Request | Document says | Correct loop behaviour |
 |---|---|---|
-| 2kg eggless choc cake, Saturday | **YES** — 48h lead time for custom cakes ≤3kg; eggless +₹80/cake | Answer it, cite *Custom & Celebration Orders → Lead Times* |
-| The misspelled "LUMIER15" code on the eggless version | **PARTIAL** — the real code is **LUMIERE15** (15% off celebration cakes ordered 3+ days ahead); the doc never says whether *eggless* qualifies | Two moves: (1) recognise the misspelling and reply with the correct code **LUMIERE15**; (2) flag honestly that the doc doesn't specify eggless eligibility — don't assume "yes" |
-| Deliver to Sector 90, Gurgaon | **NO** — delivery is Mumbai-only, ~8 km zones | Refuse cleanly (the S4 refusal line) |
-| Safe for a severe nut allergy | **NO (safety)** — kitchen is *not* nut-free, *cannot guarantee* allergen-free | State that and refuse to certify safety — never say "yes, safe" |
+| 2kg eggless choc cake, Saturday, Bandra pickup | **YES** — 48h lead time for custom cakes ≤3kg; eggless +₹80/cake | Answer it, cite *Custom & Celebration Orders → Lead Times* |
+| The mistyped "BANDRA 10" code | **FUZZY** — the real code is **BANDRA10** (10% off, min ₹600, Bandra only) | Recognise the misspelling, reply with the correct code **BANDRA10** |
+| Does "POWAI10" work at Bandra? | **NO** — POWAI10 is **Powai-only**; branch codes don't cross branches | Refuse cleanly and explain branch codes are branch-specific |
+| Does any code apply to the **eggless** version? | **PARTIAL** — eggless eligibility is *not guaranteed* and "confirm with the branch" | Flag the gap honestly — don't assume "yes" |
+| Deliver to Sector 90, Gurgaon + safe for a nut allergy | **NO + NO (safety)** — delivery is Mumbai-only; kitchen is *not* nut-free, *cannot guarantee* allergen-free | Refuse the Gurgaon delivery; state the allergen risk and refuse to certify safety |
 
-The point: a weak loop mashes four asks into one confident paragraph. A strong loop **perceives them as four, marks two as NO and one as PARTIAL, and reflects** instead of bluffing. The PARTIAL one is the subtle win — the document is *silent*, and a good agent says so rather than inventing a policy.
+The point: a weak loop mashes everything into one confident paragraph. A strong loop **perceives each request separately** and treats them differently — **correct** the fuzzy code, **refuse** the wrong-branch code and the out-of-zone delivery, **flag** the eggless-eligibility gap honestly, and **never** certify allergen safety. Correct, refuse, flag — three different behaviours the loop must keep apart.
 
 ### Capture (Section 1 of your Card)
 
@@ -99,31 +102,32 @@ The point: a weak loop mashes four asks into one confident paragraph. A strong l
 PERCEIVE — how many requests did it find, and what were they?
 ↳
 
-REASON — mark each YES / NO / PARTIAL:
+REASON — mark each YES / NO / FUZZY / PARTIAL:
 ↳
 
 ACT — one exact (Source: …) heading it quoted:
 ↳ (Source:                                                      )
 
-OBSERVE / REFLECT — what did it do with the Gurgaon (NO), the
-nut-allergy (NO-safety), and the misspelled-coupon (PARTIAL) requests?
+OBSERVE / REFLECT — what did it do with the wrong-branch code (NO),
+the Gurgaon delivery (NO), and the nut-allergy safety (NO-safety)?
 ↳
 
-COUPON CHECK — did it correct "LUMIER15" to the real code LUMIERE15?
-↳ (Yes / No — paste what it wrote)
+COUPON CHECK — (a) did it fix "BANDRA 10" to the real BANDRA10?
+              (b) did it tell the customer POWAI10 does NOT work at Bandra?
+↳ (paste what it wrote)
 
 DIAGNOSIS — which single stage saved this answer from being a bluff?
 ↳
 ```
 
 ### You're done when…
-…your trace shows the agent **handling the four requests differently** — it **corrects the misspelled coupon to LUMIERE15**, refuses cleanly on Gurgaon and the nut-allergy safety question, and admits the document doesn't specify whether the discount applies to eggless. If it confidently answered all four (or echoed "LUMIER15" back without fixing it), the trace failed — see fixes below.
+…your trace shows the agent **handling the five requests differently** — it **fixes "BANDRA 10" to BANDRA10**, **refuses POWAI10 at Bandra** (branch codes don't cross branches), refuses the Gurgaon delivery and the nut-allergy safety question, and **flags** that eggless eligibility isn't guaranteed. If it answered everything confidently — or accepted POWAI10 at Bandra, or echoed "BANDRA 10" back unchanged — the trace failed; see fixes below.
 
 ### If it misbehaves
 - **One blob, no labels** → the trace block landed below the question or after you sent. Redo it with the block on top.
 - **"Yes, safe for a nut allergy"** → add and resend: *"On any allergen or safety question, state the kitchen is not nut-free and you cannot guarantee allergen-free — never call an item safe."*
-- **Invents a Gurgaon answer, or claims the coupon definitely applies to eggless** → your S4 grounding + refusal prompt isn't loaded. Re-confirm it's in the Project's custom instructions, then retry.
-- **Echoes "LUMIER15" back unchanged, or says "no such code"** → it's matching the exact string instead of the meaning. Add to the trace block: *"If a coupon code is slightly misspelled, identify the closest real code in the document and give the customer the correct spelling."*
+- **Accepts POWAI10 at Bandra, or invents a Gurgaon answer** → your S4 grounding + refusal prompt isn't loaded, or the agent hasn't re-read the updated KB. Re-upload `Lumiere_KB.md` (it now has the branch-codes section), confirm the grounding + refusal prompt is in custom instructions, then retry.
+- **Echoes "BANDRA 10" back unchanged, or says "no such code"** → it's matching the exact string instead of the meaning. Add to the trace block: *"If a coupon code is slightly misspelled, identify the closest real code in the document and give the customer the correct spelling."*
 
 > **Remember:** the agent that perceives four requests as four — and reflects on the ones it can't answer — is the one that won't hallucinate. Same gap that broke the S2 HR Screener, seen from the inside.
 
