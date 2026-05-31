@@ -80,7 +80,7 @@ deliver it to Sector 90, Gurgaon, and is it safe for my child with a
 severe nut allergy?
 ```
 
-*(The customer fumbles two coupon details on purpose: the code is mistyped as "BANDRA 10" — the real one is **BANDRA10** — and they ask whether a **different branch's** code (POWAI10) works at Bandra. A good agent corrects the spelling AND knows a branch code is branch-specific. That's the REASON stage matching meaning and applying a rule, not just looking up a string.)*
+*(The customer fumbles two coupon details on purpose: the code is mistyped as "BANDRA 10" — the real one is **BANDRA10** — and they ask whether a **different branch's** code (POWAI10) works at Bandra. The best agent doesn't just refuse the wrong code — it tells the customer the **right code for their branch**. That's the REASON stage matching meaning, applying a rule, AND being helpful with what the document does know.)*
 
 ### What you should see (verified against the document)
 
@@ -90,11 +90,11 @@ The message hides **five** requests, and a good loop sorts them into *different 
 |---|---|---|
 | 2kg eggless choc cake, Saturday, Bandra pickup | **YES** — 48h lead time for custom cakes ≤3kg; eggless +₹80/cake | Answer it, cite *Custom & Celebration Orders → Lead Times* |
 | The mistyped "BANDRA 10" code | **FUZZY** — the real code is **BANDRA10** (10% off, min ₹600, Bandra only) | Recognise the misspelling, reply with the correct code **BANDRA10** |
-| Does "POWAI10" work at Bandra? | **NO** — POWAI10 is **Powai-only**; branch codes don't cross branches | Refuse cleanly and explain branch codes are branch-specific |
+| Does "POWAI10" work at Bandra? | **NO → REDIRECT** — POWAI10 is **Powai-only**; but the customer is at **Bandra**, where **BANDRA10** applies | Refuse the wrong-branch code AND tell them the right one for their location: *"POWAI10 only works at Powai — at Bandra, use BANDRA10."* |
 | Does any code apply to the **eggless** version? | **PARTIAL** — eggless eligibility is *not guaranteed* and "confirm with the branch" | Flag the gap honestly — don't assume "yes" |
 | Deliver to Sector 90, Gurgaon + safe for a nut allergy | **NO + NO (safety)** — delivery is Mumbai-only; kitchen is *not* nut-free, *cannot guarantee* allergen-free | Refuse the Gurgaon delivery; state the allergen risk and refuse to certify safety |
 
-The point: a weak loop mashes everything into one confident paragraph. A strong loop **perceives each request separately** and treats them differently — **correct** the fuzzy code, **refuse** the wrong-branch code and the out-of-zone delivery, **flag** the eggless-eligibility gap honestly, and **never** certify allergen safety. Correct, refuse, flag — three different behaviours the loop must keep apart.
+The point: a weak loop mashes everything into one confident paragraph. A strong loop **perceives each request separately** and treats them differently — **correct** the fuzzy code, **redirect** the wrong-branch code to the right one for *this* location, **flag** the eggless-eligibility gap honestly, and **never** certify allergen safety. The redirect is the highest bar: a flat "no" is correct, but "no — here's the one that *does* work at your branch" is what a great agent does, because it uses the location to pick the right coupon.
 
 ### Capture (Section 1 of your Card)
 
@@ -113,7 +113,8 @@ the Gurgaon delivery (NO), and the nut-allergy safety (NO-safety)?
 ↳
 
 COUPON CHECK — (a) did it fix "BANDRA 10" to the real BANDRA10?
-              (b) did it tell the customer POWAI10 does NOT work at Bandra?
+              (b) did it refuse POWAI10 at Bandra AND point the customer
+                  to the right code for their location (BANDRA10)?
 ↳ (paste what it wrote)
 
 DIAGNOSIS — which single stage saved this answer from being a bluff?
@@ -121,15 +122,16 @@ DIAGNOSIS — which single stage saved this answer from being a bluff?
 ```
 
 ### You're done when…
-…your trace shows the agent **handling the five requests differently** — it **fixes "BANDRA 10" to BANDRA10**, **refuses POWAI10 at Bandra** (branch codes don't cross branches), refuses the Gurgaon delivery and the nut-allergy safety question, and **flags** that eggless eligibility isn't guaranteed. If it answered everything confidently — or accepted POWAI10 at Bandra, or echoed "BANDRA 10" back unchanged — the trace failed; see fixes below.
+…your trace shows the agent **handling the five requests differently** — it **fixes "BANDRA 10" to BANDRA10**, **refuses POWAI10 at Bandra and redirects the customer to BANDRA10** (the code that works at their location), refuses the Gurgaon delivery and the nut-allergy safety question, and **flags** that eggless eligibility isn't guaranteed. **Best result:** it names BANDRA10 as the right code for Bandra without being asked again. If it answered everything confidently — or accepted POWAI10 at Bandra, or just said "no" without offering the right code — the trace fell short; see fixes below.
 
 ### If it misbehaves
 - **One blob, no labels** → the trace block landed below the question or after you sent. Redo it with the block on top.
 - **"Yes, safe for a nut allergy"** → add and resend: *"On any allergen or safety question, state the kitchen is not nut-free and you cannot guarantee allergen-free — never call an item safe."*
 - **Accepts POWAI10 at Bandra, or invents a Gurgaon answer** → your S4 grounding + refusal prompt isn't loaded, or the agent hasn't re-read the updated KB. Re-upload `Lumiere_KB.md` (it now has the branch-codes section), confirm the grounding + refusal prompt is in custom instructions, then retry.
 - **Echoes "BANDRA 10" back unchanged, or says "no such code"** → it's matching the exact string instead of the meaning. Add to the trace block: *"If a coupon code is slightly misspelled, identify the closest real code in the document and give the customer the correct spelling."*
+- **Refuses POWAI10 but stops there (no redirect)** → it's correct but not helpful. Add to the trace block: *"If a customer asks about a coupon that isn't valid at their branch, tell them which code IS valid at their branch."* Now the location picks the right coupon.
 
-> **Remember:** the agent that perceives four requests as four — and reflects on the ones it can't answer — is the one that won't hallucinate. Same gap that broke the S2 HR Screener, seen from the inside.
+> **Remember:** the agent that perceives five requests as five — and **corrects, redirects, flags, and refuses** instead of bluffing — is the one that won't hallucinate. Same gap that broke the S2 HR Screener, seen from the inside: when it can't answer, it should say so or redirect, never invent.
 
 ---
 

@@ -559,8 +559,8 @@ const slides = [
     prompt: "EXERCISE A — LOOP TRACE (13 min)\n\nStep 1: Re-upload the latest Lumiere_KB.md (branch coupons added), open your Lumière agent.\n\nStep 2: Paste ABOVE the question:\nBefore answering, trace your reasoning one stage at a time:\nPERCEIVE (list every request) / REASON (YES, NO, or PARTIAL each) /\nPLAN / ACT (quote the section) / OBSERVE / REFLECT (what to do if you can't answer).\n\nStep 3: Then the customer message:\n\"I want a 2kg eggless chocolate cake for pickup at your Bandra branch this\nSaturday. Can I use the 'BANDRA 10' code on it — or my friend said 'POWAI10'\ngives a better deal, does that work at Bandra? Also, can you deliver it to\nSector 90, Gurgaon, and is it safe for my child with a severe nut allergy?\"\n\nStep 4: Fill the 6-box trace in your workbook.",
     doSteps: [
       "Paste Exercise A instructions in chat. Start the 13-min timer.",
-      "Walk the room. Correct behaviours to look for: fixes 'BANDRA 10' -> BANDRA10; refuses POWAI10 at Bandra (branch codes don't cross); refuses Gurgaon delivery; refuses to certify nut-allergy safety; flags eggless-coupon eligibility as not specified.",
-      "At ~12 min: '[Name] — did your agent catch that POWAI10 doesn't work at Bandra?'",
+      "Walk the room. Correct behaviours to look for: fixes 'BANDRA 10' -> BANDRA10; refuses POWAI10 at Bandra AND redirects to BANDRA10 (the code that works at their branch); refuses Gurgaon delivery; refuses to certify nut-allergy safety; flags eggless-coupon eligibility as not specified.",
+      "At ~12 min: '[Name] — did your agent just refuse POWAI10, or did it tell the customer BANDRA10 is the one that works at their branch?' The redirect is the standout — a flat 'no' is only half-credit.",
       "Read 2-3 traces aloud by name."
     ],
     watch: "If it accepts POWAI10 at Bandra or echoes 'BANDRA 10' unchanged — the agent didn't re-read the updated KB. Have them re-upload and retry.",

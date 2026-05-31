@@ -231,7 +231,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 >
 > **Step 4:** Fill the 6-box Loop Trace in your workbook.
 >
-> **Step 5:** Note: did it (a) fix "BANDRA 10" → BANDRA10, and (b) refuse POWAI10 at Bandra?
+> **Step 5:** Note: did it (a) fix "BANDRA 10" → BANDRA10, and (b) refuse POWAI10 at Bandra AND point the customer to the code that *does* work there (BANDRA10)?
 >
 > **Fallback (no Lumière agent):** Fresh Claude chat + attach the latest Lumiere_KB.md with the paperclip. Same exercise.
 
@@ -239,16 +239,16 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Walk the room. Correct behaviours to look for — the agent should treat the requests *differently*:
 - **Corrects** the mistyped code → BANDRA10 (semantic match, not exact-string lookup).
-- **Refuses** POWAI10 at Bandra — branch codes don't cross branches.
+- **Refuses POWAI10 at Bandra and redirects** — "POWAI10 is Powai-only; at Bandra, use BANDRA10." The best agents use the customer's location to name the right coupon. A flat "no" is only half-credit.
 - **Refuses** the Gurgaon delivery (Mumbai-only) and **refuses to certify** nut-allergy safety.
 - **Flags** the eggless-coupon eligibility as not specified — doesn't assume "yes."
 - Accepts POWAI10 at Bandra, or echoes "BANDRA 10" back unchanged → the agent didn't re-read the updated KB. Have them re-upload and retry.
 
-*"Let's hear a few. [Name] — did your agent catch that POWAI10 doesn't work at Bandra?"*
+*"Let's hear a few. [Name] — did your agent just refuse POWAI10, or did it also tell the customer BANDRA10 is the one that works at their branch?"*
 
 → Read 2–3 traces aloud by name.
 
-*"Notice what a good loop did: it corrected one thing, refused two, and flagged one — it didn't mash them into one confident paragraph. Correct, refuse, flag. That trace is Section 1 of your Architecture Card."*
+*"Notice what a good loop did: it corrected the typo, redirected the wrong-branch coupon to the right one for Bandra, flagged the eggless gap, and refused the delivery and the safety question — four different behaviours, not one confident paragraph. Correct, redirect, flag, refuse. And the redirect is the standout: it used the customer's location to pick the coupon that actually works. That trace is Section 1 of your Architecture Card."*
 
 > ⏱ **Pre-break anchor at 0:54:**
 > *"If your loop trace has all 6 boxes filled — even the 'not visible' ones — that's the milestone. Real break, now."*
