@@ -350,6 +350,8 @@
   .mem-card .mc-analogy { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 400; color: var(--terra); line-height: 1; margin-bottom: 0.15em; font-variation-settings: 'opsz' 80, 'SOFT' 30; }
   .mem-card .mc-name { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; margin-bottom: 0.5em; }
   .mem-card .mc-use { font-size: 0.95rem; color: var(--ink-soft); line-height: 1.4; }
+  .mem-card .mc-ex { font-size: 0.92rem; color: var(--ink); line-height: 1.4; margin-top: 0.6em; padding-top: 0.5em; border-top: 1px dotted var(--rule-soft); }
+  .mem-card .mc-ex .ex-lbl { display:block; font-family: 'Geist Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 0.2em; }
   .mem-card .mc-tag { font-size: 0.82rem; color: var(--terra); font-style: italic; margin-top: 0.5em; }
 
   /* --- TOOL QUADRANT (uses .radial) — sublabels --- */
@@ -437,6 +439,61 @@
   .colophon .course-mark { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); text-align: right; line-height: 1.7; }
   .colophon .course-mark .terra { color: var(--terra); }
 
+  /* --- COMPONENT-DETAIL SLIDE (one per part of the 5) --- */
+  .comp-wrap { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: var(--s-5); align-items: center; margin-top: var(--s-2); }
+  .comp-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .comp-badge .cb-num {
+    font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(8rem, 16vw, 13rem);
+    line-height: 0.8; color: var(--terra); font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    letter-spacing: -0.05em;
+  }
+  .comp-badge .cb-of { font-family: 'Geist Mono', monospace; font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-top: 0.4em; }
+  .comp-badge .cb-icon { margin-top: var(--s-3); height: 4.5rem; }
+  .comp-badge .cb-icon svg { height: 100%; width: auto; overflow: visible; }
+  .comp-detail .cd-name { font-family: 'Fraunces', serif; font-size: clamp(2.6rem, 4.6vw, 3.8rem); font-weight: 400; color: var(--ink); line-height: 1; font-variation-settings: 'opsz' 120, 'SOFT' 30; }
+  .comp-detail .cd-tag { font-family: 'Geist Mono', monospace; font-size: 0.92rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--terra); margin: 0.5em 0 var(--s-3); }
+  .comp-detail .cd-line { display: flex; gap: 0.8em; align-items: baseline; padding: 0.6em 0; border-bottom: 1px solid var(--rule-soft); }
+  .comp-detail .cd-k { font-family: 'Geist Mono', monospace; font-size: 0.82rem; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.08em; min-width: 7.5em; }
+  .comp-detail .cd-v { font-size: 1.18rem; color: var(--ink-soft); line-height: 1.4; }
+  .comp-detail .cd-v strong { color: var(--ink); font-weight: 600; }
+  .comp-detail .cd-v .terra { color: var(--terra); }
+
+  /* --- RECOVERY TIMELINE (improved replan visual) --- */
+  .recovery { margin-top: var(--s-3); position: relative; }
+  .rcv-track { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.55rem; position: relative; }
+  .rcv-step { display: flex; flex-direction: column; align-items: stretch; }
+  .rcv-dot-row { display: flex; align-items: center; margin-bottom: 0.5rem; }
+  .rcv-dot { width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--terra); flex-shrink: 0; z-index: 2; }
+  .rcv-step.warn .rcv-dot { background: var(--warn); }
+  .rcv-step.calm .rcv-dot { background: var(--calm); }
+  .rcv-step .rcv-bar { height: 2px; background: var(--rule); flex: 1; }
+  .rcv-step:last-child .rcv-bar { display: none; }
+  .rcv-label { font-family: 'Geist Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; }
+  .rcv-step.warn .rcv-label { color: var(--warn); }
+  .rcv-step.calm .rcv-label { color: var(--calm); }
+  .rcv-text { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.2em; }
+  .rcv-text strong { color: var(--ink); font-weight: 600; }
+  .rcv-return {
+    margin-top: 0.7rem; display: flex; align-items: center; gap: 0.7em;
+    background: var(--calm-soft); border-left: 3px solid var(--calm);
+    padding: 0.7em 1em; font-size: 1.02rem; color: var(--ink);
+  }
+  .rcv-return .rcv-loop { font-family: 'Geist Mono', monospace; font-weight: 600; color: var(--calm); }
+  .rcv-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-2); }
+  .rcv-outcome { padding: 0.8em 1em; border: 1px solid var(--rule); }
+  .rcv-outcome.bad { border-left: 3px solid var(--danger); background: var(--danger-soft); }
+  .rcv-outcome.good { border-left: 3px solid var(--calm); background: var(--calm-soft); }
+  .rcv-outcome .ro-h { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.3em; }
+  .rcv-outcome.bad .ro-h { color: var(--danger); }
+  .rcv-outcome.good .ro-h { color: var(--calm); }
+  .rcv-outcome .ro-b { font-size: 1.02rem; color: var(--ink-soft); line-height: 1.4; }
+
+  /* --- EXERCISE CALLOUT STRIP (when to do / what it teaches) --- */
+  .ex-callout { margin-top: var(--s-3); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+  .ex-co-cell { border-top: 2px solid var(--terra); padding-top: 0.6em; }
+  .ex-co-cell .eco-h { font-family: 'Geist Mono', monospace; font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: 0.3em; }
+  .ex-co-cell .eco-b { font-size: 1.08rem; color: var(--ink-soft); line-height: 1.4; }
+
   /* ===================== PRINT / PDF ===================== */
   @media print {
     @page { size: 13.333in 7.5in; margin: 0; }
@@ -489,7 +546,7 @@
         </tbody>
       </table>
     </div>
-    <div class="folio">2<sup>/24</sup></div>
+    <div class="folio">2<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 3 — THE BUG (hook) ============ -->
@@ -501,7 +558,7 @@
       <p class="lede mt-3">When its candidate search came back empty, it didn't stop. It didn't say "I found nothing." It <span class="terra">made up</span> profiles to fill the gap.</p>
       <div class="callout mt-3"><strong>That wasn't an AI problem. It was an architecture problem.</strong> A missing piece in how the agent was built. Today you name that piece — and learn to build it right.</div>
     </div>
-    <div class="folio">3<sup>/24</sup></div>
+    <div class="folio">3<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 4 — ANATOMY (hub & spoke) ============ -->
@@ -509,7 +566,7 @@
     <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Anatomy</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
       <div class="eyebrow">Five components · one machine</div>
-      <h2>Every agent is five parts around one brain.</h2>
+      <h2>Every agent is 5 parts around one brain.</h2>
       <div class="radial-wrap">
         <div class="radial">
           <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
@@ -534,40 +591,160 @@
         </div>
       </div>
     </div>
-    <div class="folio">4<sup>/24</sup></div>
+    <div class="folio">4<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 1 of 5 — LLM ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 1 of 5 — LLM</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">1</div>
+          <div class="cb-of">of 5 · the brain</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="24" fill="none" stroke="#b8431b" stroke-width="2.5"/><circle cx="35" cy="35" r="13" fill="none" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="35" cy="35" r="3" fill="#b8431b"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">LLM</div>
+          <div class="cd-tag">The brain — reasons and decides</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Reads the request, weighs the options, picks the next move. It is the only part that <strong>thinks</strong>.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The model that reads a customer's WhatsApp message and works out what they're actually asking for.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">No reasoning at all</span> — you're left with a fixed script, not an agent.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">5<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 2 of 5 — MEMORY ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 2 of 5 — Memory</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">2</div>
+          <div class="cb-of">of 5 · what it knows</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><rect x="14" y="14" width="42" height="42" rx="2" fill="none" stroke="#b8431b" stroke-width="2.5"/><line x1="14" y1="28" x2="56" y2="28" stroke="#b8431b" stroke-width="1.5"/><line x1="14" y1="42" x2="56" y2="42" stroke="#b8431b" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Memory</div>
+          <div class="cd-tag">What it knows — and recalls</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Holds the current chat, recalls past orders, and stores what it has already done so it doesn't repeat itself.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The order history that lets the agent say "your usual red-velvet, like last month?" — and the log that stops a monitor re-alerting on a rule it saw yesterday.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Forgets every session</span> — starts from zero each time you talk to it.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">6<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 3 of 5 — TOOLS ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 3 of 5 — Tools</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">3</div>
+          <div class="cb-of">of 5 · what it can do</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><path d="M22 14 L34 26 L26 34 L14 22 Z" fill="none" stroke="#b8431b" stroke-width="2.5"/><line x1="30" y1="30" x2="54" y2="54" stroke="#b8431b" stroke-width="3"/><circle cx="52" cy="52" r="5" fill="none" stroke="#b8431b" stroke-width="2.5"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Tools</div>
+          <div class="cd-tag">What it can do — the hands</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Reaches outside the model — searches, queries a database, books a slot, sends an email. <strong>The only way an agent changes the world.</strong></span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The slot-booker that reserves a production time; the confirmation-sender that messages the customer.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Can only talk</span> — it can describe booking a cake, but never actually books one.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">7<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 4 of 5 — PLANNER ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 4 of 5 — Planner</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">4</div>
+          <div class="cb-of">of 5 · what's next</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><circle cx="18" cy="20" r="4" fill="#b8431b"/><circle cx="18" cy="50" r="4" fill="#b8431b"/><circle cx="52" cy="35" r="4" fill="#b8431b"/><line x1="22" y1="20" x2="48" y2="33" stroke="#b8431b" stroke-width="1.8"/><line x1="22" y1="50" x2="48" y2="37" stroke="#b8431b" stroke-width="1.8"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Planner</div>
+          <div class="cd-tag">What to do, and in what order</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Breaks a goal into steps and sequences them — first this, then that, then send.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">For an order: <em>check the spec → confirm lead time → book the slot → send confirmation</em> — in that order, not jumbled.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Stuck on anything complex</span> — it doesn't know what to do first.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">8<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 5 of 5 — EXECUTOR ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 5 of 5 — Executor</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">5</div>
+          <div class="cb-of">of 5 · runs the plan</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><polygon points="24,16 24,54 54,35" fill="none" stroke="#b8431b" stroke-width="2.5" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Executor</div>
+          <div class="cd-tag">The part that actually runs it</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Takes the planner's steps and fires the tools in order — and feeds each result back to the brain.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The engine that calls the slot-booker, waits for the booking ID, then triggers the confirmation — and stops if a step fails.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Plans that never run</span> — the agent knows what to do and never does it.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">9<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 5 — ANATOMY: the bug located ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">The Bug, Located</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Your HR Screener · five parts, one empty</div>
-      <h2>The missing part was Memory.</h2>
+      <div class="eyebrow">Your HR Screener · the part that couldn't do the job</div>
+      <h2>The broken part was the Tool.</h2>
       <div class="radial-wrap">
         <div class="radial">
           <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
-            <line x1="200" y1="150" x2="200" y2="48"  stroke="#991b1b" stroke-width="2" stroke-dasharray="5 4"/>
-            <line x1="200" y1="150" x2="340" y2="150" stroke="#14532d" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="200" y2="48"  stroke="#8a8478" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="340" y2="150" stroke="#991b1b" stroke-width="2" stroke-dasharray="5 4"/>
             <line x1="200" y1="150" x2="200" y2="252" stroke="#a16207" stroke-width="1.5"/>
             <line x1="200" y1="150" x2="60"  y2="150" stroke="#8a8478" stroke-width="1.5"/>
           </svg>
           <div class="r-core" style="left:50%;top:50%"><div class="r-title">LLM</div><div class="r-sub">Claude</div></div>
-          <div class="r-node danger" style="left:50%;top:16%"><div class="r-n-title">Memory</div><div class="r-n-sub">✕ nothing</div></div>
-          <div class="r-node calm" style="left:85%;top:50%"><div class="r-n-title">Tools</div><div class="r-n-sub">web search</div></div>
+          <div class="r-node mute" style="left:50%;top:16%"><div class="r-n-title">Memory</div><div class="r-n-sub">none set</div></div>
+          <div class="r-node danger" style="left:85%;top:50%"><div class="r-n-title">Tools</div><div class="r-n-sub">✕ can't reach LinkedIn</div></div>
           <div class="r-node warn" style="left:50%;top:84%"><div class="r-n-title">Executor</div><div class="r-n-sub">pipeline</div></div>
           <div class="r-node mute" style="left:15%;top:50%"><div class="r-n-title">Planner</div><div class="r-n-sub">3 steps</div></div>
         </div>
         <div class="radial-side">
-          <div class="rs-item"><span class="rs-k">LLM</span><span class="rs-arrow">✓</span><span class="rs-v">Claude ran each step</span></div>
-          <div class="rs-item bug"><span class="rs-k">Memory</span><span class="rs-arrow">✕</span><span class="rs-v">none — nowhere to note "search came back empty"</span></div>
-          <div class="rs-item"><span class="rs-k">Tools</span><span class="rs-arrow">✓</span><span class="rs-v">web search in step 1</span></div>
+          <div class="rs-item"><span class="rs-k">LLM</span><span class="rs-arrow">✓</span><span class="rs-v">Claude reasoned fine</span></div>
+          <div class="rs-item bug"><span class="rs-k">Tools</span><span class="rs-arrow">✕</span><span class="rs-v">a generic web search <strong>cannot</strong> fetch real LinkedIn profiles — LinkedIn allows no scraping, no public API, no MCP</span></div>
           <div class="rs-item"><span class="rs-k">Planner</span><span class="rs-arrow">✓</span><span class="rs-v">your 3-step sequence</span></div>
           <div class="rs-item"><span class="rs-k">Executor</span><span class="rs-arrow">✓</span><span class="rs-v">the Builder runner</span></div>
+          <div class="rs-item"><span class="rs-k">Memory</span><span class="rs-arrow">~</span><span class="rs-v">none set — but that's not what broke it</span></div>
         </div>
       </div>
-      <div class="callout"><strong>The screener had no memory.</strong> With nowhere to record "I searched, found nothing" — it filled the gap with fake URLs. Not a Claude bug. A design choice you didn't know you were making.</div>
+      <div class="callout"><strong>It was a Tool problem — Gap #3.</strong> The job needed verified LinkedIn profiles, but no tool can legally get them. With no working tool <em>and</em> no guardrail, the model filled the hole with plausible fake URLs. The fix that was missing wasn't memory — it was a refusal guardrail that says <span class="terra">"I can't verify these"</span> instead of inventing.</div>
     </div>
-    <div class="folio">5<sup>/24</sup></div>
+    <div class="folio">10<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 6 — THE LOOP (actual ring) ============ -->
@@ -613,62 +790,68 @@
       </div>
       <div class="pull-quote mt-2">A great consultant doesn't quit when the first call fails — they try the next contact. The loop is that instinct, built in.</div>
     </div>
-    <div class="folio">6<sup>/24</sup></div>
+    <div class="folio">11<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 7 — LOOP TRACE: invoice (replan) ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 2</span><span class="dot">·</span><span class="topic">The Loop Recovers</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Overdue-invoice agent · a bounced email</div>
-      <h2>Watch it replan when something breaks.</h2>
-      <div class="trace-flow">
-        <div class="trace-row">
-          <div class="trace-cell"><span class="tc-n">Perceive</span><span class="tc-name">8am trigger</span><span class="tc-body">"run overdue check"</span></div>
-          <div class="trace-cell"><span class="tc-n">Reason</span><span class="tc-name">Need the list</span><span class="tc-body">invoices = overdue</span></div>
-          <div class="trace-cell"><span class="tc-n">Plan</span><span class="tc-name">Pull → draft → send</span><span class="tc-body">14 invoices found</span></div>
-          <div class="trace-cell"><span class="tc-n">Act</span><span class="tc-name">Send 14</span><span class="tc-body">via email</span></div>
-          <div class="trace-cell warn"><span class="tc-n">Observe</span><span class="tc-name">13 ✓ · 1 ✗</span><span class="tc-body">one bounced</span></div>
-          <div class="trace-cell calm"><span class="tc-n">Reflect</span><span class="tc-name">Not done</span><span class="tc-body">stale email → replan</span></div>
+      <div class="eyebrow">Overdue-invoice agent · one email bounces</div>
+      <h2>When a step fails, the loop doesn't quit — it tries another way.</h2>
+      <p class="mt-2" style="font-size:1.12rem;max-width:64ch">A chatbot would send the batch, hit the bounce, and stop with "1 failed." The agent treats the bounce as <strong>new information</strong>, loops back, and finds another route. Follow the dots:</p>
+      <div class="recovery">
+        <div class="rcv-track">
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Perceive</div><div class="rcv-text">8 a.m. trigger fires: <strong>"run the overdue check"</strong></div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Plan</div><div class="rcv-text">Pull the list, draft a reminder, send each — <strong>14 invoices</strong></div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Act</div><div class="rcv-text">Sends all 14 reminder emails</div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Observe</div><div class="rcv-text"><strong>13 delivered, 1 bounced</strong> — that address is dead</div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Reflect</div><div class="rcv-text">"Goal not met for one. The email on file is stale."</div></div>
+          <div class="rcv-step calm"><div class="rcv-dot-row"><span class="rcv-dot"></span></div><div class="rcv-label">Done</div><div class="rcv-text"><strong>14 / 14 delivered</strong></div></div>
         </div>
-        <div class="replan-arc"><span>Reflect</span><span class="arc-line"></span><span>↺ replan: look up a fresh contact</span><span class="arc-line"></span><span>Plan v2</span></div>
-        <div class="trace-row-2">
-          <div class="trace-cell"><span class="tc-n">Plan v2</span><span class="tc-name">Find new contact</span><span class="tc-body">in the CRM</span></div>
-          <div class="trace-cell"><span class="tc-n">Act v2</span><span class="tc-name">Resend</span><span class="tc-body">to new address</span></div>
-          <div class="trace-cell calm"><span class="tc-n">Observe</span><span class="tc-name">14 / 14 ✓</span><span class="tc-body">goal achieved</span></div>
-        </div>
+        <div class="rcv-return"><span class="rcv-loop">↺ loop back</span><span>Instead of stopping, it re-plans: <strong>look up a current contact in the CRM</strong> → re-send to the new address → check again. The bounce became the trigger for a better plan, not a dead end.</span></div>
       </div>
-      <div class="callout calm"><strong>Exit conditions (need all three):</strong> goal achieved · max iterations reached · human escalation. Without them, a loop runs forever and burns money.</div>
+      <div class="callout calm"><strong>But a loop needs a stop sign.</strong> Three exit conditions, all required: <strong>goal achieved</strong> · <strong>max tries reached</strong> · <strong>human escalation</strong>. Without them, an agent that can't recover just loops forever and burns money.</div>
     </div>
-    <div class="folio">7<sup>/24</sup></div>
+    <div class="folio">12<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 8 — LOOP TRACE: HR screener (gap) ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 2</span><span class="dot">·</span><span class="topic">The Gap, Drawn</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Your HR Screener · the same loop, one box empty</div>
-      <h2>No Reflect step. So no recovery.</h2>
-      <div class="trace-flow">
-        <div class="trace-row">
-          <div class="trace-cell"><span class="tc-n">Perceive</span><span class="tc-name">Job params</span><span class="tc-body">title, location, years</span></div>
-          <div class="trace-cell"><span class="tc-n">Reason</span><span class="tc-name">Need 5 profiles</span><span class="tc-body">from a search</span></div>
-          <div class="trace-cell"><span class="tc-n">Plan</span><span class="tc-name">Run web search</span><span class="tc-body">with the params</span></div>
-          <div class="trace-cell warn"><span class="tc-n">Act</span><span class="tc-name">Searched</span><span class="tc-body">came back empty</span></div>
-          <div class="trace-cell warn"><span class="tc-n">Observe</span><span class="tc-name">No profiles</span><span class="tc-body">nothing valid found</span></div>
-          <div class="trace-cell dead"><span class="tc-n">Reflect</span><span class="tc-name">Recovery</span><span class="tc-miss">missing → invented URLs to fill the gap</span></div>
+      <div class="eyebrow">Your HR Screener · the same loop, no stop sign at Reflect</div>
+      <h2>The tool came up empty. With no guardrail, the loop bluffed.</h2>
+      <p class="mt-2" style="font-size:1.12rem;max-width:64ch">Same six stages as the invoice agent — but here the tool <em>can't</em> succeed (no way to reach real LinkedIn data), and there's no refusal rule at Reflect. Watch where the two agents diverge at the final stage:</p>
+      <div class="recovery">
+        <div class="rcv-track">
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Perceive</div><div class="rcv-text">Job params: title, location, years</div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Plan</div><div class="rcv-text">"Get 5 matching profiles via search"</div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Act</div><div class="rcv-text">Web search runs — <strong>but can't reach LinkedIn</strong></div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Observe</div><div class="rcv-text">Nothing valid comes back</div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot" style="background:var(--ink-faint)"></span></div><div class="rcv-label" style="color:var(--ink-mute)">Reflect?</div><div class="rcv-text" style="color:var(--ink-mute)">no rule here to decide what to do with an empty result</div></div>
+        </div>
+        <div class="rcv-split">
+          <div class="rcv-outcome bad">
+            <div class="ro-h">✕ What the screener did (no guardrail)</div>
+            <div class="ro-b">Reached the gap, found nothing, and <strong>filled it with plausible fake LinkedIn URLs</strong>. The loop ran to the end — it just had nothing true to end with.</div>
+          </div>
+          <div class="rcv-outcome good">
+            <div class="ro-h">✓ What a guardrail would have done</div>
+            <div class="ro-b">A refusal rule at Reflect: <strong>"if no verified profiles, say so and escalate to a recruiter — never invent."</strong> Same loop, honest ending.</div>
+          </div>
         </div>
       </div>
-      <div class="callout"><strong>The fix is one instruction:</strong> "If the search returns nothing valid, say so and stop — never invent." That single line is the Reflect step the agent never had.</div>
+      <div class="callout"><strong>Root cause: the tool (Gap #3)</strong> — there's no legal way to fetch real LinkedIn profiles. <strong>The missing safeguard: a refusal guardrail</strong> — so the gap ends in "I can't verify these," not invention. Tool failed; guardrail was absent; hallucination was the result.</div>
     </div>
-    <div class="folio">8<sup>/24</sup></div>
+    <div class="folio">13<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 9 — MEMORY (icons) ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 3</span><span class="dot">·</span><span class="topic">Memory</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Four types · one office</div>
+      <div class="eyebrow">4 types · one office</div>
       <h2>Agents remember in layers.</h2>
       <div class="mem-grid">
         <div class="mem-card">
@@ -678,6 +861,7 @@
           <div class="mc-analogy">Desk</div>
           <div class="mc-name">Short-term</div>
           <div class="mc-use">What's happening right now in this chat.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>"Earlier you said the cake's for Saturday" — it holds the running order details across a few messages.</div>
           <div class="mc-tag">Cleared when the chat closes.</div>
         </div>
         <div class="mem-card">
@@ -687,6 +871,7 @@
           <div class="mc-analogy">Notebook</div>
           <div class="mc-name">Long-term</div>
           <div class="mc-use">Facts that persist across sessions.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>"Welcome back, Priya — your usual eggless red velvet?" It remembers a returning customer weeks later.</div>
           <div class="mc-tag">Knows you next week.</div>
         </div>
         <div class="mem-card">
@@ -696,7 +881,8 @@
           <div class="mc-analogy">Archive</div>
           <div class="mc-name">Episodic</div>
           <div class="mc-use">A log of past events &amp; outcomes.</div>
-          <div class="mc-tag">"Last time, this failed."</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>The FSSAI monitor's record: "already alerted on the May labelling rule" — so it never re-flags the same one twice.</div>
+          <div class="mc-tag">"Last time, this happened."</div>
         </div>
         <div class="mem-card active">
           <div class="mem-icon">
@@ -705,11 +891,12 @@
           <div class="mc-analogy">Library</div>
           <div class="mc-name">Semantic</div>
           <div class="mc-use">A body of documents to answer from.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>The Lumiere_KB.md you grounded in S4 — lead times, allergens, the new branch coupons. Ask, and it answers from the doc.</div>
           <div class="mc-tag">You built this in S4.</div>
         </div>
       </div>
     </div>
-    <div class="folio">9<sup>/24</sup></div>
+    <div class="folio">14<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 10 — MEMORY side-by-side ============ -->
@@ -732,7 +919,7 @@
       </div>
       <div class="pull-quote mt-3">Every office has a desk, a notebook, an archive, and a library. Agents do too — they just don't come with all four installed.</div>
     </div>
-    <div class="folio">10<sup>/24</sup></div>
+    <div class="folio">15<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 11 — EXERCISE A ============ -->
@@ -742,17 +929,21 @@
       <div class="ex-letter">A</div>
       <div>
         <div class="ex-meta">Exercise A · Loop Trace · 13 minutes</div>
-        <h3>Read your agent's mind — six stages.</h3>
-        <p class="mt-2" style="font-size:1.15rem">Open your Lumière agent. Paste the loop-trace instruction <em>above</em> a three-part question. Fill the six boxes in your workbook.</p>
-        <div class="prompt mt-3" style="font-size:0.92rem">Before answering, trace your reasoning step by step. Label each stage:
+        <h3>Read your agent's mind — 6 stages.</h3>
+        <p class="mt-2" style="font-size:1.12rem">Open your Lumière agent (re-upload the latest <code>Lumiere_KB.md</code> first — it now has branch coupons). Paste the loop-trace instruction <em>above</em> the messy customer message. Fill the 6 boxes in your workbook.</p>
+        <div class="prompt mt-3" style="font-size:0.9rem">Before answering, trace your reasoning step by step:
 PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
 
-[then the eggless-cake + discount + Andheri-delivery question]</div>
-        <p class="mt-2" style="font-size:1rem;color:var(--ink-mute)">Watch which stage goes thin. It's usually <strong class="terra">Reflect</strong> — the same gap that broke the HR Screener.</p>
+[then the customer message that mistypes "BANDRA 10",
+asks if POWAI10 works at Bandra, + Gurgaon delivery + nut-allergy]</div>
+        <div class="ex-callout">
+          <div class="ex-co-cell"><div class="eco-h">Do this now</div><div class="eco-b">Right after the memory concepts, before the break. Workbook → Exercise A.</div></div>
+          <div class="ex-co-cell"><div class="eco-h">What it teaches</div><div class="eco-b">To <strong>read a loop stage by stage</strong> — and spot when an agent <strong>corrects, refuses, or flags</strong> instead of bluffing.</div></div>
+        </div>
       </div>
     </div>
     <div class="ex-timer">13:00</div>
-    <div class="folio">11<sup>/24</sup></div>
+    <div class="folio">16<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 12 — BREAK ============ -->
@@ -793,7 +984,7 @@ PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
       </div>
       <div class="callout"><strong>Scope &amp; permission every tool.</strong> The loop recovers from the <em>wrong</em> tool. It cannot undo a correctly-run tool with too-broad scope.</div>
     </div>
-    <div class="folio">13<sup>/24</sup></div>
+    <div class="folio">18<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 14 — TOOL MANIFEST ============ -->
@@ -814,7 +1005,7 @@ PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
       </table>
       <div class="pull-quote mt-3">A tool manifest is the employment contract for each of the agent's hands. Can't say what it's <em>not</em> allowed to do? You haven't scoped it.</div>
     </div>
-    <div class="folio">14<sup>/24</sup></div>
+    <div class="folio">19<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 15 — PLANNING (mini-flows) ============ -->
@@ -870,7 +1061,7 @@ PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
       </div>
       <div class="callout mt-2"><strong>Pick by three questions:</strong> complexity · does it need live tools · how high the stakes. Answer those and the strategy picks itself.</div>
     </div>
-    <div class="folio">15<sup>/24</sup></div>
+    <div class="folio">20<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 16 — EXERCISE B ============ -->
@@ -880,16 +1071,19 @@ PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
       <div class="ex-letter">B</div>
       <div>
         <div class="ex-meta">Exercise B · Tool Manifest · 17 minutes</div>
-        <h3>Write the contract for your agent's hands.</h3>
-        <p class="mt-2" style="font-size:1.15rem">Think of a real agent you'd want at work. Use the Claude prompt to draft 5 tools — then narrow every scope and permission.</p>
-        <div class="prompt mt-3" style="font-size:0.92rem">I want to design an agent that [your job — one sentence].
-List 5 tools. For each: name, scope (what it must NOT touch),
-minimum permission, and what breaks if removed.</div>
-        <p class="mt-2" style="font-size:1rem;color:var(--ink-mute)">Then circle the one tool that makes you <strong class="terra">nervous</strong>. It's always a send-or-execute tool — and it needs a human approval gate.</p>
+        <h3>Write the contract for the bakery's new agents.</h3>
+        <p class="mt-2" style="font-size:1.12rem">Two manifests in your workbook: the <strong>Lumière Order Assistant</strong> (≈7 min) and the harder <strong>FSSAI Regulation Monitor</strong> (≈10 min). Draft each in RCTFC, then narrow every scope and permission.</p>
+        <div class="prompt mt-3" style="font-size:0.9rem">List the 5 tools each agent needs. For each, in RCTFC:
+ROLE · CONTEXT · TASK · FORMAT · CONSTRAINTS (scope + min permission)
+— and what breaks if it's removed.</div>
+        <div class="ex-callout">
+          <div class="ex-co-cell"><div class="eco-h">Do this now</div><div class="eco-b">After the Tools + Planning concepts. Workbook → Exercise B, both parts.</div></div>
+          <div class="ex-co-cell"><div class="eco-h">What it teaches</div><div class="eco-b"><strong>Scope &amp; permission</strong> — and the governance line: the monitor <strong>auto-applies trivial updates but escalates every allergen/safety rule to a human.</strong></div></div>
+        </div>
       </div>
     </div>
     <div class="ex-timer">17:00</div>
-    <div class="folio">16<sup>/24</sup></div>
+    <div class="folio">21<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 17 — MULTI-AGENT topologies ============ -->
@@ -949,7 +1143,7 @@ minimum permission, and what breaks if removed.</div>
         </div>
       </div>
     </div>
-    <div class="folio">17<sup>/24</sup></div>
+    <div class="folio">22<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 18 — MULTI-AGENT analogies (photos) ============ -->
@@ -975,7 +1169,7 @@ minimum permission, and what breaks if removed.</div>
         </div>
       </div>
     </div>
-    <div class="folio">18<sup>/24</sup></div>
+    <div class="folio">23<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 19 — HR SCREENER revealed ============ -->
@@ -996,7 +1190,7 @@ minimum permission, and what breaks if removed.</div>
       </div>
       <p class="lede mt-3">Three specialists. Three phases. Each handing to the next. Now you know what to call it.</p>
     </div>
-    <div class="folio">19<sup>/24</sup></div>
+    <div class="folio">24<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 20 — EXERCISE C ============ -->
@@ -1006,16 +1200,19 @@ minimum permission, and what breaks if removed.</div>
       <div class="ex-letter">C</div>
       <div>
         <div class="ex-meta">Exercise C · Pattern Choice · 8 minutes</div>
-        <h3>Pick the architecture. Defend it in a sentence.</h3>
-        <p class="mt-2" style="font-size:1.15rem">Ask Claude which of the three patterns fits your agent. Read its answer — agree or push back. Write your choice in the workbook.</p>
-        <div class="prompt mt-3" style="font-size:0.92rem">I want to build an agent that [your job].
-Which pattern fits best — Orchestrator-Worker, Parallel Agents,
-or Specialist Handoffs — and why? What breaks if I pick wrong?</div>
-        <p class="mt-2" style="font-size:1rem;color:var(--ink-mute)">Disagreeing with Claude is the best outcome — it means you understand your use case better than its first guess.</p>
+        <h3>Lumière opens a London branch. Now what?</h3>
+        <p class="mt-2" style="font-size:1.12rem">A new country means a new regulator (FSA, not FSSAI). One monitor isn't enough. Ask Claude which of the 3 patterns fits — then push back if it over-automates.</p>
+        <div class="prompt mt-3" style="font-size:0.9rem">Keeping multiple branches compliant across DIFFERENT regulators —
+Orchestrator-Worker, Parallel Agents, or Specialist Handoffs?
+Why? What breaks if I pick wrong? Where must a human stay?</div>
+        <div class="ex-callout">
+          <div class="ex-co-cell"><div class="eco-h">Do this now</div><div class="eco-b">Right after the multi-agent patterns + the HR-screener reveal. Workbook → Exercise C.</div></div>
+          <div class="ex-co-cell"><div class="eco-h">What it teaches</div><div class="eco-b"><strong>When one agent isn't enough</strong> — and how to split work (one monitor per regulator, an orchestrator that only routes, a human gate everywhere).</div></div>
+        </div>
       </div>
     </div>
     <div class="ex-timer">8:00</div>
-    <div class="folio">20<sup>/24</sup></div>
+    <div class="folio">25<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 21 — ARCHITECTURE CARD ============ -->
@@ -1045,7 +1242,7 @@ or Specialist Handoffs — and why? What breaks if I pick wrong?</div>
         </div>
       </div>
     </div>
-    <div class="folio">21<sup>/24</sup></div>
+    <div class="folio">26<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 22 — SYNTHESIS ============ -->
@@ -1056,7 +1253,7 @@ or Specialist Handoffs — and why? What breaks if I pick wrong?</div>
       <h1 class="display">Architecture is a design decision. Which means you can make it.</h1>
       <p class="lede mt-3">The HR Screener hallucinated because of three gaps — no episodic memory, no reflect step, no exit condition. Not bugs in the model. Choices in the build. You now know how to make those choices.</p>
     </div>
-    <div class="folio">22<sup>/24</sup></div>
+    <div class="folio">27<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 23 — QUICK REFERENCE ============ -->
@@ -1075,7 +1272,7 @@ or Specialist Handoffs — and why? What breaks if I pick wrong?</div>
       </div>
       <div class="callout mt-3"><strong>The diagnostic:</strong> any agent that doesn't record what happened when something fails will eventually invent a result. That's the memory gap, every time.</div>
     </div>
-    <div class="folio">23<sup>/24</sup></div>
+    <div class="folio">28<sup>/29</sup></div>
   </section>
 
   <!-- ============ SLIDE 24 — CLOSE ============ -->
@@ -1091,7 +1288,7 @@ or Specialist Handoffs — and why? What breaks if I pick wrong?</div>
         <div class="course-mark">EdYoda · GenAI &amp; AI Agents for Non-Coders<br><span class="terra">Session 5 of 8 · Agent Architecture</span></div>
       </div>
     </div>
-    <div class="folio">24<sup>/24</sup></div>
+    <div class="folio">29<sup>/29</sup></div>
   </section>
 
 </div><!-- /.deck -->
