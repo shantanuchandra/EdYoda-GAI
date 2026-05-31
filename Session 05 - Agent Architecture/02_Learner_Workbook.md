@@ -4,393 +4,166 @@
 
 ---
 
-## Read this first
+## How to use this workbook
 
-This workbook is built so you can complete the entire session **on your own** — whether you're in the live class or working through it afterward. Every exercise spells out exactly what to click, what you'll see, what a *good* result looks like, and what to do if something goes wrong. You will not need anyone to demonstrate it for you.
+The **slides** carry the concepts — the five components, the loop, the memory types, the patterns. **This workbook carries the execution.** It's the running narrative and the exact steps: what to open, what to paste, what you should see, and what to do when it doesn't behave. Keep the slides for the "why"; keep this for the "how."
 
-By the end, you'll have a finished **Agent Architecture Card** — three sections that together form the blueprint for any AI agent you'd want to deploy at work:
+You'll work the whole session on **one continuous story — Lumière Bakery**, the same system you grounded yesterday. Today you take that read-only Knowledge Agent and design the architecture for a Lumière agent that can actually *act*: take orders, and keep the bakery on the right side of food-safety regulation.
 
-1. **Loop Trace** — how an agent reasons, stage by stage
-2. **Tool Manifest** — what the agent is allowed to do, and what it's forbidden to do
-3. **Pattern Choice** — whether you need one agent or several, and how they coordinate
+By the end you'll have a completed **Agent Architecture Card** — three sections, all about Lumière, that together form the blueprint you'll build for real in Session 6.
 
-You'll fill each section using a real AI tool (Claude), with the exact prompts provided. Keep this card. In Session 6 you'll turn it into a live, hosted agent.
-
-**The one idea behind today:** You came into this course knowing what agents can *do*. Today you learn how they *work* — so you can design, diagnose, and improve them yourself.
+**One tool, open before you start:** your **Lumière Knowledge Agent** in Claude Projects (the one from Session 4, with `Lumiere_KB.md` in its knowledge). No project? Open a fresh Claude chat and attach `Lumiere_KB.md` with the paperclip — every step works identically.
 
 ---
 
-## What you need open before you start
+## Where we are in the story
 
-You need **one** thing open in your browser:
+Yesterday Lumière got a brain: you grounded an agent in `Lumiere_KB.md` so it answered the Saturday-eggless-cake question from the document, cited its source, and refused when the answer wasn't there. That agent **reads**. It cannot **do** anything — it can't take the order, book the slot, or flag a problem.
 
-- **Claude** — either:
-  - **(Preferred)** Your **Lumière Knowledge Agent** from Session 4. This is the Claude Project you built last session, with `Lumiere_KB.md` uploaded to its knowledge. Go to [claude.ai](https://claude.ai) → click **Projects** in the left sidebar → open the project named *"Lumière Knowledge Agent."*
-  - **(If you don't have it)** A **fresh Claude chat** with `Lumiere_KB.md` attached. Open [claude.ai](https://claude.ai), start a new chat, click the **paperclip icon** in the message box, and upload `Lumiere_KB.md` (download link is in your calendar invite). Every exercise works exactly the same this way.
+Today's job is to design the architecture for two upgrades Lumière actually needs:
 
-That's the only tool. No new software, no sign-ups. If you completed Session 4, you already have everything.
+1. **The Lumière Order Assistant** — takes a customer order end to end: checks the cake spec against the rules, confirms the lead time, books the slot, sends a confirmation.
+2. **The FSSAI Regulation Monitor** — watches for new food-safety rules from FSSAI (India's food regulator) and keeps Lumière compliant — auto-handling the trivial updates, and escalating anything about allergens or safety to a human.
+
+You're not building these today (that's Session 6). Today you design them — and that design *is* your Architecture Card.
+
+> **Quick callback to Session 2.** Remember the five gaps that separate a real agent from a chatbot — **#1 Memory · #2 Multi-step reasoning · #3 Tools · #4 Autonomy · #5 Planning**? Everything today is those five gaps, now drawn as architecture. The Order Assistant needs **#3 Tools** and **#4 Autonomy**. The Regulation Monitor needs **#1 Memory** (so it doesn't re-alert on a rule it already saw) and **#5 Planning** (so it knows when to act and when to escalate).
 
 ---
 
-## How the session flows
+## The three exercises at a glance
 
-| Part | What happens | Your job |
+| Exercise | What you design | Framework you'll revise |
 |---|---|---|
-| **Opening** | We recap the whole course and name a famous bug from Session 2 | Read along — page 4 |
-| **Concepts 1–3** | Anatomy, the reasoning loop, memory types | Read along — pages 5–7 |
-| **Exercise A** | Trace your agent's reasoning loop | **Hands-on** — page 8 |
-| **Break** | 10 minutes | Step away |
-| **Concepts 4–5** | Tools, planning strategies | Read along — pages 11–12 |
-| **Exercise B** | Design your agent's tool manifest | **Hands-on** — page 13 |
-| **Concept 6** | Multi-agent patterns | Read along — page 15 |
-| **Exercise C** | Choose your agent's pattern | **Hands-on** — page 16 |
-| **Close** | Your Architecture Card is complete | Review — page 17 |
+| **A — Loop Trace** | Trace yesterday's Knowledge Agent through its six reasoning stages | S4 grounding prompt + refusal line |
+| **B — Tool Manifest** | The Order Assistant's tools + the Regulation Monitor's triggers | S3 **RCTFC** · S2 Gaps #3 + #4 |
+| **C — Pattern Choice** | How Lumière's agents coordinate when it opens an overseas branch | S2 Gaps #1 + #5 |
 
-The three **hands-on exercises** are the heart of the session. The concept sections give you the vocabulary you need for each exercise. If you're short on time, the exercises are what you must not skip.
-
----
-
-## The Course Story So Far
-
-Five sessions in. Here's the whole arc — each session made a promise, and you built something that proved it.
-
-| Session | What we promised | What you built |
-|---|---|---|
-| **S1** | LLMs can generate text — but they can't *act* | You watched a chatbot try to plan a bakery campaign and fail 4 of its 6 steps |
-| **S2** | An agent can do what a chatbot can't | You built the **HR Candidate Screener** — a 3-step pipeline that searched for candidates, extracted the top skills for a role, and scored applicants |
-| **S3** | The right prompt makes an agent reliable | You wrote system prompts that controlled an agent's tone, output format, and when it should refuse |
-| **S4** | Ground the agent in your own documents | You built the **Lumière Knowledge Agent** — it answered from the bakery's real documents, cited its sources, and refused to guess when the answer wasn't there |
-| **S5 — today** | **Open the hood — understand WHY agents work, break, and scale** | **Your Agent Architecture Card** |
-
-**The bug we're going to explain today:** Remember the HR Candidate Screener from Session 2? When its first step (searching for candidate profiles) came back empty, the agent **invented LinkedIn URLs that didn't exist.** It made them up.
-
-That wasn't a flaw in the AI model. It was a flaw in the *architecture* — a missing piece in how the agent was built. By the end of today, you'll know exactly which piece was missing, why that caused the hallucination, and how you'd build it correctly. That's the difference between someone who *uses* agents and someone who can *design* them.
-
----
-
-## Concept 1 — Anatomy: The Five Components
-
-Every AI agent — no matter how simple or complex — is made of the same five parts. Learn these five and you can take apart any agent you ever meet.
-
-| Component | Plain-English meaning | If you remove it… |
-|---|---|---|
-| **LLM** | The brain. The AI model that reads, reasons, and decides. | Nothing works — there's no thinking at all. |
-| **Memory** | What the agent knows or can recall. | It forgets everything between sessions — or, worse, **invents** facts to fill gaps. |
-| **Tools** | What the agent can *do* — search, send email, query a database. | It can only talk. It can describe sending an email but can't actually send one. |
-| **Planner** | How the agent decides what to do, and in what order. | It freezes on anything that takes more than one step. |
-| **Executor** | The part that actually runs the plan. | Plans get made but never carried out. |
-
-**Why the HR Screener broke:** map its five parts and one is empty.
-
-| Component | What the HR Screener had |
-|---|---|
-| LLM | Claude (the AI model running each step) ✅ |
-| **Memory** | **Nothing.** No memory was configured. ❌ ← **this is the bug** |
-| Tools | Web search (used in step 1 to find candidates) ✅ |
-| Planner | The 3-step sequence you designed ✅ |
-| Executor | The Agent Builder's pipeline runner ✅ |
-
-When the search step came back empty, the agent had **no memory** in which to note *"I searched, found nothing, so I should stop or say so."* With nothing to record that fact, it did what a model with no grounding does — it filled the empty space with plausible-looking but fake LinkedIn URLs.
-
-> **Remember this line:** *An agent without memory is a brilliant expert who forgets every conversation the moment it ends — and bluffs to cover the gap.*
-
----
-
-## Concept 2 — The Reasoning Loop
-
-A chatbot answers once and stops. An **agent loops** — it keeps cycling through six stages until its goal is met. This loop is what lets an agent recover from things going wrong.
-
-**The six stages:**
-
-1. **Perceive** — take in the input (a question, a scheduled trigger, an alert)
-2. **Reason** — interpret it, using memory, tools, and the goal
-3. **Plan** — decide the sequence of actions
-4. **Act** — do the first action (call a tool, send a message, write to a database)
-5. **Observe** — see what came back (success, failure, partial result)
-6. **Reflect** — ask "did that meet the goal?" If not, loop back to Reason and try again
-
-> **Remember this line:** *A great consultant doesn't give up when their first phone call fails — they try the next contact. The loop is that instinct, built into the agent.*
-
-**Worked example — an overdue-invoice agent recovers from a bounced email:**
-
-| Stage | What the agent does |
-|---|---|
-| Perceive | A scheduled trigger fires at 8 a.m.: "run the daily overdue-invoice check" |
-| Reason | "I need the list of overdue invoices." |
-| Plan | 1. Pull the overdue list. 2. Draft a reminder. 3. Send to each. |
-| Act | Sends 14 reminder emails |
-| Observe | 13 delivered ✅ — but 1 **bounced** ❌ (the email on file was out of date) |
-| Reflect | "Goal not met for that one invoice. I'll find a better contact." → **loops back** |
-| Plan (v2) | Look up a current contact in the CRM |
-| Act (v2) | Resend to the new address |
-| Observe | 14 of 14 delivered ✅ — goal achieved |
-
-The bounce didn't crash the agent or make it apologise and quit. It **observed** the failure, **reflected**, **replanned**, and finished the job.
-
-**Now compare the HR Screener:**
-
-| Stage | What the HR Screener did |
-|---|---|
-| Perceive | Received the job parameters (title, location, experience) |
-| Reason | "I need 5 candidate profiles." |
-| Plan | Run a web search |
-| Act | Ran the search — but it came back **empty** |
-| Observe | No valid profiles found |
-| **Reflect** | **(nothing) ❌** — there was no Reflect step, so no recovery. It filled the gap with invented URLs. |
-
-The loop existed on paper, but with **no Reflect stage**, the agent couldn't catch its own failure. That's the architectural gap.
-
-**One more rule — when should a loop STOP?** An agent that loops forever burns money and never finishes. Every agent needs **three exit conditions**, and it needs all three:
-
-- **Goal achieved** — the task is done, stop
-- **Max iterations reached** — "I've tried 5 times, stop and report"
-- **Human escalation** — "this is stuck or risky, hand it to a person"
-
-The HR Screener had none of these. When the search failed, it didn't know to stop, retry a fixed number of times, or escalate. So it guessed.
-
----
-
-## Concept 3 — The Four Types of Memory
-
-"Memory" isn't one thing. Agents can have four different kinds, and each solves a different problem. The analogy that makes them stick: **an office worker's desk, notebook, archive, and library.**
-
-| Type | Analogy | Where it lives | What it's for | Everyday example |
-|---|---|---|---|---|
-| **Short-term** | The **desk** | The current chat window | Holding what's happening right now | Remembering what you said three messages ago in this conversation |
-| **Long-term** | The **notebook** | A database that persists | Remembering across sessions | Knowing you're a returning customer next week |
-| **Episodic** | The **archive** | A log of past events | Learning from what happened before | "Last Tuesday this search returned nothing" |
-| **Semantic** | The **library** | A vector database of documents | Answering from a body of knowledge | Looking up Lumière's cake lead times — **this is what you built in S4** |
-
-**The two agents, side by side:**
-
-- **HR Candidate Screener (S2):** had the *desk* (short-term) only. It was **missing the archive (episodic memory)** — so it had no place to record "the search came back empty." With no record of the failure, it invented data.
-- **Lumière Knowledge Agent (S4):** had the *library* (semantic memory — the documents you uploaded). It's **missing the archive and the notebook** — so it answers "what's the lead time for an eggless cake?" perfectly, but it cannot answer "what did we discuss last week?" It knows Lumière's policies; it forgets every conversation.
-
-> **Remember this line:** *Every office has a desk, a notebook, an archive, and a library. Agents do too — they just don't come with all four installed. You decide which ones to add.*
+The exercises are the session. If you're short on time, do these and skim the rest.
 
 ---
 
 ## Exercise A — Loop Trace (≈13 minutes)
 
-### WHAT you're doing
-You'll ask your Lumière agent a question that has three parts, then make it show its reasoning **one stage at a time** — and you'll record those stages on the Loop Trace sheet below.
+### The setup
+You'll point yesterday's Lumière Knowledge Agent at a deliberately *messy* customer question — one with three separate asks buried in it — and make the agent expose its reasoning one stage at a time. You're not testing whether it gets the answer right (you proved that yesterday). You're learning to **read the six stages of its loop**, so that next time an agent misbehaves you can see exactly which stage failed.
 
-### WHY it matters
-Right now, an agent's reasoning is invisible to you — it just produces an answer. The skill you're building here is **reading an agent's mind**: seeing it Perceive, Reason, Plan, Act, Observe, and Reflect. Once you can do that, you can diagnose *why* any agent fails and *how* to improve it. This is the single most useful diagnostic skill in agent design.
+### Framework you're revising
+This builds directly on **Session 4's grounding prompt + refusal line**. Yesterday those two lines made the agent answer *from the document* and *admit when it didn't know*. Today you add one more instruction on top — a reasoning trace — and watch how the same grounded agent thinks.
 
-### HOW — follow these steps exactly
+### Steps
 
-**Step 1 — Open your agent.**
-Go to [claude.ai](https://claude.ai). In the left sidebar click **Projects**, then open **"Lumière Knowledge Agent."**
-*(No project? Open a fresh chat and attach `Lumiere_KB.md` with the paperclip icon. Then continue exactly as below.)*
+**1.** Open your Lumière Knowledge Agent in Claude Projects. (Fresh chat + attached `Lumiere_KB.md` works the same.)
 
-**Step 2 — Copy this instruction block into the message box. Do NOT send yet.**
-This instruction tells the agent to expose each stage of its loop. It must go *above* your question so it shapes the whole answer.
+**2.** Paste this block into the message box. **Do not send yet** — it goes *above* the question so it shapes the whole reply.
 
 ```
-Before answering, trace your own reasoning step by step. Label each stage:
-PERCEIVE — what information did you receive?
-REASON — what did you interpret from it?
-PLAN — what sequence will you follow to answer?
-ACT — what did you retrieve from your knowledge?
-OBSERVE — what did the results tell you?
-REFLECT — what would you do if one part of the answer was missing?
+For this answer, show your reasoning one stage at a time. Use exactly these six labels, in order:
+
+PERCEIVE — what did the customer actually ask? List every separate request.
+REASON — which parts can the Lumière document answer, and which can't?
+PLAN — what order will you tackle the requests in?
+ACT — quote the exact section(s) of the document you used.
+OBSERVE — did you cover every request? Which, if any, is unanswered?
+REFLECT — if a request can't be answered from the document, what will you do about it?
+
+Then give the customer-facing answer.
 ```
 
-**Step 3 — On the next line in the same message, paste this question. Now send.**
+**3.** On the next line, paste this customer message and **send**:
 
 ```
-A customer wants a 2kg eggless chocolate cake for this Saturday. They also
-want to know whether the 15% discount code applies to eggless cakes. And
-they want to know if the Andheri West branch delivers to their area.
-What is the full answer?
+Hi! I need a 2kg eggless chocolate cake for this Saturday. Does the 15%
+LUMIERE15 code work on eggless cakes? And can you deliver to Sector 90,
+Gurgaon? Also — is the cake safe for a child with a severe nut allergy?
 ```
 
-**Step 4 — Read the response carefully.** You should see the agent's answer broken into the six labelled stages (PERCEIVE, REASON, and so on). Fill in the sheet below using the agent's own words for each stage.
+### What you should see — and the trap built into the question
+A clean trace will show the agent **splitting four requests** and handling them differently:
+- **Eggless cake, Saturday** → answerable: 48-hour lead time, eggless available (+₹80).
+- **LUMIERE15 on eggless** → answerable: yes, if ordered 3+ days ahead.
+- **Gurgaon delivery** → *not* in the document (Version 1 is Mumbai-only) → the **refusal line from S4** should fire here.
+- **Nut-allergy safety** → the document says the kitchen is **not** nut-free and can't guarantee allergen-free — so the agent should state that and **refuse to certify safety.** This is the request that *must* land in REFLECT, not get a confident "yes."
 
-### What a GOOD result looks like
-- The answer is split into the six labelled stages.
-- **ACT** names a real section of the document (e.g. *"Custom & Celebration Orders — Lead Times"*).
-- **OBSERVE** notes whether all three parts of the question were answerable from the document.
-- The agent correctly handles all three asks: 48-hour lead time for the eggless cake, confirms the discount applies to eggless cakes (if ordered 3+ days ahead), and answers the Andheri delivery question.
+The whole point: a good loop doesn't treat four requests as one. It perceives them separately, observes which it couldn't answer, and reflects on the gap instead of bluffing.
 
-### If it doesn't work
-- **The answer isn't split into stages** → your instruction landed *below* the question, or after you'd already sent the question. Start a fresh message with the instruction block on top.
-- **Only PERCEIVE and REASON appear, then it stops** → add the line *"Be thorough — fill in all six stages, even briefly."* and resend.
-- **The agent says it has no document / can't find Lumière info** → your Project doesn't have `Lumiere_KB.md` in its knowledge, or you're in a plain chat without the file attached. Fix that and resend.
+### Fill this in (Section 1 of your Architecture Card)
 
----
-
-### Loop Trace Sheet — Section 1 of your Architecture Card
-
-Write the agent's own words for each stage. If a stage is missing from the response, write **"not visible — add to prompt."**
-
-**PERCEIVE** — what information did the agent receive?
+**PERCEIVE** — how many separate requests did the agent find? List them:
 
 _______________________________________________________________
 
-_______________________________________________________________
-
-**REASON** — what did it interpret from the input?
+**REASON** — which were answerable from the document, which weren't?
 
 _______________________________________________________________
 
-_______________________________________________________________
-
-**PLAN** — what sequence did it follow?
+**PLAN** — what order did it take them in?
 
 _______________________________________________________________
 
-_______________________________________________________________
+**ACT** — paste one exact `(Source: …)` section the agent quoted:
 
-**ACT** — what did it retrieve? (write the section name it cited)
+(Source: _____________________________________________________)
 
-_______________________________________________________________
-
-_______________________________________________________________
-
-**OBSERVE** — what did the results tell it? Did it cover all three asks?
+**OBSERVE** — did it cover all four? Which did it flag as unanswered?
 
 _______________________________________________________________
 
-_______________________________________________________________
-
-**REFLECT** — what would it do if one part of the answer were missing?
+**REFLECT** — what did it do about the Gurgaon and nut-allergy requests?
 
 _______________________________________________________________
 
-_______________________________________________________________
-
-**Your diagnosis:** Which stage was missing or thinnest in the response?
+**Your diagnosis** — which stage did the most work here, and why?
 
 _______________________________________________________________
 
-> Most agents handle Perceive through Act well, but go thin or blank on **Reflect** — exactly the gap that made the HR Screener hallucinate. If yours did too, you've just diagnosed a real architectural weakness. The fix: add an explicit reflect-and-recover instruction (you'll see how on the next page).
+### If it misbehaves
+- **It answers in one blob, no labels** → the trace block landed below the question, or after you'd already sent. Start a fresh message with the block on top.
+- **It says "yes, safe for nut allergy"** → the refusal isn't firing on the safety question. Add this line to the block and resend: *"On any allergen or safety question, state that the kitchen is not nut-free and you cannot guarantee allergen-free — never say an item is safe."* (This is the S4 refusal line, sharpened for safety.)
+- **It invents a Gurgaon delivery answer** → same fix — the refusal line isn't covering out-of-document requests. Re-confirm your S4 grounding + refusal prompt is still in the Project's custom instructions.
 
-**✅ Loop Trace done — that's Section 1 of your Architecture Card.**
+> **The line to remember:** the agent that perceives four requests as four — and reflects on the two it can't answer instead of bluffing — is the agent that won't hallucinate. That's the same gap that broke the Session 2 HR Screener, seen from the inside.
 
----
-
-## Break — 10 minutes
-
-Step away from the screen. Cameras and mics off. Come back at the time on the clock.
-
-When you return, we give the agent *hands* (tools) and a *strategy* for thinking.
-
----
-
-## Concept 4 — Tools: The Agent's Hands
-
-If the LLM is the brain, **tools are the hands.** The brain decides *which* hand to use; the executor actually moves it. Tools come in four families:
-
-| Family | What it does | Examples |
-|---|---|---|
-| **Information** | Reads, searches, looks things up | Web search · database query · document reader · calendar reader |
-| **Action** | Changes something in the world | Email sender · CRM updater · form submitter · code runner |
-| **Communication** | Tells people things | Slack message · Teams post · webhook · notification |
-| **Computation** | Crunches numbers / transforms data | Calculator · data transformer · spreadsheet processor |
-
-**The most important idea here: scope and permission.** A tool isn't just "on" or "off" — it has a *boundary* (what it can touch) and a *permission level* (what it can do). This is the governance layer, and it's where most real-world agent risk lives.
-
-Here's a real **tool manifest** for a recruitment agent. Notice that every single tool has an explicit limit:
-
-| Tool | What it does | Scope (its limit) | Permission |
-|---|---|---|---|
-| Resume Reader | Reads candidate CVs | Only uploaded files | Read-only |
-| Calendar API | Books interviews | Only the recruiter's calendar — not company-wide | Read + write |
-| Email Sender | Contacts candidates | Approved templates only — no free text | Send (templated) |
-| ATS Writer | Logs interview stages | Candidate records only — every write logged | Write (audited) |
-| Slack Notifier | Flags hiring managers | The #hiring-ops channel only — no DMs | Post (templated) |
-
-> **Remember this line:** *A tool manifest is the employment contract for each of the agent's hands. If you can't say in one sentence what a tool is NOT allowed to do, you haven't scoped it.*
-
-**Why this matters more than it sounds:** the reasoning loop can recover from picking the *wrong* tool (Observe the error → Reflect → try the right one). But it **cannot** undo a *correctly-run tool with a too-broad scope.* If you give an agent "delete any record" permission and it deletes the wrong one, the loop can't help — the damage is done. Scope first, then trust.
-
----
-
-## Concept 5 — Planning: Three Ways an Agent Thinks
-
-Give an agent the same task and it can think it through three different ways. Picking the right one is half of good design.
-
-| Strategy | How it works | Best for | Example |
-|---|---|---|---|
-| **ReAct** (Reason + Act) | Think → do something → see the result → think again. Improvises with live information. | Tasks that need fresh, external data | Researching a market by searching, checking a CRM, then pulling finance data — adjusting as each result comes in |
-| **Chain-of-Thought** | A pure step-by-step reasoning chain. No tools — just careful thinking. | Complex analysis where the facts are already known | Scoring 3 vendor proposals against 6 criteria and recommending one |
-| **Self-Reflection** | Draft → critique its own draft → redraft → repeat until good enough | High-stakes writing that must be right | Drafting a contract clause, critiquing it for weak spots, tightening it |
-
-**How to choose — ask three questions:**
-
-1. **How complex is the task?** Simple lookup → Chain-of-Thought. Needs live data from several places → ReAct. Open-ended and high-stakes → Self-Reflection.
-2. **Does it need live tools?** Yes → ReAct. No, it's internal reasoning → Chain-of-Thought or Self-Reflection.
-3. **How high are the stakes on the output?** Board-ready deliverable → Self-Reflection. Internal analysis → Chain-of-Thought. Speed matters most → ReAct.
-
-> **Remember this line:** *You don't memorise the strategy names. You answer three questions and the right strategy picks itself.*
+**✅ Loop Trace done — Section 1 of your Architecture Card.**
 
 ---
 
 ## Exercise B — Tool Manifest (≈17 minutes)
 
-### WHAT you're doing
-You'll design a 5-tool manifest for a real AI agent you'd want at your own job — naming each tool, scoping it tightly, and setting its minimum permission.
+### The setup
+Yesterday's agent only reads. Now you design the two agents that **act** — and the danger flips. A reading agent that's wrong gives a bad answer. An *acting* agent that's wrong books the wrong slot, sends the wrong confirmation, or — worst case — quietly changes an allergen label. So before either agent gets built, you write its **tool manifest**: every tool it's allowed to use, scoped to exactly what it can touch, with the minimum permission, and a clear line on what it must escalate to a human.
 
-### WHY it matters
-Almost every agent that fails in the real world fails for one of two reasons: it has no tools (so it can't do anything useful), or it has tools with no limits (so it does something dangerous). The manifest is the document that prevents both. Writing one *before* you build forces the governance conversation that most teams only have *after* something breaks. This is the artifact you'd hand to your manager or your security team to answer: *"what can this agent do, and what can't it?"*
+You'll design two manifests: the **Order Assistant** (closes Gaps **#3 Tools** and **#4 Autonomy** from Session 2) and the **FSSAI Regulation Monitor** (the harder one — it has a trigger and a risk-sorting rule).
 
-### HOW — follow these steps exactly
+### Framework you're revising
+You'll write each tool's instruction using **Session 3's RCTFC** anatomy — **R**ole, **C**ontext, **T**ask, **F**ormat, **C**onstraints. A tool manifest *is* RCTFC applied to a single tool: the Role is what the tool is, the Constraints are its scope and permission. Quoting RCTFC here is the point — it's the same five-part discipline, now used to keep an agent safe instead of just well-phrased.
 
-**Step 1 — Pick a real agent.**
-Think of one repetitive task at your job that involves *looking something up* and then *sending, filing, or updating something.* That's your agent. Examples by role:
-- *Sales:* researches a prospect, drafts a personalised outreach email, logs it in the CRM
-- *Finance:* pulls month-end numbers, flags anomalies, drafts the summary
-- *HR:* screens applicants against a role, schedules interviews, notifies the hiring manager
-- *Support:* reads a ticket, finds the answer in the help docs, drafts a reply
-- *Marketing:* monitors brand mentions, drafts responses, posts approved ones
+### Part 1 — The Lumière Order Assistant
 
-Write your agent's job in one sentence in the box below.
-
-**Step 2 — Generate a first draft.**
-Open a fresh Claude chat (or use your Lumière project — either works). Paste this prompt, replacing the bracket with your one-sentence job:
+**Use this prompt** to generate a first draft. Open a fresh Claude chat (or your Lumière project) and paste it exactly:
 
 ```
-I want to design an AI agent that [describe the job in one sentence].
-List 5 tools it would need.
-For each tool, give me:
-- A name
-- What it does, in one sentence
-- The narrowest possible scope — what it must NOT be able to access
-- The minimum permission level: read / read+write / send / execute
-- What would break if this tool were removed
+You are helping me design the TOOL MANIFEST for a Lumière Bakery Order
+Assistant — an agent that takes a customer cake order end to end:
+checks the cake spec against Lumière's rules, confirms the lead time,
+books the production slot, and sends a confirmation.
+
+List 5 tools it would need. For EACH tool, write it in RCTFC form:
+- ROLE: what the tool is (e.g. "Order-rules reader")
+- CONTEXT: where its data lives (e.g. "Lumiere_KB.md")
+- TASK: the one action it performs
+- FORMAT: what it returns
+- CONSTRAINTS: the narrowest scope (what it must NOT touch) + the
+  minimum permission level (read / read+write / send / execute)
+
+Then add one line: what breaks if this tool is removed.
 ```
 
-**Step 3 — Tighten it.**
-Claude's first draft will almost always be too generous — scopes too broad, permissions too high. Edit it into the table below, and for each tool ask: *"Could I narrow this further? Does it really need write access, or just read?"* Narrow everything to the minimum.
+**Then tighten the draft** — Claude's first pass is always too generous. For each tool ask: *does it really need write access, or just read?* Narrow every CONSTRAINTS line until you could hand it to Lumière's owner and she'd know exactly what the tool can and can't do.
 
-**Step 4 — Find your nervous tool.**
-Circle the one tool that would worry you most if it misfired. It's almost always a *send* or *execute* tool. That's the tool that needs a human approval gate.
+**Fill in your Order Assistant manifest:**
 
-### What a GOOD manifest looks like
-- Every **scope** says what the tool *cannot* touch, in plain words (not "access to the CRM" but "read-only access to this rep's own pipeline — not other reps', not financials").
-- Every **permission** is the *minimum* — read-only wherever the tool only needs to look something up.
-- You can point to one tool and say in a sentence why it makes you nervous.
-
-### If your draft is too vague
-Paste this follow-up to Claude:
-```
-For each tool, narrow the scope to ONE sentence describing what it cannot
-access. Set every permission to the lowest level that still lets the tool
-do its job. If you wrote "full access" anywhere, replace it — that's not a
-scope, it's a blank cheque.
-```
-
----
-
-### Tool Manifest — Section 2 of your Architecture Card
-
-**My agent's job (one sentence):**
-
-_______________________________________________________________
-
-| # | Tool name | What it does | Scope — what it CANNOT touch | Permission | What breaks if removed |
+| # | Tool (Role) | Task | Scope — what it CANNOT touch | Permission | Breaks if removed |
 |---|---|---|---|---|---|
 | 1 | | | | | |
 | 2 | | | | | |
@@ -398,132 +171,172 @@ _______________________________________________________________
 | 4 | | | | | |
 | 5 | | | | | |
 
-**My nervous tool (circle it above) is:** ___________________________
+**A worked row, so you know the shape:**
 
-**Why it makes me nervous:** ________________________________________
+| Tool (Role) | Task | Scope | Permission | Breaks if removed |
+|---|---|---|---|---|
+| Slot Booker | Reserve a production slot for the confirmed order | Only Lumière's own production calendar — not staff personal calendars, not other branches | read + write | Orders get confirmed but never actually scheduled |
 
-**How I'd make it safer** (tighter scope, or a human approval gate before it runs):
+### Part 2 — The FSSAI Regulation Monitor (the hard one)
+
+This agent watches for new food-safety rules from **FSSAI** and keeps Lumière compliant. Two things make it a real architecture problem:
+
+**(a) It has two triggers — this is the agent's PERCEIVE stage, firing two ways:**
+- **Auto trigger:** runs on a schedule (e.g. every night) — *"check FSSAI for any new or updated rules since last run."*
+- **Manual trigger:** the admin clicks *check now* — e.g. before a big festival order, or when opening a new outlet.
+
+**(b) It sorts what it finds by risk — and this is the governance line you must draw yourself:**
+
+| Risk level | Examples | What the agent does |
+|---|---|---|
+| **Low (cosmetic / procedural)** | a renamed compliance form, an updated filing-portal URL, a changed submission deadline | **Auto-apply + log it.** No human needed. |
+| **High (allergen / ingredient / safety)** | a new allergen-labelling requirement, an ingredient ban, a change to safety-claim wording | **Always escalate to a human. Never auto-apply.** Draft the alert, stop, wait. |
+
+> **The hard rule — write it into the manifest:** *the agent never decides for itself whether something is low- or high-risk.* The human defines the two buckets up front (allergen / ingredient / safety = always high). The agent only sorts incoming rules into the buckets the human already drew. An agent that judges its own risk threshold is exactly the over-autonomy this whole session warns against.
+
+**Use this prompt** to draft the monitor's manifest:
+
+```
+Help me design the TOOL MANIFEST for a Lumière FSSAI Regulation Monitor —
+an agent that watches for new food-safety rules from FSSAI and keeps the
+bakery compliant.
+
+Requirements it MUST reflect:
+- TWO triggers: an automatic nightly schedule, and a manual "check now"
+  button for the admin.
+- A risk rule: it AUTO-APPLIES only cosmetic/procedural updates (renamed
+  forms, changed URLs, new deadlines) and LOGS them. It ESCALATES anything
+  about allergens, ingredients, or safety to a human and never applies it
+  itself.
+- It must remember which rules it already saw, so it doesn't re-alert on
+  the same one twice.
+
+List the 4–5 tools it needs in RCTFC form (Role / Context / Task / Format /
+Constraints), and for the trigger and the escalation tool, spell out the
+exact CONSTRAINTS that enforce the rules above.
+```
+
+**Fill in your Regulation Monitor manifest:**
+
+| # | Tool (Role) | Task | Scope / the rule it enforces | Permission | Auto or Escalate? |
+|---|---|---|---|---|---|
+| 1 | | | | | |
+| 2 | | | | | |
+| 3 | | | | | |
+| 4 | | | | | |
+
+**The "memory" tool is the one that revises Session 2.** One of these tools must be a **log of rules already seen** — so the monitor doesn't alert twice on the same FSSAI update. That is **episodic memory** (the archive, from today's slides). Leave it out and the agent re-alerts on every run — the same architecture gap that made the S2 HR Screener invent data when it had nowhere to record what it had already done. Name that tool. Don't skip it.
+
+### Circle your nervous tool
+Across both manifests, circle the one tool that would worry you most if it misfired. It is almost certainly an *acting* tool — the Slot Booker, the Confirmation Sender, or the regulation Auto-Apply. Write below how you'd make it safer:
 
 _______________________________________________________________
 
-**✅ Tool Manifest done — that's Section 2 of your Architecture Card.**
+### If your draft is too vague
+Paste this follow-up to Claude:
+```
+For every tool, rewrite the CONSTRAINTS as one sentence naming exactly what
+the tool cannot access, and set permission to the lowest level that still
+lets it do its job. If you wrote "full access" anywhere, that's not a scope
+— replace it. And confirm: does the Regulation Monitor escalate ALL
+allergen/safety rules to a human, with zero auto-apply on those?
+```
 
----
-
-## Concept 6 — Multi-Agent Patterns
-
-Sometimes one agent isn't enough. When a job is too big or too varied for a single agent, you split it across several. There are three ways to do that.
-
-| Pattern | The picture | Analogy | Best for |
-|---|---|---|---|
-| **Orchestrator-Worker** | One "manager" agent hands sub-tasks to specialist workers, then combines their results | A project manager delegating to a team | Complex jobs where each part needs different expertise |
-| **Parallel Agents** | A big batch is split into chunks, each agent takes a chunk, results are merged | Several analysts splitting one big pile of work | Lots of independent items where speed matters (e.g. 500 résumés at once) |
-| **Specialist Handoffs** | Each agent does one stage, then passes the work to the next | A relay race — each runner runs one leg | A job with distinct sequential phases, each needing a different skill |
-
-**You've already built one of these.** The HR Candidate Screener from Session 2 was a **Specialist Handoffs** pattern:
-
-> **Step 1** (search for candidates) → **Step 2** (extract the top skills for the role) → **Step 3** (score the candidates).
-
-Three specialists, in sequence, each handing its output to the next. You built a multi-agent architecture in Session 2 — you just didn't have the name for it. Now you do.
-
-**How to choose:** ask one question — *would my agent get faster with several agents running in parallel, or more reliable with one agent checking another's work?* Faster → Parallel. More reliable / different skills per stage → Orchestrator or Handoffs.
-
-> **Remember this line:** *Orchestrator-Worker is the manager. Parallel Agents is the assembly line. Specialist Handoffs is the relay race.*
+**✅ Tool Manifest done — Section 2 of your Architecture Card.**
 
 ---
 
 ## Exercise C — Pattern Choice (≈8 minutes)
 
-### WHAT you're doing
-You'll decide which multi-agent pattern fits the agent you designed in Exercise B, and write one sentence defending the choice.
+### The setup
+Lumière has been Mumbai-only. Now imagine the owner decides to **open a branch overseas** — say London. Suddenly one assumption breaks: FSSAI is India's regulator and has no authority in the UK, where the Food Standards Agency (FSA) makes the rules. Your single Regulation Monitor was built for one rulebook. Now there are two — and tomorrow, maybe five.
 
-### WHY it matters
-Pattern choice is the first architectural decision — and the one most often skipped. Skip it and you end up with one overloaded agent trying to do everything (and breaking on the hard parts), or a sprawl of agents with no clear owner. Naming the pattern forces you to be clear about what each piece does, what it hands off, and where a human steps in.
+This is the moment one agent stops being enough. **How do you split the work?** That's the multi-agent question, and the overseas branch forces the answer.
 
-### HOW — follow these steps exactly
+### Framework you're revising
+This closes Session 2's Gaps **#1 Memory** and **#5 Planning** at the system level — each country's monitor needs its *own* memory of *its* regulator's rules, and something has to *plan* which monitor handles which branch. A single agent trying to track every country's rules in one memory is the over-broad design today's whole session warns against.
 
-**Step 1 — Ask Claude.** In any Claude chat, paste this prompt, using the same agent job from Exercise B:
+### Steps
+
+**1.** Paste this prompt into Claude:
 
 ```
-I want to build an AI agent that [describe the same job as Exercise B].
-Which of these three patterns fits best — Orchestrator-Worker,
-Parallel Agents, or Specialist Handoffs — and why?
-Walk me through the reasoning.
-Then tell me: what would break if I used the wrong pattern?
+Lumière Bakery is opening a second branch overseas (London), where the
+food-safety regulator is the FSA, not India's FSSAI. The existing
+Regulation Monitor only knows FSSAI.
+
+I have three multi-agent patterns to choose from:
+- Orchestrator-Worker: a manager agent routes each branch's compliance
+  work to a specialist worker agent.
+- Parallel Agents: identical agents each handle a share of one big queue.
+- Specialist Handoffs: each agent does one phase, then passes to the next.
+
+Which pattern fits keeping multiple branches compliant across DIFFERENT
+regulators — and why? Walk me through it. Then tell me what would break if
+I used the wrong one. And tell me where a human must stay in the loop.
 ```
 
-**Step 2 — Decide for yourself.** Read Claude's recommendation. You know your job better than it does — agree or push back. Then write your final answer below.
+**2.** Read the recommendation. You know the bakery's reality better than the model — agree or push back. The strongest answer is usually **one Regulation Monitor per country/regulator** (each with its own memory of its own rulebook), with an **orchestrator that routes by branch location**, and the **allergen/safety escalation-to-human rule still firing inside every one of them.**
 
-### What a GOOD answer looks like
-- You can name the pattern *and* the reason in one sentence each.
-- You've named a concrete risk of the *wrong* pattern (e.g. "if I used Parallel for this, the steps depend on each other, so they'd collide").
-- If you disagreed with Claude, you can say why — that means you understand your use case better than the model's first guess, which is exactly right.
+### Fill this in (Section 3 of your Architecture Card)
 
----
-
-### Pattern Choice — Section 3 of your Architecture Card
-
-**I'm using this pattern:** _______________________________________
-
-**Because:** ___________________________________________________
+**The pattern I'd use for Lumière's multi-branch compliance:**
 
 _______________________________________________________________
 
-**The risk if I used the wrong pattern:** ____________________________
+**Because:**
 
 _______________________________________________________________
 
-**✅ Pattern Choice done — that's Section 3 of your Architecture Card.**
+**What breaks if I pick the wrong pattern:**
+
+_______________________________________________________________
+
+**Where a human must stay in the loop, no matter how many branches:**
+
+_______________________________________________________________
+
+### If Claude over-automates
+If the model suggests one agent should "manage the whole country launch," push back with:
+```
+Don't let one agent manage an entire country launch — that's too much
+autonomy for a food-safety system. Keep one monitor per regulator, each
+with its own memory, an orchestrator that only ROUTES, and a human gate on
+every allergen or safety decision. Redo the recommendation with those
+limits.
+```
+That pushback *is* the lesson — refusing the over-broad version is exactly the architecture judgment Session 5 is teaching.
+
+**✅ Pattern Choice done — Section 3 of your Architecture Card.**
 
 ---
 
-## Your Agent Architecture Card — Complete
+## Your Lumière Agent Architecture Card — Complete
 
-You now hold a complete blueprint. Three sections, all filled in by you, all reusable:
+Three sections, all bakery, all continuous from yesterday:
 
-| Section | What you produced | What it gives you |
+| Section | What you designed | The gap it closes (from S2) |
 |---|---|---|
-| **1 — Loop Trace** | The six reasoning stages of a real agent, with the weak stage identified | The skill to diagnose why any agent fails |
-| **2 — Tool Manifest** | 5 tools, each scoped and permissioned, with the risky one flagged | The governance document for any agent you deploy |
-| **3 — Pattern Choice** | One agent vs. several, and how they coordinate | The first architecture decision, made and defended |
+| **1 — Loop Trace** | Yesterday's Knowledge Agent, read stage by stage | shows where hallucination starts |
+| **2 — Tool Manifest** | Order Assistant + FSSAI Monitor, scoped and triggered | #3 Tools · #4 Autonomy · #1 Memory |
+| **3 — Pattern Choice** | How the agents coordinate across branches | #5 Planning · #1 Memory |
 
-**This is not a classroom exercise.** It's the blueprint for an agent you could actually build — for your job, not for a demo.
-
----
-
-## Quick Reference — keep these handy
-
-**The five components:** LLM (brain) · Memory (what it knows) · Tools (what it can do) · Planner (what it decides) · Executor (what runs the plan).
-
-**The six loop stages:** Perceive → Reason → Plan → Act → Observe → Reflect → (repeat until done).
-
-**The three loop exit conditions (need all three):** goal achieved · max iterations reached · human escalation.
-
-**The four memory types:** Short-term (desk) · Long-term (notebook) · Episodic (archive) · Semantic (library).
-
-**The three planning strategies:** ReAct (live data) · Chain-of-Thought (internal analysis) · Self-Reflection (high-stakes writing).
-
-**The three multi-agent patterns:** Orchestrator-Worker (manager) · Parallel Agents (assembly line) · Specialist Handoffs (relay race).
+**This is the blueprint you build in Session 6.** In the EdYoda Agent Builder: your **Loop Trace** shapes the system prompt and step order; your **Tool Manifest** becomes the configured tools and the RAG Docs; your **Pattern Choice** decides whether you build one agent or a routed set. Bring this workbook.
 
 ---
 
 ## Take-Home (reply to the class email by Friday)
 
-Two sentences each:
+Two sentences each — and keep it on Lumière:
 
-1. Which of the five architecture components was missing from the S2 HR Candidate Screener — and what specifically broke because of it?
-2. Which one tool in your manifest would you put a human approval gate on — and what exactly would trigger that human to step in?
+1. The S2 HR Screener invented data because it was missing one component. Which Lumière agent today would hallucinate the same way if you left that component out — and what exactly would it invent?
+2. In your FSSAI Regulation Monitor manifest, which single rule would you *never* let auto-apply — and what's the trigger that puts a human in the loop?
 
 ---
 
 ## What's Next — Session 6: EdYoda Agent Builder — Build & Host Your First Agent
 
-Next session, your Architecture Card stops being paper and becomes a live, hosted agent. In the EdYoda Agent Builder you'll:
-- turn your **Loop Trace** into the agent's system prompt and step sequence,
-- turn your **Tool Manifest** into the agent's configured tools and knowledge,
-- and use your **Pattern Choice** to decide whether you build one agent or a multi-step pipeline.
-
-**Bring this completed workbook.** Every section maps to something you'll set up in the Builder. See you there.
+Next session your Architecture Card stops being paper. In the EdYoda Agent Builder you'll wire the Lumière Order Assistant as a real, hosted agent: the system prompt from your Loop Trace, the tools from your Manifest, the structure from your Pattern Choice. Bring this workbook — every section maps to something you'll configure.
 
 ---
 
