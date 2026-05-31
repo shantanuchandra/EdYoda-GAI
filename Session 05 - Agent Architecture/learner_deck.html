@@ -101,6 +101,9 @@
     flex: 1; display: flex; flex-direction: column; justify-content: center;
     padding: var(--s-3) 0; max-width: 1320px; margin: 0 auto; width: 100%;
   }
+  /* Thin concept slides: start content higher and let the larger content fill downward,
+     instead of floating in a centered band with big top/bottom margins. */
+  .slide-body.fill-top { justify-content: flex-start; padding-top: var(--s-4); }
 
   .folio {
     position: absolute; bottom: 1rem; right: 4.6vw;
@@ -167,6 +170,16 @@
     font-family: 'Geist Mono', monospace; font-size: 0.7rem;
     letter-spacing: 0.2em; color: var(--ink-mute); font-weight: 500;
   }
+  .prompt-copy {
+    position: absolute; top: -0.7em; right: var(--s-2);
+    background: var(--terra); color: var(--paper); border: none;
+    font-family: 'Geist Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;
+    padding: 0.35em 0.8em; border-radius: 4px; cursor: pointer;
+    transition: background 200ms var(--ease);
+  }
+  .prompt-copy:hover { background: #9e3a17; }
+  .prompt-copy.copied { background: var(--calm); }
 
   .grid { display: grid; gap: var(--s-3); }
   .g-2 { grid-template-columns: 1fr 1fr; }
@@ -358,25 +371,31 @@
   .tool-q-label { display: flex; flex-direction: column; }
 
   /* --- PLANNING mini-flows --- */
-  .plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); margin-top: var(--s-3); }
-  .plan-card { border-top: 3px solid var(--rule); padding-top: var(--s-2); display: flex; flex-direction: column; }
+  .plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-top: var(--s-4); }
+  .plan-card { border: 1px solid var(--rule); border-top: 4px solid var(--rule); background: var(--paper-cream); padding: var(--s-3) var(--s-3) var(--s-3); display: flex; flex-direction: column; }
   .plan-card.react { border-top-color: var(--terra); }
   .plan-card.cot { border-top-color: var(--ink-blue); }
   .plan-card.reflect { border-top-color: var(--calm); }
-  .plan-card .pc-name { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 500; color: var(--ink); margin-bottom: 0.6rem; }
-  .plan-diagram { height: 8.5rem; margin: 0.4rem 0 0.8rem; display: flex; align-items: center; justify-content: center; }
+  .plan-card .pc-name { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; line-height: 1; }
+  .plan-card .pc-tag { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 0.6rem; }
+  .plan-diagram { height: 12rem; margin: 0.6rem 0 1rem; display: flex; align-items: center; justify-content: center; }
   .plan-diagram svg { max-height: 100%; width: 100%; overflow: visible; }
-  .plan-card .pc-best { font-size: 0.98rem; color: var(--ink-soft); line-height: 1.4; }
-  .plan-card .pc-ex { font-size: 0.86rem; color: var(--ink-mute); font-style: italic; margin-top: 0.4em; }
+  .plan-card .pc-best { font-size: 1.12rem; color: var(--ink-soft); line-height: 1.45; }
+  .plan-card .pc-eg { margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px dotted var(--rule); font-size: 1rem; color: var(--ink); line-height: 1.45; }
+  .plan-card .pc-eg .eg-lbl { display: block; font-family: 'Geist Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); margin-bottom: 0.3em; }
+  .plan-card .pc-eg .eg-lbl.cool { color: var(--ink-blue); }
+  .plan-card .pc-eg .eg-lbl.calm { color: var(--calm); }
 
   /* --- MULTI-AGENT topologies --- */
-  .ma-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); margin-top: var(--s-3); }
-  .ma-card { border: 1px solid var(--rule); background: var(--paper-cream); padding: var(--s-2) var(--s-3) var(--s-3); display: flex; flex-direction: column; }
-  .ma-card .ma-name { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 500; color: var(--ink); margin-bottom: 0.1em; }
-  .ma-card .ma-analogy { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: var(--s-2); }
-  .ma-diagram { height: 9rem; margin-bottom: var(--s-2); display: flex; align-items: center; justify-content: center; }
+  .ma-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-top: var(--s-4); }
+  .ma-card { border: 1px solid var(--rule); background: var(--paper-cream); padding: var(--s-3); display: flex; flex-direction: column; }
+  .ma-card .ma-name { font-family: 'Fraunces', serif; font-size: 1.75rem; font-weight: 500; color: var(--ink); margin-bottom: 0.1em; line-height: 1; }
+  .ma-card .ma-analogy { font-family: 'Geist Mono', monospace; font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: var(--s-2); }
+  .ma-diagram { height: 13rem; margin-bottom: var(--s-2); display: flex; align-items: center; justify-content: center; }
   .ma-diagram svg { max-height: 100%; width: 100%; overflow: visible; }
-  .ma-card .ma-best { font-size: 0.95rem; color: var(--ink-soft); line-height: 1.4; }
+  .ma-card .ma-best { font-size: 1.08rem; color: var(--ink-soft); line-height: 1.45; }
+  .ma-card .ma-eg { margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px dotted var(--rule); font-size: 1rem; color: var(--ink); line-height: 1.45; }
+  .ma-card .ma-eg .eg-lbl { display: block; font-family: 'Geist Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); margin-bottom: 0.3em; }
 
   /* --- DUOTONE PHOTO --- */
   .photo-duo { position: relative; border: 1px solid var(--rule); overflow: hidden; }
@@ -422,6 +441,12 @@
   .arch-section .as-num { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: 0.4em; }
   .arch-section .as-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 500; color: var(--ink); margin-bottom: 0.5em; }
   .arch-section .as-body { font-size: 1rem; color: var(--ink-soft); line-height: 1.45; }
+  .arch-section .as-eg {
+    margin-top: var(--s-2); background: var(--paper-cream); border-left: 3px solid var(--terra);
+    padding: 0.7em 0.85em; font-family: 'Geist Mono', monospace; font-size: 0.8rem;
+    line-height: 1.5; color: var(--ink); white-space: pre-wrap;
+  }
+  .arch-section .as-eg .eg-h { display: block; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 0.4em; }
   .arch-section .as-bridge { margin-top: var(--s-2); padding-top: var(--s-1); border-top: 1px dotted var(--rule-soft); font-size: 0.92rem; color: var(--ink-mute); font-style: italic; }
 
   .callout { background: var(--terra-soft); border-left: 3px solid var(--terra); padding: var(--s-2) var(--s-3); margin-top: var(--s-3); font-size: 1.12rem; color: var(--ink); line-height: 1.5; }
@@ -535,7 +560,7 @@
     .deck { width: 13.333in; height: auto; position: static; }
     .slide { position: relative !important; inset: auto !important; width: 13.333in !important; height: 7.5in !important; display: flex !important; opacity: 1 !important; page-break-after: always; page-break-inside: avoid; break-after: page; break-inside: avoid; overflow: hidden; padding: 0.34in 0.5in 0.4in !important; }
     .slide:last-child { page-break-after: auto; break-after: auto; }
-    .nav, .progress-thread, .preclass-timer { display: none !important; }
+    .nav, .progress-thread, .preclass-timer, .prompt-copy { display: none !important; }
     body::before { background-image: none !important; opacity: 0 !important; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
   }
@@ -580,7 +605,7 @@
   <section class="slide">
     <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">The Story So Far</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Five sessions · one arc</div>
+      <div class="eyebrow">5 sessions · one arc</div>
       <h1>Every session made a promise.<br>You built the proof.</h1>
       <table class="story-table">
         <thead><tr><th>Session</th><th>The promise</th><th>What you built</th></tr></thead>
@@ -612,7 +637,7 @@
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Anatomy</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Five components · one machine</div>
+      <div class="eyebrow">5 components · one machine</div>
       <h2>Every agent is 5 parts around one brain.</h2>
       <div class="radial-wrap">
         <div class="radial">
@@ -798,7 +823,7 @@
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 2</span><span class="dot">·</span><span class="topic">The Reasoning Loop</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Six stages · until the goal is met</div>
+      <div class="eyebrow">6 stages · until the goal is met</div>
       <h2>A chatbot answers once. An agent loops.</h2>
       <div class="loop-wrap">
         <div class="loop-ring">
@@ -951,7 +976,7 @@
     <div class="running-head"><div class="left"><span>Concept 3</span><span class="dot">·</span><span class="topic">What Each Agent Was Missing</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
       <div class="eyebrow">Both agents · had vs. missing</div>
-      <h2>You've used two of the four already.</h2>
+      <h2>You've used 2 of the 4 already.</h2>
       <div class="grid g-2 mt-2">
         <div style="border:1px solid var(--rule);background:var(--paper-cream);padding:var(--s-3)">
           <h3 style="font-size:1.4rem">HR Screener <span style="font-size:0.9rem;color:var(--ink-mute)">· S2</span></h3>
@@ -978,7 +1003,7 @@
         <div class="ex-meta">Exercise A · Loop Trace · 13 minutes</div>
         <h3>Read your agent's mind — 6 stages.</h3>
         <p class="mt-2" style="font-size:1.12rem">Open your Lumière agent (re-upload the latest <code>Lumiere_KB.md</code> first — it now has branch coupons). Paste the loop-trace instruction <em>above</em> the messy customer message. Fill the 6 boxes in your workbook.</p>
-        <div class="prompt mt-3" style="font-size:0.9rem">Before answering, trace your reasoning step by step:
+        <div class="prompt mt-3" style="font-size:0.9rem"><button class="prompt-copy" data-prompt="A" onclick="copyPrompt(this)">Copy</button>Before answering, trace your reasoning step by step:
 PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
 
 [then the customer message that mistypes "BANDRA 10",
@@ -1006,7 +1031,7 @@ asks if POWAI10 works at Bandra, + Gurgaon delivery + nut-allergy]</div>
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 4</span><span class="dot">·</span><span class="topic">Tools</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Four families · the agent's hands</div>
+      <div class="eyebrow">4 families · the agent's hands</div>
       <h2>The brain picks the hand. The executor moves it.</h2>
       <div class="radial-wrap">
         <div class="radial">
@@ -1058,55 +1083,58 @@ asks if POWAI10 works at Bandra, + Gurgaon delivery + nut-allergy]</div>
   <!-- ============ SLIDE 15 — PLANNING (mini-flows) ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 5</span><span class="dot">·</span><span class="topic">Planning</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
-    <div class="slide-body">
-      <div class="eyebrow">Three strategies · same task, different shapes</div>
-      <h2>Three ways an agent can think.</h2>
+    <div class="slide-body fill-top">
+      <div class="eyebrow">3 strategies · same task, different shapes</div>
+      <h2>3 ways an agent can think.</h2>
       <div class="plan-grid">
         <div class="plan-card react">
           <div class="pc-name">ReAct</div>
+          <div class="pc-tag">Best for: tool-heavy, live-data tasks</div>
           <div class="plan-diagram">
             <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet">
-              <rect x="10" y="10" width="78" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="49" y="27" font-family="monospace" font-size="11" fill="#1a1814" text-anchor="middle">think</text>
-              <rect x="112" y="47" width="78" height="26" rx="3" fill="#b8431b" stroke="#b8431b"/><text x="151" y="64" font-family="monospace" font-size="11" fill="#fff" text-anchor="middle">act</text>
-              <rect x="10" y="84" width="78" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="49" y="101" font-family="monospace" font-size="11" fill="#1a1814" text-anchor="middle">think</text>
-              <path d="M 88 23 L 112 56" stroke="#8a8478" stroke-width="1.5" fill="none"/><path d="M 112 64 L 88 95" stroke="#8a8478" stroke-width="1.5" fill="none"/>
+              <rect x="10" y="10" width="78" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="49" y="30" font-family="monospace" font-size="14" fill="#1a1814" text-anchor="middle">think</text>
+              <rect x="112" y="45" width="78" height="30" rx="3" fill="#b8431b" stroke="#b8431b"/><text x="151" y="65" font-family="monospace" font-size="14" fill="#fff" text-anchor="middle">act</text>
+              <rect x="10" y="80" width="78" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="49" y="100" font-family="monospace" font-size="14" fill="#1a1814" text-anchor="middle">think</text>
+              <path d="M 88 25 L 112 53" stroke="#8a8478" stroke-width="2" fill="none"/><path d="M 112 67 L 88 92" stroke="#8a8478" stroke-width="2" fill="none"/>
             </svg>
           </div>
-          <div class="pc-best">Think, do, see, think again. Improvises with live data.</div>
-          <div class="pc-ex">Best for: tool-heavy research.</div>
+          <div class="pc-best">Think, do, see, think again — improvises with live data as each result lands.</div>
+          <div class="pc-eg"><span class="eg-lbl">Lumière</span>"Should we run a delivery promo this weekend?" → checks the weather tool, then the order backlog, then decides.</div>
         </div>
         <div class="plan-card cot">
           <div class="pc-name">Chain-of-Thought</div>
+          <div class="pc-tag">Best for: analysis from known facts</div>
           <div class="plan-diagram">
-            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet">
-              <rect x="55" y="6" width="90" height="20" rx="3" fill="none" stroke="#1e3a5f" stroke-width="1.5"/><text x="100" y="20" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">step 1</text>
-              <rect x="55" y="34" width="90" height="20" rx="3" fill="none" stroke="#1e3a5f" stroke-width="1.5"/><text x="100" y="48" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">step 2</text>
-              <rect x="55" y="62" width="90" height="20" rx="3" fill="none" stroke="#1e3a5f" stroke-width="1.5"/><text x="100" y="76" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">step 3</text>
-              <rect x="55" y="92" width="90" height="22" rx="3" fill="#1e3a5f" stroke="#1e3a5f"/><text x="100" y="107" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">answer</text>
-              <line x1="100" y1="26" x2="100" y2="34" stroke="#8a8478" stroke-width="1.5"/><line x1="100" y1="54" x2="100" y2="62" stroke="#8a8478" stroke-width="1.5"/><line x1="100" y1="82" x2="100" y2="92" stroke="#8a8478" stroke-width="1.5"/>
+            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+              <rect x="50" y="6" width="100" height="24" rx="3" fill="none" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="22" font-family="monospace" font-size="13" fill="#1e3a5f" text-anchor="middle">step 1</text>
+              <rect x="50" y="38" width="100" height="24" rx="3" fill="none" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="54" font-family="monospace" font-size="13" fill="#1e3a5f" text-anchor="middle">step 2</text>
+              <rect x="50" y="70" width="100" height="24" rx="3" fill="none" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="86" font-family="monospace" font-size="13" fill="#1e3a5f" text-anchor="middle">step 3</text>
+              <rect x="50" y="102" width="100" height="26" rx="3" fill="#1e3a5f" stroke="#1e3a5f"/><text x="100" y="119" font-family="monospace" font-size="13" fill="#fff" text-anchor="middle">answer</text>
+              <line x1="100" y1="30" x2="100" y2="38" stroke="#8a8478" stroke-width="2"/><line x1="100" y1="62" x2="100" y2="70" stroke="#8a8478" stroke-width="2"/><line x1="100" y1="94" x2="100" y2="102" stroke="#8a8478" stroke-width="2"/>
             </svg>
           </div>
-          <div class="pc-best">A pure reasoning chain. No tools — just careful thinking.</div>
-          <div class="pc-ex">Best for: known-facts analysis.</div>
+          <div class="pc-best">A pure reasoning chain — no tools, just careful step-by-step thinking.</div>
+          <div class="pc-eg"><span class="eg-lbl cool">Lumière</span>"Which 3 cakes should we feature this month?" → weighs margin, prep time, and season, then recommends.</div>
         </div>
         <div class="plan-card reflect">
           <div class="pc-name">Self-Reflection</div>
+          <div class="pc-tag">Best for: high-stakes writing</div>
           <div class="plan-diagram">
-            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet">
-              <rect x="20" y="20" width="70" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="55" y="36" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">draft</text>
-              <rect x="110" y="20" width="70" height="24" rx="3" fill="#a16207" stroke="#a16207"/><text x="145" y="36" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">critique</text>
-              <rect x="65" y="76" width="70" height="24" rx="3" fill="#14532d" stroke="#14532d"/><text x="100" y="92" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">redraft</text>
-              <path d="M 90 32 L 110 32" stroke="#8a8478" stroke-width="1.5" marker-end="url(#pa)"/>
-              <path d="M 145 44 Q 145 88 135 88" stroke="#8a8478" stroke-width="1.5" fill="none"/>
-              <path d="M 65 88 Q 40 88 40 44 Q 40 32 50 32" stroke="#8a8478" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
-              <defs><marker id="pa" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#8a8478" stroke-width="1.5"/></marker></defs>
+            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+              <rect x="18" y="22" width="76" height="28" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="56" y="41" font-family="monospace" font-size="13" fill="#1a1814" text-anchor="middle">draft</text>
+              <rect x="110" y="22" width="76" height="28" rx="3" fill="#a16207" stroke="#a16207"/><text x="148" y="41" font-family="monospace" font-size="13" fill="#fff" text-anchor="middle">critique</text>
+              <rect x="62" y="84" width="76" height="28" rx="3" fill="#14532d" stroke="#14532d"/><text x="100" y="103" font-family="monospace" font-size="13" fill="#fff" text-anchor="middle">redraft</text>
+              <path d="M 94 36 L 110 36" stroke="#8a8478" stroke-width="2" marker-end="url(#pa)"/>
+              <path d="M 148 50 Q 148 98 138 98" stroke="#8a8478" stroke-width="2" fill="none"/>
+              <path d="M 62 98 Q 36 98 36 50 Q 36 36 48 36" stroke="#8a8478" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
+              <defs><marker id="pa" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#8a8478" stroke-width="2"/></marker></defs>
             </svg>
           </div>
-          <div class="pc-best">Draft, critique itself, redraft until good enough.</div>
-          <div class="pc-ex">Best for: high-stakes writing.</div>
+          <div class="pc-best">Draft, critique its own draft, redraft — until it's good enough to send.</div>
+          <div class="pc-eg"><span class="eg-lbl calm">Lumière</span>An apology message to a customer whose cake was late → drafts, critiques the tone, rewrites before sending.</div>
         </div>
       </div>
-      <div class="callout mt-2"><strong>Pick by three questions:</strong> complexity · does it need live tools · how high the stakes. Answer those and the strategy picks itself.</div>
+      <div class="callout mt-3"><strong>Pick by 3 questions:</strong> how complex is the task · does it need live tools · how high are the stakes. Answer those and the right strategy picks itself.</div>
     </div>
     <div class="folio">20<sup>/29</sup></div>
   </section>
@@ -1120,7 +1148,7 @@ asks if POWAI10 works at Bandra, + Gurgaon delivery + nut-allergy]</div>
         <div class="ex-meta">Exercise B · Tool Manifest · 17 minutes</div>
         <h3>Write the contract for the bakery's new agents.</h3>
         <p class="mt-2" style="font-size:1.12rem">Two manifests in your workbook: the <strong>Lumière Order Assistant</strong> (≈7 min) and the harder <strong>FSSAI Regulation Monitor</strong> (≈10 min). Draft each in RCTFC, then narrow every scope and permission.</p>
-        <div class="prompt mt-3" style="font-size:0.9rem">List the 5 tools each agent needs. For each, in RCTFC:
+        <div class="prompt mt-3" style="font-size:0.9rem"><button class="prompt-copy" data-prompt="B" onclick="copyPrompt(this)">Copy both</button>List the 5 tools each agent needs. For each, in RCTFC:
 ROLE · CONTEXT · TASK · FORMAT · CONSTRAINTS (scope + min permission)
 — and what breaks if it's removed.</div>
         <div class="ex-callout">
@@ -1136,57 +1164,59 @@ ROLE · CONTEXT · TASK · FORMAT · CONSTRAINTS (scope + min permission)
   <!-- ============ SLIDE 17 — MULTI-AGENT topologies ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 6</span><span class="dot">·</span><span class="topic">Multi-Agent</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
-    <div class="slide-body">
-      <div class="eyebrow">Three patterns · when one agent isn't enough</div>
-      <h2>Split the work three ways.</h2>
+    <div class="slide-body fill-top">
+      <div class="eyebrow">3 patterns · when one agent isn't enough</div>
+      <h2>Split the work 3 ways.</h2>
       <div class="ma-grid">
         <div class="ma-card">
           <div class="ma-name">Orchestrator-Worker</div>
           <div class="ma-analogy">The manager</div>
           <div class="ma-diagram">
-            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
-              <rect x="72" y="6" width="56" height="24" rx="3" fill="#1a1814"/><text x="100" y="22" font-family="monospace" font-size="9" fill="#fff" text-anchor="middle">MANAGER</text>
-              <line x1="100" y1="30" x2="40" y2="62" stroke="#b8431b" stroke-width="1.5"/><line x1="100" y1="30" x2="100" y2="62" stroke="#b8431b" stroke-width="1.5"/><line x1="100" y1="30" x2="160" y2="62" stroke="#b8431b" stroke-width="1.5"/>
-              <rect x="14" y="62" width="52" height="22" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="40" y="77" font-family="monospace" font-size="8" fill="#1a1814" text-anchor="middle">worker</text>
-              <rect x="74" y="62" width="52" height="22" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="100" y="77" font-family="monospace" font-size="8" fill="#1a1814" text-anchor="middle">worker</text>
-              <rect x="134" y="62" width="52" height="22" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="160" y="77" font-family="monospace" font-size="8" fill="#1a1814" text-anchor="middle">worker</text>
-              <line x1="40" y1="84" x2="100" y2="106" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="100" y1="84" x2="100" y2="106" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="160" y1="84" x2="100" y2="106" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/>
-              <rect x="68" y="106" width="64" height="20" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="1.5"/><text x="100" y="120" font-family="monospace" font-size="8" fill="#1e3a5f" text-anchor="middle">synthesis</text>
+            <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet">
+              <rect x="68" y="6" width="64" height="28" rx="3" fill="#1a1814"/><text x="100" y="24" font-family="monospace" font-size="11" fill="#fff" text-anchor="middle">MANAGER</text>
+              <line x1="100" y1="34" x2="40" y2="66" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="34" x2="100" y2="66" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="34" x2="160" y2="66" stroke="#b8431b" stroke-width="2"/>
+              <rect x="12" y="66" width="56" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="40" y="83" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">worker</text>
+              <rect x="72" y="66" width="56" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="100" y="83" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">worker</text>
+              <rect x="132" y="66" width="56" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="160" y="83" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">worker</text>
+              <line x1="40" y1="92" x2="100" y2="114" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="100" y1="92" x2="100" y2="114" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="160" y1="92" x2="100" y2="114" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <rect x="62" y="114" width="76" height="24" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="130" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">synthesis</text>
             </svg>
           </div>
           <div class="ma-best">Complex jobs where each part needs different expertise.</div>
+          <div class="ma-eg"><span class="eg-lbl">Lumière</span>A festival-week plan: one worker forecasts demand, one prices the menu, one drafts the social posts — the manager combines them.</div>
         </div>
         <div class="ma-card">
           <div class="ma-name">Parallel Agents</div>
           <div class="ma-analogy">The assembly line</div>
           <div class="ma-diagram">
-            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
-              <rect x="62" y="6" width="76" height="22" rx="3" fill="#1a1814"/><text x="100" y="21" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">500 items</text>
-              <line x1="100" y1="28" x2="32" y2="58" stroke="#b8431b" stroke-width="1.5"/><line x1="100" y1="28" x2="77" y2="58" stroke="#b8431b" stroke-width="1.5"/><line x1="100" y1="28" x2="123" y2="58" stroke="#b8431b" stroke-width="1.5"/><line x1="100" y1="28" x2="168" y2="58" stroke="#b8431b" stroke-width="1.5"/>
-              <rect x="14" y="58" width="36" height="20" rx="3" fill="none" stroke="#1a1814" stroke-width="1.3"/><rect x="59" y="58" width="36" height="20" rx="3" fill="none" stroke="#1a1814" stroke-width="1.3"/><rect x="105" y="58" width="36" height="20" rx="3" fill="none" stroke="#1a1814" stroke-width="1.3"/><rect x="150" y="58" width="36" height="20" rx="3" fill="none" stroke="#1a1814" stroke-width="1.3"/>
-              <text x="100" y="72" font-family="monospace" font-size="7" fill="#8a8478" text-anchor="middle"> </text>
-              <line x1="32" y1="78" x2="100" y2="104" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="77" y1="78" x2="100" y2="104" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="123" y1="78" x2="100" y2="104" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="168" y1="78" x2="100" y2="104" stroke="#8a8478" stroke-width="1.2" stroke-dasharray="3 3"/>
-              <rect x="64" y="104" width="72" height="20" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="1.5"/><text x="100" y="118" font-family="monospace" font-size="8" fill="#1e3a5f" text-anchor="middle">merge</text>
+            <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet">
+              <rect x="58" y="6" width="84" height="26" rx="3" fill="#1a1814"/><text x="100" y="23" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">200 reviews</text>
+              <line x1="100" y1="32" x2="32" y2="62" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="32" x2="77" y2="62" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="32" x2="123" y2="62" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="32" x2="168" y2="62" stroke="#b8431b" stroke-width="2"/>
+              <rect x="14" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/><rect x="59" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/><rect x="105" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/><rect x="150" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/>
+              <line x1="32" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="77" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="123" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="168" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <rect x="62" y="112" width="76" height="24" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="128" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">merge</text>
             </svg>
           </div>
           <div class="ma-best">Lots of independent items where speed matters.</div>
+          <div class="ma-eg"><span class="eg-lbl">Lumière</span>200 Google reviews to triage overnight: split across 4 agents, each tags 50 as praise / complaint / question, then merge.</div>
         </div>
         <div class="ma-card">
           <div class="ma-name">Specialist Handoffs</div>
           <div class="ma-analogy">The relay race</div>
           <div class="ma-diagram">
-            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
-              <rect x="14" y="30" width="40" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="34" y="46" font-family="monospace" font-size="8" fill="#1a1814" text-anchor="middle">classify</text>
-              <rect x="80" y="30" width="40" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="1.5"/><text x="100" y="46" font-family="monospace" font-size="8" fill="#1a1814" text-anchor="middle">resolve</text>
-              <rect x="146" y="30" width="40" height="26" rx="3" fill="#b8431b"/><text x="166" y="46" font-family="monospace" font-size="8" fill="#fff" text-anchor="middle">escalate</text>
-              <path d="M 54 43 L 80 43" stroke="#b8431b" stroke-width="2" marker-end="url(#ma1)"/>
-              <path d="M 120 43 L 146 43" stroke="#b8431b" stroke-width="2" marker-end="url(#ma1)"/>
-              <rect x="80" y="86" width="40" height="24" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="1.5"/><text x="100" y="101" font-family="monospace" font-size="8" fill="#1e3a5f" text-anchor="middle">close</text>
-              <path d="M 166 56 Q 166 98 120 98" stroke="#8a8478" stroke-width="1.3" fill="none" stroke-dasharray="3 3"/>
-              <defs><marker id="ma1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#b8431b" stroke-width="1.6"/></marker></defs>
+            <svg viewBox="-6 0 212 140" preserveAspectRatio="xMidYMid meet">
+              <rect x="10" y="34" width="48" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="34" y="53" font-family="monospace" font-size="9" fill="#1a1814" text-anchor="middle">classify</text>
+              <rect x="76" y="34" width="48" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="100" y="53" font-family="monospace" font-size="9" fill="#1a1814" text-anchor="middle">resolve</text>
+              <rect x="142" y="34" width="48" height="30" rx="3" fill="#b8431b"/><text x="166" y="53" font-family="monospace" font-size="9" fill="#fff" text-anchor="middle">escalate</text>
+              <path d="M 58 49 L 76 49" stroke="#b8431b" stroke-width="2.5" marker-end="url(#ma1)"/>
+              <path d="M 124 49 L 142 49" stroke="#b8431b" stroke-width="2.5" marker-end="url(#ma1)"/>
+              <rect x="76" y="96" width="48" height="26" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="113" font-family="monospace" font-size="9" fill="#1e3a5f" text-anchor="middle">close</text>
+              <path d="M 166 64 Q 166 109 124 109" stroke="#8a8478" stroke-width="1.6" fill="none" stroke-dasharray="3 3"/>
+              <defs><marker id="ma1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#b8431b" stroke-width="2"/></marker></defs>
             </svg>
           </div>
           <div class="ma-best">Distinct sequential phases, each needing a different skill.</div>
+          <div class="ma-eg"><span class="eg-lbl">Lumière</span>Your S2 HR Screener — and a customer order: take it → check stock → book the slot → hand a refund case to a human.</div>
         </div>
       </div>
     </div>
@@ -1197,7 +1227,7 @@ ROLE · CONTEXT · TASK · FORMAT · CONSTRAINTS (scope + min permission)
   <section class="slide">
     <div class="running-head"><div class="left"><span>Concept 6</span><span class="dot">·</span><span class="topic">The Analogies, For Real</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
-      <div class="eyebrow">Two patterns you can picture</div>
+      <div class="eyebrow">2 patterns you can picture</div>
       <h2>A relay race and an assembly line.</h2>
       <div class="grid g-2 mt-2" style="gap:var(--s-3)">
         <div>
@@ -1249,7 +1279,7 @@ ROLE · CONTEXT · TASK · FORMAT · CONSTRAINTS (scope + min permission)
         <div class="ex-meta">Exercise C · Pattern Choice · 8 minutes</div>
         <h3>Lumière opens a London branch. Now what?</h3>
         <p class="mt-2" style="font-size:1.12rem">A new country means a new regulator (FSA, not FSSAI). One monitor isn't enough. Ask Claude which of the 3 patterns fits — then push back if it over-automates.</p>
-        <div class="prompt mt-3" style="font-size:0.9rem">Keeping multiple branches compliant across DIFFERENT regulators —
+        <div class="prompt mt-3" style="font-size:0.9rem"><button class="prompt-copy" data-prompt="C" onclick="copyPrompt(this)">Copy</button>Keeping multiple branches compliant across DIFFERENT regulators —
 Orchestrator-Worker, Parallel Agents, or Specialist Handoffs?
 Why? What breaks if I pick wrong? Where must a human stay?</div>
         <div class="ex-callout">
@@ -1265,26 +1295,35 @@ Why? What breaks if I pick wrong? Where must a human stay?</div>
   <!-- ============ SLIDE 21 — ARCHITECTURE CARD ============ -->
   <section class="slide">
     <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">Card Complete</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
-    <div class="slide-body">
-      <div class="eyebrow">Three sections · one blueprint</div>
+    <div class="slide-body fill-top">
+      <div class="eyebrow">3 sections · one blueprint</div>
       <h2>This isn't a classroom exercise. It's a blueprint.</h2>
       <div class="arch-card">
         <div class="arch-section">
           <div class="as-num">Section 1</div>
           <div class="as-title">Loop Trace</div>
-          <div class="as-body">You traced a real agent's six reasoning stages and found the weak one.</div>
+          <div class="as-body">You traced a real agent's 6 reasoning stages and found the weak one.</div>
+          <div class="as-eg"><span class="eg-h">What yours looks like</span>PERCEIVE: 5 customer asks
+ACT: cited "Coupons → Branch Codes"
+REFLECT: refused POWAI10, gave BANDRA10</div>
           <div class="as-bridge">→ becomes your system prompt + step sequence in S6.</div>
         </div>
         <div class="arch-section">
           <div class="as-num">Section 2</div>
           <div class="as-title">Tool Manifest</div>
           <div class="as-body">You scoped 5 tools, set minimum permissions, flagged the risky one.</div>
+          <div class="as-eg"><span class="eg-h">What yours looks like</span>Slot Booker · production calendar only · read+write
+Weather tool · read-only
+⚠ Confirmation Sender · needs human gate</div>
           <div class="as-bridge">→ becomes your configured tools + knowledge in S6.</div>
         </div>
         <div class="arch-section">
           <div class="as-num">Section 3</div>
           <div class="as-title">Pattern Choice</div>
           <div class="as-body">You chose one agent or several, and can defend it in a sentence.</div>
+          <div class="as-eg"><span class="eg-h">What yours looks like</span>"Specialist Handoffs — one FSSAI monitor per
+country, an orchestrator routes by branch,
+human gate on every safety rule."</div>
           <div class="as-bridge">→ decides single pipeline vs. multi-step build in S6.</div>
         </div>
       </div>
@@ -1308,7 +1347,7 @@ Why? What breaks if I pick wrong? Where must a human stay?</div>
     <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">Carry This</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
     <div class="slide-body">
       <div class="eyebrow">The whole session · one card</div>
-      <h2>Six ideas to keep.</h2>
+      <h2>6 ideas to keep.</h2>
       <div class="grid g-2 mt-2" style="gap:var(--s-2) var(--s-4)">
         <div class="rs-item"><span class="rs-k" style="min-width:9em">5 components</span><span class="rs-v">LLM · Memory · Tools · Planner · Executor</span></div>
         <div class="rs-item"><span class="rs-k" style="min-width:9em">6 loop stages</span><span class="rs-v">Perceive → Reason → Plan → Act → Observe → Reflect</span></div>
@@ -1438,6 +1477,87 @@ Why? What breaks if I pick wrong? Where must a human stay?</div>
     preclassRender();
   }
   preclassRender();
+
+  // Copy-to-clipboard for prompt boxes. Each button copies the FULL workbook
+  // version of that exercise's prompt (the slide shows a trimmed version).
+  const WORKBOOK_PROMPTS = {
+    A: `For this answer, show your reasoning one stage at a time, using exactly
+these six labels in order:
+
+PERCEIVE — list every separate request in the message.
+REASON — for each request, can the Lumière document answer it: YES,
+         NO (not in the document), or PARTIAL (document covers the topic
+         but not this exact detail)?
+PLAN — what order will you handle them in?
+ACT — quote the exact section heading(s) you used.
+OBSERVE — which requests did you fully answer? Which not?
+REFLECT — for anything you couldn't fully answer, what will you do
+          instead of guessing?
+
+Then write the customer-facing reply.
+
+[Then paste the customer message:]
+Hi! I want a 2kg eggless chocolate cake for pickup at your Bandra branch
+this Saturday. Can I use the "BANDRA 10" code on it — or my friend said
+"POWAI10" gives a better deal, does that work at Bandra? Also, can you
+deliver it to Sector 90, Gurgaon, and is it safe for my child with a
+severe nut allergy?`,
+    B: `PART 1 — Lumière Order Assistant:
+Help me design the TOOL MANIFEST for a Lumière Bakery Order Assistant — an
+agent that takes a customer cake order end to end: checks the cake spec
+against Lumière's rules, confirms the lead time, books the production slot,
+and sends a confirmation.
+List 5 tools. Write EACH in RCTFC form:
+- ROLE: what the tool is
+- CONTEXT: where its data lives (e.g. Lumiere_KB.md, the production calendar)
+- TASK: the one action it performs
+- FORMAT: what it returns
+- CONSTRAINTS: the narrowest scope (what it must NOT touch) + the minimum
+  permission (read / read+write / send / execute)
+Then one line: what breaks if this tool is removed.
+
+PART 2 — FSSAI Regulation Monitor:
+Help me design the TOOL MANIFEST for a Lumière FSSAI Regulation Monitor —
+an agent that watches for new FSSAI food-safety rules and keeps the bakery
+compliant. It MUST reflect:
+- TWO triggers: an automatic nightly schedule AND a manual "check now" button.
+- A risk rule: AUTO-APPLY + LOG only cosmetic/procedural updates (renamed
+  forms, changed URLs, new deadlines). ESCALATE anything about allergens,
+  ingredients, or safety to a human — never apply it itself.
+- A memory of rules already seen, so it never re-alerts on the same one twice.
+List the 4–5 tools it needs in RCTFC form, and for the trigger tool and the
+escalation tool, spell out the exact CONSTRAINTS that enforce the rules above.`,
+    C: `I want to build an agent that keeps Lumière's branches compliant.
+Lumière is opening a branch overseas (London), where the food-safety
+regulator is the FSA, not India's FSSAI. The current Regulation Monitor only
+knows FSSAI. I have three patterns:
+- Orchestrator-Worker: a manager agent routes each branch's compliance work
+  to a specialist worker agent.
+- Parallel Agents: identical agents each take a share of one big queue.
+- Specialist Handoffs: each agent does one phase, then passes to the next.
+Which fits keeping multiple branches compliant across DIFFERENT regulators,
+and why? What breaks if I pick wrong? Where must a human stay in the loop?`
+  };
+  function copyPrompt(btn) {
+    const key = btn.getAttribute('data-prompt');
+    const text = WORKBOOK_PROMPTS[key];
+    if (!text) return;
+    const done = () => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else { fallbackCopy(text, done); }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
 
   const PRINT_KEY = 'genai_s5_print_request';
   let lastPrintStamp = '';
