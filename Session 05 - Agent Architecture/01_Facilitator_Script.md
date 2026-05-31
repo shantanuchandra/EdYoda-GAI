@@ -219,41 +219,36 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 > **EXERCISE A — Loop Trace (13 min):**
 >
-> **Step 1:** Open your Lumière Knowledge Agent in Claude Projects (same one from Session 4).
+> **Step 1:** Re-upload the latest `Lumiere_KB.md` (it now has a branch-coupons section), then open your Lumière Knowledge Agent in Claude Projects.
 >
 > **Step 2:** Add this instruction ABOVE your question — copy it exactly:
 >
-> *"Before answering, trace your own reasoning step by step. Label each stage:*
-> *PERCEIVE — what information did you receive?*
-> *REASON — what did you interpret from it?*
-> *PLAN — what sequence will you follow to answer?*
-> *ACT — what did you retrieve from your knowledge?*
-> *OBSERVE — what did the results tell you?*
-> *REFLECT — what would you do if one part of the answer was missing?"*
+> *"Before answering, trace your reasoning one stage at a time. Label each: PERCEIVE (list every separate request) / REASON (for each: YES, NO, or PARTIAL from the document) / PLAN / ACT (quote the section) / OBSERVE / REFLECT (what will you do about anything you can't answer). Then write the customer reply."*
 >
-> **Step 3:** Then ask this question (copy it exactly):
+> **Step 3:** Then paste this customer message (copy it exactly):
 >
-> *"A customer wants a 2kg eggless chocolate cake for this Saturday. They also want to know whether the 15% discount code applies to eggless cakes. And they want to know if the Andheri West branch delivers to their area. What's the full answer?"*
+> *"Hi! I want a 2kg eggless chocolate cake for pickup at your Bandra branch this Saturday. Can I use the 'BANDRA 10' code on it — or my friend said 'POWAI10' gives a better deal, does that work at Bandra? Also, can you deliver it to Sector 90, Gurgaon, and is it safe for my child with a severe nut allergy?"*
 >
-> **Step 4:** Read the response. Fill in the Loop Trace Sheet in your workbook — one box per stage. If a stage is missing, write: "not visible — add to prompt."
+> **Step 4:** Fill the 6-box Loop Trace in your workbook.
 >
-> **Step 5:** One reflection: Which stage did the agent skip or compress? What would break if you asked a harder version of this question?
+> **Step 5:** Note: did it (a) fix "BANDRA 10" → BANDRA10, and (b) refuse POWAI10 at Bandra?
 >
-> **Fallback (no Lumière agent):** Fresh Claude chat + attach Lumiere_KB.md with the paperclip. Same exercise, same result.
+> **Fallback (no Lumière agent):** Fresh Claude chat + attach the latest Lumiere_KB.md with the paperclip. Same exercise.
 
 → Start timer. **Key: 13 min.**
 
-→ Walk the room. Watch for:
-- Instruction pasted after the question instead of before — nudge: *"Instruction goes above the question — it shapes the whole response."*
-- Agent labels PERCEIVE and REASON but stops there — the prompt may not be strong enough. Nudge: add "Be thorough on every label."
-- Clean 6-stage output — call it out by name: *"[Name]'s agent labelled all six stages. That's the architecture working."*
-- REFLECT is most often the thinnest or missing stage — that's the design lesson.
+→ Walk the room. Correct behaviours to look for — the agent should treat the requests *differently*:
+- **Corrects** the mistyped code → BANDRA10 (semantic match, not exact-string lookup).
+- **Refuses** POWAI10 at Bandra — branch codes don't cross branches.
+- **Refuses** the Gurgaon delivery (Mumbai-only) and **refuses to certify** nut-allergy safety.
+- **Flags** the eggless-coupon eligibility as not specified — doesn't assume "yes."
+- Accepts POWAI10 at Bandra, or echoes "BANDRA 10" back unchanged → the agent didn't re-read the updated KB. Have them re-upload and retry.
 
-*"Let's hear a few of these. [Name] — which stage was missing or thin for you?"*
+*"Let's hear a few. [Name] — did your agent catch that POWAI10 doesn't work at Bandra?"*
 
-→ Read 2–3 traces aloud by name. The room should converge on REFLECT as the weakest.
+→ Read 2–3 traces aloud by name.
 
-*"Every agent that skips REFLECT has a version of the HR Screener problem — it can't catch its own failures. That's architectural. And now you know how to fix it: add a reflection step. That trace is Section 1 of your Architecture Card."*
+*"Notice what a good loop did: it corrected one thing, refused two, and flagged one — it didn't mash them into one confident paragraph. Correct, refuse, flag. That trace is Section 1 of your Architecture Card."*
 
 > ⏱ **Pre-break anchor at 0:54:**
 > *"If your loop trace has all 6 boxes filled — even the 'not visible' ones — that's the milestone. Real break, now."*
@@ -267,8 +262,8 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 *"Real ten minutes. Cameras off, mics off, get away from the screen. Back at the exact clock time on the slide. Go."*
 
 → **Use the break:**
-- DM any learner whose loop trace showed blank REFLECT. Send: *"Try adding 'If any part of the answer is missing from the document, say what you'd search for next' to the instruction line. That forces a reflection output."*
-- If two or more learners had the same fallback issue, plan a 30-second mention at the top of Block 3.
+- DM any learner whose agent accepted POWAI10 at Bandra or echoed "BANDRA 10" unchanged. Send: *"Re-upload the latest Lumiere_KB.md — it has the branch-coupons section. Then retry; the agent should fix the spelling and refuse the wrong-branch code."*
+- If two or more learners hit the same KB-upload issue, plan a 30-second mention at the top of Block 3.
 
 → When you return: *"Welcome back. You just traced an agent's reasoning loop. Now we give it hands — tools — and a strategy for thinking."*
 
@@ -345,42 +340,43 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 ### 1:23 – 1:40 — EXERCISE B: Tool Manifest (17 min)
 
-*"Exercise B — 17 minutes. You're going to design the employment contracts for your agent's hands. Think of a real agent you'd want at work. One sentence to describe its job. Use the Claude prompt to generate a first draft — then narrow it."*
+*"Exercise B — 17 minutes, and it's two manifests, both for Lumière. First the Order Assistant — the agent that takes a cake order end to end. Then the harder one, the FSSAI Regulation Monitor. You'll write each tool in RCTFC — same five-part discipline from Session 3 — then narrow every scope and permission."*
 
 → Paste in chat:
 
 > **EXERCISE B — Tool Manifest (17 min):**
 >
-> **Step 1:** Think of a real agent you'd want at your job. One sentence to describe what it does.
+> **Part 1 (~7 min) — Lumière Order Assistant.** Use this prompt:
 >
-> **Step 2:** Use this Claude prompt (paste into a fresh chat, replace the bracketed part):
+> *"Help me design the TOOL MANIFEST for a Lumière Bakery Order Assistant — it takes a cake order end to end (checks the spec, confirms lead time, books the slot, sends confirmation). List 5 tools. Write each in RCTFC — Role / Context / Task / Format / Constraints (narrowest scope + minimum permission) — and one line on what breaks if it's removed."*
 >
-> *"I want to design an agent that [describe the job — one sentence]. List 5 tools it would need. For each tool: name it, describe what it does in one sentence, suggest the narrowest possible scope (what it explicitly cannot access), recommend the minimum permission level required (read / read+write / send / execute), and tell me what breaks if this tool is removed."*
+> **Part 2 (~10 min) — FSSAI Regulation Monitor.** Use this prompt:
 >
-> **Step 3:** Edit the output into the Tool Manifest table in your workbook. The first draft is always too broad on scope and too permissive on permission. Narrow both.
+> *"Help me design the TOOL MANIFEST for a Lumière FSSAI Regulation Monitor. It MUST have: two triggers (auto nightly + manual 'check now'); a rule that auto-applies and logs only cosmetic/procedural updates but escalates anything about allergens/ingredients/safety to a human and never applies it itself; and a Seen-Rules Log so it never re-alerts on the same rule twice. List 4–5 tools in RCTFC."*
 >
-> **Step 4:** Circle one tool that makes you nervous. That's the one your legal team will ask about first.
+> **Then:** narrow every scope to one sentence; circle the one tool that makes you nervous.
 
-→ Start timer. **Key: 17 min.**
+→ Start timer. **Key: 17 min.** Give a 2-min warning at Part 1 → Part 2 (~1:30).
 
 → Walk the room. Watch for:
-- Scope written as "access to CRM" — not a scope. *"What specifically can't it touch? Write that."*
-- Permission written as "full access" — *"Minimum means: what's the least access it needs to do its job?"*
-- A send or execute tool with no scope boundary — *"That's your nervous tool. Circle it."*
+- Scope written as "access to the calendar" — not a scope. *"What specifically can't it touch? Write that."*
+- Permission written as "full access" — *"Minimum means: what's the least it needs?"*
+- The monitor missing a memory tool — *"Add the Seen-Rules Log, or it re-alerts every night."*
+- **The one hard line:** anyone letting the monitor auto-apply an allergen or safety rule — stop them. *"Allergen and safety always escalate to a human. Never auto-apply."*
 
 *"Let's hear the nervous tools. [Name] — what's yours and why?"*
 
 → Each learner reads their nervous tool aloud.
 
-*"Every nervous tool is a write or send tool with scope that's still too broad. The fix is always the same: narrow the scope to one sentence, or add a human approval gate before the tool runs. That manifest is Section 2 of your Architecture Card — and the first document you show anyone who asks 'what can this agent do?'"*
+*"Every nervous tool is a write or send tool — the Slot Booker, the Confirmation Sender, the regulation Auto-Apply. The fix is always the same: narrow the scope, or add a human gate. Those two manifests are Section 2 of your Architecture Card."*
 
-> ⏱ **1:40.** If learners are still writing at 1:38, give a 2-minute warning. A 4-row manifest is fine.
+> ⏱ **1:40.** If learners are still writing at 1:38, give a 2-minute warning. A 4-row monitor manifest is fine as long as it has the memory tool and the escalation rule.
 
 ---
 
 ## BLOCK 4 — MULTI-AGENT + EXERCISE C (1:40 – 1:55)
 
-**Goal:** Name the three multi-agent patterns. Show the cohort they already built one. Exercise C: pattern choice for their own agent.
+**Goal:** Name the three multi-agent patterns. Show the cohort they already built one (the screener was a Specialist Handoff). Exercise C: the London-branch expansion forces a multi-agent pattern choice.
 
 ### 1:40 – 1:43 — Optional: Self-Reflection Demo (3 min — CUT if behind on time)
 
@@ -426,23 +422,23 @@ Read critique aloud.
 
 ### 1:50 – 1:55 — EXERCISE C: Pattern Choice (5 min)
 
-*"Exercise C — 5 minutes. Pattern choice for your own agent. Use the prompt in your workbook. I'll call on each of you while you work."*
+*"Exercise C — 5 minutes. Here's the scenario: Lumière opens a branch in London. New country, new regulator — the FSA, not FSSAI. Your one Regulation Monitor knew only FSSAI. So how do you split the work? Use the prompt in your workbook. I'll call on each of you while you work."*
 
 → Paste in chat:
 
 > **EXERCISE C — Pattern Choice (5 min):**
 >
-> **Step 1:** Use this Claude prompt (replace the bracketed part):
+> **Step 1:** Use this Claude prompt:
 >
-> *"I want to build an agent that [describe the same job as Exercise B]. Which of these three patterns fits best — Orchestrator-Worker, Parallel Agents, or Specialist Handoffs — and why? Walk me through the choice. Then tell me: what breaks if I use the wrong pattern?"*
+> *"Lumière is opening a London branch — the regulator there is the FSA, not FSSAI. My current monitor only knows FSSAI. Keeping multiple branches compliant across DIFFERENT regulators — which fits best: Orchestrator-Worker, Parallel Agents, or Specialist Handoffs? Why? What breaks if I pick wrong? Where must a human stay in the loop?"*
 >
-> **Step 2:** Read the recommendation. Agree or push back. Write in your workbook: "I'm using [pattern name] because [one sentence]. The risk if I use the wrong pattern: [one sentence]."
+> **Step 2:** Read the recommendation. Agree or push back. Write in your workbook: "I'm using [pattern] because [one sentence]. The risk of the wrong pattern: [one sentence]. The human stays in the loop at: [where]."
 
 → Start timer. **Key: 5 min.** While they work, call on each learner by name:
 
-*"[Name] — what pattern does Claude recommend for your agent? Do you agree?"*
+*"[Name] — what pattern, and where does the human stay in the loop?"*
 
-→ The disagreements are often the best moments — when the learner knows their use case better than the model's first answer. Praise those explicitly.
+→ The strong answer: one monitor per regulator (each with its own memory), an orchestrator that only *routes* by branch, and the allergen/safety human gate firing inside every one. Praise anyone who pushes back on "one agent runs the whole country launch" — that refusal is the judgment being taught.
 
 > ⏱ **1:55.** Pivot to close.
 
@@ -454,7 +450,7 @@ Read critique aloud.
 
 *"Step back. The HR Screener hallucinated LinkedIn URLs. We now know why — the tool couldn't do the job (no legal way to fetch real profiles) and there was no guardrail to catch the gap. That's not a bug in the model. It's a design choice — the wrong tool, no refusal rule. And a choice is something you can make differently. You now know how."*
 
-*"Flip to your workbook. Three sections. Loop Trace — you read an agent's reasoning, named every stage, found the gap. Tool Manifest — you designed the governance layer, found your nervous tool, wrote the scope. Pattern Choice — you picked the architecture and defended it in one sentence."*
+*"Flip to your workbook. Three sections. Loop Trace — you read an agent's reasoning and watched it correct, refuse, and flag instead of bluffing. Tool Manifest — you designed two agents, found your nervous tool, drew the allergen-safety human gate. Pattern Choice — you split the work for a second country and defended it in one sentence."*
 
 *"That card is not a demo exercise. It is the blueprint for any agent you want to build — not for Lumière, not for a classroom, for your job."*
 
