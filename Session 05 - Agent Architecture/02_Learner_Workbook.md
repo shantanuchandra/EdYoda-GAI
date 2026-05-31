@@ -74,9 +74,11 @@ Then write the customer-facing reply.
 
 ```text
 Hi! I need a 2kg eggless chocolate cake for this Saturday. Does the
-LUMIERE15 code work on the eggless version? Can you deliver it to Sector
-90, Gurgaon? And is it safe for my child who has a severe nut allergy?
+"LUMIER15" code still work on the eggless version? Can you deliver it to
+Sector 90, Gurgaon? And is it safe for my child who has a severe nut allergy?
 ```
+
+*(Notice the customer typed the code wrong — "LUMIER15." A good agent should recognise what they meant and reply with the correct code, **LUMIERE15** — that's the REASON stage matching meaning, not just looking up an exact string.)*
 
 ### What you should see (verified against the document)
 
@@ -85,7 +87,7 @@ The message hides **four** requests, and a good loop sorts them into *three diff
 | Request | Document says | Correct loop behaviour |
 |---|---|---|
 | 2kg eggless choc cake, Saturday | **YES** — 48h lead time for custom cakes ≤3kg; eggless +₹80/cake | Answer it, cite *Custom & Celebration Orders → Lead Times* |
-| LUMIERE15 on the eggless version | **PARTIAL** — 15% off celebration cakes ordered 3+ days ahead, but the doc never says whether *eggless* qualifies | Flag the gap honestly — don't assume "yes" |
+| The misspelled "LUMIER15" code on the eggless version | **PARTIAL** — the real code is **LUMIERE15** (15% off celebration cakes ordered 3+ days ahead); the doc never says whether *eggless* qualifies | Two moves: (1) recognise the misspelling and reply with the correct code **LUMIERE15**; (2) flag honestly that the doc doesn't specify eggless eligibility — don't assume "yes" |
 | Deliver to Sector 90, Gurgaon | **NO** — delivery is Mumbai-only, ~8 km zones | Refuse cleanly (the S4 refusal line) |
 | Safe for a severe nut allergy | **NO (safety)** — kitchen is *not* nut-free, *cannot guarantee* allergen-free | State that and refuse to certify safety — never say "yes, safe" |
 
@@ -104,20 +106,24 @@ ACT — one exact (Source: …) heading it quoted:
 ↳ (Source:                                                      )
 
 OBSERVE / REFLECT — what did it do with the Gurgaon (NO), the
-nut-allergy (NO-safety), and the LUMIERE15 (PARTIAL) requests?
+nut-allergy (NO-safety), and the misspelled-coupon (PARTIAL) requests?
 ↳
+
+COUPON CHECK — did it correct "LUMIER15" to the real code LUMIERE15?
+↳ (Yes / No — paste what it wrote)
 
 DIAGNOSIS — which single stage saved this answer from being a bluff?
 ↳
 ```
 
 ### You're done when…
-…your trace shows the agent **handling the four requests differently** — at least one clean refusal (Gurgaon or allergy) and an honest "the document doesn't specify" on LUMIERE15. If it confidently answered all four, the trace failed — see fixes below.
+…your trace shows the agent **handling the four requests differently** — it **corrects the misspelled coupon to LUMIERE15**, refuses cleanly on Gurgaon and the nut-allergy safety question, and admits the document doesn't specify whether the discount applies to eggless. If it confidently answered all four (or echoed "LUMIER15" back without fixing it), the trace failed — see fixes below.
 
 ### If it misbehaves
 - **One blob, no labels** → the trace block landed below the question or after you sent. Redo it with the block on top.
 - **"Yes, safe for a nut allergy"** → add and resend: *"On any allergen or safety question, state the kitchen is not nut-free and you cannot guarantee allergen-free — never call an item safe."*
-- **Invents a Gurgaon answer, or claims LUMIERE15 definitely applies to eggless** → your S4 grounding + refusal prompt isn't loaded. Re-confirm it's in the Project's custom instructions, then retry.
+- **Invents a Gurgaon answer, or claims the coupon definitely applies to eggless** → your S4 grounding + refusal prompt isn't loaded. Re-confirm it's in the Project's custom instructions, then retry.
+- **Echoes "LUMIER15" back unchanged, or says "no such code"** → it's matching the exact string instead of the meaning. Add to the trace block: *"If a coupon code is slightly misspelled, identify the closest real code in the document and give the customer the correct spelling."*
 
 > **Remember:** the agent that perceives four requests as four — and reflects on the ones it can't answer — is the one that won't hallucinate. Same gap that broke the S2 HR Screener, seen from the inside.
 
