@@ -581,14 +581,15 @@ const slides = [
   {
     num: 18, when: "1:05 – 1:15", duration: "10 min",
     title: "Sprint 4 — Tools: The Agent's Hands",
-    say: "Tools are the agent's hands; the LLM is the mind that picks them up. Four families: Information (read, search, query), Action (write, send, update), Communication (notify, message), Computation (calculate, transform).",
+    say: "Tools are the agent's hands; the LLM is the mind that picks them up. Two you've actually seen Claude use: the SEARCH tool, which looks up live facts the model wasn't trained on, and a WEATHER tool, which gives today's temperature for a place — a fact no model has on its own. Those are 'Information' tools. The other families: Action (write, send), Communication (notify), Computation (calculate).",
     doSteps: [
-      "Show the tools radial (learner slide 18). Name each quadrant with examples.",
+      "Show the tools radial (learner slide 18). Name each quadrant; spotlight Search + Weather as the two concrete Information tools.",
+      "Run the ice-cake callout live: 'A customer asks how long their ice cake survives the trip. The model doesn't know today's weather — so it calls the WEATHER tool (Sector 86 Gurgaon = 24 degrees today), then a CALCULATION for the safe window (~2 hours at 24), then caveats it. Open a San Francisco branch and the same agent gets ~15 degrees and stretches to 3-4 hours. Location drives the weather, weather drives the math.'",
       "Land the scope/permission principle.",
       "Ask: 'Which tool would make your legal team nervous if it weren't scoped?' Take 2-3."
     ],
-    afterPause: "Scope every tool. Permission every tool. If you can't say in one sentence what a tool cannot do — it's not scoped enough.",
-    watch: "Action tools (send/write) draw the nervous responses. Validate them.",
+    afterPause: "The model can't know today's weather or the live web — a tool does. And it caveats what's still an estimate, never guesses. Scope every tool, permission every tool: if you can't say in one sentence what a tool cannot do, it's not scoped enough.",
+    watch: "Action tools (send/write) draw the nervous responses. The ice-cake beat is the one that makes 'why a tool, not a guess' click — don't skip it.",
     bridge: "Here's a real manifest — every tool has a limit."
   },
   {

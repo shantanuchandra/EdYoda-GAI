@@ -139,6 +139,32 @@ DIAGNOSIS — which single stage saved this answer from being a bluff?
 
 **What & why.** A reading agent that's wrong gives a bad answer. An *acting* agent that's wrong books the wrong slot, sends the wrong confirmation, or — worst case — quietly changes an allergen label. So before either agent is built, you write its **tool manifest**: every tool, scoped to exactly what it may touch, at the minimum permission, with a clear escalation line. *Revises S3:* you'll write each tool in **RCTFC** form — a manifest is RCTFC pointed at a single tool, where **Constraints** = scope + permission.
 
+---
+
+### Tools in action — the ice-cake question (read before you start)
+
+Two tools matter most for the Order Assistant, and neither is something the model can do on its own:
+
+- **Search tool** — looks up live facts the model wasn't trained on (a competitor's price, a news item, a supplier's stock).
+- **Weather tool** — returns *today's* temperature for a specific place. A model has no idea what the weather is right now — it must call a tool.
+
+Here's why this matters, and it ties the whole session together. Lumière sells an **ice cake** (an ice-cream cake) that has to stay frozen. A customer asks:
+
+> *"If I pick up the ice cake, how long will it last before it melts?"*
+
+The honest answer **depends on where they are and how warm it is right now** — and the model knows neither. A weak agent guesses "about 2 hours." A strong agent reaches for tools:
+
+1. **PERCEIVE** — customer wants the safe out-of-freezer window for an ice cake, at their location.
+2. **ACT (weather tool)** — call it for the customer's locality. Say it's a future **Gurgaon (Sector 86)** branch → the tool returns **24°C** today.
+3. **ACT (calculation)** — apply the melt rule: an ice cake is safe roughly **2 hours at 24°C**; warmer cuts it shorter, cooler stretches it longer. (This is a *computation* tool / explicit reasoning — not a number the model should eyeball.)
+4. **REFLECT + caveat** — "About **2 hours** at today's 24°C in Sector 86 — that's an estimate, not a guarantee. Keep it refrigerated and transport it cold." Same honesty discipline as the allergen refusal.
+
+**Now change the location — and watch the answer change.** Open a **San Francisco** branch and the same question runs the same tools: the weather tool returns ~**15°C**, the calculation stretches the safe window to roughly **3–4 hours**. *Same agent, same tools — the location drives the weather, the weather drives the math, the math drives the answer.* That's the lesson: the agent doesn't *know* the temperature or the melt time — it **calls the right tool for the place, does the math, and caveats what's still uncertain.**
+
+> Notice the pattern repeating from Exercise A: the **customer's location** picks the right output — there it chose the right coupon; here it chooses the right weather, and therefore the right melt-time. Location-aware tool use is the same move both times.
+
+---
+
 ### Part 1 — Lumière Order Assistant (≈7 min) · closes Gaps #3 Tools, #4 Autonomy
 
 **Draft it.** Open a fresh Claude chat (or your Lumière project) and paste:
@@ -183,7 +209,7 @@ BREAKS IF REMOVED: Orders get confirmed but never actually scheduled.
 5. ROLE:            TASK:            SCOPE:                           PERM:
 ```
 
-*(A complete Order Assistant usually has: an order-rules reader [read-only on `Lumiere_KB.md`], a lead-time checker, a slot booker [read+write, calendar only], a confirmation sender [send, templated], and a payment-link generator [send, no charging]. Yours may differ — defend your five.)*
+*(A complete Order Assistant usually has: an order-rules reader [read-only on `Lumiere_KB.md`], a slot booker [read+write, calendar only], a confirmation sender [send, templated], a **weather tool** [read-only, for the ice-cake melt-window question above], and a **melt-window calculator** [read-only computation]. Yours may differ — defend your five.)*
 
 ### Part 2 — FSSAI Regulation Monitor (≈10 min) · closes Gaps #1 Memory, #5 Planning
 
