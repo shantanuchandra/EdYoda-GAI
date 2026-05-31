@@ -47,7 +47,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 ### 0:00 – 0:03 — Cold Open · one-word check-in
 
-*"Welcome back. Quick one before I say anything else — type one word in the chat: how did Session 4 land for you? The Lumière agent, the knowledge base, the whole build. One word."*
+*"Welcome back, everyone. Before we dive in — quick one. Drop a single word in the chat: how did last session land for you? The Lumière agent, the whole build. Just one word, whatever's honest."*
 
 → Wait 30 seconds. Read **every response** out loud, **by name**. With this cohort size, every name gets called.
 
@@ -71,7 +71,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 *"That's four sessions of building. What we've never done is open one of those agents up and name every part. Today we do that."*
 
-*"And I want to start with something specific. The HR Screener you built in Session 2 — the 3-node pipeline, Node 1 searches, Node 2 extracts skills, Node 3 scores candidates. That agent hallucinated LinkedIn URLs when Node 1 came back empty. Some of you caught it. Some of you didn't. Either way — today we name exactly why it happened. Not a Claude problem. An architecture problem — one of the agent's parts was the wrong tool for the job, and nothing was there to catch it. By the end of this session, you'll know exactly which part, and how you'd build it right."*
+*"And I want to start somewhere specific — because it's the whole reason we're here today. Remember the candidate screener you built back in Session 2? The one that searched for people, pulled out their skills, and scored them. Well, when that search came up empty, it didn't tell you it found nothing — it made up LinkedIn links that don't exist. Some of you caught it at the time; some didn't. Either way, today we figure out exactly why it happened. And here's the thing — it wasn't the AI being dumb. It was something missing in how the agent was put together: one of its parts was the wrong tool for the job, and nothing was there to catch the gap. By the end of today, you'll be able to point at the exact part that failed, and tell me how you'd build it right."*
 
 → Pause. Let that land.
 
@@ -79,7 +79,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 ### 0:08 – 0:12 — Norms + The One Rule
 
-*"Quick norms — same room, same rules."*
+*"Same room as always, so just a quick reminder on how we run."*
 
 | Norm | What it means |
 |---|---|
@@ -90,9 +90,9 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 | **Stuck** | Ask live. If it needs more, I'll email it. |
 | **Today's tool** | Claude Projects — same one from Session 4. |
 
-*"One rule for today. You came in knowing what agents can do. You leave knowing how they work. The Architecture Card is the proof."*
+*"One rule for today. You came in knowing what agents can do. You'll leave knowing how they actually work — and that card you fill in is the proof."*
 
-*"Three moves to get there. Autopsy — we open the HR Screener and the Lumière agent and name every part. Inside the Loop — three exercises that put you in the agent's seat. Design Your Own — you draft the architecture for an agent you'd actually deploy at work. Let's go."*
+*"Here's how we get there. First we open the hood — we take the screener and the Lumière agent apart and name every piece. Then you get inside one yourself, with a few hands-on exercises. And by the end, you'll sketch the design for an agent you'd genuinely want at your own work. Let's go."*
 
 > ⏱ **Time check: 0:12.** If past 0:10, shorten the one-word check-in debrief. The course story table and the hallucination callback are non-negotiable.
 
@@ -104,15 +104,15 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 **Pacing rule:** ~10 min per sprint. WHAT → WHY → HOW. The HOW is always the cohort's own work. Cut the analogy before you cut the callback.
 
-*"Three fast concepts. Each one is something you've already seen — we're just finally naming it. Same two agents the whole way: the HR Screener from Session 2, and the Lumière Knowledge Agent from Session 4."*
+*"Three quick concepts coming up — and here's the nice part: each one is something you've already lived through. We're just putting names to it. And I'll keep coming back to the same two agents you already know — the candidate screener from Session 2, and the Lumière agent from Session 4."*
 
 ### 0:12 – 0:22 — Sprint 1: Anatomy — Five Components, One Machine
 
 → Show the anatomy diagram slide.
 
-*"Every agent — any agent, not just yours — is five parts. LLM, Memory, Tools, Planner, Executor. That's it. Five parts, one machine."*
+*"Here's the good news: every agent ever built — simple or fancy, yours or anyone's — is really just five parts working together. Five parts, one machine. Let me walk you through them."*
 
-*"LLM is the brain. It reads, reasons, decides. Memory is what it knows — what it can look up or remember. Tools are what it can do — the hands. Planner is the strategy — it decides what to do in what order. Executor is the runner — it takes the plan and actually runs it."*
+*"There's the brain — the AI model that reads, reasons, and decides. There's its memory — what it knows, what it can look up or remember. There's its hands — the tools, the things it can actually do. There's the planner — the part that decides what to do, and in what order. And there's the runner — the part that takes that plan and actually carries it out."*
 
 *"Now — remove any one of these. What happens?"*
 
@@ -134,11 +134,11 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 - *"Tools: native web search on Node 1 — and this is the one that broke."*
 - *"Memory: none configured. Worth noting — but it's not what caused the hallucination. Hold that thought."*
 
-*"Here's the real cause, and I want to be precise about it. Node 1's job was to fetch real, verified LinkedIn profiles. But LinkedIn allows no scraping, no public API, no MCP — there is no legal tool that can pull those profiles. So the web search Node 1 was handed physically could not do the job. It came back empty. That's a TOOL problem — Gap #3 from Session 2."*
+*"So here's what actually went wrong, and I want to be precise about it. That first step's job was to go fetch real, verified LinkedIn profiles — but here's the catch: LinkedIn doesn't let anyone do that. No scraping, no open door, no official way in. So the plain web search it was handed simply couldn't do the job. It came back empty-handed. That's a tool problem — the same Gap #3 we talked about in Session 2."*
 
-*"Now — why did an empty tool become a hallucination? Because there was no guardrail telling it what to do with nothing. With no working tool AND no refusal rule, the model did what models do with a gap: it filled it. Plausible-looking LinkedIn URLs that don't exist."*
+*"And why did coming up empty turn into a made-up answer? Because nobody had given it a rule for what to do with nothing. No working tool, and no instruction to just admit it — so the model did what models do with a blank: it filled it in. Links that look completely real, and aren't."*
 
-*"So two things, kept straight: the cause was the tool — there was no real tool for the job. The fix that was missing was a refusal guardrail — a line that says 'I can't verify these, escalate to a recruiter' instead of inventing. Not a memory problem. A tool problem with no guardrail."*
+*"So keep these two straight. The cause was the tool — there was no real tool for the job. And the thing that was missing was a simple rule: 'if you can't verify these, say so and hand it to a person,' instead of inventing. It was never a memory problem. It was a tool problem, with nothing to catch the gap."*
 
 **Analogy (memorize):** *"Hand someone a job their tools can't do, with no permission to say 'I can't' — and they'll bluff. That's the screener."*
 
@@ -148,17 +148,17 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Show the loop diagram slide.
 
-*"Agents don't respond once. They loop. Six stages — and they repeat until the goal is met."*
+*"Here's the big difference between a chatbot and an agent. A chatbot answers you once and stops. An agent goes around in a loop — it takes something in, thinks it over, makes a plan, does one thing, looks at what came back, and asks itself 'are we there yet?' If not, it goes around again. Six stages, repeating until the job's actually done."*
 
-*"Perceive: receive the input. Reason: interpret it in context of memory, tools, and goal. Plan: decide the sequence of actions needed. Act: execute the first action — call a tool, write to a database. Observe: receive the result — success, failure, partial data. Reflect: evaluate — did we meet the goal? If not, loop back to Reason."*
+*"Let me name them as we go: it takes in the request, thinks about it, makes a plan, does the first thing, sees what happened, and then decides — done, or go around again."*
 
-*"The analogy: a great consultant doesn't give up when their first call fails. They try the next contact. That instinct — built in — is what the loop does."*
+*"Think of a really good consultant. They don't give up when the first phone call doesn't pan out — they just try the next contact. That instinct to keep going is baked right into the loop."*
 
 → Show the overdue-invoice trace slide.
 
-*"Watch this. Cron trigger fires at 8am — 'run daily overdue check.' The agent Perceives it, Reasons it needs an invoice list, Plans: query NetSuite, draft emails, send each. Acts: sends 14 reminders. Observes: 13 sent, 1 bounced — acme@old.com. Reflects: goal not met for that invoice. Loops back. Plans v2: query Salesforce for a new contact. Acts: resends to cfo@acme-new.com. 14 of 14 sent. Goal achieved."*
+*"Let me show you. Picture an agent whose job is to chase up overdue invoices every morning. It sends out fourteen reminder emails — and one bounces straight back, because that customer's email on file is out of date. Now, a plain chatbot would stop right there and just tell you 'one failed.' But watch what this one does instead: it notices the bounce, goes and digs up a fresh contact from the system, and sends it again. Fourteen out of fourteen, done."*
 
-*"That's the loop saving you. One bounce, no crash, no apology — replanned and closed it."*
+*"That's the loop saving you. One email bounced, and it didn't crash or give up — it just found another way and finished the job. The bounce wasn't a dead end. It was a clue."*
 
 *"Now let's trace your HR Screener through the same loop."*
 
@@ -171,9 +171,9 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 - *"OBSERVE: the results were empty or useless."*
 - *"REFLECT: nothing. No reflection node. No recovery. No 'results were empty, I should stop or escalate.' It filled in what was missing. Invented URLs."*
 
-*"The loop existed in theory. But there was no REFLECT node to catch the failure. Without a reflection step, the agent can't recover."*
+*"The loop was there on paper. But there was nothing at that last step — nothing to stop and say 'hang on, I came up empty, let me do something about it.' And without that, the agent just can't recover. It plows ahead and bluffs."*
 
-*"One more thing. When should an agent stop looping? Three conditions — and you need all three. Goal achieved. Max iterations reached. Human escalation triggered. Without all three, agents loop forever and burn tokens. Your screener had none of the three."*
+*"One more thing about loops — they also need to know when to stop. Three ways, and you want all three: when the job's actually done, when it's tried enough times and should give up, or when it's stuck and should hand off to a person. Leave those out and the agent loops forever, burning money. Your screener had none of them."*
 
 **Analogy (memorize):** *"The loop is the consultant instinct. The exit conditions are the project manager saying 'stop and escalate if this takes more than three tries.'"*
 
@@ -183,14 +183,14 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Show the memory types slide.
 
-*"Four memory types. Each solves a different problem. Missing the wrong one breaks a specific thing."*
+*"Memory isn't one single thing — it comes in four kinds. And the easiest way to picture them is an office."*
 
 → Walk each type (~30 sec each):
 
-- *"Short-term — the desk. The prompt window, the current session. When the chat closes, the desk is cleared. Use case: multi-turn chat, mid-task context."*
-- *"Long-term — the notebook. A database — SQL, NoSQL — that persists across sessions. The agent knows who you are the next time you talk. Use case: personalization, customer history."*
-- *"Episodic — the archive. Logs and summaries of past interactions. Not just facts — events. 'Last Tuesday the search came back empty.' Use case: audit trails, learning from patterns."*
-- *"Semantic — the library. A vector database of domain knowledge. This is what you built in Session 4 — the RAG Docs tab IS semantic memory. Use case: accurate answers from a specific knowledge base."*
+- *"There's the desk — what you're working on right this second. 'You just told me the cake's for Saturday.' When the chat closes, the desk gets cleared."*
+- *"There's the notebook — things worth keeping across days. It's what lets the agent say 'welcome back, Priya' next week, instead of treating you like a stranger."*
+- *"There's the archive — a log of what's actually happened before. Not just facts, but events: 'last Tuesday that search came back empty.' It's how an agent learns from what went wrong."*
+- *"And there's the library — a whole shelf of reference documents it can look things up in. That's exactly what you built in Session 4 when you loaded the Lumière file. That's this kind of memory."*
 
 *"Now the side-by-side that matters."*
 
@@ -277,38 +277,38 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Show the tools slide.
 
-*"Tools are the agent's hands. The LLM is the mind that picks them up. Four categories."*
+*"So — tools. Think of these as the agent's hands. The brain decides which hand to reach for, and the runner actually moves it. They come in four families."*
 
 → Walk the grid:
 
-- *"Information tools — read, search, query. Web search, database query, document reader, calendar reader."*
-- *"Action tools — write, send, update. Email sender, CRM updater, form submitter, code executor."*
-- *"Communication tools — notify, message. Slack, Teams, webhook."*
-- *"Computation tools — calculate, transform. Calculator, data transformer, spreadsheet processor."*
+- *"First, information tools — for looking things up. Searching the web, querying a database, reading a document, checking a calendar."*
+- *"Second, action tools — for doing things. Sending an email, updating a record, submitting a form."*
+- *"Third, communication tools — for telling people things. A Slack message, a Teams post, a notification."*
+- *"And fourth, computation tools — for crunching numbers. A calculator, a spreadsheet processor."*
 
-*"How tool-calling works in five steps. LLM decides a tool is needed. Generates a structured call — name plus parameters. Executor runs the tool. Result returns to LLM. LLM uses it in the next reasoning step."*
+*"And the way it actually works is simple: the brain decides it needs a tool, it spells out which one and what to pass it, the runner goes and uses it, the result comes back, and the brain picks up from there."*
 
 → Show the Recruitment Agent manifest:
 
-*"Here's a real tool manifest. Recruitment agent. Five tools. Watch the scope and permission columns."*
+*"Here's what that looks like written down — a real tool list for a recruiting agent. Five tools, and I want you to watch the limits on each."*
 
 → Walk each row:
 
-- *"Resume Reader — read-only, parse PDFs. Can it write? No."*
-- *"Calendar API — read and write, but only the recruiter's calendar. Not the whole company."*
-- *"Email Sender — send, but templated only. No free text. The agent picks from approved templates."*
-- *"ATS Writer — write, audited. Every write is logged. Candidate records only."*
-- *"Slack Notifier — post, templated, #hiring-ops channel only."*
+- *"The resume reader can only read — never write anything."*
+- *"The calendar tool can book things, but only on the recruiter's own calendar — not the whole company's."*
+- *"The email sender can send, but only pre-approved templates — it can't write whatever it wants."*
+- *"The record-keeper can write, but every change is logged, and only to candidate records."*
+- *"And the notifier posts to exactly one channel — nowhere else."*
 
-*"Every row has a boundary — something it explicitly cannot do. That's the point."*
+*"See the pattern? Every single one has a line it's not allowed to cross. That's the whole point."*
 
 → Ask the room: *"Which of those five tools would make your legal team nervous if it weren't scoped — and why?"*
 
 → Let 2–3 respond. Usually Calendar API or Email Sender — validate both.
 
-*"Wrong tool — error — reflect — right tool. The loop saves you from wrong tool calls. But a tool with no scope boundary? That's a different failure — the loop runs the wrong-scoped tool correctly, and you've already changed something in the world. No recovery."*
+*"And here's why the limits matter so much. If the agent grabs the wrong tool, the loop saves you — it sees the error and tries the right one. But if a tool has no limit and does its job a little too well? The loop can't undo that. By the time you notice, it's already changed something out in the real world."*
 
-*"Scope every tool. Permission every tool. If you can't describe in one sentence what a tool cannot do — it's not scoped enough."*
+*"So: give every tool a clear boundary. My rule of thumb — if you can't say in one sentence what a tool is NOT allowed to do, you haven't pinned it down yet."*
 
 **Analogy (memorize):** *"A tool manifest is the employment contract for each of the agent's hands."*
 
@@ -318,21 +318,19 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 → Show the planning strategies slide.
 
-*"Three ways an agent can think through a task. Same task — three different paths, three different outputs, three different costs."*
+*"There are three different ways an agent can work through the same problem — and they give you different results, at different costs."*
 
-- *"ReAct — Reason plus Act, interleaved. Think. Do something. See what happened. Think again. Best for tool-heavy tasks where you need live data."*
-- *"Chain-of-Thought — pure reasoning chain. No tools. Step 1, step 2, step 3, conclusion. Best for complex analysis where the answer is already in the agent's knowledge."*
-- *"Self-Reflection — draft, critique, redraft. The agent writes something, critiques itself, improves it. Best for high-stakes outputs — reports, proposals, anything that needs to be right before it ships."*
+- *"The first is think-then-do, over and over: it thinks, takes an action, sees what came back, thinks again. Best when it needs fresh, live information as it goes."*
+- *"The second is just careful step-by-step reasoning — no tools at all, one step leading to the next. Best when it already has all the facts it needs."*
+- *"And the third is draft, then criticize its own draft, then rewrite. Best for anything important enough that it has to be right before it goes out."*
 
-→ One example, three paths: *"Should we expand into Southeast Asia?"*
+→ Give a Lumière example of each (these match the learner slide):
 
-- *"ReAct: web search for GDP growth, CRM lookup for competitors, finance API for cash runway. Live data brief."*
-- *"Chain-of-Thought: define criteria, list markets, score each on six factors, rank and recommend. No tools."*
-- *"Self-Reflection: v1 says 'yes, expand to Vietnam.' Critique: 'why not Indonesia?' v2: 'Vietnam first, then Indonesia.' Critique: 'cash for two markets?' v3: 'Vietnam Q1, Indonesia if ARR target hit.' Each pass tightens it."*
+- *"Think-then-do: 'should we run a delivery promo this weekend?' It checks the weather, checks the order backlog, and decides — live information, gathered as it goes."*
+- *"Step-by-step reasoning: 'which three cakes should we feature this month?' It weighs margin, prep time, and season, and recommends — no tools, just thinking it through."*
+- *"Draft-and-fix: writing an apology to a customer whose cake showed up late. It drafts it, decides the tone's off, and rewrites before it goes out."*
 
-*"Three questions to pick the right strategy. Task complexity — simple lookup? CoT. Multi-source live data? ReAct. Open-ended, high-stakes? Reflection. Tool dependency — needs live tools? ReAct. Internal reasoning only? CoT or Reflection. Output quality — high-stakes deliverable? Reflection. Internal analysis? CoT. Speed matters? ReAct."*
-
-*"You don't memorize strategy names. You answer three questions and the right strategy picks itself."*
+*"And you don't have to memorize the names. You just ask three questions: how hard is the task, does it need fresh live information, and how much does getting it exactly right matter? Answer those, and the right approach picks itself."*
 
 **Analogy (memorize):** *"ReAct is the detective who interviews witnesses. CoT is the analyst at the whiteboard. Self-Reflection is the lawyer who reads the brief twice before signing."*
 
@@ -400,21 +398,21 @@ Read critique aloud.
 
 → Show the multi-agent patterns slide.
 
-*"When one agent isn't enough. Three patterns."*
+*"Sometimes one agent isn't enough, and you split the work across a few. There are three ways to do that."*
 
 → Walk each pattern + analogy:
 
-- *"Orchestrator-Worker — a project manager delegating to a team of specialists. The orchestrator receives the task, breaks it into subtasks, routes each to a worker. Workers do focused work. Orchestrator synthesizes. Best for complex tasks with sequential dependencies."*
-- *"Parallel Agents — multiple analysts splitting a shared queue. Same task, divided into batches, each agent takes one batch. Speed is the win. Best for independent sub-tasks where volume is the bottleneck."*
-- *"Specialist Handoffs — a relay race. Each agent handles one phase, then hands to the next. Ticket → Classifier → Resolver → Escalate → Follow-up. Best for distinct sequential phases where each phase needs different expertise."*
+- *"The first is a manager and its team. One agent takes the job, hands pieces to specialist agents, and pulls their answers back together. Good when each piece needs different expertise."*
+- *"The second is a row of identical agents working side by side. You've got a big pile of work, so you split it up and let them all chew through it at once. The win here is speed."*
+- *"And the third is a relay race. Each agent does one leg of the job and passes the baton to the next — classify it, resolve it, escalate it, close it. Good when the work has clear stages, each needing a different skill."*
 
-*"Now — the callback I've been waiting to make."*
+*"Now — here's the callback I've been waiting to make."*
 
-*"Your HR Screener from Session 2 was a Specialist Handoffs pattern. Node 1 searched for candidates. Node 2 extracted the top 5 skills for the job title. Node 3 scored the candidates. Three specialists, in sequence, each handing to the next. You built a multi-agent architecture in Session 2 without knowing what to call it. Now you know."*
+*"That candidate screener you built in Session 2? It was a relay. The first agent searched, and handed off to a second that pulled out the skills, which handed off to a third that scored everyone. Three specialists, each running one leg and passing the baton. You built a multi-agent system months ago — you just didn't have a name for it. Now you do."*
 
 → Pause. Let that land.
 
-*"Design question: would your agent get faster with more agents running in parallel — or more reliable with one agent checking the other's work? That one question picks the pattern."*
+*"And when you're deciding which pattern to use, it comes down to one question: do you want it faster, with agents working side by side — or safer, with one agent checking another's work?"*
 
 **Analogy (memorize):** *"Orchestrator-Worker is the manager. Parallel Agents is the assembly line. Specialist Handoffs is the relay race."*
 
@@ -448,15 +446,15 @@ Read critique aloud.
 
 ### 1:55 – 1:57 — Synthesis
 
-*"Step back. The HR Screener hallucinated LinkedIn URLs. We now know why — the tool couldn't do the job (no legal way to fetch real profiles) and there was no guardrail to catch the gap. That's not a bug in the model. It's a design choice — the wrong tool, no refusal rule. And a choice is something you can make differently. You now know how."*
+*"Let's step back for a second. That screener made up answers — and now we know exactly why. The tool couldn't do the job, because there was no legal way to get those profiles, and nothing was there to catch the gap. That wasn't the AI being broken. It was a choice in how it was built. And the whole point of today is this: those are choices — and now they're yours to make."*
 
-*"Flip to your workbook. Three sections. Loop Trace — you read an agent's reasoning and watched it correct, refuse, and flag instead of bluffing. Tool Manifest — you designed two agents, found your nervous tool, drew the allergen-safety human gate. Pattern Choice — you split the work for a second country and defended it in one sentence."*
+*"Flip to the back of your workbook — you've got three sections filled in. You read a real agent's thinking and watched it fix, refuse, and flag instead of bluffing. You designed two agents' tools, found the one that worried you, and drew the line where a human has to step in. And you split the work for a second country and can defend the call in a sentence."*
 
-*"That card is not a demo exercise. It is the blueprint for any agent you want to build — not for Lumière, not for a classroom, for your job."*
+*"That's not a classroom exercise. That's a real blueprint — for an agent you'd actually want, at your own work."*
 
 ### 1:57 – 1:58 — Forward Bridge
 
-*"Session 6: EdYoda Agent Builder — Build and Host Your First Agent. Bring the Architecture Card. The system prompt in Section 1, the nodes in Section 2, the pattern in Section 3 — they all go into the Builder."*
+*"Next time, it stops being paper. In Session 6 — the EdYoda Agent Builder — you'll build a real, live agent, and everything on this card goes straight in: your loop trace becomes the system prompt, your tool list becomes its tools, and your pattern choice decides how you wire it together. So bring the card."*
 
 ### 1:58 – 2:00 — Reflection + Goodbye
 
@@ -466,7 +464,7 @@ Read critique aloud.
 > 1. Which of the 5 architecture components was missing from the S2 HR Screener — and what specifically broke because of it?
 > 2. What's the one tool in your manifest you'd add a human approval gate to — and what's the trigger for escalation?
 
-*"Five sessions. You've watched an agent fail, built one that works, grounded it in documents, and today opened it up and named every part. See you for architecture in action — Session 6."*
+*"Five sessions in. You've watched an agent fail, built one that works, taught it to read your own documents, and today you opened it right up and named every part. Lovely work today, all of you. See you next time, when we build a real one."*
 
 → Wave. Stop recording. End meeting.
 
