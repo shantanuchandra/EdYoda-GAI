@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5efe6; --paper-warm: #ede4d3; --paper-cream: #faf6ef;
+    --ink: #1a1814; --ink-soft: #4a463e; --ink-mute: #8a8478; --ink-faint: #b8b1a3;
+    --rule: #d4ccba; --rule-soft: #e3dccb;
+    --terra: #b8431b; --terra-soft: rgba(184,67,27,0.10);
+    --ink-blue: #1e3a5f; --ink-blue-soft: rgba(30,58,95,0.08);
+    --warn: #a16207; --warn-soft: rgba(161,98,7,0.10);
+    --danger: #991b1b; --danger-soft: rgba(153,27,27,0.08);
+    --calm: #14532d; --calm-soft: rgba(20,83,45,0.08);
+    --s-1:.5rem; --s-2:1rem; --s-3:1.5rem; --s-4:2rem; --s-5:3rem; --s-6:4.5rem;
+    --t-eyebrow:.85rem; --t-meta:.92rem; --t-body:1.28rem; --t-body-sm:1.08rem;
+    --t-lede:1.7rem; --t-h3:1.85rem; --t-h2:3rem;
+    --t-h1:clamp(3.2rem,5.6vw,5.2rem); --t-display:clamp(3.8rem,7vw,6.6rem);
+    --ease:cubic-bezier(0.22,1,0.36,1); --dur:480ms;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;width:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.45;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 50%,rgba(26,24,20,0.08) 100%);}
+  .deck{position:relative;width:100vw;height:100vh;z-index:2;}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:3.4vh 4.6vw 4vh;opacity:0;transition:opacity var(--dur) var(--ease);}
+  .slide.active{display:flex;opacity:1;}
+  .running-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:var(--s-2);border-bottom:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:var(--t-eyebrow);color:var(--ink-mute);letter-spacing:0.18em;text-transform:uppercase;font-weight:500;}
+  .running-head .left{display:flex;gap:1.4em;align-items:baseline;}
+  .running-head .left .dot{color:var(--ink-faint);}
+  .running-head .left .topic{color:var(--ink-soft);}
+  .running-head .pub-title{font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;letter-spacing:0.02em;text-transform:none;color:var(--ink);font-weight:400;}
+  .slide-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:var(--s-3) 0;max-width:1320px;margin:0 auto;width:100%;}
+  .slide-body.fill-top{justify-content:flex-start;padding-top:var(--s-4);}
+  .folio{position:absolute;bottom:1rem;right:4.6vw;font-family:'Fraunces',serif;font-weight:300;font-size:7rem;line-height:0.8;color:var(--ink-faint);font-variant-numeric:tabular-nums oldstyle-nums;letter-spacing:-0.04em;pointer-events:none;user-select:none;z-index:0;opacity:0.5;}
+  .folio sup{font-size:0.32em;vertical-align:top;margin-left:0.15em;color:var(--ink-mute);font-weight:400;}
+  .eyebrow{display:inline-block;font-family:'Geist Mono',monospace;font-size:var(--t-eyebrow);letter-spacing:0.22em;text-transform:uppercase;color:var(--terra);font-weight:500;margin-bottom:var(--s-2);position:relative;padding-left:1.8em;}
+  .eyebrow::before{content:'';position:absolute;left:0;top:50%;width:1.2em;height:1px;background:var(--terra);}
+  .eyebrow.cool{color:var(--ink-blue);} .eyebrow.cool::before{background:var(--ink-blue);}
+  h1,h2,h3,.display{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:-0.02em;}
+  h1{font-size:var(--t-h1);font-weight:400;line-height:1.02;font-variation-settings:'opsz' 120,'SOFT' 30;margin-bottom:var(--s-3);}
+  h2{font-size:var(--t-h2);font-weight:400;line-height:1.08;font-variation-settings:'opsz' 80;margin-bottom:var(--s-2);}
+  h3{font-size:var(--t-h3);font-weight:500;line-height:1.2;color:var(--ink);margin-bottom:var(--s-1);}
+  .display{font-size:var(--t-display);font-weight:300;line-height:1.04;font-variation-settings:'opsz' 144,'SOFT' 40,'WONK' 1;max-width:18ch;}
+  p,li{font-size:var(--t-body);line-height:1.55;color:var(--ink-soft);}
+  .lede{font-family:'Fraunces',serif;font-size:var(--t-lede);font-weight:300;font-style:italic;line-height:1.4;color:var(--ink-soft);max-width:52ch;font-variation-settings:'opsz' 36;}
+  .terra{color:var(--terra);} .blue{color:var(--ink-blue);}
+  .marked{background:linear-gradient(180deg,transparent 58%,var(--terra-soft) 58%);padding:0 0.05em;}
+  .rule{height:1px;background:var(--rule);margin:var(--s-3) 0;}
+  .prompt{background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--ink);padding:var(--s-2) var(--s-3);font-family:'Geist Mono',monospace;font-size:1rem;line-height:1.65;color:var(--ink);white-space:pre-wrap;position:relative;}
+  .prompt::before{content:'PASTE IN N8N';position:absolute;top:-0.6em;left:var(--s-3);background:var(--paper);padding:0 0.6em;font-family:'Geist Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;color:var(--ink-mute);font-weight:500;}
+  .prompt-copy{position:absolute;top:-0.7em;right:var(--s-2);background:var(--terra);color:var(--paper);border:none;font-family:'Geist Mono',monospace;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;padding:0.35em 0.8em;border-radius:4px;cursor:pointer;transition:background 200ms var(--ease);}
+  .prompt-copy:hover{background:#9e3a17;} .prompt-copy.copied{background:var(--calm);}
+  .grid{display:grid;gap:var(--s-3);} .g-2{grid-template-columns:1fr 1fr;} .g-3{grid-template-columns:repeat(3,1fr);}
+  .mt-2{margin-top:var(--s-2);} .mt-3{margin-top:var(--s-3);}
+
+  /* Cover */
+  .cover{display:grid;grid-template-columns:auto 1fr;gap:var(--s-6);align-items:end;height:100%;padding:var(--s-5) 0 var(--s-3);}
+  .cover .vol{writing-mode:vertical-rl;transform:rotate(180deg);font-family:'Geist Mono',monospace;font-size:0.85rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--ink-mute);align-self:stretch;border-right:1px solid var(--rule);padding-right:var(--s-2);}
+  .cover .cover-main h1.cover-title{font-family:'Fraunces',serif;font-size:clamp(3.8rem,7.4vw,7rem);font-weight:300;line-height:0.94;letter-spacing:-0.03em;font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1;max-width:15ch;}
+  .cover .cover-byline{font-family:'Fraunces',serif;font-style:italic;font-size:1.55rem;color:var(--ink-soft);font-variation-settings:'opsz' 36;margin-top:var(--s-3);max-width:48ch;line-height:1.4;}
+  .cover .cover-foot{margin-top:var(--s-5);display:flex;justify-content:space-between;align-items:baseline;padding-top:var(--s-2);border-top:1px solid var(--ink);font-family:'Geist Mono',monospace;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--ink-mute);}
+
+  /* Pre-class timer */
+  .preclass-timer{display:flex;align-items:center;gap:var(--s-2);margin-top:var(--s-3);}
+  .pct-display{font-family:'Fraunces',serif;font-size:2.8rem;font-weight:300;font-variant-numeric:tabular-nums oldstyle-nums;letter-spacing:-0.03em;color:var(--ink);line-height:1;}
+  .pct-label{font-family:'Geist Mono',monospace;font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-mute);}
+  .pct-controls{display:flex;gap:0.4rem;flex-wrap:wrap;}
+  .pct-controls button{background:transparent;border:1px solid var(--rule);color:var(--ink-soft);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'Geist Mono',monospace;font-size:0.75rem;transition:all 180ms var(--ease);}
+  .pct-controls button:hover{background:var(--paper-warm);color:var(--ink);}
+  @media print{.preclass-timer{display:none;}}
+
+  /* Exercise slide */
+  .exercise-slide .slide-body{display:grid;grid-template-columns:auto 1fr;gap:var(--s-5);align-items:center;}
+  .exercise-slide .ex-letter{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(12rem,24vw,20rem);line-height:0.85;color:var(--terra);font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1;letter-spacing:-0.04em;}
+  .exercise-slide .ex-meta{font-family:'Geist Mono',monospace;font-size:var(--t-meta);letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:var(--s-2);}
+  .exercise-slide .ex-timer{position:absolute;bottom:1.3rem;right:4.6vw;font-family:'Fraunces',serif;font-weight:300;font-size:3.4rem;color:var(--ink-mute);font-variant-numeric:tabular-nums oldstyle-nums;z-index:3;}
+  .exercise-slide .folio{left:4.6vw;right:auto;}
+
+  /* Nav */
+  .nav{position:fixed;bottom:1.1rem;left:50%;transform:translateX(-50%);display:flex;gap:0.4rem;z-index:100;background:rgba(245,239,230,0.85);backdrop-filter:blur(8px);padding:4px;border-radius:999px;border:1px solid var(--rule);opacity:0;transition:opacity var(--dur) var(--ease);}
+  body:hover .nav{opacity:0.5;} .nav:hover{opacity:1;}
+  .nav button{background:transparent;border:none;color:var(--ink-soft);cursor:pointer;font-size:0.9rem;padding:5px 12px;border-radius:999px;font-family:'Geist Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;transition:background var(--dur) var(--ease);}
+  .nav button:hover{background:var(--paper-warm);color:var(--ink);}
+  .progress-thread{position:fixed;top:0;left:0;height:2px;background:var(--terra);z-index:200;transition:width var(--dur) var(--ease);}
+
+  /* Break slide */
+  .break-slide{align-items:center;justify-content:center;text-align:center;}
+  .break-slide .slide-body{align-items:center;justify-content:center;text-align:center;}
+  .break-clock{font-family:'Fraunces',serif;font-size:clamp(7rem,16vw,14rem);font-weight:300;line-height:1;font-variant-numeric:tabular-nums oldstyle-nums;letter-spacing:-0.04em;color:var(--ink);font-variation-settings:'opsz' 144;margin:var(--s-3) 0;}
+  .break-clock.warn{color:var(--warn);} .break-clock.danger{color:var(--danger);}
+  .break-label{font-family:'Geist Mono',monospace;font-size:0.9rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:var(--s-2);}
+
+  /* Workflow diagram components */
+  .wf-flow{display:flex;align-items:center;gap:0;margin:var(--s-3) 0;flex-wrap:wrap;row-gap:var(--s-2);}
+  .wf-node{display:flex;flex-direction:column;align-items:center;gap:0.3em;min-width:7.5rem;}
+  .wf-node .wn-box{background:var(--paper-cream);border:2px solid var(--terra);border-radius:8px;padding:0.6rem 1rem;text-align:center;width:100%;}
+  .wf-node .wn-box.trigger{border-color:var(--calm);background:var(--calm-soft);}
+  .wf-node .wn-box.http{border-color:var(--ink-blue);background:var(--ink-blue-soft);}
+  .wf-node .wn-box.gate{border-color:var(--warn);background:var(--warn-soft);}
+  .wf-node .wn-box.wait{border-color:var(--terra);background:var(--terra-soft);border-style:dashed;}
+  .wf-node .wn-box.action{border-color:var(--calm);background:var(--calm-soft);}
+  .wf-node .wn-label{font-family:'Geist Mono',monospace;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink);}
+  .wf-node .wn-sub{font-size:0.78rem;color:var(--ink-mute);line-height:1.2;text-align:center;}
+  .wf-arrow{font-size:1.4rem;color:var(--ink-faint);padding:0 0.3rem;flex-shrink:0;}
+  .wf-branch{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-top:var(--s-2);}
+  .wf-branch-arm{display:flex;flex-direction:column;gap:var(--s-2);padding:var(--s-2);border:1px solid var(--rule-soft);border-radius:8px;}
+  .wf-branch-arm .arm-label{font-family:'Geist Mono',monospace;font-size:0.72rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:0.3em;}
+  .wf-branch-arm.standard .arm-label{color:var(--calm);}
+  .wf-branch-arm.complex .arm-label{color:var(--terra);}
+
+  /* 4-node reference table */
+  .node-table{display:grid;grid-template-columns:1fr;gap:0.6rem;margin-top:var(--s-2);}
+  .nt-row{display:grid;grid-template-columns:8rem 12rem 1fr;gap:var(--s-2);align-items:start;padding:0.8rem 0;border-bottom:1px solid var(--rule-soft);}
+  .nt-row:last-child{border-bottom:none;}
+  .nt-name{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;color:var(--ink);}
+  .nt-job{font-family:'Geist Mono',monospace;font-size:0.82rem;color:var(--terra);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
+  .nt-rule{font-size:1.05rem;color:var(--ink-soft);}
+
+  /* Two Ears diagram */
+  .two-ears{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);align-items:center;margin-top:var(--s-3);}
+  .ear-col{display:flex;flex-direction:column;gap:var(--s-2);}
+  .ear-entry{background:var(--paper-cream);border:2px solid var(--terra);border-radius:8px;padding:0.8rem 1.2rem;}
+  .ear-entry.ear2{border-color:var(--ink-blue);}
+  .ear-entry .ee-label{font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:600;color:var(--terra);margin-bottom:0.3em;}
+  .ear-entry.ear2 .ee-label{color:var(--ink-blue);}
+  .ear-entry .ee-name{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;color:var(--ink);}
+  .ear-entry .ee-sub{font-size:0.92rem;color:var(--ink-mute);margin-top:0.2em;}
+  .ear-wait{background:var(--terra-soft);border:2px dashed var(--terra);border-radius:8px;padding:0.8rem 1.2rem;text-align:center;}
+  .ear-wait .ew-label{font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:600;color:var(--terra);}
+  .ear-wait .ew-name{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:500;color:var(--terra);margin-top:0.2em;}
+  .ear-wait .ew-sub{font-size:0.88rem;color:var(--ink-mute);margin-top:0.2em;}
+  .ear-arrow{font-size:1.6rem;color:var(--ink-faint);text-align:center;}
+
+  /* Step card */
+  .step-card{background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:var(--s-2) var(--s-3);margin-bottom:var(--s-2);}
+  .step-card .sc-label{font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:600;color:var(--terra);margin-bottom:0.3em;}
+  .step-card .sc-title{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--ink);margin-bottom:0.3em;}
+  .step-card p{font-size:var(--t-body-sm);}
+
+  /* Stat strip */
+  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-2);margin-top:var(--s-3);}
+  .stat-cell{background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-2);text-align:center;}
+  .stat-cell .sc-n{font-family:'Fraunces',serif;font-size:2.8rem;font-weight:300;color:var(--terra);line-height:1;}
+  .stat-cell .sc-label{font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-mute);margin-top:0.3em;}
+
+  /* Debug 3-question card */
+  .debug-card{background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-3);margin-top:var(--s-2);}
+  .debug-card .dq{display:flex;gap:var(--s-2);align-items:baseline;padding:0.7rem 0;border-bottom:1px solid var(--rule-soft);}
+  .debug-card .dq:last-child{border-bottom:none;}
+  .debug-card .dq-n{font-family:'Fraunces',serif;font-size:2.2rem;font-weight:300;color:var(--terra);line-height:1;min-width:2.2rem;}
+  .debug-card .dq-q{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;color:var(--ink);}
+  .debug-card .dq-a{font-size:1.05rem;color:var(--ink-mute);}
+
+  /* Session story table */
+  .story-table{width:100%;border-collapse:collapse;margin-top:var(--s-2);}
+  .story-table th{font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-mute);text-align:left;padding:0.5rem 0.8rem;border-bottom:2px solid var(--rule);}
+  .story-table td{font-size:var(--t-body-sm);color:var(--ink-soft);padding:0.6rem 0.8rem;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  .story-table tr.current td{color:var(--ink);font-weight:500;background:var(--terra-soft);}
+  .story-table tr.current td:first-child{border-left:3px solid var(--terra);}
+
+  /* Close / colophon */
+  .colophon{margin-top:var(--s-5);padding-top:var(--s-2);border-top:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:0.82rem;color:var(--ink-mute);letter-spacing:0.1em;}
+  .colophon a{color:var(--terra);text-decoration:none;} .colophon a:hover{text-decoration:underline;}
+
+  @media print{
+    body{overflow:auto;} .deck{height:auto;} .slide{position:relative;display:flex!important;opacity:1!important;page-break-after:always;height:100vh;}
+    .nav{display:none;} .progress-thread{display:none;} body::before{display:none;}
+    @page{size:11.25in 6.33in;margin:0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread"></div>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1 — Cover -->
+<section class="slide active" id="s1">
+  <div class="slide-body" style="justify-content:flex-end;padding-bottom:var(--s-3);">
+    <div class="cover">
+      <div class="vol">A Field Guide to Generative AI · Session 06 of 08</div>
+      <div class="cover-main">
+        <div class="eyebrow">Session 6 of 8</div>
+        <h1 class="cover-title">Wiring Agents into Business Workflows</h1>
+        <p class="cover-byline">Today your Architecture Card stops being paper. The agent you designed in Session 5 becomes a real workflow — one that fires when an email arrives, classifies it, and routes it to a human when it matters.</p>
+        <div class="preclass-timer">
+          <div>
+            <div class="pct-display" id="pctDisplay">5:00</div>
+            <div class="pct-label">Starting in</div>
+          </div>
+          <div class="pct-controls">
+            <button onclick="pctAdjust(60)">+1m</button>
+            <button onclick="pctAdjust(-60)">−1m</button>
+            <button onclick="pctStart()">▶</button>
+            <button onclick="pctReset()">↺</button>
+          </div>
+        </div>
+        <div class="cover-foot">
+          <span>Workflow Automation with n8n</span>
+          <span>Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu" style="color:inherit;">linkedin.com/in/chandrashantanu</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 2 — Check-in -->
+<section class="slide" id="s2">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Opening</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="display" style="font-size:clamp(3rem,6vw,5.5rem);">One word in the chat.</div>
+    <p class="lede mt-3">How did Session 5 land? The Architecture Card, the loop trace, the whole thing. Just one word — whatever's honest.</p>
+  </div>
+  <div class="folio">2<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 3 — The Human Glue problem -->
+<section class="slide" id="s3">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">The Problem</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow">The bottleneck</div>
+    <h2>Someone at Lumière is copy-pasting every order by hand.</h2>
+    <!-- Human Glue diagram: person in the middle manually bridging systems -->
+    <svg viewBox="0 0 960 260" width="100%" style="max-width:960px;display:block;margin:var(--s-3) auto 0;overflow:visible;">
+      <!-- Left: Gmail inbox -->
+      <rect x="0" y="70" width="180" height="90" rx="8" fill="rgba(20,83,45,0.06)" stroke="#d4ccba" stroke-width="1.5"/>
+      <text x="90" y="105" font-family="Geist Mono,monospace" font-size="12" fill="#8a8478" text-anchor="middle" letter-spacing="2" font-weight="600">GMAIL INBOX</text>
+      <text x="90" y="124" font-family="Geist,sans-serif" font-size="12" fill="#8a8478" text-anchor="middle">Order arrives</text>
+      <text x="90" y="141" font-family="Geist,sans-serif" font-size="12" fill="#b8b1a3" text-anchor="middle">waiting…</text>
+
+      <!-- Dashed red arrow: manual copy -->
+      <line x1="182" y1="115" x2="330" y2="115" stroke="#991b1b" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <polygon points="330,110 342,115 330,120" fill="#991b1b"/>
+      <text x="256" y="103" font-family="Geist Mono,monospace" font-size="10" fill="#991b1b" text-anchor="middle" letter-spacing="1">copy-paste</text>
+
+      <!-- Centre: Manual Operator (the human glue) -->
+      <rect x="344" y="44" width="192" height="132" rx="8" fill="rgba(153,27,27,0.06)" stroke="#991b1b" stroke-width="2" stroke-dasharray="6,4"/>
+      <text x="440" y="80" font-family="Geist Mono,monospace" font-size="11" fill="#991b1b" text-anchor="middle" letter-spacing="2" font-weight="700">MANUAL OPERATOR</text>
+      <text x="440" y="100" font-family="Fraunces,serif" font-size="13" fill="#4a463e" text-anchor="middle" font-style="italic">"The Human Glue"</text>
+      <text x="440" y="120" font-family="Geist,sans-serif" font-size="11" fill="#8a8478" text-anchor="middle">Copy-pasting orders</text>
+      <text x="440" y="137" font-family="Geist,sans-serif" font-size="11" fill="#8a8478" text-anchor="middle">Waiting for approvals</text>
+      <text x="440" y="154" font-family="Geist,sans-serif" font-size="11" fill="#b8b1a3" text-anchor="middle">Checking manually</text>
+
+      <!-- Dashed red arrow: manual prompt -->
+      <line x1="538" y1="95" x2="666" y2="95" stroke="#991b1b" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <polygon points="666,90 678,95 666,100" fill="#991b1b"/>
+      <text x="602" y="83" font-family="Geist Mono,monospace" font-size="10" fill="#991b1b" text-anchor="middle" letter-spacing="1">prompt</text>
+
+      <!-- Right top: AI Chat Window -->
+      <rect x="680" y="44" width="180" height="80" rx="8" fill="rgba(30,58,95,0.06)" stroke="#d4ccba" stroke-width="1.5"/>
+      <text x="770" y="79" font-family="Geist Mono,monospace" font-size="11" fill="#8a8478" text-anchor="middle" letter-spacing="2" font-weight="600">AI CHAT WINDOW</text>
+      <text x="770" y="98" font-family="Geist,sans-serif" font-size="11" fill="#b8b1a3" text-anchor="middle">Manual prompting</text>
+      <text x="770" y="115" font-family="Geist,sans-serif" font-size="11" fill="#b8b1a3" text-anchor="middle">your S5 agent</text>
+
+      <!-- Dashed red: result back to operator -->
+      <line x1="770" y1="126" x2="770" y2="168" stroke="#991b1b" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="770" y1="168" x2="538" y2="168" stroke="#991b1b" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <polygon points="538,163 526,168 538,173" fill="#991b1b"/>
+      <text x="654" y="186" font-family="Geist Mono,monospace" font-size="10" fill="#991b1b" text-anchor="middle" letter-spacing="1">manual log</text>
+
+      <!-- n8n bridge label — the solution, greyed out with a glow hint -->
+      <rect x="344" y="214" width="192" height="36" rx="6" fill="rgba(184,67,27,0.08)" stroke="#b8431b" stroke-width="1.5"/>
+      <text x="440" y="237" font-family="Geist Mono,monospace" font-size="12" fill="#b8431b" text-anchor="middle" letter-spacing="3" font-weight="700">n8n REPLACES THIS</text>
+    </svg>
+    <p style="font-size:var(--t-body-sm);color:var(--ink-mute);margin-top:var(--s-2);max-width:60ch;">Every order arrives in Gmail. Someone reads it, copies the text, pastes it into the agent, reads the reply, then manually sends the confirmation. That person is the bottleneck. Today we remove them from the loop.</p>
+  </div>
+  <div class="folio">3<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 4 — Course story + today's milestones -->
+<section class="slide" id="s4">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Course Story</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body fill-top">
+    <div class="eyebrow">Six sessions, one system</div>
+    <table class="story-table">
+      <thead><tr><th>Session</th><th>Promise</th><th>What you built</th></tr></thead>
+      <tbody>
+        <tr><td>S1</td><td>LLMs can generate — but they can't act</td><td>Watched the bakery campaign fail 4 of 6 steps</td></tr>
+        <tr><td>S2</td><td>An agent can do what a chatbot can't</td><td>HR Candidate Screener — 3 nodes</td></tr>
+        <tr><td>S3</td><td>The right prompt makes an agent reliable</td><td>System prompts for tone, format, refusal</td></tr>
+        <tr><td>S4</td><td>Ground the agent in your own documents</td><td>Lumière Knowledge Agent — cites source, refuses when unsure</td></tr>
+        <tr><td>S5</td><td>Open the hood — understand how agents work</td><td>Agent Architecture Card — loop trace, tool manifest, pattern choice</td></tr>
+        <tr class="current"><td>S6</td><td>Wire the blueprint into a running workflow</td><td><strong>The Lumière Order Triage workflow ←</strong></td></tr>
+      </tbody>
+    </table>
+    <!-- Today's build milestone strip -->
+    <div style="margin-top:var(--s-3);display:flex;align-items:center;gap:0;">
+      <!-- Milestone 1 -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;flex:1;">
+        <div style="width:2.6rem;height:2.6rem;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.3rem;font-weight:300;color:var(--paper);line-height:1;">1</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--terra);font-weight:600;text-align:center;">Wire</div>
+        <div style="font-size:0.82rem;color:var(--ink-mute);text-align:center;line-height:1.3;">Gmail → Agent<br>→ IF → Gmail</div>
+      </div>
+      <!-- Connector -->
+      <div style="height:2px;flex:0.4;background:linear-gradient(90deg,var(--terra),var(--ink-faint));margin-bottom:1.8rem;"></div>
+      <!-- Milestone 2 -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;flex:1;">
+        <div style="width:2.6rem;height:2.6rem;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.3rem;font-weight:300;color:var(--paper);line-height:1;">2</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--terra);font-weight:600;text-align:center;">Guard</div>
+        <div style="font-size:0.82rem;color:var(--ink-mute);text-align:center;line-height:1.3;">Wait node<br>+ Telegram ✅ ❌</div>
+      </div>
+      <!-- Connector -->
+      <div style="height:2px;flex:0.4;background:linear-gradient(90deg,var(--ink-faint),var(--ink-faint));margin-bottom:1.8rem;"></div>
+      <!-- Milestone 3 -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;flex:1;">
+        <div style="width:2.6rem;height:2.6rem;border-radius:50%;background:var(--paper-warm);border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.3rem;font-weight:300;color:var(--ink-mute);line-height:1;">3</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;text-align:center;">Debug</div>
+        <div style="font-size:0.82rem;color:var(--ink-mute);text-align:center;line-height:1.3;">Find the red node<br>in 2 minutes</div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">4<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 5 — Sprint 1: 4 nodes -->
+<section class="slide" id="s5">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Sprint 1 · 4 Nodes</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body fill-top">
+    <div class="eyebrow">Concept sprint 1 of 4</div>
+    <h2>4 Nodes. 4 Jobs.</h2>
+    <!-- SVG pipeline: each node drawn doing its job, Lumière order flowing through -->
+    <svg viewBox="0 0 1140 280" width="100%" style="max-width:1100px;display:block;margin:var(--s-3) auto 0;overflow:visible;">
+      <!-- ── Node 1: Trigger ── -->
+      <rect x="0" y="40" width="200" height="90" rx="8" fill="rgba(20,83,45,0.08)" stroke="#14532d" stroke-width="2.5"/>
+      <text x="100" y="76" font-family="Geist Mono,monospace" font-size="13" fill="#14532d" text-anchor="middle" letter-spacing="3" font-weight="700">TRIGGER</text>
+      <text x="100" y="98" font-family="Geist,sans-serif" font-size="13" fill="#4a463e" text-anchor="middle">Gmail · email arrives</text>
+      <text x="100" y="115" font-family="Geist,sans-serif" font-size="13" fill="#4a463e" text-anchor="middle">workflow wakes up</text>
+      <!-- rule label -->
+      <text x="100" y="162" font-family="Geist Mono,monospace" font-size="11" fill="#14532d" text-anchor="middle" letter-spacing="1">"Something happened</text>
+      <text x="100" y="176" font-family="Geist Mono,monospace" font-size="11" fill="#14532d" text-anchor="middle" letter-spacing="1">in the world"</text>
+
+      <!-- ── Arrow 1→2 ── -->
+      <line x1="202" y1="85" x2="268" y2="85" stroke="#b8b1a3" stroke-width="1.5"/>
+      <polygon points="268,80 280,85 268,90" fill="#b8b1a3"/>
+      <!-- data label -->
+      <text x="240" y="74" font-family="Geist Mono,monospace" font-size="10" fill="#8a8478" text-anchor="middle">email text</text>
+
+      <!-- ── Node 2: HTTP Request ── -->
+      <rect x="282" y="40" width="200" height="90" rx="8" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2.5"/>
+      <text x="382" y="76" font-family="Geist Mono,monospace" font-size="13" fill="#1e3a5f" text-anchor="middle" letter-spacing="3" font-weight="700">HTTP REQUEST</text>
+      <text x="382" y="98" font-family="Geist,sans-serif" font-size="13" fill="#4a463e" text-anchor="middle">calls the agent URL</text>
+      <text x="382" y="115" font-family="Geist,sans-serif" font-size="13" fill="#4a463e" text-anchor="middle">gets JSON back</text>
+      <text x="382" y="162" font-family="Geist Mono,monospace" font-size="11" fill="#1e3a5f" text-anchor="middle" letter-spacing="1">"The agent</text>
+      <text x="382" y="176" font-family="Geist Mono,monospace" font-size="11" fill="#1e3a5f" text-anchor="middle" letter-spacing="1">lives here"</text>
+
+      <!-- ── Arrow 2→3 ── -->
+      <line x1="484" y1="85" x2="548" y2="85" stroke="#b8b1a3" stroke-width="1.5"/>
+      <polygon points="548,80 560,85 548,90" fill="#b8b1a3"/>
+      <text x="522" y="74" font-family="Geist Mono,monospace" font-size="10" fill="#8a8478" text-anchor="middle">JSON answer</text>
+
+      <!-- ── Node 3: IF ── -->
+      <!-- diamond shape -->
+      <polygon points="662,40 762,85 662,130 562,85" fill="rgba(161,98,7,0.08)" stroke="#a16207" stroke-width="2.5"/>
+      <text x="662" y="80" font-family="Geist Mono,monospace" font-size="13" fill="#a16207" text-anchor="middle" letter-spacing="2" font-weight="700">IF</text>
+      <text x="662" y="97" font-family="Geist,sans-serif" font-size="12" fill="#4a463e" text-anchor="middle">standard?</text>
+      <text x="662" y="162" font-family="Geist Mono,monospace" font-size="11" fill="#a16207" text-anchor="middle" letter-spacing="1">"Standard or</text>
+      <text x="662" y="176" font-family="Geist Mono,monospace" font-size="11" fill="#a16207" text-anchor="middle" letter-spacing="1">complex?"</text>
+      <!-- yes label -->
+      <text x="718" y="64" font-family="Geist Mono,monospace" font-size="10" fill="#14532d" text-anchor="middle">yes →</text>
+      <!-- no label -->
+      <text x="718" y="112" font-family="Geist Mono,monospace" font-size="10" fill="#b8431b" text-anchor="middle">no ↓</text>
+
+      <!-- ── Arrow 3→4 (complex branch, curves down) ── -->
+      <line x1="762" y1="105" x2="900" y2="105" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <polygon points="900,100 912,105 900,110" fill="#b8431b"/>
+
+      <!-- ── Node 4: Wait ── -->
+      <rect x="914" y="64" width="200" height="90" rx="8" fill="rgba(184,67,27,0.10)" stroke="#b8431b" stroke-width="2.5" stroke-dasharray="8,4"/>
+      <text x="1014" y="100" font-family="Geist Mono,monospace" font-size="13" fill="#b8431b" text-anchor="middle" letter-spacing="3" font-weight="700">WAIT</text>
+      <text x="1014" y="120" font-family="Geist,sans-serif" font-size="13" fill="#4a463e" text-anchor="middle">pauses the workflow</text>
+      <text x="1014" y="137" font-family="Geist,sans-serif" font-size="13" fill="#4a463e" text-anchor="middle">until human taps ✅</text>
+      <text x="1014" y="182" font-family="Geist Mono,monospace" font-size="11" fill="#b8431b" text-anchor="middle" letter-spacing="1">"Don't act without</text>
+      <text x="1014" y="196" font-family="Geist Mono,monospace" font-size="11" fill="#b8431b" text-anchor="middle" letter-spacing="1">permission"</text>
+
+      <!-- ── Auto-confirm branch (standard, goes right of IF) ── -->
+      <line x1="762" y1="68" x2="840" y2="40" stroke="#14532d" stroke-width="1.5"/>
+      <rect x="840" y="20" width="130" height="36" rx="6" fill="rgba(20,83,45,0.08)" stroke="#14532d" stroke-width="1.5"/>
+      <text x="905" y="44" font-family="Geist Mono,monospace" font-size="11" fill="#14532d" text-anchor="middle" letter-spacing="1">Gmail auto-confirm</text>
+
+      <!-- ── Dashed border around Wait to emphasise "paused" state ── -->
+      <!-- already dashed via stroke-dasharray above -->
+
+      <!-- ── bottom axis label ── -->
+      <text x="570" y="242" font-family="Geist Mono,monospace" font-size="11" fill="#b8b1a3" text-anchor="middle" letter-spacing="2">ORDER ARRIVES ────────────────────── HUMAN DECIDES ──── CONFIRMS</text>
+    </svg>
+    <!-- compact reference strip -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-2);margin-top:var(--s-3);">
+      <div style="border-top:2px solid var(--calm);padding-top:0.5rem;"><span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--calm);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Trigger</span><br><span style="font-size:var(--t-body-sm);color:var(--ink-soft);">Starts the machine</span></div>
+      <div style="border-top:2px solid var(--ink-blue);padding-top:0.5rem;"><span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--ink-blue);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">HTTP Request</span><br><span style="font-size:var(--t-body-sm);color:var(--ink-soft);">Calls your agent</span></div>
+      <div style="border-top:2px solid var(--warn);padding-top:0.5rem;"><span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--warn);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">IF / Switch</span><br><span style="font-size:var(--t-body-sm);color:var(--ink-soft);">Routes on a condition</span></div>
+      <div style="border-top:2px solid var(--terra);padding-top:0.5rem;"><span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--terra);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Wait</span><br><span style="font-size:var(--t-body-sm);color:var(--ink-soft);">Pauses for a human</span></div>
+    </div>
+  </div>
+  <div class="folio">5<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 6 — Sprint 2: HTTP Request -->
+<section class="slide" id="s6">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Sprint 2 · HTTP Request</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body fill-top">
+    <div class="eyebrow">Concept sprint 2 of 4</div>
+    <h2>The HTTP Request node:<br>how n8n talks to your agent.</h2>
+    <div class="grid g-2 mt-3">
+      <div>
+        <p class="lede" style="font-size:1.3rem;">You configure three things.</p>
+        <div class="node-table mt-2" style="margin-top:var(--s-2);">
+          <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job" style="color:var(--ink-blue);">URL</div><div class="nt-rule">Where your agent lives</div></div>
+          <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job" style="color:var(--ink-blue);">Method</div><div class="nt-rule">POST (almost always)</div></div>
+          <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job" style="color:var(--ink-blue);">Body</div><div class="nt-rule">The message you're sending</div></div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:var(--t-body-sm);color:var(--ink-mute);margin-bottom:var(--s-1);">EMAIL IN →</p>
+        <div class="prompt" style="font-size:0.88rem;">Hi, I need a 3-tier fondant cake,<br>dairy-free, this Saturday...</div>
+        <p style="font-size:var(--t-body-sm);color:var(--ink-mute);margin:var(--s-1) 0;">→ JSON OUT</p>
+        <div class="prompt" style="font-size:0.88rem;">{ "order_type": "custom",<br>  "human_gate": true,<br>  "draft_response": "..." }</div>
+      </div>
+    </div>
+    <p class="mt-3" style="color:var(--ink-mute);font-size:var(--t-body-sm);">Expression: <code style="font-family:'Geist Mono';color:var(--terra);">{{ $json.text }}</code> = take the text field from the previous node's output. This is the only syntax you need today.</p>
+  </div>
+  <div class="folio">6<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 7 — Sprint 3: IF node -->
+<section class="slide" id="s7">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Sprint 3 · IF Node</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow">Concept sprint 3 of 4</div>
+    <h2>The IF node: where the agent's answer becomes a decision.</h2>
+    <div class="grid g-2 mt-3">
+      <div>
+        <p class="lede" style="font-size:1.3rem;">One condition. Two paths.</p>
+        <p class="mt-2">The agent returns <code style="font-family:'Geist Mono';color:var(--terra);">human_gate: true</code> or <code style="font-family:'Geist Mono';color:var(--calm);">false</code>. The IF node reads it and routes the workflow — machine-speed left, human review right.</p>
+        <p class="mt-2">You've been doing this your whole career. "If the deal is above ₹10L, escalate to the VP." That's an IF node. Today n8n runs it for you.</p>
+      </div>
+      <div class="wf-branch" style="display:flex;flex-direction:column;gap:var(--s-2);">
+        <div class="wf-branch-arm standard">
+          <div class="arm-label">✓ false — standard</div>
+          <div class="wf-node" style="width:100%;"><div class="wn-box action">Gmail<br><span style="font-size:0.78rem;">auto-confirm</span></div></div>
+        </div>
+        <div class="wf-branch-arm complex">
+          <div class="arm-label">✗ true — complex</div>
+          <div class="wf-node" style="width:100%;"><div class="wn-box wait">Telegram<br><span style="font-size:0.78rem;">human gate</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">7<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 8 — Sprint 4: Two Ears -->
+<section class="slide" id="s8">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Sprint 4 · Two Ears</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body fill-top">
+    <div class="eyebrow">Concept sprint 4 of 4 — the hardest one</div>
+    <h2>Two Ears: the Human-in-the-Loop pattern.</h2>
+    <div class="two-ears">
+      <div class="ear-col">
+        <div class="ear-entry">
+          <div class="ee-label">Ear 1 — Gmail Trigger</div>
+          <div class="ee-name">Order email arrives</div>
+          <div class="ee-sub">Workflow wakes up and starts running</div>
+        </div>
+        <div class="ear-arrow" style="text-align:center;font-size:2rem;color:var(--ink-faint);">↓</div>
+        <div class="ear-wait">
+          <div class="ew-label">Wait node</div>
+          <div class="ew-name">Workflow sleeps</div>
+          <div class="ew-sub">Not cancelled. Not deleted. Holding — until the second ear hears something.</div>
+        </div>
+        <div class="ear-arrow" style="text-align:center;font-size:2rem;color:var(--ink-faint);">↓</div>
+        <div class="ear-entry ear2">
+          <div class="ee-label">Ear 2 — Telegram Trigger</div>
+          <div class="ee-name">Manager taps ✅ or ❌</div>
+          <div class="ee-sub">Workflow wakes up again — only on the right branch</div>
+        </div>
+      </div>
+      <div style="padding-left:var(--s-3);">
+        <p class="lede" style="font-size:1.3rem;">The human doesn't need to log into n8n.</p>
+        <p class="mt-2">They get a Telegram message with two buttons. That's the entire interface. The machine does the work. The human makes the call. The machine finishes the job.</p>
+        <div class="rule"></div>
+        <p style="font-size:var(--t-body-sm);color:var(--ink-mute);">This pattern appears in every serious automation: invoice approvals, content sign-offs, medical referrals, legal reviews.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio">8<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 9 — Build A Step 1: Gmail Trigger -->
+<section class="slide exercise-slide" id="s9">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Step 1</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">A</div>
+    <div>
+      <div class="ex-meta">Build Step A · Wire the Spine</div>
+      <h3>Step 1 — Gmail Trigger</h3>
+      <p class="mt-2">Add a <strong>Gmail Trigger</strong> node. Trigger on: New Email. Poll time: every minute. Click <em>Test step</em> — pull a real email from your inbox.</p>
+      <p class="mt-2">Confirm you see: <code style="font-family:'Geist Mono';color:var(--terra);">from</code> · <code style="font-family:'Geist Mono';color:var(--terra);">subject</code> · <code style="font-family:'Geist Mono';color:var(--terra);">text</code>. The <code style="font-family:'Geist Mono';color:var(--terra);">text</code> field is what we hand to the agent.</p>
+      <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-mute);">OAuth failing? Pair with your neighbour — same workflow, your own copy at home.</p>
+    </div>
+  </div>
+  <div class="folio">9<sup>/28</sup></div>
+  <div class="ex-timer" id="exTimer9">—</div>
+</section>
+
+<!-- SLIDE 10 — Build A Step 2: HTTP Request -->
+<section class="slide exercise-slide" id="s10">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Step 2</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="display:grid;grid-template-columns:auto 1fr;gap:var(--s-5);align-items:center;">
+    <div class="ex-letter">A</div>
+    <div>
+      <div class="ex-meta">Build Step A · Wire the Spine</div>
+      <h3>Step 2 — HTTP Request (call the agent)</h3>
+      <!-- n8n panel mockup -->
+      <div style="margin-top:var(--s-2);background:var(--paper-cream);border:1px solid var(--rule);border-radius:8px;overflow:hidden;">
+        <!-- panel header -->
+        <div style="background:var(--paper-warm);border-bottom:1px solid var(--rule);padding:0.5rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:'Geist Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-blue);font-weight:700;">HTTP REQUEST</span>
+          <span style="font-family:'Geist Mono',monospace;font-size:0.68rem;color:var(--ink-mute);">n8n node config</span>
+        </div>
+        <!-- fields -->
+        <div style="padding:0.8rem 1rem;display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="display:grid;grid-template-columns:6rem 1fr;gap:0.5rem;align-items:center;border-bottom:1px solid var(--rule-soft);padding-bottom:0.4rem;">
+            <span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em;">Method</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:0.88rem;color:var(--ink-blue);font-weight:600;background:rgba(30,58,95,0.06);padding:0.2rem 0.5rem;border-radius:4px;display:inline-block;">POST</span>
+          </div>
+          <div style="display:grid;grid-template-columns:6rem 1fr;gap:0.5rem;align-items:center;border-bottom:1px solid var(--rule-soft);padding-bottom:0.4rem;">
+            <span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em;">URL</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:0.82rem;color:var(--terra);">[Lumière Order Assistant endpoint]</span>
+          </div>
+          <div style="display:grid;grid-template-columns:6rem 1fr;gap:0.5rem;align-items:center;border-bottom:1px solid var(--rule-soft);padding-bottom:0.4rem;">
+            <span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em;">Body type</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:0.82rem;color:var(--ink);">JSON</span>
+          </div>
+          <div style="display:grid;grid-template-columns:6rem 1fr;gap:0.5rem;align-items:start;">
+            <span style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em;padding-top:0.25rem;">Body</span>
+            <div style="background:#1a1814;border-radius:4px;padding:0.5rem 0.7rem;position:relative;">
+              <span style="font-family:'Geist Mono',monospace;font-size:0.82rem;color:#5eead4;white-space:pre;">{"message": "{{ $json.text }}"}</span>
+              <button class="prompt-copy" onclick="copyPrompt(this)" style="top:-0.5em;right:0.4rem;font-size:0.6rem;">Copy</button>
+            </div>
+          </div>
+        </div>
+        <!-- expected output strip -->
+        <div style="background:rgba(20,83,45,0.06);border-top:1px solid var(--rule);padding:0.5rem 1rem;">
+          <span style="font-family:'Geist Mono',monospace;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:600;">Expected output JSON</span>
+          <div style="margin-top:0.3rem;font-family:'Geist Mono',monospace;font-size:0.78rem;color:var(--ink-soft);">
+            <span style="color:var(--terra);">order_type</span> · <span style="color:var(--terra);">complexity</span> · <span style="color:var(--terra);">human_gate</span> · <span style="color:var(--terra);">draft_response</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">10<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 11 — Build A Step 3: IF node -->
+<section class="slide exercise-slide" id="s11">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Step 3</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">A</div>
+    <div>
+      <div class="ex-meta">Build Step A · Wire the Spine</div>
+      <h3>Step 3 — IF node (route the decision)</h3>
+      <p class="mt-2">Add an <strong>IF node</strong> after the HTTP Request.</p>
+      <p class="mt-2">Condition: <code style="font-family:'Geist Mono';color:var(--terra);">{{ $json.human_gate }}</code> equals <code style="font-family:'Geist Mono';color:var(--terra);">true</code></p>
+      <div class="wf-branch mt-3">
+        <div class="wf-branch-arm standard"><div class="arm-label">false → standard</div><p style="font-size:var(--t-body-sm);">Auto-confirm via Gmail</p></div>
+        <div class="wf-branch-arm complex"><div class="arm-label">true → complex</div><p style="font-size:var(--t-body-sm);">Human gate via Telegram</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">11<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 12 — Build A Step 4: Gmail auto-confirm -->
+<section class="slide exercise-slide" id="s12">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Step 4</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">A</div>
+    <div>
+      <div class="ex-meta">Build Step A · Wire the Spine</div>
+      <h3>Step 4 — Gmail auto-confirm (false branch)</h3>
+      <p class="mt-2">Add a <strong>Gmail</strong> node on the false branch. Action: Send Email.</p>
+      <div class="node-table mt-2" style="margin-top:var(--s-2);">
+        <div class="nt-row" style="grid-template-columns:5rem 1fr;"><div class="nt-job">To</div><div class="nt-rule"><code style="font-family:'Geist Mono';font-size:0.9rem;color:var(--terra);">{{ $('Gmail Trigger').item.json.from }}</code></div></div>
+        <div class="nt-row" style="grid-template-columns:5rem 1fr;"><div class="nt-job">Subject</div><div class="nt-rule">Your Lumière order is confirmed ✓</div></div>
+        <div class="nt-row" style="grid-template-columns:5rem 1fr;"><div class="nt-job">Body</div><div class="nt-rule"><code style="font-family:'Geist Mono';font-size:0.9rem;color:var(--terra);">{{ $('HTTP Request').item.json.draft_response }}</code></div></div>
+      </div>
+      <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-mute);">Run the full workflow with a standard order. Watch the confirmation fire in under a second.</p>
+    </div>
+  </div>
+  <div class="folio">12<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 13 — Build A debrief -->
+<section class="slide" id="s13">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Debrief</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow">Debrief</div>
+    <h2>Where is your nervous tool?</h2>
+    <p class="lede mt-2">Look at your Session 5 Tool Manifest. Find the tool you marked as irreversible — the one you circled. Where does it sit in the workflow you just built?</p>
+    <p class="mt-3">For most of you it's the Gmail send. The IF node's false branch is the constraint around it — it only fires when the agent classified the order as safe. <span class="marked">Build B adds the second gate.</span></p>
+    <div class="prompt mt-3" style="font-size:0.9rem;">Test email — standard order:
+
+Subject: Cake order request
+Body: Hi, I'd like to order a 2-tier vanilla sponge with buttercream frosting
+for a birthday. About 20 people. Budget around ₹2,500.
+Pick-up on Saturday afternoon. Thanks, Priya<button class="prompt-copy" onclick="copyPrompt(this)">Copy</button></div>
+  </div>
+  <div class="folio">13<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 14 — Standard order end-to-end -->
+<section class="slide" id="s14">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Full Flow</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow">Standard order — end to end</div>
+    <h2>Machine speed. No human touched anything.</h2>
+    <div class="wf-flow mt-3">
+      <div class="wf-node"><div class="wn-box trigger">Gmail Trigger</div><div class="wn-sub">Order email arrives</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box http">HTTP Request</div><div class="wn-sub">Agent classifies it</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box gate">IF node</div><div class="wn-sub">human_gate: false</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box action">Gmail Send</div><div class="wn-sub">Confirmation fires</div></div>
+    </div>
+    <p class="mt-3" style="color:var(--ink-mute);">Under a second. The right branch — the complex path — is what we wire after the break.</p>
+  </div>
+  <div class="folio">14<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 15 — Build A check -->
+<section class="slide exercise-slide" id="s15">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build A · Check</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">A</div>
+    <div>
+      <div class="ex-meta">Build Step A · Check your work</div>
+      <h3>Run Build A with the standard test email</h3>
+      <p class="mt-2">Expected: Gmail Trigger catches it → HTTP Request returns <code style="font-family:'Geist Mono';color:var(--calm);">human_gate: false</code> → IF routes to false branch → Gmail confirmation sends.</p>
+      <p class="mt-2" style="color:var(--ink-mute);font-size:var(--t-body-sm);">All nodes green in Execution History? You're ready for the break.</p>
+    </div>
+  </div>
+  <div class="folio">15<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 16 — Midpoint -->
+<section class="slide" id="s16">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Midpoint</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="sc-n">1</div><div class="sc-label">Trigger wired</div></div>
+      <div class="stat-cell"><div class="sc-n">1</div><div class="sc-label">Agent called</div></div>
+      <div class="stat-cell"><div class="sc-n">1</div><div class="sc-label">Route live</div></div>
+      <div class="stat-cell"><div class="sc-n" style="color:var(--ink-faint);">+3</div><div class="sc-label">Nodes after break</div></div>
+    </div>
+    <p class="lede mt-3">The left branch is done. Every standard order is now handled automatically. After the break: the right branch — the human gate.</p>
+  </div>
+  <div class="folio">16<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 17 — Break -->
+<section class="slide break-slide" id="s17">
+  <div class="slide-body">
+    <div class="break-label">Break · 10 minutes</div>
+    <div class="break-clock" id="breakClock">10:00</div>
+    <p style="font-size:var(--t-body);color:var(--ink-mute);">Back at the exact time shown above.</p>
+    <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-faint);">After the break: Telegram bot · Wait node · the live approval moment.</p>
+  </div>
+</section>
+
+<!-- SLIDE 18 — BotFather demo -->
+<section class="slide" id="s18">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · BotFather</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body fill-top">
+    <div class="eyebrow">Facilitator demo only</div>
+    <h2>How a Telegram bot is born.</h2>
+    <div class="node-table mt-2">
+      <div class="nt-row" style="grid-template-columns:2.5rem 4rem 1fr;"><div style="font-family:'Fraunces',serif;font-size:1.5rem;color:var(--terra);font-weight:300;">1</div><div class="nt-job">BotFather</div><div class="nt-rule">Search @BotFather in Telegram → /newbot → name it → get the token</div></div>
+      <div class="nt-row" style="grid-template-columns:2.5rem 4rem 1fr;"><div style="font-family:'Fraunces',serif;font-size:1.5rem;color:var(--terra);font-weight:300;">2</div><div class="nt-job">chat_id</div><div class="nt-rule">Send one message to the bot → <code style="font-family:'Geist Mono';font-size:0.82rem;">api.telegram.org/bot&lt;token&gt;/getUpdates</code> → read the chat_id</div></div>
+      <div class="nt-row" style="grid-template-columns:2.5rem 4rem 1fr;"><div style="font-family:'Fraunces',serif;font-size:1.5rem;color:var(--terra);font-weight:300;">3</div><div class="nt-job">n8n cred</div><div class="nt-rule">Settings → Credentials → Telegram → paste token → save</div></div>
+    </div>
+    <p class="mt-3" style="color:var(--ink-mute);font-size:var(--t-body-sm);">In production: <span class="marked">one bot per Lumière location.</span> Same workflow, different chat_id. No code changes.</p>
+  </div>
+  <div class="folio">18<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 19 — Build B Step 1: Telegram send -->
+<section class="slide exercise-slide" id="s19">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · Step 1</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">B</div>
+    <div>
+      <div class="ex-meta">Build Step B · Add the Human Gate</div>
+      <h3>Step 1 — Telegram Send (notify the manager)</h3>
+      <p class="mt-2">Add <strong>Telegram</strong> node on true branch. Action: Send Message. Reply Markup: <strong>Inline Keyboard</strong>.</p>
+      <div class="node-table mt-2" style="margin-top:var(--s-1);">
+        <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">Button 1</div><div class="nt-rule">Text: <code style="font-family:'Geist Mono';color:var(--calm);">✅ Approve</code> · Callback: <code style="font-family:'Geist Mono';color:var(--calm);">approve</code></div></div>
+        <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">Button 2</div><div class="nt-rule">Text: <code style="font-family:'Geist Mono';color:var(--danger);">❌ Reject</code> · Callback: <code style="font-family:'Geist Mono';color:var(--danger);">reject</code></div></div>
+      </div>
+      <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-mute);">If inline keyboard doesn't show: check Reply Markup is set to "Inline Keyboard" not "Reply Keyboard".</p>
+    </div>
+  </div>
+  <div class="folio">19<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 20 — Build B Step 2: Wait node -->
+<section class="slide exercise-slide" id="s20">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · Step 2</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">B</div>
+    <div>
+      <div class="ex-meta">Build Step B · Add the Human Gate</div>
+      <h3>Step 2 — Wait node (the workflow goes to sleep)</h3>
+      <p class="mt-2">Add a <strong>Wait</strong> node after the Telegram Send. Mode: <strong>On webhook call</strong>.</p>
+      <p class="mt-2">n8n generates a Resume URL automatically. The workflow stops here — holding until the Telegram Trigger calls that URL.</p>
+      <div class="step-card mt-3">
+        <div class="sc-label">The film metaphor</div>
+        <div class="sc-title">Pause, not stop.</div>
+        <p>The frames are still in memory. When the Telegram callback fires, it presses play from exactly where it stopped.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio">20<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 21 — Build B Step 3: Telegram Trigger -->
+<section class="slide exercise-slide" id="s21">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · Step 3</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">B</div>
+    <div>
+      <div class="ex-meta">Build Step B · Add the Human Gate</div>
+      <h3>Step 3 — Telegram Trigger (the second ear)</h3>
+      <p class="mt-2">Add a <strong>Telegram Trigger</strong> node — separate entry point. Updates: <strong>Callback Query</strong>.</p>
+      <p class="mt-2">Add an <strong>IF node</strong> after it:</p>
+      <div class="node-table mt-2" style="margin-top:var(--s-1);">
+        <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">Condition</div><div class="nt-rule"><code style="font-family:'Geist Mono';color:var(--terra);">{{ $json.callback_query.data }}</code> equals <code style="font-family:'Geist Mono';color:var(--terra);">approve</code></div></div>
+        <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">True</div><div class="nt-rule">Approval path → send confirmation</div></div>
+        <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">False</div><div class="nt-rule">Rejection path → re-draft + revised response</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">21<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 22 — Build B Step 4: Approval branch -->
+<section class="slide exercise-slide" id="s22">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · Step 4</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">B</div>
+    <div>
+      <div class="ex-meta">Build Step B · Add the Human Gate</div>
+      <h3>Step 4 — Approval branch</h3>
+      <p class="mt-2">On the <strong>true branch</strong>: add a Gmail node. Send the draft confirmation to the customer.</p>
+      <div class="node-table mt-2" style="margin-top:var(--s-1);">
+        <div class="nt-row" style="grid-template-columns:5rem 1fr;"><div class="nt-job">To</div><div class="nt-rule"><code style="font-family:'Geist Mono';font-size:0.85rem;color:var(--terra);">{{ $('Gmail Trigger').item.json.from }}</code></div></div>
+        <div class="nt-row" style="grid-template-columns:5rem 1fr;"><div class="nt-job">Body</div><div class="nt-rule"><code style="font-family:'Geist Mono';font-size:0.85rem;color:var(--terra);">{{ $('HTTP Request').item.json.draft_response }}</code></div></div>
+      </div>
+      <p class="mt-2" style="color:var(--ink-mute);font-size:var(--t-body-sm);">Same Gmail node shape as Build A — but this one fires because a human said yes, not because the agent classified it as safe.</p>
+    </div>
+  </div>
+  <div class="folio">22<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 23 — Build B Step 5: Rejection + HITL moment -->
+<section class="slide exercise-slide" id="s23">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · Step 5</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body">
+    <div class="ex-letter">B</div>
+    <div>
+      <div class="ex-meta">Build Step B · The HITL Moment</div>
+      <h3>Step 5 — Rejection branch + live approval</h3>
+      <p class="mt-2">On the <strong>false branch</strong>: add HTTP Request (re-draft) → Gmail (revised response).</p>
+      <div class="prompt mt-2" style="font-size:0.82rem;">{
+  "message": "{{ $('Gmail Trigger').item.json.text }}",
+  "revision_note": "Manager requested a revision. Ask the customer for their preferred date and budget range."
+}<button class="prompt-copy" onclick="copyPrompt(this)">Copy</button></div>
+      <div class="prompt mt-2" style="font-size:0.88rem;">Test email — complex order:
+
+Subject: Custom fondant cake request
+Body: Hi! I need a 3-tier fondant cake, dairy-free (severe allergy),
+for Saturday — 2 days from now. Budget ₹3,000–₹3,500. — Meera<button class="prompt-copy" onclick="copyPrompt(this)">Copy</button></div>
+    </div>
+  </div>
+  <div class="folio">23<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 24 — Build B debrief: Architecture Card made real -->
+<section class="slide" id="s24">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build B · Debrief</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow">Architecture Card → running workflow</div>
+    <h2>The paper became the machine.</h2>
+    <div class="node-table mt-3">
+      <div class="nt-row"><div class="nt-job">Loop Trace</div><div class="nt-name" style="font-size:1.1rem;">→</div><div class="nt-rule">The classifier prompt inside the HTTP Request node</div></div>
+      <div class="nt-row"><div class="nt-job">Tool Manifest</div><div class="nt-name" style="font-size:1.1rem;">→</div><div class="nt-rule">The HTTP node + its scoped URL and permissions</div></div>
+      <div class="nt-row"><div class="nt-job">Human gate ○</div><div class="nt-name" style="font-size:1.1rem;">→</div><div class="nt-rule">The Wait node + Telegram inline keyboard</div></div>
+      <div class="nt-row"><div class="nt-job">Pattern Choice</div><div class="nt-name" style="font-size:1.1rem;">→</div><div class="nt-rule">The IF branch structure — standard left, complex right</div></div>
+    </div>
+    <p class="mt-3" style="color:var(--ink-mute);">You drew it in Session 5. You wired it today.</p>
+  </div>
+  <div class="folio">24<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 25 — Build C: Debug the dirty node -->
+<section class="slide exercise-slide" id="s25">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build C · Debug</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="display:grid;grid-template-columns:auto 1fr;gap:var(--s-5);align-items:center;">
+    <div class="ex-letter">C</div>
+    <div>
+      <div class="ex-meta">Build Step C · Debug the Dirty Node</div>
+      <h3>Find what's broken in under 2 minutes.</h3>
+      <!-- Execution history panel mockup -->
+      <div style="margin-top:var(--s-2);display:grid;grid-template-columns:160px 1fr;gap:var(--s-2);">
+        <!-- Left: execution list -->
+        <div style="background:#1a1814;border-radius:8px 0 0 8px;padding:0.7rem;display:flex;flex-direction:column;gap:0.4rem;">
+          <div style="font-family:'Geist Mono',monospace;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#5a6377;margin-bottom:0.3rem;">Execution History</div>
+          <div style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:4px;padding:0.35rem 0.5rem;">
+            <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;color:#4ade80;font-weight:600;">● SUCCESS</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.62rem;color:#5a6377;">ID: #421 · Webhook</div>
+          </div>
+          <div style="background:rgba(251,113,133,0.12);border:1px solid rgba(251,113,133,0.4);border-radius:4px;padding:0.35rem 0.5rem;">
+            <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;color:#fb7185;font-weight:600;">● FAILED</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.62rem;color:#5a6377;">ID: #420 · Gmail</div>
+          </div>
+          <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.15);border-radius:4px;padding:0.35rem 0.5rem;opacity:0.6;">
+            <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;color:#4ade80;font-weight:600;">● SUCCESS</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.62rem;color:#5a6377;">ID: #419 · Webhook</div>
+          </div>
+        </div>
+        <!-- Right: error detail for the failed run -->
+        <div style="background:#0d111a;border-radius:0 8px 8px 0;padding:0.8rem;border:1px solid rgba(251,113,133,0.25);">
+          <div style="font-family:'Geist Mono',monospace;font-size:0.68rem;color:#fb7185;font-weight:600;letter-spacing:0.1em;margin-bottom:0.5rem;">ERROR — Node: "HTTP Request"</div>
+          <div style="font-family:'Geist Mono',monospace;font-size:0.72rem;color:#fb7185;margin-bottom:0.5rem;">Connection refused (Status 404)</div>
+          <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:0.5rem;display:flex;flex-direction:column;gap:0.3rem;">
+            <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;color:#5a6377;letter-spacing:0.08em;">INPUT RECEIVED:</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;color:#8993a6;">{ "message": "Hi, I'd like a cake..." }</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;color:#5a6377;letter-spacing:0.08em;margin-top:0.3rem;">EXPECTED:</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;color:#8993a6;">200 OK · JSON with order_type</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;color:#5a6377;letter-spacing:0.08em;margin-top:0.3rem;">MISMATCH:</div>
+            <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;color:#fbbf24;">Wrong URL in node config → fix it → re-run</div>
+          </div>
+        </div>
+      </div>
+      <!-- 3 questions compact -->
+      <div style="margin-top:var(--s-2);display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-1);">
+        <div style="border-top:2px solid var(--danger);padding-top:0.4rem;"><span style="font-family:'Fraunces',serif;font-size:1.4rem;color:var(--danger);font-weight:300;">1</span><br><span style="font-size:0.85rem;color:var(--ink-soft);">Which node is <strong>red</strong>?</span></div>
+        <div style="border-top:2px solid var(--warn);padding-top:0.4rem;"><span style="font-family:'Fraunces',serif;font-size:1.4rem;color:var(--warn);font-weight:300;">2</span><br><span style="font-size:0.85rem;color:var(--ink-soft);">What did it <strong>receive</strong>?</span></div>
+        <div style="border-top:2px solid var(--calm);padding-top:0.4rem;"><span style="font-family:'Fraunces',serif;font-size:1.4rem;color:var(--calm);font-weight:300;">3</span><br><span style="font-size:0.85rem;color:var(--ink-soft);">What did it <strong>expect</strong>?</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">25<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 26 — Pin data -->
+<section class="slide" id="s26">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Build C · Pin Data</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow">Technique</div>
+    <h2>Test without sending real emails.</h2>
+    <p class="lede mt-2">Pin data from a previous run. The Trigger replays the pinned email instead of polling Gmail.</p>
+    <div class="node-table mt-3">
+      <div class="nt-row" style="grid-template-columns:2.5rem 1fr;"><div style="font-family:'Fraunces',serif;font-size:1.5rem;color:var(--terra);font-weight:300;">1</div><div class="nt-rule">Open Gmail Trigger output from any successful run</div></div>
+      <div class="nt-row" style="grid-template-columns:2.5rem 1fr;"><div style="font-family:'Fraunces',serif;font-size:1.5rem;color:var(--terra);font-weight:300;">2</div><div class="nt-rule">Click <strong>Pin data</strong></div></div>
+      <div class="nt-row" style="grid-template-columns:2.5rem 1fr;"><div style="font-family:'Fraunces',serif;font-size:1.5rem;color:var(--terra);font-weight:300;">3</div><div class="nt-rule">Run workflow — Trigger uses pinned email. No Gmail polling, no inbox clutter.</div></div>
+    </div>
+    <p class="mt-3" style="color:var(--ink-mute);font-size:var(--t-body-sm);">Use this for every test after your first one. Faster and cleaner.</p>
+  </div>
+  <div class="folio">26<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 27 — What you shipped -->
+<section class="slide" id="s27">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Close</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body fill-top">
+    <div class="eyebrow">What you shipped today</div>
+    <h2>A workflow that thinks, routes, and waits for a human — automatically.</h2>
+    <div class="wf-flow mt-3" style="flex-wrap:wrap;row-gap:var(--s-2);">
+      <div class="wf-node"><div class="wn-box trigger">Gmail Trigger</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box http">HTTP Request</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box gate">IF node</div></div>
+      <div class="wf-arrow" style="color:var(--calm);">→ std</div>
+      <div class="wf-node"><div class="wn-box action">Gmail ✓</div></div>
+    </div>
+    <div class="wf-flow mt-2" style="padding-left:28rem;flex-wrap:wrap;row-gap:var(--s-1);">
+      <div class="wf-arrow" style="color:var(--terra);">→ complex</div>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--terra);">Telegram</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box wait">Wait</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--ink-blue);">Telegram Trigger</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node"><div class="wn-box action">Gmail ✓</div></div>
+    </div>
+    <p class="mt-3" style="font-size:var(--t-body-sm);color:var(--ink-mute);">Take-home: customise the classifier prompt for your own job. The workbook has templates for sales, finance, HR, and healthcare.</p>
+  </div>
+  <div class="folio">27<sup>/28</sup></div>
+</section>
+
+<!-- SLIDE 28 — S7 bridge -->
+<section class="slide" id="s28">
+  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Next Session</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="slide-body" style="justify-content:center;">
+    <div class="eyebrow cool">Session 7 of 8</div>
+    <h1 style="font-size:clamp(2.8rem,5vw,4.8rem);">EdYoda Agent Builder — Build &amp; Host Your First Agent</h1>
+    <p class="lede mt-3">You called an agent today via HTTP Request — a URL, a JSON body, a JSON response. That agent lived at an endpoint we gave you. Next session, you build that endpoint yourself. Your own system prompt. Your own knowledge base. Your own shareable link.</p>
+    <p class="mt-3" style="font-size:var(--t-body-sm);color:var(--ink-mute);">Then swap it into today's workflow — everywhere you used our URL, you use yours.</p>
+    <div class="colophon">Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu">linkedin.com/in/chandrashantanu</a></div>
+  </div>
+  <div class="folio">28<sup>/28</sup></div>
+</section>
+
+</div><!-- /deck -->
+
+<nav class="nav">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <button onclick="goSlide(0)">⏮</button>
+  <button onclick="goSlide(totalSlides-1)">⏭</button>
+</nav>
+
+<script>
+const MASTER_KEY = 'genai_s6_slide_master';
+const PRINT_KEY  = 'genai_s6_print_request';
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let current = 0;
+
+function goSlide(i) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(totalSlides - 1, i));
+  slides[current].classList.add('active');
+  document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+  try { localStorage.setItem(MASTER_KEY, String(current)); } catch(e) {}
+  if (slides[current].classList.contains('break-slide')) startBreakTimer();
+}
+function next() { goSlide(current + 1); }
+function prev() { goSlide(current - 1); }
+
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key))         { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End')  goSlide(totalSlides - 1);
+});
+
+/* localStorage sync from presenter */
+window.addEventListener('storage', (e) => {
+  if (e.key === MASTER_KEY && e.newValue !== null) {
+    const idx = Math.min(parseInt(e.newValue, 10), totalSlides - 1);
+    if (!isNaN(idx)) goSlide(idx);
+  }
+  if (e.key === PRINT_KEY) window.print();
+});
+
+/* Break timer */
+let breakInterval = null;
+function startBreakTimer() {
+  if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+  let remaining = 600;
+  const el = document.getElementById('breakClock');
+  if (!el) return;
+  function tick() {
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.className = 'break-clock' + (remaining <= 60 ? ' danger' : remaining <= 120 ? ' warn' : '');
+    remaining--;
+    if (remaining < 0) { clearInterval(breakInterval); breakInterval = null; }
+  }
+  tick();
+  breakInterval = setInterval(tick, 1000);
+}
+
+/* Pre-class cover timer */
+let pctBase = 300, pctRemaining = 300, pctInterval = null, pctRunning = false;
+function pctRender() {
+  const m = Math.floor(pctRemaining / 60), s = pctRemaining % 60;
+  const el = document.getElementById('pctDisplay');
+  if (el) el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+}
+function pctStart() {
+  if (pctRunning) return;
+  pctRunning = true;
+  pctInterval = setInterval(() => {
+    pctRemaining--;
+    pctRender();
+    if (pctRemaining <= 0) { clearInterval(pctInterval); pctRunning = false; }
+  }, 1000);
+}
+function pctReset() {
+  clearInterval(pctInterval); pctRunning = false; pctRemaining = pctBase; pctRender();
+}
+function pctAdjust(delta) {
+  pctBase = Math.max(60, pctBase + delta);
+  if (!pctRunning) { pctRemaining = pctBase; pctRender(); }
+}
+
+/* Copy prompt */
+function copyPrompt(btn) {
+  const box = btn.closest('.prompt');
+  const text = box.childNodes[0].textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+goSlide(0);
+</script>
+</body>
+</html>

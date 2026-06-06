@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f; --bg-1: #0d111a; --bg-2: #131826;
+    --surface: rgba(255,255,255,0.03); --surface-hover: rgba(255,255,255,0.05); --surface-strong: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+    --text: #f4f6fb; --text-soft: #c9d0de; --text-muted: #8993a6; --text-dim: #5a6377;
+    --accent: #5eead4; --accent-soft: rgba(94,234,212,0.14); --accent-line: rgba(94,234,212,0.35);
+    --warm: #fbbf24; --warm-soft: rgba(251,191,36,0.12);
+    --hot: #fb7185; --hot-soft: rgba(251,113,133,0.12);
+    --green: #4ade80; --green-soft: rgba(74,222,128,0.12);
+    --purple: #a78bfa; --purple-soft: rgba(167,139,250,0.12);
+    --s-1:8px; --s-2:16px; --s-3:24px; --s-4:32px;
+    --ease-out: cubic-bezier(0.16,1,0.3,1); --dur-fast:180ms; --dur-med:280ms;
+    --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;background:var(--bg-0);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-feature-settings:'cv02','cv03','cv11','ss01';-webkit-font-smoothing:antialiased;overflow:hidden;}
+  .topbar{height:64px;background:var(--bg-1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 var(--s-3);gap:var(--s-3);flex-shrink:0;}
+  .topbar .title{font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--text-muted);letter-spacing:0.1em;font-size:0.72rem;text-transform:uppercase;}
+  .topbar .title .accent{color:var(--accent);}
+  .clock-divider{width:1px;height:32px;background:var(--border);}
+  .clock-box{display:flex;flex-direction:column;line-height:1.15;gap:2px;}
+  .clock-box .label{color:var(--text-dim);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;font-weight:500;font-family:'JetBrains Mono',monospace;}
+  .clock-box .big{font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;}
+  .clock-box.real .big{color:var(--text);}
+  .clock-box.planned .big{color:var(--text-soft);}
+  .clock-box.delta .big.ok{color:var(--green);}
+  .clock-box.delta .big.warn{color:var(--warm);}
+  .clock-box.delta .big.danger{color:var(--hot);}
+  .topbar .grow{flex:1;}
+  .topbar button{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.83rem;font-family:inherit;font-weight:500;transition:all var(--dur-fast) var(--ease-out);}
+  .topbar button:hover{background:var(--surface-hover);border-color:var(--border-strong);color:var(--text);}
+  .topbar button.primary{background:var(--accent);color:#062420;border-color:var(--accent);font-weight:600;}
+  .topbar button.primary:hover{background:#7df1de;}
+  .topbar .slide-counter{color:var(--text-muted);font-size:0.82rem;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;padding-left:var(--s-2);border-left:1px solid var(--border);}
+  .main{display:grid;grid-template-columns:1fr 380px;height:calc(100vh - 64px - 56px);}
+  .panel-left{overflow-y:auto;padding:var(--s-3) var(--s-4);border-right:1px solid var(--border);}
+  .panel-right{overflow-y:auto;background:var(--bg-1);padding:var(--s-3);}
+  .panel-left::-webkit-scrollbar,.panel-right::-webkit-scrollbar{width:8px;}
+  .panel-left::-webkit-scrollbar-track,.panel-right::-webkit-scrollbar-track{background:transparent;}
+  .panel-left::-webkit-scrollbar-thumb,.panel-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .panel-left::-webkit-scrollbar-thumb:hover,.panel-right::-webkit-scrollbar-thumb:hover{background:var(--border-strong);}
+  .bottombar{height:56px;background:var(--bg-1);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 var(--s-3);gap:var(--s-2);flex-shrink:0;}
+  .bottombar button{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.83rem;font-family:inherit;font-weight:500;transition:all var(--dur-fast) var(--ease-out);}
+  .bottombar button:hover{background:var(--surface-hover);color:var(--text);}
+  .bottombar .progress{flex:1;height:4px;background:var(--surface);border-radius:2px;overflow:hidden;margin:0 var(--s-2);border:1px solid var(--border);}
+  .bottombar .progress-fill{height:100%;background:var(--accent);transition:width var(--dur-med) var(--ease-out);box-shadow:0 0 8px var(--accent-line);}
+  .timing-bar{display:flex;align-items:center;gap:var(--s-2);margin-bottom:var(--s-3);padding:12px 16px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);}
+  .timing-bar .time-pill{background:var(--accent-soft);color:var(--accent);padding:5px 12px;border-radius:999px;font-weight:600;font-size:0.78rem;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;border:1px solid var(--accent-line);}
+  .timing-bar .duration{color:var(--text-muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;}
+  .timing-bar .block-title{font-weight:500;flex:1;font-size:0.88rem;color:var(--text-soft);text-align:right;font-family:'JetBrains Mono',monospace;}
+  .slide-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--s-2);}
+  .slide-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--text-muted);}
+  .slide-tag.break::before{background:var(--green);} .slide-tag.break{color:var(--green);border-color:var(--green-soft);}
+  .slide-tag.demo::before{background:var(--warm);} .slide-tag.demo{color:var(--warm);border-color:var(--warm-soft);}
+  .slide-tag.exercise::before{background:var(--purple);} .slide-tag.exercise{color:var(--purple);border-color:var(--purple-soft);}
+  .slide-tag.title::before{background:var(--accent);} .slide-tag.title{color:var(--accent);border-color:var(--accent-line);}
+  .slide-pane h1{font-size:1.7rem;font-weight:700;line-height:1.15;margin-bottom:var(--s-3);letter-spacing:-0.02em;color:var(--text);}
+  .section{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:12px;transition:border-color var(--dur-fast) var(--ease-out);}
+  .section:hover{border-color:var(--border-strong);}
+  .section .header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .section h3{font-size:0.7rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+  .section.say{border-left:3px solid var(--warm);} .section.say h3{color:var(--warm);}
+  .section.do{border-left:3px solid var(--green);} .section.do h3{color:var(--green);}
+  .section.watch{border-left:3px solid var(--hot);} .section.watch h3{color:var(--hot);}
+  .section.note{border-left:3px solid var(--purple);} .section.note h3{color:var(--purple);}
+  .section.prompt-section{border-left:3px solid var(--accent);} .section.prompt-section h3{color:var(--accent);}
+  .section.deeper{border-left:3px solid #60a5fa;} .section.deeper h3{color:#60a5fa;}
+  .section.bridge{border-left:3px solid #f472b6;} .section.bridge h3{color:#f472b6;}
+  .quote{color:var(--text);font-size:1rem;line-height:1.6;padding-left:12px;border-left:2px solid var(--warm);margin:0;font-weight:400;}
+  .section p{font-size:0.94rem;line-height:1.6;color:var(--text-soft);margin-bottom:6px;}
+  .section p:last-child{margin-bottom:0;}
+  .step-list{counter-reset:step;list-style:none;padding-left:0;margin:0;}
+  .step-list>li{counter-increment:step;padding-left:36px;position:relative;padding-bottom:10px;font-size:0.94rem;line-height:1.55;color:var(--text-soft);}
+  .step-list>li:last-child{padding-bottom:0;}
+  .step-list>li::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:2px;width:26px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.04em;}
+  .prompt-box{background:#060810;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--accent);white-space:pre-wrap;line-height:1.6;margin-top:4px;}
+  .right-section{margin-bottom:var(--s-3);}
+  .right-section h4{font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .preview-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;transition:border-color var(--dur-fast) var(--ease-out);}
+  .preview-card.next{border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),var(--bg-2));}
+  .preview-card .num{font-size:0.66rem;color:var(--text-dim);letter-spacing:0.14em;font-weight:600;font-family:'JetBrains Mono',monospace;}
+  .preview-card.next .num{color:var(--accent);}
+  .preview-card .title{font-size:0.92rem;font-weight:500;margin:4px 0 2px;color:var(--text);line-height:1.35;}
+  .preview-card .when{font-size:0.74rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;}
+  .timer-block{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 16px;text-align:center;transition:border-color var(--dur-med) var(--ease-out);}
+  .timer-block.warn{border-color:var(--warm);background:linear-gradient(180deg,var(--warm-soft),var(--bg-2));}
+  .timer-block.danger{border-color:var(--hot);background:linear-gradient(180deg,var(--hot-soft),var(--bg-2));}
+  .timer-display{font-family:'JetBrains Mono',monospace;font-size:2.4rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text);line-height:1;letter-spacing:-0.02em;transition:color var(--dur-fast) var(--ease-out);}
+  .timer-block.warn .timer-display{color:var(--warm);} .timer-block.danger .timer-display{color:var(--hot);}
+  .timer-label{font-size:0.66rem;color:var(--text-dim);letter-spacing:0.14em;text-transform:uppercase;margin-top:8px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .timer-controls{display:flex;gap:4px;margin-top:14px;justify-content:center;flex-wrap:wrap;}
+  .timer-controls button{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);padding:6px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.75rem;font-family:'JetBrains Mono',monospace;font-weight:500;transition:all var(--dur-fast) var(--ease-out);}
+  .timer-controls button:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line);}
+  .quick-key{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text-muted);margin-bottom:6px;}
+  .quick-key kbd{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-soft);font-weight:500;min-width:22px;text-align:center;box-shadow:0 1px 0 var(--border);}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session 6</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real"><span class="label">Real clock</span><span class="big" id="realClock">—</span></div>
+  <div class="clock-box planned"><span class="label">Class time</span><span class="big" id="classClock">0:00 / 2:00</span></div>
+  <div class="clock-box delta"><span class="label">Pace</span><span class="big ok" id="paceLabel">—</span></div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 28</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Build timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(300)">5m</button>
+          <button onclick="startExTimer(480)">8m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="startExTimer(720)">12m</button>
+          <button onclick="startExTimer(900)">15m</button>
+          <button onclick="startExTimer(1200)">20m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>5</kbd> 5m · <kbd>8</kbd> 8m · <kbd>1</kbd> 15m · <kbd>2</kbd> 20m timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break (slide 17)</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA =====================
+   Session 6 · Workflow Automation with n8n — 28 slides, paired 1:1 to learner_deck.html.
+   BREAK_SLIDE_INDEX = 16 (0-based → slide 17 in 1-based numbering).
+   say: is the literal warm sentence read aloud.
+   ===================================================== */
+const BREAK_SLIDE_INDEX = 16;
+const MASTER_KEY = 'genai_s6_slide_master';
+const PRINT_KEY  = 'genai_s6_print_request';
+
+const slides = [
+  {
+    num:1, when:"Pre-start", tag:"title",
+    title:"Workflow Automation with n8n — Wiring Agents into Business Workflows",
+    say:"Welcome back, everyone. Last session you designed the Order Assistant on paper — the loop trace, the tool manifest, the human gate you circled. Today that paper starts running. We're wiring it into the real world.",
+    doSteps:[
+      "Music up. Greet people by name as they arrive.",
+      "Confirm all learners have n8n.cloud open and Gmail credential connected. If not: ask them to do it now before we start — takes 3 min.",
+      "Tabs ready: n8n canvas (your working workflow), Gmail test inbox, Telegram bot chat, n8n Execution History, Learner Workbook open to Build Step A.",
+      "Confirm the Lumière Order Assistant endpoint is live — test it once with a curl call."
+    ],
+    bridge:"When the clock starts: one-word check-in, then the course story."
+  },
+  {
+    num:2, when:"0:00 – 0:05", duration:"5 min", tag:"title",
+    title:"Every session made a promise. You built the proof.",
+    say:"Same ritual as always — one word in the chat: how did Session 5 land? Just one word, whatever's honest.",
+    afterPause:"Read every word aloud by name. Then: 'Let me show you how far you've actually come.' Walk the table as a story — one breath per session.",
+    doSteps:[
+      "Read every chat response aloud, by name.",
+      "Walk the Course Story table as a story, not a list.",
+      "Land on S5: 'Last time, you drew the blueprint — the Architecture Card. Today it runs.'"
+    ],
+    watch:"If chat is quiet after 20 seconds: 'Any word — useful, dense, exciting, confusing. There's no wrong answer.'"
+  },
+  {
+    num:3, when:"0:05 – 0:08", duration:"3 min", tag:"title",
+    title:"The gap between design and running.",
+    say:"Here's the gap. Your Lumière Order Assistant can reason — it can classify an order, check the spec, draft a response. But right now it just sits there waiting for someone to paste a message into it. Nobody at Lumière is going to do that for every order that comes in. n8n is the bridge.",
+    doSteps:[
+      "Show the gap diagram — agent on the left, real world on the right, gap in the middle.",
+      "Name what's on the right: Gmail, Telegram, Slack, calendar, CRM. Real systems.",
+      "Say the one rule: 'You will not leave with theory. You will leave with a workflow that fires when an email arrives.'"
+    ],
+    bridge:"Four concepts first — fast. Then we build."
+  },
+  {
+    num:4, when:"0:08 – 0:12", duration:"4 min",
+    title:"The course story: six sessions, one system.",
+    say:"Before we go anywhere new — let me show you how far you've come.",
+    doSteps:[
+      "Walk the session table one row at a time, one breath per row.",
+      "S1: watched the bakery fail. S2: built the HR Screener. S3: prompt engineering. S4: Lumière Knowledge Agent. S5: Architecture Card. S6: today.",
+      "Land on: 'Five sessions of building. Today we step outside the conversation window and connect it to the real world.'"
+    ],
+    bridge:"Sprint 1 — four nodes, four jobs."
+  },
+  {
+    num:5, when:"0:12 – 0:19", duration:"7 min",
+    title:"Sprint 1 — 4 Nodes, 4 Jobs.",
+    say:"n8n has over 400 nodes. You don't need to know most of them. For today, four nodes do everything. The Trigger starts the machine. The HTTP Request talks to your agent. The IF node asks a yes/no question. The Wait node pauses everything for a human. That's the whole session.",
+    doSteps:[
+      "Show the 4-node decision table. Read each row aloud — name, job, one-sentence rule.",
+      "Ask in chat: 'Which of these four do you think is most important for the workflows you'd want to build at your job?' Read 2–3 answers by name.",
+      "Move on — don't linger."
+    ],
+    note:"Decision rule to speak aloud: Trigger starts it. HTTP calls the agent. IF routes it. Wait pauses it for a human."
+  },
+  {
+    num:6, when:"0:19 – 0:26", duration:"7 min",
+    title:"Sprint 2 — The HTTP Request node: how n8n talks to your agent.",
+    say:"The HTTP Request node is the key that unlocks everything. Your Lumière Order Assistant lives at a URL. When you paste that URL into this node, you're saying: call this agent, give it this message, bring back the answer. Three things you configure: the URL, the method — almost always POST — and the body, which is the email text we're sending.",
+    doSteps:[
+      "Show the HTTP Request anatomy slide: URL field, method, body JSON, response.",
+      "Show the before/after: raw email text goes in, structured JSON comes out.",
+      "Read the JSON fields aloud: order_type, complexity, human_gate, draft_response.",
+      "Say: 'This pattern works for any agent, any tool, any API in the world. Learn this node and you can wire your agent into anything.'"
+    ],
+    deeper:["The body expression {{ $json.text }} is the only syntax they need today. Explain: $json = current node's input. Everything else is just field names."]
+  },
+  {
+    num:7, when:"0:26 – 0:33", duration:"7 min",
+    title:"Sprint 3 — The IF node: where the agent's answer becomes a decision.",
+    say:"The HTTP Request node brought back the agent's JSON. One field is called human_gate — it's true or false. The IF node reads that field and sends the workflow down one of two paths. Left: standard order, auto-confirm. Right: complex order, human review. That's conditional logic. You've been doing this your whole career — you just ran it in your head. Today n8n runs it for you.",
+    doSteps:[
+      "Show the IF node diagram — one input wire, two output wires.",
+      "Label the branches: false (left) = standard, true (right) = complex.",
+      "Analogy: 'If the deal is above ₹10 lakh, escalate to the VP. If it's below, handle it yourself. That's an IF node.'"
+    ],
+    bridge:"The hardest concept is next — Two Ears. Name it before we build."
+  },
+  {
+    num:8, when:"0:33 – 0:40", duration:"7 min",
+    title:"Sprint 4 — Two Ears: the Human-in-the-Loop pattern.",
+    say:"Our workflow has two entry points — two ears. Ear one: the Gmail Trigger. An order email arrives and the workflow wakes up. Ear two: the Telegram Trigger. The manager taps Approve or Reject and the workflow wakes up again — but only on the right branch, only where the Wait node put it to sleep. In between: the Wait node. It pauses the workflow — holds it in place — until that second ear hears something.",
+    doSteps:[
+      "Show the Two Ears diagram: two arrows entering the workflow at different points. Gmail top-left. Telegram partway down the right branch. Wait node between them.",
+      "Say: 'The workflow isn't deleted. It isn't cancelled. It's asleep, waiting.'",
+      "Say: 'The human doesn't need to log into n8n. They just get a Telegram message with two buttons. That's the entire interface.'",
+      "Pause. Let it land. This is the hardest concept — give it 5 seconds of silence after you say it."
+    ],
+    watch:"If they look confused: 'Think of it like a relay race. Baton passes from machine to human and back. The Wait node is the moment the baton is in the human's hand.'",
+    bridge:"We're about to build this. Let's go."
+  },
+  {
+    num:9, when:"0:40 – 0:43", duration:"3 min", tag:"demo",
+    title:"Build A — Step 1: Gmail Trigger.",
+    say:"Start with a blank workflow. Click the plus, search for Gmail, choose Gmail Trigger. This is the first ear.",
+    doSteps:[
+      "Share screen. Open n8n canvas. Add Gmail Trigger node.",
+      "Configure: Trigger on New Email, poll every minute.",
+      "Click Test step — pull a real email from inbox. Point to from, subject, text fields.",
+      "Say: 'That text field — the email body — is what we're about to hand to the agent.'"
+    ],
+    prompt:"Step 1 – Gmail Trigger config\n──────────────────────────────\nNode:         Gmail Trigger\nTrigger on:   New Email\nPoll time:    Every Minute\nCredential:   [learner's Gmail OAuth]\n\nTest step → confirm output has:\n  from      • subject      • text\n\nVerify loop:\n  [ ] Node added and credential selected\n  [ ] Test step returns an email JSON\n  [ ] 'text' field visible in output\n  [ ] Learner deck slide 9 on screen",
+    watch:"If OAuth fails: 'Pair with your neighbour. You'll build your own version at home.' Move on — don't let credential issues block the room."
+  },
+  {
+    num:10, when:"0:43 – 0:48", duration:"5 min", tag:"demo",
+    title:"Build A — Step 2: HTTP Request (call the agent).",
+    say:"Add an HTTP Request node. This is where the agent lives. Paste the Lumière Order Assistant URL. Set method to POST. In the body, use the expression to pass the email text.",
+    doSteps:[
+      "Add HTTP Request node after Gmail Trigger.",
+      "Configure: Method POST, URL [endpoint], body JSON with {{ $json.text }}.",
+      "Click Test step with a real order email. Show the JSON response.",
+      "Read the fields aloud: order_type, complexity, human_gate, draft_response."
+    ],
+    prompt:'Step 2 – HTTP Request config\n──────────────────────────────\nNode:         HTTP Request\nMethod:       POST\nURL:          [Lumière Order Assistant endpoint — confirm it\'s live]\nBody type:    JSON\nBody:\n{\n  "message": "{{ $json.text }}"\n}\n\nExpected output JSON:\n  order_type     · "standard" or "custom"\n  complexity     · "simple" | "moderate" | "complex"\n  human_gate     · true or false\n  human_gate_reason  · one-sentence string or ""\n  draft_response · full confirmation email text\n\nVerify loop:\n  [ ] Node added, method is POST\n  [ ] URL pasted (no trailing space, no http typo)\n  [ ] Body type = JSON (not Form Data)\n  [ ] {{ $json.text }} expression in body\n  [ ] Test step returns JSON with all 5 fields\n  [ ] Learner deck slide 10 on screen',
+    watch:"If endpoint is down: switch to the fallback URL from your contingency sheet. Say: 'In Session 7 you'll host this agent yourself.'",
+    note:"Explain the expression once, clearly: {{ $json.text }} means 'take the text field from the previous node's output.' This is the only expression syntax needed today."
+  },
+  {
+    num:11, when:"0:48 – 0:52", duration:"4 min", tag:"demo",
+    title:"Build A — Step 3: IF node (route the decision).",
+    say:"Add an IF node. We're asking one question: is human_gate true? Left goes to auto-confirm. Right goes to the human. That's the entire routing logic — one condition, two paths.",
+    doSteps:[
+      "Add IF node after HTTP Request.",
+      "Condition: {{ $json.human_gate }} equals true.",
+      "Point to the two output wires: false (left) = standard, true (right) = complex.",
+      "Ask the room: 'Which path do you think most Lumière orders will take?' Brief chat."
+    ],
+    prompt:"Step 3 – IF Node config\n──────────────────────────────\nNode:         IF\nCondition:    {{ $json.human_gate }}\nOperation:    equals\nValue:        true   (type: Boolean)\n\nOutput wires:\n  FALSE (left)  → standard order → auto-confirm branch\n  TRUE  (right) → complex order  → human gate branch\n\nVerify loop:\n  [ ] IF node added after HTTP Request\n  [ ] Condition uses {{ $json.human_gate }}, not hardcoded string\n  [ ] Two output ports visible on canvas\n  [ ] Test with standard email → routes to FALSE port\n  [ ] Test with complex email  → routes to TRUE port\n  [ ] Learner deck slide 11 on screen"
+  },
+  {
+    num:12, when:"0:52 – 0:57", duration:"5 min", tag:"demo",
+    title:"Build A — Step 4: Gmail auto-confirm (false branch).",
+    say:"On the false branch — standard order — we send the confirmation automatically. The customer gets their answer in under a second. No one at Lumière touched anything.",
+    doSteps:[
+      "Add Gmail node on false branch. Action: Send Email.",
+      "To: {{ $('Gmail Trigger').item.json.from }}",
+      "Subject: 'Your Lumière order is confirmed ✓'",
+      "Body: {{ $('HTTP Request').item.json.draft_response }}",
+      "Run the full workflow with a standard order email. Watch the confirmation fire."
+    ],
+    prompt:"Step 4 – Gmail auto-confirm (false branch)\n──────────────────────────────\nNode:         Gmail → Send Email\nBranch:       FALSE output of IF node\n\nTo:      {{ $(\'Gmail Trigger\').item.json.from }}\nSubject: Your Lumière order is confirmed ✓\nBody:    {{ $(\'HTTP Request\').item.json.draft_response }}\n\nTest email (standard order — paste as email body):\n──────────────────────────────\nSubject: Cake order request\nBody: Hi, I'd like to order a 2-tier vanilla sponge with\nbuttercream frosting for a birthday. About 20 people.\nBudget around ₹2,500. Pick-up on Saturday afternoon.\nThanks, Priya\n──────────────────────────────\n\nVerify loop:\n  [ ] Gmail node on FALSE branch only\n  [ ] To field uses expression — not hardcoded email\n  [ ] Body uses draft_response expression\n  [ ] Full workflow run: all nodes green in Execution History\n  [ ] Confirmation email appears in sent folder / inbox\n  [ ] Learner deck slide 12 on screen",
+    watch:"If the Gmail send fails: check that the To field uses the expression, not a hardcoded email. Also check credentials are the same Gmail account."
+  },
+  {
+    num:13, when:"0:57 – 1:00", duration:"3 min",
+    title:"Build A — Debrief: where is your nervous tool?",
+    say:"Look at the workflow you just built. Now look at your Session 5 Tool Manifest. Find the tool you marked as a 'write' action — the irreversible step. Where does it sit in this flow? For most of you it's the Gmail send. And what's the constraint around it right now? The IF node's false branch. It only fires after the agent classified the order as safe to auto-handle. Build B adds a second gate — for the orders that aren't safe.",
+    doSteps:[
+      "Ask in chat: 'What's the irreversible step in your Session 5 tool manifest?' Read 2–3 answers by name.",
+      "Connect their answer to the false branch: 'That tool is now inside the false branch. It only fires when the agent says it's safe.'",
+      "Bridge to break: 'After the break we add the human gate. That's where it gets interesting.'"
+    ],
+    prompt:"Build A — Debrief check (chat prompt)\n──────────────────────────────\nAsk in chat: 'Find the tool you circled as\nirreversible on your Session 5 Tool Manifest.\nWhich n8n node did it become today?'\n\nExpected answers:\n  Gmail Send        → the auto-confirm node\n  HTTP Request      → the agent call\n  Telegram (some)   → if they thought about B already\n\nBuild A state check before break:\n  [ ] 4 nodes visible on canvas: Gmail Trigger → HTTP Request → IF → Gmail\n  [ ] FALSE branch connected and tested (all green)\n  [ ] TRUE branch wire exists but nothing connected yet\n  [ ] Learner deck slide 13 on screen"
+  },
+  {
+    num:14, when:"0:57 – 1:00", duration:"2 min",
+    title:"Standard order flow — end to end.",
+    say:"Let me show you the full standard order path before we break. Email in, agent classifies, IF says false, confirmation out. No human touched anything.",
+    doSteps:[
+      "Walk the canvas diagram of Build A — highlight the path visually.",
+      "Run one more test with a clean standard order email.",
+      "Point: trigger fires, HTTP Request runs, IF routes to false branch, Gmail sends. All green."
+    ],
+    bridge:"Break. Then we add the right branch — the human gate."
+  },
+  {
+    num:15, when:"0:58 – 1:00", duration:"2 min", tag:"demo",
+    title:"Build A — check your work.",
+    say:"Before we break, run the full Build A yourself with this test email. Paste it, trigger manually, confirm it routes to the false branch and the auto-confirm fires.",
+    doSteps:[
+      "Give learners 2 min to run their own Build A with the standard order test email from the workbook.",
+      "Watch the chat for errors. Address the most common one."
+    ],
+    prompt:"Subject: Cake order request\nBody: Hi, I'd like to order a 2-tier vanilla sponge with buttercream frosting for a birthday. About 20 people. Budget around ₹2,500. Pick-up on Saturday afternoon. Thanks, Priya"
+  },
+  {
+    num:16, when:"0:58 – 1:00", duration:"1 min",
+    title:"Midpoint — where you are.",
+    say:"You've just built the deterministic half of the workflow. Every standard order is now handled automatically — machine speed, no human in the loop. After the break we add the thing that makes this trustworthy for the orders that actually need a human.",
+    doSteps:[
+      "Show the midpoint diagram — left branch complete, right branch empty.",
+      "Point to the true output of the IF node: 'This is where we go next.'"
+    ],
+    bridge:"Break in 60 seconds."
+  },
+  {
+    num:17, when:"1:00 – 1:10", duration:"10 min", tag:"break",
+    title:"Break — 10 minutes.",
+    say:"Ten minutes. Real break. When you come back we add the human gate — the Telegram approval flow. That's where it gets interesting.",
+    doSteps:[
+      "Start the break timer.",
+      "While learners are away: confirm your Telegram bot is live and receiving messages.",
+      "Open the BotFather demo steps in a separate tab — you'll walk through this in the first 3 minutes of Build B."
+    ]
+  },
+  {
+    num:18, when:"1:10 – 1:13", duration:"3 min", tag:"demo",
+    title:"Build B — BotFather demo: how a Telegram bot is born.",
+    say:"Before we wire it, let me show you how a Telegram bot gets created. This takes three minutes and you'll do this yourself for any workflow you build after today. Watch only — no learner action needed.",
+    doSteps:[
+      "Open Telegram. Search @BotFather.",
+      "/newbot → name it LumiereOrderBot → get the token.",
+      "Send one message to the bot. Open api.telegram.org/bot<token>/getUpdates → show chat_id.",
+      "Add Telegram credential in n8n: Settings → Credentials → Telegram → paste token.",
+      "Say: 'One bot, one token, one chat ID. In production: one bot per Lumière location. London gets its own, Gurgaon gets its own. Same workflow, different chat_id. No code changes.'"
+    ],
+    note:"Learner action: none. They watch. Your bot is pre-configured. Move on immediately after showing the credential."
+  },
+  {
+    num:19, when:"1:13 – 1:19", duration:"6 min", tag:"demo",
+    title:"Build B — Step 1: Telegram Send (notify the manager).",
+    say:"On the true branch of the IF node, add a Telegram node — action: Send Message. This is what the manager sees on their phone.",
+    doSteps:[
+      "Add Telegram node on true branch.",
+      "Configure: Chat ID = your bot's chat_id.",
+      "Paste the message template with expressions pulling order data.",
+      "Set Reply Markup: Inline Keyboard. Row 1: Button ✅ Approve (callback: approve), Button ❌ Reject (callback: reject).",
+      "Test: trigger with the complex order email. Watch the Telegram message arrive with two buttons."
+    ],
+    prompt:"Step B1 – Telegram Send config\n──────────────────────────────\nNode:         Telegram → Send Message\nBranch:       TRUE output of IF node\nChat ID:      [facilitator's bot chat_id]\n\nMessage text:\n🧁 New custom order from {{ $(\'Gmail Trigger\').item.json.from }}\n\n{{ $(\'Gmail Trigger\').item.json.text }}\n\nAgent: {{ $(\'HTTP Request\').item.json.complexity }}\nReason: {{ $(\'HTTP Request\').item.json.human_gate_reason }}\n\nDraft:\n{{ $(\'HTTP Request\').item.json.draft_response }}\n\nReply Markup: Inline Keyboard\n  Row 1 · Button 1:  Text = ✅ Approve  · Callback = approve\n  Row 1 · Button 2:  Text = ❌ Reject   · Callback = reject\n\nTest email — complex order:\n──────────────────────────────\nSubject: Custom fondant cake request\nBody: Hi! I need a 3-tier fondant cake, dairy-free\n(severe allergy), for Saturday — 2 days from now.\nBudget ₹3,000–₹3,500. — Meera\n──────────────────────────────\n\nVerify loop:\n  [ ] Telegram node on TRUE branch only\n  [ ] Reply Markup = Inline Keyboard (not Reply Keyboard)\n  [ ] Both buttons have correct callback data strings\n  [ ] Test: Telegram message arrives on facilitator phone\n  [ ] Two buttons visible in message\n  [ ] Learner deck slide 19 on screen",
+    watch:"If inline keyboard doesn't show: confirm Reply Markup is set to 'Inline Keyboard' not 'Reply Keyboard'. This is the most common config mistake."
+  },
+  {
+    num:20, when:"1:19 – 1:22", duration:"3 min", tag:"demo",
+    title:"Build B — Step 2: Wait node (the workflow goes to sleep).",
+    say:"After the Telegram Send, add a Wait node. Mode: On webhook call. The workflow stops here. It doesn't time out. It doesn't cancel. It waits — for as long as it takes — until someone calls the Resume URL. The Telegram Trigger is the thing that will call it.",
+    doSteps:[
+      "Add Wait node after Telegram Send.",
+      "Mode: On webhook call. n8n generates a Resume URL automatically.",
+      "Say: 'Think of it like pressing pause on a film. The frames are still in memory. When the Telegram callback fires, it presses play — from exactly where it stopped.'"
+    ],
+    prompt:"Step B2 – Wait Node config\n──────────────────────────────\nNode:         Wait\nPosition:     After Telegram Send node\nWait for:     On webhook call   (NOT a time delay)\n\nn8n auto-generates a Resume URL.\n→ This is the address the Telegram Trigger will call\n  when the manager taps ✅ or ❌.\n→ You don't need to copy it — n8n handles the wiring.\n\nVerify loop:\n  [ ] Wait node added immediately after Telegram Send\n  [ ] Mode = On webhook call\n  [ ] Resume URL visible in node output (save a screenshot)\n  [ ] Full branch so far: IF(true) → Telegram → Wait\n  [ ] Learner deck slide 20 on screen",
+    note:"The Resume URL is what connects the Wait node to the Telegram Trigger. The workflow is now sleeping."
+  },
+  {
+    num:21, when:"1:22 – 1:27", duration:"5 min", tag:"demo",
+    title:"Build B — Step 3: Telegram Trigger (the second ear).",
+    say:"Now the second ear. Add a Telegram Trigger node — this is a separate entry point into the workflow. It listens for the callback query — what fires when the manager taps a button. Add an IF node after it to route approve vs reject.",
+    doSteps:[
+      "Add Telegram Trigger node. Updates: Callback Query.",
+      "Add IF node after Telegram Trigger. Condition: {{ $json.callback_query.data }} equals 'approve'.",
+      "True branch = approval path. False branch = rejection path.",
+      "Explain: 'This is the second ear. Two nodes, two entry points, one workflow. The Wait node is the bridge between them.'"
+    ],
+    prompt:"Step B3 – Telegram Trigger (second ear)\n──────────────────────────────\nNode:         Telegram Trigger\nPosition:     Separate entry point — NOT connected to the main chain\nUpdates:      Callback Query\nCredential:   Same Telegram bot token as Step B1\n\n→ After Telegram Trigger, add an IF node:\nCondition:    {{ $json.callback_query.data }}\nOperation:    equals\nValue:        approve   (lowercase, exact match)\n\nOutput wires:\n  TRUE  → Approval path  (manager said ✅)\n  FALSE → Rejection path (manager said ❌)\n\nTwo-Ears state check:\n  [ ] Two triggers visible on canvas: Gmail Trigger + Telegram Trigger\n  [ ] They are NOT connected to each other\n  [ ] Wait node on the true-branch chain, between them logically\n  [ ] IF node after Telegram Trigger, condition exact match 'approve'\n  [ ] Learner deck slide 21 on screen",
+    bridge:"Two branches. First the approval path."
+  },
+  {
+    num:22, when:"1:27 – 1:30", duration:"3 min", tag:"demo",
+    title:"Build B — Step 4: Approval branch.",
+    say:"Approve path: send the draft confirmation to the customer. Same Gmail node as before — but this time it fires because a human said yes, not because the agent said it was safe.",
+    doSteps:[
+      "Add Gmail node on true branch. To: customer from, Subject: confirmed, Body: draft_response.",
+      "Point out: same Gmail node shape, different trigger. One is machine-gated; this one is human-gated."
+    ],
+    prompt:"Step B4 – Approval branch\n──────────────────────────────\nNode:         Gmail → Send Email\nBranch:       TRUE output of IF-after-Telegram-Trigger\n\nTo:      {{ $(\'Gmail Trigger\').item.json.from }}\nSubject: Your Lumière order is confirmed ✓\nBody:    {{ $(\'HTTP Request\').item.json.draft_response }}\n\nNote: Both To and Body reach back to the FIRST\nbranch of the workflow (Gmail Trigger + HTTP Request).\nExpressions cross the Two-Ears boundary via workflow\nexecution context — n8n holds all node data.\n\nVerify loop:\n  [ ] Gmail node on TRUE branch of the Telegram IF node\n  [ ] To uses $('Gmail Trigger') expression\n  [ ] Body uses $('HTTP Request') expression\n  [ ] Identical expressions to Build A Step 4 — intentional\n  [ ] Learner deck slide 22 on screen"
+  },
+  {
+    num:23, when:"1:30 – 1:35", duration:"5 min", tag:"demo",
+    title:"Build B — Step 5: Rejection branch + the HITL moment.",
+    say:"Reject path: call the agent again with the manager's note, ask for a revised response, then send that to the customer. Then we run the whole thing live.",
+    doSteps:[
+      "Add HTTP Request node on false branch. Same endpoint. Body adds revision_note field.",
+      "Add Gmail to send the revised response.",
+      "Run the full complex-order workflow live: send the fondant dairy-free test email, watch Telegram notification arrive with buttons.",
+      "Tap ✅ Approve live on screen. Watch the Gmail confirmation fire.",
+      "Pause. Let the room react."
+    ],
+    prompt:'Step B5 – Rejection branch + HITL live run\n──────────────────────────────\nNode A:  HTTP Request (re-draft)\nBranch:  FALSE output of IF-after-Telegram-Trigger\nMethod:  POST\nURL:     [same Lumière Order Assistant endpoint]\nBody:\n{\n  "message": "{{ $(\'Gmail Trigger\').item.json.text }}",\n  "revision_note": "Manager requested a revision. Ask the customer for their preferred date and budget range."\n}\n\nNode B: Gmail → Send Email\nTo:      {{ $(\'Gmail Trigger\').item.json.from }}\nSubject: Re: Your Lumière order\nBody:    {{ $json.draft_response }}   ← from the re-draft HTTP Request\n\n──────────────────────────────\nLIVE RUN — complex order test email:\nSubject: Custom fondant cake request\nBody: Hi! I need a 3-tier fondant cake, dairy-free\n(severe allergy), for Saturday — 2 days from now.\nBudget ₹3,000–₹3,500. — Meera\n──────────────────────────────\n\nHITL moment sequence:\n  1. Trigger with complex email → Telegram arrives with ✅❌\n  2. Tap ✅ Approve on screen → Gmail confirmation fires\n  3. Re-run, tap ❌ Reject → re-draft HTTP runs → revised Gmail fires\n\nVerify loop:\n  [ ] Rejection HTTP Request on FALSE branch\n  [ ] revision_note field in rejection body\n  [ ] Re-draft Gmail uses $json.draft_response from rejection node\n  [ ] Live ✅ tap fired a real Gmail send\n  [ ] Live ❌ tap fired re-draft then Gmail\n  [ ] Learner deck slide 23 on screen',
+    watch:"The live approval tap is non-negotiable. Do not skip this even if you're running 5 minutes late."
+  },
+  {
+    num:24, when:"1:35 – 1:40", duration:"5 min",
+    title:"Build B — Debrief: the Architecture Card made real.",
+    say:"Look at your Session 5 Tool Manifest. Find the human gate you circled. That's the Wait node and the Telegram button. The paper didn't just describe the machine — it was the machine. You drew it in Session 5 and wired it today.",
+    doSteps:[
+      "Ask in chat: 'Find the human gate you circled on your Tool Manifest. Which node in today's workflow is that gate?' Read answers by name.",
+      "Connect: Loop Trace → classifier prompt. Tool Manifest → HTTP Request node + scoped permissions. Human gate circled → Wait node + Telegram button. Pattern Choice → IF branch structure.",
+      "Bridge to Build C: 'Every workflow you ever build will break at some point. The skill is finding what broke in under two minutes.'"
+    ],
+    prompt:"Build B — Full workflow state check\n──────────────────────────────\nCanvas should show these nodes:\n\nEar 1 chain:\n  Gmail Trigger → HTTP Request → IF\n      FALSE → Gmail (auto-confirm)       [Build A]\n      TRUE  → Telegram Send → Wait       [Build B1–B2]\n\nEar 2 chain:\n  Telegram Trigger → IF (approve?)\n      TRUE  → Gmail (confirmation)        [Build B4]\n      FALSE → HTTP Request (re-draft)\n               → Gmail (revised response) [Build B5]\n\nArchitecture Card mapping to read aloud:\n  S5 Loop Trace      →  classifier prompt in HTTP Request\n  S5 Tool Manifest   →  HTTP Request node + scoped URL\n  S5 Human gate ○    →  Wait node + Telegram inline keyboard\n  S5 Pattern Choice  →  IF branch: standard left, complex right\n\nVerify loop:\n  [ ] 9 nodes total on canvas (Gmail Trig, HTTP, IF, Gmail, Telegram, Wait, Tg Trig, IF, Gmail + HTTP + Gmail)\n  [ ] Both branches tested end-to-end\n  [ ] Execution History shows clean SUCCESS runs\n  [ ] Learner deck slide 24 on screen"
+  },
+  {
+    num:25, when:"1:40 – 1:50", duration:"10 min", tag:"exercise",
+    title:"Build C — Debug the dirty node.",
+    say:"Build C. Every workflow breaks. The question is whether you can find what broke in under two minutes. I've got a broken workflow. Let's use three questions to find the problem.",
+    doSteps:[
+      "Switch to the deliberately broken workflow (wrong HTTP URL).",
+      "Run it with a test email. Watch it fail — one or more nodes go red.",
+      "Open Execution History. Click the most recent run. Point to the red node.",
+      "Ask the room: 'Question 1 — which node is red?' Let them answer.",
+      "Click the red node. Show Input tab. 'Question 2 — what did it receive?' The email arrived correctly.",
+      "Read the error message. 'Question 3 — what did it expect?' A valid URL and a 200 response. It got a 404.",
+      "Fix the URL. Re-run. All green.",
+      "Demo pin data for safe testing (2 min)."
+    ],
+    prompt:"Build C — Broken workflow diagnostic\n──────────────────────────────\nBroken workflow setup (pre-configured by facilitator):\n  HTTP Request node URL has a deliberate typo → returns 404\n  Everything else is correct\n\nDiagnostic steps to walk aloud:\n\n  Q1: WHICH NODE IS RED?\n      Open Execution History → click last FAILED run\n      → Red node: HTTP Request\n      Do NOT start at the beginning — start at the red node.\n\n  Q2: WHAT DID IT RECEIVE?\n      Click red node → Input tab\n      → Message field has the email text\n      → Input arrived correctly. Problem is NOT upstream.\n\n  Q3: WHAT DID IT EXPECT?\n      Read the error message:\n      → 'Connection refused (Status 404)'\n      → Expected: 200 OK with JSON\n      → Got: 404 (wrong URL)\n      Mismatch: URL typo in node config.\n\n  FIX: Correct the URL → Re-run → All green.\n\nPin Data demo (after fix):\n  1. Open Gmail Trigger output from last SUCCESS run\n  2. Click Pin data\n  3. Re-run → Trigger uses pinned email, not live Gmail poll\n  → Test the complex branch any time, no inbox clutter\n\nVerify loop:\n  [ ] Learners identified the red node correctly\n  [ ] 3-question method applied in order\n  [ ] Fix applied → all green execution\n  [ ] Pin data demonstrated\n  [ ] Learner deck slide 25 on screen",
+    note:"Three questions to memorize: (1) Which node is red? (2) What did it receive? (3) What did it expect? Fix the mismatch. Re-run. Done."
+  },
+  {
+    num:26, when:"1:50 – 1:52", duration:"2 min",
+    title:"Pin data — test without sending real emails.",
+    say:"One more technique before we close. Instead of sending a real email every time you test, pin the data from a previous run. It saves your inbox and means you can test the complex branch any time without crafting a perfect test email.",
+    doSteps:[
+      "Show: open Gmail Trigger output from a previous run → Pin data button.",
+      "Re-run workflow with pinned data — show it uses the pinned email instead of polling.",
+      "Say: 'Use this for every test after your first one. It's faster and cleaner.'"
+    ]
+  },
+  {
+    num:27, when:"1:52 – 1:56", duration:"4 min",
+    title:"What you shipped today.",
+    say:"Look at what you built. An email arrives. The agent reads it and makes a decision. Simple orders go out in under a second. Complex ones pause, notify a human, wait for a tap, then finish. The whole thing runs without anyone watching it.",
+    doSteps:[
+      "Walk the completed workflow canvas — the full diagram, all nodes connected.",
+      "Read the Architecture Card mapping aloud: 'Your loop trace became the classifier prompt. Your tool manifest became the HTTP Request node. The human gate you circled became the Wait node and the Telegram button.'",
+      "Take-home: 'Customize the classifier prompt for your own job. The workbook has a template for sales, finance, HR, and healthcare. The pattern is identical — the prompt changes.'"
+    ]
+  },
+  {
+    num:28, when:"1:56 – 2:00", duration:"4 min", tag:"title",
+    title:"Session 7 — The EdYoda Agent Builder.",
+    say:"You called an agent today via HTTP Request — a URL, a JSON body, a JSON response. That agent lived at an endpoint we gave you. In Session 7, you build that endpoint yourself. You'll open the EdYoda Agent Builder, give your agent a system prompt, connect its knowledge base, and get a URL that works exactly like the one you used today. Then you can swap in your own agent everywhere you used ours.",
+    doSteps:[
+      "Show the S7 bridge slide.",
+      "Say: 'Great session, everyone. See you next time.'",
+      "Post the workbook link in chat with the take-home exercise."
+    ],
+    bridge:"Session 7: EdYoda Agent Builder — Build & Host Your First Agent."
+  }
+];
+
+/* ===================== RENDER ENGINE ===================== */
+let current = 0;
+
+function goSlide(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  render();
+}
+function next() { goSlide(current + 1); }
+function prev() { goSlide(current - 1); }
+
+function render() {
+  const s = slides[current];
+  const pane = document.getElementById('slidePane');
+  let html = '';
+
+  if (s.when) {
+    html += `<div class="timing-bar"><span class="time-pill">${s.when}</span>${s.duration ? `<span class="duration">${s.duration}</span>` : ''}<span class="block-title">Session 6 · n8n Workflow Automation</span></div>`;
+  }
+  if (s.tag) html += `<div class="slide-tag ${s.tag}">${s.tag}</div>`;
+  html += `<h1>${s.title}</h1>`;
+
+  if (s.say) {
+    html += `<div class="section say"><div class="header"><h3>Say</h3></div><blockquote class="quote">${s.say}</blockquote></div>`;
+  }
+  if (s.afterPause) {
+    html += `<div class="section say"><div class="header"><h3>After pause</h3></div><p>${s.afterPause}</p></div>`;
+  }
+  if (s.doSteps && s.doSteps.length) {
+    const items = s.doSteps.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section do"><div class="header"><h3>Do</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+  if (s.watch) {
+    html += `<div class="section watch"><div class="header"><h3>Watch for</h3></div><p>${s.watch}</p></div>`;
+  }
+  if (s.note) {
+    html += `<div class="section note"><div class="header"><h3>Note</h3></div><p>${s.note}</p></div>`;
+  }
+  if (s.bridge) {
+    html += `<div class="section bridge"><div class="header"><h3>Bridge</h3></div><p>${s.bridge}</p></div>`;
+  }
+  if (s.deeper && s.deeper.length) {
+    const items = s.deeper.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section deeper"><div class="header"><h3>Deeper (if asked)</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+  if (s.prompt) {
+    html += `<div class="section prompt-section"><div class="header"><h3>Paste / configure</h3></div><div class="prompt-box">${s.prompt}</div></div>`;
+  }
+
+  pane.innerHTML = html;
+
+  document.getElementById('slideCounter').textContent = `${String(s.num).padStart(2,'0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  const np = (i) => slides[i] || null;
+  const now = np(current), nx = np(current+1), nx2 = np(current+2);
+  if (now) { document.getElementById('nowNum').textContent=`Slide ${now.num}`; document.getElementById('nowTitle').textContent=now.title; document.getElementById('nowWhen').textContent=now.when||'—'; }
+  if (nx)  { document.getElementById('nextNum').textContent=`Slide ${nx.num}`;  document.getElementById('nextTitle').textContent=nx.title;  document.getElementById('nextWhen').textContent=nx.when||'—'; }
+  else     { document.getElementById('nextNum').textContent='—'; document.getElementById('nextTitle').textContent='—'; document.getElementById('nextWhen').textContent='—'; }
+  if (nx2) { document.getElementById('next2Num').textContent=`Slide ${nx2.num}`; document.getElementById('next2Title').textContent=nx2.title; document.getElementById('next2When').textContent=nx2.when||'—'; }
+  else     { document.getElementById('next2Num').textContent='—'; document.getElementById('next2Title').textContent='—'; document.getElementById('next2When').textContent='—'; }
+}
+
+/* ===================== REAL CLOCK ===================== */
+function updateRealClock() {
+  const now = new Date();
+  document.getElementById('realClock').textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+/* ===================== CLASS TIMER ===================== */
+let classStart=null, classPaused=true, classInterval=null;
+function startClass() {
+  if (classPaused) {
+    if (!classStart) classStart=Date.now();
+    else classStart=Date.now()-(classStart>0?Date.now()-classStart:0);
+    classPaused=false;
+    document.getElementById('startBtn').textContent='⏸ Pause';
+    classInterval=setInterval(tickClass,1000);
+  } else {
+    classPaused=true; clearInterval(classInterval);
+    document.getElementById('startBtn').textContent='▶ Resume';
+  }
+}
+function resetClass() {
+  classPaused=true; clearInterval(classInterval); classStart=null;
+  document.getElementById('classClock').textContent='0:00 / 2:00';
+  document.getElementById('paceLabel').textContent='—';
+  document.getElementById('paceLabel').className='big';
+  document.getElementById('startBtn').textContent='▶ Start Class';
+}
+function tickClass() {
+  if (!classStart) return;
+  const elapsed=Math.floor((Date.now()-classStart)/1000);
+  const m=Math.floor(elapsed/60), s=elapsed%60;
+  document.getElementById('classClock').textContent=`${m}:${String(s).padStart(2,'0')} / 2:00`;
+  const target=slides[current].when?parseWhen(slides[current].when):null;
+  if (target!==null) {
+    const diff=elapsed-target;
+    const label=document.getElementById('paceLabel');
+    if (diff>180){label.textContent=`+${Math.floor(diff/60)}m late`;label.className='big danger';}
+    else if(diff>60){label.textContent=`+${diff}s`;label.className='big warn';}
+    else{label.textContent='on time';label.className='big ok';}
+  }
+}
+function parseWhen(w) { const m=w.match(/(\d+):(\d+)/); if(!m)return null; return parseInt(m[1])*60+parseInt(m[2]); }
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval=null, exRemaining=0;
+function startExTimer(secs) {
+  stopExTimer(); exRemaining=secs;
+  function tick() {
+    const m=Math.floor(exRemaining/60),s=exRemaining%60;
+    document.getElementById('exTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const b=document.getElementById('timerBlock');
+    b.classList.toggle('warn',exRemaining<=120&&exRemaining>30);
+    b.classList.toggle('danger',exRemaining<=30);
+    exRemaining--;
+    if(exRemaining<0){stopExTimer();document.getElementById('exTimer').textContent='00:00';}
+  }
+  tick(); exInterval=setInterval(tick,1000);
+}
+function stopExTimer() {
+  if(exInterval){clearInterval(exInterval);exInterval=null;}
+  document.getElementById('timerBlock').classList.remove('warn','danger');
+}
+
+/* ===================== KEYBOARD ===================== */
+document.addEventListener('keydown',(e)=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();next();}
+  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
+  if(e.key==='Home')goSlide(0);
+  if(e.key==='End')goSlide(slides.length-1);
+  if(e.key==='s'||e.key==='S')startClass();
+  if(e.key==='b'||e.key==='B')goSlide(BREAK_SLIDE_INDEX);
+  if(e.key==='5')startExTimer(300);
+  if(e.key==='8')startExTimer(480);
+  if(e.key==='1')startExTimer(900);
+  if(e.key==='2')startExTimer(1200);
+  if(e.key==='p'||e.key==='P')printLearnerDeck();
+  if(e.key==='f'||e.key==='F')toggleFullscreen();
+});
+
+/* ===================== LEARNER DECK CONTROL ===================== */
+let learnerWin=null;
+function openLearnerDeck() {
+  const url='learner_deck.html';
+  if(!learnerWin||learnerWin.closed){learnerWin=window.open(url,'genai_s6_learner');}
+  else{learnerWin.focus();}
+}
+const _goSlide=goSlide;
+window.goSlide=function(i){
+  _goSlide(i);
+  try{localStorage.setItem(MASTER_KEY,String(current));}catch(e){}
+};
+function printLearnerDeck() {
+  if(!learnerWin||learnerWin.closed){
+    learnerWin=window.open('learner_deck.html','genai_s6_learner');
+    setTimeout(()=>{try{localStorage.setItem(PRINT_KEY,Date.now().toString());}catch(e){}},1500);
+  } else {
+    try{localStorage.setItem(PRINT_KEY,Date.now().toString());}catch(e){}
+  }
+}
+function toggleFullscreen() {
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+goSlide(0);
+</script>
+</body>
+</html>

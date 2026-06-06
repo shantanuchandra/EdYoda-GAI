@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S5 Workbook — Agent Architecture · EdYoda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ===================== DESIGN TOKENS ===================== */
+:root {
+  --paper:        #f5efe6;
+  --paper-warm:   #ede4d3;
+  --paper-cream:  #faf6ef;
+  --ink:          #1a1814;
+  --ink-soft:     #4a463e;
+  --ink-mute:     #8a8478;
+  --ink-faint:    #b8b1a3;
+  --rule:         #d4ccba;
+  --rule-soft:    #e3dccb;
+
+  --terra:        #b8431b;
+  --terra-soft:   rgba(184,67,27,0.10);
+  --ink-blue:     #1e3a5f;
+  --ink-blue-soft: rgba(30,58,95,0.08);
+  --warn:         #a16207;
+  --warn-soft:    rgba(161,98,7,0.10);
+  --danger:       #991b1b;
+  --danger-soft:  rgba(153,27,27,0.08);
+  --calm:         #14532d;
+  --calm-soft:    rgba(20,83,45,0.08);
+
+  --s-1: 0.5rem;  --s-2: 1rem;  --s-3: 1.5rem;  --s-4: 2rem;
+  --s-5: 3rem;    --s-6: 4.5rem;
+
+  --t-eyebrow: 0.78rem;
+  --t-meta:    0.9rem;
+  --t-body:    1.08rem;
+  --t-body-sm: 0.96rem;
+  --t-lede:    1.4rem;
+  --t-h3:      1.5rem;
+  --t-h2:      2.1rem;
+  --t-h1:      2.8rem;
+
+  --ease: cubic-bezier(0.22,1,0.36,1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Geist', -apple-system, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+body {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: var(--s-5) var(--s-4) var(--s-6);
+}
+
+/* ===================== TYPOGRAPHY ===================== */
+h1, h2, h3, .serif { font-family: 'Fraunces', serif; letter-spacing: -0.02em; }
+
+h1 {
+  font-size: var(--t-h1); font-weight: 300; line-height: 1.05;
+  font-variation-settings: 'opsz' 120, 'SOFT' 40, 'WONK' 1;
+  color: var(--ink);
+}
+h2 {
+  font-size: var(--t-h2); font-weight: 400; line-height: 1.1;
+  font-variation-settings: 'opsz' 80;
+  color: var(--ink);
+  margin-top: var(--s-6);
+}
+h3 {
+  font-size: var(--t-h3); font-weight: 500; line-height: 1.2;
+  font-variation-settings: 'opsz' 60;
+  color: var(--ink);
+  margin-top: var(--s-4);
+}
+
+p { font-size: var(--t-body); color: var(--ink-soft); line-height: 1.65; margin-top: var(--s-2); }
+p:first-child { margin-top: 0; }
+
+strong { color: var(--ink); font-weight: 600; }
+em { font-style: italic; }
+
+ul, ol { margin-top: var(--s-2); padding-left: 1.5em; }
+li { font-size: var(--t-body); color: var(--ink-soft); line-height: 1.6; margin-top: 0.4em; }
+li:first-child { margin-top: 0; }
+li strong { color: var(--ink); }
+
+/* ===================== LAYOUT HELPERS ===================== */
+.rule { height: 1px; background: var(--rule); margin: var(--s-4) 0; }
+.rule-soft { height: 1px; background: var(--rule-soft); margin: var(--s-3) 0; }
+.mt-2 { margin-top: var(--s-2); }
+.mt-3 { margin-top: var(--s-3); }
+.mt-4 { margin-top: var(--s-4); }
+
+/* ===================== COVER ===================== */
+.cover {
+  padding: var(--s-5) 0 var(--s-4);
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: var(--s-5);
+}
+.cover-eyebrow {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--terra); font-weight: 500;
+  display: flex; align-items: center; gap: 0.9em; margin-bottom: var(--s-3);
+}
+.cover-eyebrow::before {
+  content: ''; display: inline-block; width: 1.6em; height: 1px; background: var(--terra);
+}
+.cover-byline {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: var(--t-lede); font-weight: 300; line-height: 1.45;
+  color: var(--ink-soft); max-width: 52ch;
+  font-variation-settings: 'opsz' 36;
+  margin-top: var(--s-3);
+}
+.cover-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: var(--s-4);
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute);
+}
+
+/* ===================== SECTION HEADERS ===================== */
+.section-label {
+  display: flex; align-items: center; gap: var(--s-2);
+  margin-top: var(--s-6); margin-bottom: var(--s-1);
+}
+.section-num {
+  font-family: 'Fraunces', serif; font-size: 4.5rem; font-weight: 300;
+  line-height: 0.85; color: var(--terra); opacity: 0.22;
+  font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+  letter-spacing: -0.05em;
+  user-select: none;
+}
+.section-meta {
+  display: flex; flex-direction: column; gap: 0.2em;
+}
+.section-tag {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--terra); font-weight: 600;
+}
+.section-title {
+  font-family: 'Fraunces', serif; font-size: var(--t-h2);
+  font-weight: 400; color: var(--ink); line-height: 1;
+  font-variation-settings: 'opsz' 80;
+}
+.section-timer {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  color: var(--ink-mute); letter-spacing: 0.1em;
+}
+
+/* ===================== CALLOUTS ===================== */
+.callout {
+  background: var(--terra-soft); border-left: 3px solid var(--terra);
+  padding: var(--s-2) var(--s-3); margin-top: var(--s-3);
+  font-size: var(--t-body); color: var(--ink); line-height: 1.55;
+}
+.callout strong { color: var(--terra); }
+.callout.calm { background: var(--calm-soft); border-left-color: var(--calm); }
+.callout.calm strong { color: var(--calm); }
+.callout.blue { background: var(--ink-blue-soft); border-left-color: var(--ink-blue); }
+.callout.blue strong { color: var(--ink-blue); }
+.callout.warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.callout.warn strong { color: var(--warn); }
+
+/* ===================== PROMPTS (copyable) ===================== */
+.prompt-wrap {
+  position: relative; margin-top: var(--s-3);
+  background: var(--paper-cream); border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+}
+.prompt-wrap::before {
+  content: attr(data-label);
+  position: absolute; top: -0.62em; left: 1.2em;
+  background: var(--paper); padding: 0 0.6em;
+  font-family: 'Geist Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-mute); font-weight: 500;
+}
+.prompt-wrap pre {
+  padding: var(--s-3) var(--s-3) var(--s-2);
+  font-family: 'Geist Mono', monospace; font-size: 0.9rem;
+  line-height: 1.65; color: var(--ink); white-space: pre-wrap;
+  word-break: break-word;
+}
+.copy-btn {
+  position: absolute; top: -0.72em; right: 1em;
+  background: var(--terra); color: var(--paper); border: none;
+  font-family: 'Geist Mono', monospace; font-size: 0.64rem;
+  letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;
+  padding: 0.32em 0.75em; border-radius: 3px; cursor: pointer;
+  transition: background 200ms var(--ease);
+}
+.copy-btn:hover { background: #9e3a17; }
+.copy-btn.copied { background: var(--calm); }
+
+/* ===================== CAPTURE BLOCKS ===================== */
+.capture {
+  margin-top: var(--s-3);
+  border: 1px solid var(--rule); background: var(--paper-cream);
+  padding: var(--s-3);
+}
+.capture-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-mute); font-weight: 600;
+  margin-bottom: var(--s-2);
+  display: flex; align-items: center; gap: 0.8em;
+}
+.capture-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--rule-soft);
+}
+.capture-row {
+  border-bottom: 1px solid var(--rule-soft);
+  padding: 0.65em 0;
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 0.8em; align-items: baseline;
+}
+.capture-row:last-child { border-bottom: none; }
+.cr-label {
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  font-weight: 600; color: var(--terra); text-transform: uppercase;
+  letter-spacing: 0.08em; min-width: 9em; white-space: nowrap;
+}
+.cr-field {
+  font-size: var(--t-body); color: var(--ink-mute);
+  font-style: italic; line-height: 1.5;
+}
+.cr-sub {
+  grid-column: 2; font-size: var(--t-body-sm); color: var(--ink-mute);
+  padding: 0.25em 0 0.1em; font-style: italic; line-height: 1.4;
+}
+
+/* ===================== TABLES ===================== */
+table {
+  width: 100%; border-collapse: collapse;
+  margin-top: var(--s-3); font-size: var(--t-body-sm);
+}
+thead th {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--terra); font-weight: 600;
+  padding: 0.5em 0.8em 0.5em 0; border-bottom: 2px solid var(--terra);
+  text-align: left;
+}
+tbody td {
+  padding: 0.65em 0.8em 0.65em 0;
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--ink-soft); vertical-align: top; line-height: 1.45;
+}
+tbody td:first-child { font-weight: 600; color: var(--ink); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* Wider columns */
+.col-sm { width: 14%; }
+.col-md { width: 22%; }
+
+/* ===================== MANIFEST TABLE (tool rows) ===================== */
+.manifest {
+  margin-top: var(--s-3); border: 1px solid var(--rule);
+}
+.manifest-row {
+  display: grid; grid-template-columns: 2fr 2.4fr 1.4fr 1.2fr;
+  gap: 0; border-bottom: 1px solid var(--rule-soft);
+}
+.manifest-row:last-child { border-bottom: none; }
+.manifest-row.header { background: var(--paper-warm); border-bottom: 2px solid var(--terra); }
+.manifest-cell {
+  padding: 0.6em 0.75em;
+  font-size: var(--t-body-sm); color: var(--ink-soft); line-height: 1.4;
+  border-right: 1px solid var(--rule-soft);
+}
+.manifest-cell:last-child { border-right: none; }
+.manifest-row.header .manifest-cell {
+  font-family: 'Geist Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--terra); font-weight: 600;
+}
+.blank { color: var(--ink-faint); font-style: italic; }
+
+/* ===================== FILL GRID (manifest input) ===================== */
+.fill-grid {
+  margin-top: var(--s-2); border: 1px solid var(--rule); background: var(--paper-cream);
+}
+.fill-row {
+  display: grid; grid-template-columns: 2em 1.4fr 1.6fr 1.8fr 1.2fr;
+  gap: 0; border-bottom: 1px solid var(--rule-soft);
+}
+.fill-row:last-child { border-bottom: none; }
+.fill-row.hdr {
+  background: var(--paper-warm); border-bottom: 2px solid var(--ink-blue);
+}
+.fill-cell {
+  padding: 0.5em 0.7em;
+  font-size: 0.84rem; color: var(--ink-soft); line-height: 1.35;
+  border-right: 1px solid var(--rule-soft);
+}
+.fill-cell:last-child { border-right: none; }
+.fill-row.hdr .fill-cell {
+  font-family: 'Geist Mono', monospace; font-size: 0.64rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-blue); font-weight: 600;
+}
+.fill-num {
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  color: var(--ink-mute); display: flex; align-items: center; justify-content: center;
+}
+.fill-blank { color: var(--ink-faint); font-style: italic; }
+
+/* ===================== DONE WHEN / FIXES ===================== */
+.done-when {
+  margin-top: var(--s-3); background: var(--calm-soft);
+  border-left: 3px solid var(--calm);
+  padding: var(--s-2) var(--s-3);
+}
+.done-when .dw-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--calm); font-weight: 600; margin-bottom: 0.4em;
+}
+.done-when p { color: var(--ink-soft); margin-top: 0; }
+.done-when strong { color: var(--calm); }
+
+.fixes {
+  margin-top: var(--s-3); background: var(--warn-soft);
+  border-left: 3px solid var(--warn); padding: var(--s-2) var(--s-3);
+}
+.fixes .fx-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--warn); font-weight: 600; margin-bottom: 0.5em;
+}
+.fixes ul { margin-top: 0; }
+.fixes li { color: var(--ink-soft); }
+.fixes code { font-family: 'Geist Mono', monospace; font-size: 0.86em; color: var(--ink); background: rgba(0,0,0,0.06); padding: 0.1em 0.35em; border-radius: 2px; }
+
+/* ===================== EXAMPLE BLOCK ===================== */
+.example {
+  margin-top: var(--s-3); background: var(--paper-cream);
+  border: 1px solid var(--rule); border-top: 3px solid var(--ink-blue);
+  padding: var(--s-2) var(--s-3);
+}
+.example-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-blue); font-weight: 600; margin-bottom: var(--s-1);
+}
+.example pre {
+  font-family: 'Geist Mono', monospace; font-size: 0.88rem;
+  line-height: 1.65; color: var(--ink); white-space: pre-wrap; word-break: break-word;
+}
+
+/* ===================== NERVOUS TOOL BLOCK ===================== */
+.nervous {
+  margin-top: var(--s-3); background: var(--danger-soft);
+  border-left: 3px solid var(--danger);
+  padding: var(--s-2) var(--s-3);
+}
+.nervous .nv-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--danger); font-weight: 600; margin-bottom: var(--s-1);
+}
+.nervous .nv-row {
+  border-bottom: 1px solid rgba(153,27,27,0.15);
+  padding: 0.5em 0; display: grid; grid-template-columns: 10em 1fr;
+  gap: 0.8em; align-items: baseline;
+}
+.nervous .nv-row:last-child { border-bottom: none; }
+.nv-k {
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  font-weight: 600; color: var(--danger); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.nv-v { font-size: var(--t-body); color: var(--ink-soft); font-style: italic; }
+
+/* ===================== ARCH CARD SUMMARY ===================== */
+.arch-card {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-2); margin-top: var(--s-3);
+}
+.arch-sec {
+  border: 1px solid var(--rule); border-top: 3px solid var(--terra);
+  padding: var(--s-2);
+}
+.as-num {
+  font-family: 'Geist Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--terra); font-weight: 600; margin-bottom: 0.3em;
+}
+.as-title {
+  font-family: 'Fraunces', serif; font-size: 1.15rem;
+  font-weight: 500; color: var(--ink); margin-bottom: 0.4em; line-height: 1.1;
+}
+.as-body { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.4; }
+.as-gaps {
+  margin-top: 0.6em; font-family: 'Geist Mono', monospace;
+  font-size: 0.72rem; color: var(--terra); letter-spacing: 0.08em;
+}
+
+/* ===================== TAKE-HOME ===================== */
+.take-home {
+  margin-top: var(--s-5); padding: var(--s-4);
+  background: var(--ink); color: var(--paper);
+}
+.take-home .th-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-faint);
+  font-weight: 600; margin-bottom: var(--s-3);
+}
+.take-home h3 { color: var(--paper); font-size: 1.4rem; margin-top: 0; }
+.take-home ol { padding-left: 1.5em; margin-top: var(--s-2); }
+.take-home li { color: rgba(245,239,230,0.78); font-size: var(--t-body); line-height: 1.65; margin-top: var(--s-2); }
+.take-home li:first-child { margin-top: 0; }
+.take-home li strong { color: var(--paper); }
+
+/* ===================== NEXT SESSION ===================== */
+.next-session {
+  margin-top: var(--s-4); padding: var(--s-3);
+  border: 1px solid var(--rule); background: var(--paper-cream);
+  display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); align-items: center;
+}
+.ns-label {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  border-right: 1px solid var(--rule); padding-right: var(--s-2);
+}
+.ns-content h3 { margin-top: 0; font-size: 1.35rem; }
+.ns-content p { color: var(--ink-soft); }
+
+/* ===================== COLOPHON ===================== */
+.colophon {
+  margin-top: var(--s-5); padding-top: var(--s-3);
+  border-top: 1px solid var(--rule);
+  display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s-3);
+}
+.colophon .by {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500;
+}
+.colophon .by .name {
+  display: block; font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 1.6rem; color: var(--ink); letter-spacing: -0.01em;
+  margin-top: 0.3em; font-weight: 400; text-transform: none;
+  font-variation-settings: 'opsz' 96, 'SOFT' 30;
+}
+.colophon .by .linkedin {
+  display: block; font-family: 'Geist Mono', monospace;
+  font-size: 0.82rem; letter-spacing: 0.1em; color: var(--terra);
+  margin-top: 0.3em; text-transform: none; font-weight: 500;
+}
+.colophon .course-mark {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute); text-align: right; line-height: 1.8;
+}
+.colophon .course-mark .terra { color: var(--terra); }
+
+/* ===================== RISK TABLE ===================== */
+.risk-table { width: 100%; border-collapse: collapse; margin-top: var(--s-3); }
+.risk-table th {
+  font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600;
+  padding: 0.5em var(--s-2) 0.5em 0; border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+.risk-table td {
+  padding: 0.65em var(--s-2) 0.65em 0; border-bottom: 1px solid var(--rule-soft);
+  font-size: var(--t-body-sm); color: var(--ink-soft); vertical-align: top; line-height: 1.4;
+}
+.risk-low { color: var(--calm); font-family: 'Geist Mono', monospace; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.risk-high { color: var(--danger); font-family: 'Geist Mono', monospace; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ===================== PRINT ===================== */
+@media print {
+  @page { size: A4; margin: 18mm 20mm; }
+  html::before { display: none; }
+  .copy-btn { display: none; }
+  h2 { page-break-before: always; }
+  h2:first-of-type { page-break-before: auto; }
+  .prompt-wrap, .capture, .example, .callout, .fixes, .done-when { page-break-inside: avoid; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     COVER
+     ============================================================ -->
+<div class="cover">
+  <div class="cover-eyebrow">Session 5 · Agent Architecture</div>
+  <h1>How Agents Think,<br>Remember &amp; Act.</h1>
+  <p class="cover-byline">Slides carry the concepts. This workbook carries the execution — what to open, what to paste, what you should see, and what to do when it doesn't behave.</p>
+  <div class="cover-meta">
+    <span>Lumière Bakery · One story, three exercises</span>
+    <span>EdYoda · GenAI for Non-Coders</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     HOW TO USE THIS WORKBOOK
+     ============================================================ -->
+<h2>How to use this workbook</h2>
+<p>The <strong>slides</strong> carry the concepts — the five components, the loop, the memory types, the patterns. <strong>This workbook carries the execution</strong> — what to open, what to paste, what you should see, and what to do when it doesn't behave. Slides for the <em>why</em>; this for the <em>how</em>.</p>
+<p>Everything today runs on <strong>one story: Lumière Bakery</strong> — the same system you grounded in Session 4. You'll take that read-only Knowledge Agent and design two upgrades the bakery actually needs, ending with a completed <strong>Agent Architecture Card</strong> you'll build for real in Session 6.</p>
+
+<div class="callout blue">
+  <strong>Before you start:</strong> Open your <strong>Lumière Knowledge Agent</strong> in Claude Projects (from Session 4). <strong>Re-upload the latest <code>Lumiere_KB.md</code></strong> (in your S5 materials) into the Project's knowledge before you begin — the document gained a <strong>branch-specific coupons</strong> section since yesterday, and today's first exercise uses it.<br><br>
+  <em>No project?</em> Fresh Claude chat, attach the latest <code>Lumiere_KB.md</code> with the paperclip — every step works the same.
+</div>
+
+
+<!-- ============================================================
+     WHAT YOU'RE DESIGNING TODAY
+     ============================================================ -->
+<h2>What you're designing today</h2>
+<p>Yesterday's agent <em>reads</em>: it answered from <code>Lumiere_KB.md</code>, cited its source, refused when the answer wasn't there. It cannot <em>do</em> anything — can't take an order, book a slot, or flag a problem. Today you design the architecture for two agents that act:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Agent</th>
+      <th>What it does</th>
+      <th>The hard part</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Lumière Order Assistant</strong></td>
+      <td>Takes a cake order end to end — checks the spec against the rules, confirms lead time, books the slot, sends confirmation</td>
+      <td>It <em>acts</em>, so a mistake books the wrong slot — not just a bad answer</td>
+    </tr>
+    <tr>
+      <td><strong>FSSAI Regulation Monitor</strong></td>
+      <td>Watches for new food-safety rules from FSSAI (India's regulator) and keeps Lumière compliant</td>
+      <td>Must auto-handle trivial updates but <strong>escalate anything about allergens or safety to a human</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>You design them today; you build them in Session 6. The design <em>is</em> your Architecture Card.</p>
+
+<div class="callout">
+  <strong>Session-2 callback.</strong> The five gaps that separate an agent from a chatbot — <strong>#1 Memory · #2 Multi-step · #3 Tools · #4 Autonomy · #5 Planning</strong> — are what you're drawing as architecture today. Order Assistant → Gaps <strong>#3 + #4</strong>. Regulation Monitor → Gaps <strong>#1 + #5</strong>.
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Exercise</th>
+      <th>You produce</th>
+      <th>Time</th>
+      <th>Framework you revise</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>A — Loop Trace</strong></td>
+      <td>Yesterday's agent, read stage by stage</td>
+      <td>13 min</td>
+      <td>S4 grounding + refusal</td>
+    </tr>
+    <tr>
+      <td><strong>B — Tool Manifest</strong></td>
+      <td>Tools for both new agents</td>
+      <td>17 min</td>
+      <td>S3 RCTFC · S2 Gaps #3 #4 #1</td>
+    </tr>
+    <tr>
+      <td><strong>C — Pattern Choice</strong></td>
+      <td>How they coordinate across branches</td>
+      <td>8 min</td>
+      <td>S2 Gaps #5 #1</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- ============================================================
+     EXERCISE A — LOOP TRACE
+     ============================================================ -->
+<div class="section-label">
+  <div class="section-num">A</div>
+  <div class="section-meta">
+    <div class="section-tag">Exercise A</div>
+    <div class="section-title">Loop Trace</div>
+    <div class="section-timer">13 minutes</div>
+  </div>
+</div>
+
+<p><strong>What &amp; why.</strong> You'll feed yesterday's agent a deliberately messy customer message with several asks tangled together, and make it expose its reasoning one stage at a time. You're not checking the answer (you did that yesterday) — you're learning to <strong>read the six loop stages</strong>, so when an agent misbehaves you can name the stage that failed. <em>Revises S4:</em> the grounding prompt + refusal line are still doing the work underneath; today you add a reasoning trace on top.</p>
+
+<h3>Do this</h3>
+
+<p><strong>Step 1.</strong> Open your Lumière Knowledge Agent.</p>
+
+<p><strong>Step 2.</strong> Paste this block into the chat — <strong>do not send yet</strong> (it goes <em>above</em> the question):</p>
+
+<div class="prompt-wrap" data-label="TRACE BLOCK — paste first, above the question">
+  <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+  <pre>For this answer, show your reasoning one stage at a time, using exactly
+these six labels in order:
+
+PERCEIVE — list every separate request in the message.
+REASON — for each request, can the Lumière document answer it: YES,
+         NO (not in the document), or PARTIAL (document covers the topic
+         but not this exact detail)?
+PLAN — what order will you handle them in?
+ACT — quote the exact section heading(s) you used.
+OBSERVE — which requests did you fully answer? Which not?
+REFLECT — for anything you couldn't fully answer, what will you do
+          instead of guessing?
+
+Then write the customer-facing reply.</pre>
+</div>
+
+<p><strong>Step 3.</strong> On the next line, paste this and <strong>send</strong>:</p>
+
+<div class="prompt-wrap" data-label="CUSTOMER MESSAGE — paste below the trace block, then send">
+  <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+  <pre>Hi! I want a 2kg eggless chocolate cake for pickup at your Bandra branch
+this Saturday. Can I use the "BANDRA 10" code on it — or my friend said
+"POWAI10" gives a better deal, does that work at Bandra? Also, can you
+deliver it to Sector 90, Gurgaon, and is it safe for my child with a
+severe nut allergy?</pre>
+</div>
+
+<div class="callout">
+  The customer fumbles two coupon details on purpose: the code is mistyped as <strong>"BANDRA 10"</strong> — the real one is <strong>BANDRA10</strong> — and they ask whether a <strong>different branch's</strong> code (POWAI10) works at Bandra. The best agent doesn't just refuse the wrong code — it tells the customer the <strong>right code for their branch</strong>. That's the REASON stage matching meaning, applying a rule, and being helpful with what the document does know.
+</div>
+
+<h3>What you should see</h3>
+<p>The message hides <strong>five</strong> requests, and a good loop sorts them into <em>different kinds</em> — that's the whole lesson:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Request</th>
+      <th>Document says</th>
+      <th>Correct loop behaviour</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2kg eggless choc cake, Saturday, Bandra pickup</td>
+      <td><strong>YES</strong> — 48h lead time for custom cakes ≤3kg; eggless +₹80/cake</td>
+      <td>Answer it, cite <em>Custom &amp; Celebration Orders → Lead Times</em></td>
+    </tr>
+    <tr>
+      <td>The mistyped "BANDRA 10" code</td>
+      <td><strong>FUZZY</strong> — the real code is <strong>BANDRA10</strong> (10% off, min ₹600, Bandra only)</td>
+      <td>Recognise the misspelling, reply with the correct code <strong>BANDRA10</strong></td>
+    </tr>
+    <tr>
+      <td>Does "POWAI10" work at Bandra?</td>
+      <td><strong>NO → REDIRECT</strong> — POWAI10 is Powai-only; at Bandra, <strong>BANDRA10</strong> applies</td>
+      <td>Refuse the wrong-branch code AND tell them the right one: <em>"POWAI10 only works at Powai — at Bandra, use BANDRA10."</em></td>
+    </tr>
+    <tr>
+      <td>Does any code apply to the eggless version?</td>
+      <td><strong>PARTIAL</strong> — eggless eligibility not guaranteed; "confirm with the branch"</td>
+      <td>Flag the gap honestly — don't assume "yes"</td>
+    </tr>
+    <tr>
+      <td>Deliver to Sector 90, Gurgaon + safe for nut allergy</td>
+      <td><strong>NO + NO (safety)</strong> — delivery is Mumbai-only; kitchen is not nut-free</td>
+      <td>Refuse the Gurgaon delivery; state the allergen risk and refuse to certify safety</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The point: a weak loop mashes everything into one confident paragraph. A strong loop <strong>perceives each request separately</strong> and treats them differently — <strong>correct</strong> the fuzzy code, <strong>redirect</strong> the wrong-branch code to the right one for <em>this</em> location, <strong>flag</strong> the eggless-eligibility gap honestly, and <strong>never</strong> certify allergen safety.</p>
+
+<h3>Capture — Section 1 of your Architecture Card</h3>
+
+<div class="capture">
+  <div class="capture-label">Your trace</div>
+  <div class="capture-row">
+    <span class="cr-label">PERCEIVE</span>
+    <span class="cr-field">How many requests did it find, and what were they?</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">REASON</span>
+    <span class="cr-field">Mark each YES / NO / FUZZY / PARTIAL:</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">ACT</span>
+    <span class="cr-field">One exact (Source: …) heading it quoted:</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">OBSERVE / REFLECT</span>
+    <span class="cr-field">What did it do with the wrong-branch code (NO), the Gurgaon delivery (NO), and the nut-allergy safety (NO-safety)?</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">COUPON CHECK</span>
+    <div>
+      <div class="cr-sub">(a) Did it fix "BANDRA 10" to the real BANDRA10?</div>
+      <div class="cr-sub">(b) Did it refuse POWAI10 at Bandra AND point the customer to BANDRA10?</div>
+      <div class="cr-sub">↳ paste what it wrote:</div>
+    </div>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">DIAGNOSIS</span>
+    <span class="cr-field">Which single stage saved this answer from being a bluff?</span>
+  </div>
+</div>
+
+<div class="done-when">
+  <div class="dw-label">You're done when…</div>
+  <p>…your trace shows the agent handling the five requests differently — it <strong>fixes "BANDRA 10" to BANDRA10</strong>, <strong>refuses POWAI10 at Bandra and redirects the customer to BANDRA10</strong>, refuses the Gurgaon delivery and the nut-allergy safety question, and <strong>flags</strong> that eggless eligibility isn't guaranteed. Best result: it names BANDRA10 as the right code for Bandra without being asked again.</p>
+</div>
+
+<div class="fixes">
+  <div class="fx-label">If it misbehaves</div>
+  <ul>
+    <li><strong>One blob, no labels</strong> → the trace block landed below the question or after you sent. Redo it with the block on top.</li>
+    <li><strong>"Yes, safe for a nut allergy"</strong> → add and resend: <em>"On any allergen or safety question, state the kitchen is not nut-free and you cannot guarantee allergen-free — never call an item safe."</em></li>
+    <li><strong>Accepts POWAI10 at Bandra, or invents a Gurgaon answer</strong> → your S4 grounding + refusal prompt isn't loaded, or the agent hasn't re-read the updated KB. Re-upload <code>Lumiere_KB.md</code>, confirm the grounding + refusal prompt is in custom instructions, then retry.</li>
+    <li><strong>Echoes "BANDRA 10" unchanged, or says "no such code"</strong> → it's matching the exact string instead of the meaning. Add to the trace block: <em>"If a coupon code is slightly misspelled, identify the closest real code in the document and give the customer the correct spelling."</em></li>
+    <li><strong>Refuses POWAI10 but stops there (no redirect)</strong> → add: <em>"If a customer asks about a coupon that isn't valid at their branch, tell them which code IS valid at their branch."</em></li>
+  </ul>
+</div>
+
+<div class="callout calm">
+  <strong>Remember:</strong> the agent that perceives five requests as five — and <strong>corrects, redirects, flags, and refuses</strong> instead of bluffing — is the one that won't hallucinate. Same gap that broke the S2 HR Screener, seen from the inside: when it can't answer, it should say so or redirect, never invent.
+</div>
+
+
+<!-- ============================================================
+     EXERCISE B — TOOL MANIFEST
+     ============================================================ -->
+<div class="section-label" style="margin-top: var(--s-6);">
+  <div class="section-num">B</div>
+  <div class="section-meta">
+    <div class="section-tag">Exercise B</div>
+    <div class="section-title">Tool Manifest</div>
+    <div class="section-timer">17 min — ≈7 min Part 1, ≈10 min Part 2</div>
+  </div>
+</div>
+
+<p><strong>What &amp; why.</strong> A reading agent that's wrong gives a bad answer. An <em>acting</em> agent that's wrong books the wrong slot, sends the wrong confirmation, or — worst case — quietly changes an allergen label. So before either agent is built, you write its <strong>tool manifest</strong>: every tool, scoped to exactly what it may touch, at the minimum permission, with a clear escalation line. <em>Revises S3:</em> you'll write each tool in <strong>RCTFC</strong> form — a manifest is RCTFC pointed at a single tool, where <strong>Constraints</strong> = scope + permission.</p>
+
+<h3>Tools in action — the ice-cake question</h3>
+<p>Two tools matter most for the Order Assistant, and neither is something the model can do on its own:</p>
+<ul>
+  <li><strong>Search tool</strong> — looks up live facts the model wasn't trained on (a competitor's price, a news item, a supplier's stock).</li>
+  <li><strong>Weather tool</strong> — returns <em>today's</em> temperature for a specific place. A model has no idea what the weather is right now — it must call a tool.</li>
+</ul>
+
+<p>Here's why this matters. Lumière sells an <strong>ice cake</strong> (an ice-cream cake) that has to stay frozen. A customer asks:</p>
+<div class="callout blue" style="font-style: italic;">"If I pick up the ice cake, how long will it last before it melts?"</div>
+
+<p>The honest answer <strong>depends on where they are and how warm it is right now</strong> — and the model knows neither. A weak agent guesses "about 2 hours." A strong agent reaches for tools:</p>
+<ol>
+  <li><strong>PERCEIVE</strong> — customer wants the safe out-of-freezer window for an ice cake, at their location.</li>
+  <li><strong>ACT (weather tool)</strong> — call it for the customer's locality. A future Gurgaon (Sector 86) branch → tool returns <strong>24°C</strong> today.</li>
+  <li><strong>ACT (calculation)</strong> — apply the melt rule: an ice cake is safe roughly <strong>2 hours at 24°C</strong>; warmer cuts it shorter, cooler stretches it longer.</li>
+  <li><strong>REFLECT + caveat</strong> — <em>"About 2 hours at today's 24°C in Sector 86 — that's an estimate, not a guarantee. Keep it refrigerated and transport it cold."</em></li>
+</ol>
+
+<p><strong>Now change the location — and watch the answer change.</strong> Open a San Francisco branch: the weather tool returns ~15°C, the calculation stretches the safe window to roughly 3–4 hours. <em>Same agent, same tools — the location drives the weather, the weather drives the math, the math drives the answer.</em></p>
+
+<div class="callout">
+  Notice the pattern repeating from Exercise A: the <strong>customer's location</strong> picks the right output — there it chose the right coupon; here it chooses the right weather, and therefore the right melt-time. <strong>Location-aware tool use is the same move both times.</strong>
+</div>
+
+<div class="rule-soft"></div>
+
+<h3>Part 1 — Lumière Order Assistant · ≈7 min · closes Gaps #3 + #4</h3>
+
+<p><strong>Draft it.</strong> Open a fresh Claude chat (or your Lumière project) and paste:</p>
+
+<div class="prompt-wrap" data-label="PROMPT — Order Assistant tool manifest">
+  <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+  <pre>Help me design the TOOL MANIFEST for a Lumière Bakery Order Assistant — an
+agent that takes a customer cake order end to end: checks the cake spec
+against Lumière's rules, confirms the lead time, books the production slot,
+and sends a confirmation.
+
+List 5 tools. Write EACH in RCTFC form:
+- ROLE: what the tool is
+- CONTEXT: where its data lives (e.g. Lumiere_KB.md, the production calendar)
+- TASK: the one action it performs
+- FORMAT: what it returns
+- CONSTRAINTS: the narrowest scope (what it must NOT touch) + the minimum
+  permission (read / read+write / send / execute)
+Then one line: what breaks if this tool is removed.</pre>
+</div>
+
+<p><strong>Tighten it.</strong> Claude's first pass is always too generous. For each tool ask: <em>read access or write?</em> Narrow every Constraints line until Lumière's owner would know exactly what the tool can and can't do.</p>
+
+<div class="example">
+  <div class="example-label">Worked example — the shape to copy</div>
+  <pre>ROLE: Slot Booker
+CONTEXT: Lumière's production calendar
+TASK: Reserve one production slot for a confirmed order
+FORMAT: A booking ID + the reserved date/time
+CONSTRAINTS: Lumière production calendar only — never staff personal
+  calendars, never other branches. Permission: read + write.
+BREAKS IF REMOVED: Orders get confirmed but never actually scheduled.</pre>
+</div>
+
+<p><strong>Your manifest (5 rows):</strong></p>
+
+<div class="fill-grid">
+  <div class="fill-row hdr">
+    <div class="fill-cell">#</div>
+    <div class="fill-cell">Role</div>
+    <div class="fill-cell">Task</div>
+    <div class="fill-cell">Scope (cannot touch)</div>
+    <div class="fill-cell">Perm</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">1</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">2</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">3</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">4</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">5</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+</div>
+
+<p style="margin-top: var(--s-2); font-size: var(--t-body-sm); color: var(--ink-mute); font-style: italic;">A complete Order Assistant usually has: an order-rules reader [read-only on <code>Lumiere_KB.md</code>], a slot booker [read+write, calendar only], a confirmation sender [send, templated], a <strong>weather tool</strong> [read-only, for the ice-cake melt-window question], and a <strong>melt-window calculator</strong> [read-only computation]. Yours may differ — defend your five.</p>
+
+<div class="rule-soft"></div>
+
+<h3>Part 2 — FSSAI Regulation Monitor · ≈10 min · closes Gaps #1 + #5</h3>
+
+<p>This one is harder because it has a <strong>trigger</strong> and a <strong>risk rule</strong>.</p>
+
+<p><strong>(a) Two triggers — this is the loop's PERCEIVE stage firing two ways:</strong></p>
+<ul>
+  <li><strong>Auto:</strong> nightly schedule — <em>"check FSSAI for new/updated rules since last run."</em></li>
+  <li><strong>Manual:</strong> admin clicks <em>check now</em> — before a festival rush, or when opening a new outlet.</li>
+</ul>
+
+<p><strong>(b) A risk rule — and you draw the line, not the agent:</strong></p>
+
+<table class="risk-table">
+  <thead>
+    <tr>
+      <th>Risk</th>
+      <th>Examples</th>
+      <th>Agent does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="risk-low">Low</span><br><span style="font-size:0.82rem; color:var(--ink-mute);">(cosmetic / procedural)</span></td>
+      <td>renamed form, changed portal URL, new filing deadline</td>
+      <td><strong>Auto-apply + log</strong></td>
+    </tr>
+    <tr>
+      <td><span class="risk-high">High</span><br><span style="font-size:0.82rem; color:var(--ink-mute);">(allergen / ingredient / safety)</span></td>
+      <td>new allergen-labelling rule, ingredient ban, safety-claim wording change</td>
+      <td><strong>Escalate to a human — never auto-apply</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <strong>The hard rule, written into the manifest:</strong> the agent <strong>never decides</strong> whether something is low- or high-risk. The human fixes the buckets up front (allergen / ingredient / safety = always high); the agent only sorts new rules into buckets that already exist. An agent that judges its own risk threshold is the over-autonomy this whole session warns against.
+</div>
+
+<p><strong>Draft it.</strong> Paste:</p>
+
+<div class="prompt-wrap" data-label="PROMPT — FSSAI Regulation Monitor tool manifest">
+  <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+  <pre>Help me design the TOOL MANIFEST for a Lumière FSSAI Regulation Monitor —
+an agent that watches for new FSSAI food-safety rules and keeps the bakery
+compliant. It MUST reflect:
+- TWO triggers: an automatic nightly schedule AND a manual "check now" button.
+- A risk rule: AUTO-APPLY + LOG only cosmetic/procedural updates (renamed
+  forms, changed URLs, new deadlines). ESCALATE anything about allergens,
+  ingredients, or safety to a human — never apply it itself.
+- A memory of rules already seen, so it never re-alerts on the same one twice.
+List 4-5 tools in RCTFC form, and for the trigger tool and the escalation
+tool, spell out the exact CONSTRAINTS that enforce the rules above.</pre>
+</div>
+
+<div class="example">
+  <div class="example-label">Worked example — the memory tool you must not skip</div>
+  <pre>ROLE: Seen-Rules Log
+CONTEXT: A stored list of FSSAI rule IDs the monitor has already processed
+TASK: Before alerting, check whether this rule was seen before; after
+  handling, record it
+FORMAT: seen / not-seen, plus the date handled
+CONSTRAINTS: Read + write to this log only. Permission: read + write.
+BREAKS IF REMOVED: The monitor re-alerts on the same rule every single night.</pre>
+</div>
+
+<div class="callout">
+  That <strong>Seen-Rules Log is episodic memory</strong> (the <em>archive</em>, from today's slides). Leave it out and the agent re-alerts forever — the same gap that made the S2 HR Screener invent data when it had nowhere to record what it had already done.
+</div>
+
+<p><strong>Your monitor manifest (4–5 rows — include the memory tool and the escalation tool):</strong></p>
+
+<div class="fill-grid">
+  <div class="fill-row hdr">
+    <div class="fill-cell">#</div>
+    <div class="fill-cell">Role</div>
+    <div class="fill-cell">Task</div>
+    <div class="fill-cell">Rule it enforces</div>
+    <div class="fill-cell">Perm</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">1</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">2</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">3</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">4</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">5</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+    <div class="fill-cell fill-blank">—</div>
+  </div>
+</div>
+
+<h3>Your nervous tool</h3>
+<p>Across both manifests, name the one tool that would worry you most if it misfired (almost always an <em>acting</em> tool — Slot Booker, Confirmation Sender, or the regulation Auto-Apply):</p>
+
+<div class="nervous">
+  <div class="nv-label">Nervous tool</div>
+  <div class="nv-row">
+    <span class="nv-k">Nervous tool</span>
+    <span class="nv-v">name it here</span>
+  </div>
+  <div class="nv-row">
+    <span class="nv-k">How I'd make it safer</span>
+    <span class="nv-v">tighter scope, or a human approval gate before it runs</span>
+  </div>
+</div>
+
+<div class="done-when">
+  <div class="dw-label">You're done when…</div>
+  <p>…both manifests have <strong>scopes written as "cannot touch X," not "access to X"</strong>; every permission is the <em>minimum</em> that still works; the monitor has a named <strong>memory tool</strong>; and <strong>every allergen/safety rule escalates to a human with zero auto-apply.</strong></p>
+</div>
+
+<div class="fixes">
+  <div class="fx-label">If your draft stays vague</div>
+  <p style="font-size:var(--t-body-sm); color:var(--ink-soft); margin-bottom: 0.6em;">Paste this and re-run:</p>
+  <div class="prompt-wrap" data-label="TIGHTEN PROMPT" style="margin-top: 0.5em;">
+    <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+    <pre>Rewrite every CONSTRAINTS line as one sentence naming exactly what the tool
+cannot access, and set each permission to the lowest level that still lets it
+do its job. If you wrote "full access" anywhere, replace it. Confirm: does the
+Regulation Monitor escalate ALL allergen/safety rules with zero auto-apply?</pre>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     EXERCISE C — PATTERN CHOICE
+     ============================================================ -->
+<div class="section-label" style="margin-top: var(--s-6);">
+  <div class="section-num">C</div>
+  <div class="section-meta">
+    <div class="section-tag">Exercise C</div>
+    <div class="section-title">Pattern Choice</div>
+    <div class="section-timer">8 minutes</div>
+  </div>
+</div>
+
+<p><strong>What &amp; why.</strong> Lumière has been Mumbai-only. Now the owner opens a branch <strong>overseas — London</strong>. One assumption breaks instantly: FSSAI has no authority in the UK, where the <strong>FSA</strong> makes the rules. Your single Regulation Monitor knew one rulebook; now there are two, and tomorrow maybe five. That's the moment one agent stops being enough — and <em>how you split the work</em> is the multi-agent decision. <em>Revises S2:</em> Gaps <strong>#5 Planning</strong> (something must route work to the right monitor) and <strong>#1 Memory</strong> (each monitor needs its own memory of its own regulator).</p>
+
+<h3>Do this</h3>
+<p>Paste into Claude:</p>
+
+<div class="prompt-wrap" data-label="PROMPT — multi-agent pattern for multi-branch compliance">
+  <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+  <pre>Lumière Bakery is opening a branch overseas (London), where the food-safety
+regulator is the FSA, not India's FSSAI. The current Regulation Monitor only
+knows FSSAI. I have three patterns:
+- Orchestrator-Worker: a manager agent routes each branch's compliance work
+  to a specialist worker agent.
+- Parallel Agents: identical agents each take a share of one big queue.
+- Specialist Handoffs: each agent does one phase, then passes to the next.
+Which fits keeping multiple branches compliant across DIFFERENT regulators,
+and why? What breaks if I pick wrong? Where must a human stay in the loop?</pre>
+</div>
+
+<p>Read it. You know the bakery better than the model — agree or push back. The strong answer is usually <strong>one Regulation Monitor per regulator</strong> (each with its own memory of its own rulebook), an <strong>orchestrator that routes by branch location</strong>, and the <strong>allergen/safety human gate still firing inside every monitor</strong>.</p>
+
+<h3>Capture — Section 3 of your Architecture Card</h3>
+
+<div class="capture">
+  <div class="capture-label">Your pattern decision</div>
+  <div class="capture-row">
+    <span class="cr-label">Pattern I'd use</span>
+    <span class="cr-field">for multi-branch compliance:</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">Because</span>
+    <span class="cr-field">one-line reason:</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">What breaks</span>
+    <span class="cr-field">with the wrong pattern:</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">Human stays in loop</span>
+    <span class="cr-field">no matter how many branches:</span>
+  </div>
+</div>
+
+<div class="done-when">
+  <div class="dw-label">You're done when…</div>
+  <p>…you've named one pattern, given a one-line reason, and stated where the human gate stays. <strong>Bonus</strong> if you can say why the other two patterns are worse here.</p>
+</div>
+
+<div class="fixes">
+  <div class="fx-label">If Claude over-automates</div>
+  <p style="font-size:var(--t-body-sm); color:var(--ink-soft); margin-bottom:0.6em;">If it suggests one agent should "manage the whole country launch," push back:</p>
+  <div class="prompt-wrap" data-label="PUSHBACK PROMPT" style="margin-top: 0.5em;">
+    <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+    <pre>Don't let one agent manage an entire country launch — too much autonomy for a
+food-safety system. Keep one monitor per regulator, each with its own memory,
+an orchestrator that only ROUTES, and a human gate on every allergen/safety
+decision. Redo it with those limits.</pre>
+  </div>
+  <p style="font-size:var(--t-body-sm); color:var(--ink-soft); margin-top:0.6em;">That pushback <em>is</em> the lesson — refusing the over-broad version is the architecture judgment Session 5 teaches.</p>
+</div>
+
+
+<!-- ============================================================
+     ARCHITECTURE CARD SUMMARY
+     ============================================================ -->
+<h2>Your Lumière Agent Architecture Card</h2>
+
+<div class="arch-card">
+  <div class="arch-sec">
+    <div class="as-num">Section 1</div>
+    <div class="as-title">Loop Trace</div>
+    <div class="as-body">Yesterday's agent, read stage by stage — where hallucination starts</div>
+    <div class="as-gaps">Gaps: #3 · #4</div>
+  </div>
+  <div class="arch-sec">
+    <div class="as-num">Section 2</div>
+    <div class="as-title">Tool Manifest</div>
+    <div class="as-body">Order Assistant + FSSAI Monitor, scoped &amp; triggered</div>
+    <div class="as-gaps">Gaps: #3 · #4 · #1</div>
+  </div>
+  <div class="arch-sec">
+    <div class="as-num">Section 3</div>
+    <div class="as-title">Pattern Choice</div>
+    <div class="as-body">How the agents coordinate across branches</div>
+    <div class="as-gaps">Gaps: #5 · #1</div>
+  </div>
+</div>
+
+<div class="callout calm" style="margin-top: var(--s-3);">
+  <strong>This is the blueprint for Session 6.</strong> In the EdYoda Agent Builder: your Loop Trace shapes the system prompt and step order; your Tool Manifest becomes the configured tools + RAG Docs; your Pattern Choice decides one agent or a routed set. Bring this workbook.
+</div>
+
+
+<!-- ============================================================
+     SAMPLE RUN — ANSWER KEY
+     ============================================================ -->
+<h2 style="margin-top: var(--s-6);">Sample Run — What Good Looks Like</h2>
+<p>Below is a complete end-to-end execution of every workbook prompt against the real <code>Lumiere_KB.md</code>. Use it after you've tried each exercise yourself — not before. The filled-in captures are what a strong agent should produce.</p>
+
+<!-- ── EXERCISE A ANSWER KEY ── -->
+<div class="section-label" style="margin-top: var(--s-5);">
+  <div class="section-num" style="opacity:0.12;">A</div>
+  <div class="section-meta">
+    <div class="section-tag">Exercise A · Sample Output</div>
+    <div class="section-title">Loop Trace</div>
+  </div>
+</div>
+
+<h3>PERCEIVE — five requests, not one</h3>
+<table>
+  <thead><tr><th>#</th><th>Request the customer made</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>2kg eggless chocolate cake, Saturday, Bandra pickup</td></tr>
+    <tr><td>2</td><td>Can I use code "BANDRA 10"?</td></tr>
+    <tr><td>3</td><td>Does "POWAI10" work at Bandra?</td></tr>
+    <tr><td>4</td><td>Can you deliver to Sector 90, Gurgaon?</td></tr>
+    <tr><td>5</td><td>Is it safe for a child with a severe nut allergy?</td></tr>
+  </tbody>
+</table>
+
+<h3>REASON — each request classified</h3>
+<table>
+  <thead><tr><th>#</th><th>Request</th><th>Verdict</th><th>Document says</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>2kg eggless choc cake, Bandra Saturday</td>
+      <td><strong style="color:var(--calm)">YES</strong></td>
+      <td>Custom cakes ≤3kg: 48h lead time. Eggless: +₹80. Bandra pickup valid.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>"BANDRA 10" code</td>
+      <td><strong style="color:var(--warn)">FUZZY</strong></td>
+      <td>Real code is <strong>BANDRA10</strong> (no space): 10% off, min ₹600, Bandra only.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Does POWAI10 work at Bandra?</td>
+      <td><strong style="color:var(--ink-blue)">NO → REDIRECT</strong></td>
+      <td>POWAI10 is Powai-only. At Bandra the valid code is <strong>BANDRA10</strong>.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Deliver to Sector 90, Gurgaon</td>
+      <td><strong style="color:var(--danger)">NO</strong></td>
+      <td>Delivery Mumbai-only. Bandra covers pincodes 400049–400054. Gurgaon out-of-zone.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Safe for severe nut allergy?</td>
+      <td><strong style="color:var(--danger)">NO (safety)</strong></td>
+      <td>Kitchen NOT nut-free. Cross-contamination possible on every item. Cannot certify safety.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>ACT — sources cited</h3>
+<div class="example">
+  <div class="example-label">Sources the agent quoted</div>
+  <pre>Source: Custom &amp; Celebration Orders → Lead Times
+Source: Menu &amp; Prices → Cakes (Standard Sizes) — Eggless versions
+Source: Current Offers &amp; Loyalty → Branch-Specific Codes [Coupons]
+Source: Current Offers &amp; Loyalty → Coupon rules (eggless eligibility)
+Source: Delivery → Delivery Zones / Out-of-Zone &amp; Shipping
+Source: Allergens &amp; Ingredients → Nuts / Important notice</pre>
+</div>
+
+<h3>Customer-facing reply — what the agent sends</h3>
+<div class="callout blue" style="font-size: var(--t-body-sm); line-height: 1.7;">
+  <p>Hi! Happy to help with your Bandra order.</p>
+  <p><strong>Your cake:</strong> A 2kg eggless chocolate fudge cake is available as a custom order. Custom cakes up to 3kg need <strong>48 hours' advance notice minimum</strong> — for this Saturday, place your order by Thursday at the latest with 50% advance payment to confirm it. <em>(Source: Custom &amp; Celebration Orders → Lead Times)</em></p>
+  <p><strong>Your coupon — "BANDRA 10":</strong> The correct code is <strong>BANDRA10</strong> (no space). That's the Bandra West code: 10% off any order with a minimum of ₹600. <em>(Source: Current Offers → Branch-Specific Codes)</em><br>
+  <strong>One thing to confirm:</strong> Coupon eligibility for eggless versions is not guaranteed per promotion — message the Bandra branch on WhatsApp (+91 98200 47312) to confirm BANDRA10 applies to your eggless cake before you finalise. <em>(Source: Coupon rules)</em></p>
+  <p><strong>POWAI10 at Bandra:</strong> POWAI10 is valid at the Powai branch only — it cannot be used at Bandra West. <strong>For Bandra, BANDRA10 is the code that works for you.</strong> <em>(Source: Branch-Specific Codes)</em></p>
+  <p><strong>Delivery to Sector 90, Gurgaon:</strong> Lumière delivers within Mumbai only. The Bandra branch covers Bandra, Khar, Santacruz, and Juhu (pincodes 400049–400054). Gurgaon is outside all delivery zones. <em>(Source: Delivery → Out-of-Zone &amp; Shipping)</em> You're welcome to self-collect from Bandra on Saturday (open 8:00 am – 9:00 pm).</p>
+  <p><strong>Nut allergy — important:</strong> The Lumière kitchen is <strong>not</strong> a nut-free environment. Nuts are handled daily across all workstations and cross-contamination is possible for every item, including those that don't contain nuts as an ingredient. <em>(Source: Allergens &amp; Ingredients → Important notice)</em> I cannot certify any cake as safe for a severe nut allergy. Please consult your doctor and exercise personal judgement.</p>
+</div>
+
+<h3>Filled-in Capture — Section 1 of the Architecture Card</h3>
+<div class="capture">
+  <div class="capture-label">Exercise A · Sample answers</div>
+  <div class="capture-row">
+    <span class="cr-label">PERCEIVE</span>
+    <span class="cr-field">5 requests: cake order · misspelled coupon · wrong-branch coupon · Gurgaon delivery · nut allergy safety</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">REASON</span>
+    <span class="cr-field">#1 YES · #2 FUZZY (misspelling) · #3 NO→REDIRECT · #4 NO (out-of-zone) · #5 NO (safety)</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">ACT</span>
+    <span class="cr-field">Source: Custom &amp; Celebration Orders → Lead Times &nbsp;·&nbsp; Source: Current Offers → Branch-Specific Codes &nbsp;·&nbsp; Source: Allergens → Important notice</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">OBSERVE / REFLECT</span>
+    <span class="cr-field">POWAI10: refused AND redirected to BANDRA10. Gurgaon: refused, offered self-collect. Nut allergy: refused to certify, quoted exact KB safety language.</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">COUPON CHECK</span>
+    <div>
+      <div class="cr-sub">✅ (a) Fixed "BANDRA 10" → <strong>BANDRA10</strong></div>
+      <div class="cr-sub">✅ (b) "POWAI10 only works at Powai — at Bandra, <strong>BANDRA10</strong> is the code that works for you."</div>
+    </div>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">DIAGNOSIS</span>
+    <span class="cr-field"><strong>REASON</strong> — classifying each request YES/NO/FUZZY/REDIRECT stopped the agent from merging five different problems into one confident bluff.</span>
+  </div>
+</div>
+
+<div class="rule" style="margin-top: var(--s-5);"></div>
+
+<!-- ── EXERCISE B ANSWER KEY ── -->
+<div class="section-label" style="margin-top: var(--s-4);">
+  <div class="section-num" style="opacity:0.12;">B</div>
+  <div class="section-meta">
+    <div class="section-tag">Exercise B · Sample Output</div>
+    <div class="section-title">Tool Manifest</div>
+  </div>
+</div>
+
+<h3>Part 1 — Lumière Order Assistant</h3>
+
+<div class="fill-grid">
+  <div class="fill-row hdr">
+    <div class="fill-cell">#</div>
+    <div class="fill-cell">Role</div>
+    <div class="fill-cell">Task</div>
+    <div class="fill-cell">Scope (cannot touch)</div>
+    <div class="fill-cell">Perm</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">1</div>
+    <div class="fill-cell"><strong>Order Rules Reader</strong></div>
+    <div class="fill-cell">Look up cake specs, lead times, eggless pricing, payment rules from Lumiere_KB.md</div>
+    <div class="fill-cell">Read-only KB — never the calendar, customer data, or other branches' docs</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--calm)">Read</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">2</div>
+    <div class="fill-cell"><strong>Slot Booker</strong></div>
+    <div class="fill-cell">Reserve one production slot in the Lumière production calendar for a confirmed order</div>
+    <div class="fill-cell">Production calendar only — never staff personal calendars, never other branches</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--warn)">Read + Write</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">3</div>
+    <div class="fill-cell"><strong>Confirmation Sender</strong></div>
+    <div class="fill-cell">Send a WhatsApp confirmation to the customer: order ID, pickup time, advance payment link</div>
+    <div class="fill-cell">Templated outbound messages only — never read customer history, never message branch staff</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--ink-blue)">Send</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">4</div>
+    <div class="fill-cell"><strong>Weather Tool</strong></div>
+    <div class="fill-cell">Return today's temperature for a specified city/locality (for ice-cake melt-window)</div>
+    <div class="fill-cell">Live weather API, read-only — no write, no customer data</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--calm)">Read</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">5</div>
+    <div class="fill-cell"><strong>Melt-Window Calculator</strong></div>
+    <div class="fill-cell">Given a temperature and ice-cake type, return the estimated safe out-of-freezer window + caveat</div>
+    <div class="fill-cell">Internal computation only — no external calls, no data written anywhere</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--calm)">Read (compute)</div>
+  </div>
+</div>
+
+<div class="nervous" style="margin-top:var(--s-3);">
+  <div class="nv-label">Nervous tool — Order Assistant</div>
+  <div class="nv-row">
+    <span class="nv-k">Nervous tool</span>
+    <span class="nv-v"><strong>Slot Booker</strong> — a double-book or wrong-branch write means a real order is never made, with no error visible to the customer.</span>
+  </div>
+  <div class="nv-row">
+    <span class="nv-k">How I'd make it safer</span>
+    <span class="nv-v">Require a confirmation token from the Order Rules Reader before Slot Booker can write. Add a human approval gate for any order above ₹3,000.</span>
+  </div>
+</div>
+
+<h3 style="margin-top:var(--s-4);">Part 2 — FSSAI Regulation Monitor</h3>
+
+<div class="fill-grid">
+  <div class="fill-row hdr">
+    <div class="fill-cell">#</div>
+    <div class="fill-cell">Role</div>
+    <div class="fill-cell">Task</div>
+    <div class="fill-cell">Rule it enforces</div>
+    <div class="fill-cell">Perm</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">1</div>
+    <div class="fill-cell"><strong>FSSAI Scraper</strong></div>
+    <div class="fill-cell">Fetch new/updated rules from the FSSAI portal since the last run date</div>
+    <div class="fill-cell">Read-only FSSAI public portal — never Lumière's internal docs or calendar</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--calm)">Read</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">2</div>
+    <div class="fill-cell"><strong>Risk Classifier</strong></div>
+    <div class="fill-cell">Sort each new rule into LOW (cosmetic/procedural) or HIGH (allergen/ingredient/safety) using pre-defined human-set buckets</div>
+    <div class="fill-cell">Sorts into existing buckets only — never creates new risk categories</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--calm)">Read</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">3</div>
+    <div class="fill-cell"><strong>Seen-Rules Log</strong></div>
+    <div class="fill-cell">Before alerting, check if this rule ID was processed before; after handling, record it with date</div>
+    <div class="fill-cell">Read + write to the Seen-Rules log only — never Lumière's menu, pricing, or customer data</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--warn)">Read + Write</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">4</div>
+    <div class="fill-cell"><strong>Auto-Apply Writer</strong></div>
+    <div class="fill-cell">Apply LOW-risk updates (renamed forms, changed URLs, new deadlines) to Lumière's compliance checklist</div>
+    <div class="fill-cell">LOW-risk only — never touches allergen labels, ingredient lists, or safety claims</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--warn)">Write (checklist only)</div>
+  </div>
+  <div class="fill-row">
+    <div class="fill-cell fill-num">5</div>
+    <div class="fill-cell"><strong>Escalation Notifier</strong></div>
+    <div class="fill-cell">Send a HIGH-risk alert to the human approver with full rule text and a "do not auto-apply" flag</div>
+    <div class="fill-cell">HIGH-risk rules only — never auto-applies, never modifies any document; send-only to approver</div>
+    <div class="fill-cell" style="font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--ink-blue)">Send</div>
+  </div>
+</div>
+
+<div class="nervous" style="margin-top:var(--s-3);">
+  <div class="nv-label">Nervous tool — FSSAI Monitor</div>
+  <div class="nv-row">
+    <span class="nv-k">Nervous tool</span>
+    <span class="nv-v"><strong>Auto-Apply Writer</strong> — if its risk bucket is misconfigured, a rule it classifies as "procedural" could quietly change an allergen threshold with no human ever seeing it.</span>
+  </div>
+  <div class="nv-row">
+    <span class="nv-k">How I'd make it safer</span>
+    <span class="nv-v">Every write logs to an immutable audit trail. A daily digest of all auto-applies goes to the owner for 24h review before they go live.</span>
+  </div>
+</div>
+
+<div class="rule" style="margin-top: var(--s-5);"></div>
+
+<!-- ── EXERCISE C ANSWER KEY ── -->
+<div class="section-label" style="margin-top: var(--s-4);">
+  <div class="section-num" style="opacity:0.12;">C</div>
+  <div class="section-meta">
+    <div class="section-tag">Exercise C · Sample Output</div>
+    <div class="section-title">Pattern Choice</div>
+  </div>
+</div>
+
+<div class="capture">
+  <div class="capture-label">Exercise C · Sample answers</div>
+  <div class="capture-row">
+    <span class="cr-label">Pattern I'd use</span>
+    <span class="cr-field"><strong>Orchestrator-Worker</strong> — one Regulation Monitor per regulator, one Orchestrator that routes by branch location.</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">Because</span>
+    <span class="cr-field">Each regulator (FSSAI / FSA) has a completely different rulebook and rule IDs. The Seen-Rules Log must be separate per regulator — Mumbai can't share a log with London or they'd mark each other's rules as "already seen."</span>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">What breaks</span>
+    <div>
+      <div class="cr-sub"><strong>Parallel Agents:</strong> splits identical work across one queue — but the work here is different (different regulators, different risk categories). FSSAI logic silently misclassifies FSA rules.</div>
+      <div class="cr-sub"><strong>Specialist Handoffs:</strong> sequences phases inside one task — that's already used inside each monitor. It doesn't route across different regulators at all.</div>
+    </div>
+  </div>
+  <div class="capture-row">
+    <span class="cr-label">Human stays in loop</span>
+    <span class="cr-field">The <strong>Escalation Notifier fires inside every individual monitor</strong> for every HIGH-risk rule — allergen, ingredient, or safety — regardless of how many branches or countries the Orchestrator manages. The Orchestrator only routes; it never makes compliance decisions.</span>
+  </div>
+</div>
+
+<div class="callout calm" style="margin-top:var(--s-3);">
+  <strong>The pushback that proves you understood:</strong> if the model suggests one agent should "manage the whole country launch" — that's over-autonomy. Correct answer: one monitor per regulator, each with its own memory, an orchestrator that only routes, and a human gate on every allergen/safety rule no matter how many branches exist.
+</div>
+
+<!-- ============================================================
+     TAKE-HOME
+     ============================================================ -->
+<div class="take-home">
+  <div class="th-label">Take-home · reply to the class email by Friday — two sentences each</div>
+  <ol>
+    <li>The S2 HR Screener invented data because it lacked one component. Which Lumière agent today would hallucinate the same way without it — and <strong>what exactly would it invent?</strong></li>
+    <li>In your FSSAI Monitor manifest, name one rule you'd <strong>never</strong> let auto-apply, and the trigger that puts a human in the loop.</li>
+  </ol>
+</div>
+
+
+<!-- ============================================================
+     NEXT SESSION
+     ============================================================ -->
+<div class="next-session">
+  <div class="ns-label">Next · Session 6 of 8</div>
+  <div class="ns-content">
+    <h3>EdYoda Agent Builder — Build &amp; Host Your First Agent</h3>
+    <p>Your Architecture Card stops being paper. You'll wire the Lumière Order Assistant as a real, hosted agent — system prompt from your Loop Trace, tools from your Manifest, structure from your Pattern Choice. Bring this workbook.</p>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     COLOPHON
+     ============================================================ -->
+<div class="colophon">
+  <div class="by">
+    Written &amp; facilitated by
+    <span class="name">Shantanu Chandra</span>
+    <span class="linkedin">linkedin.com/in/chandrashantanu</span>
+  </div>
+  <div class="course-mark">
+    EdYoda · GenAI &amp; AI Agents for Non-Coders<br>
+    <span class="terra">Session 05 · Agent Architecture</span>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     COPY BUTTON SCRIPT
+     ============================================================ -->
+<script>
+function copyPrompt(btn) {
+  const pre = btn.closest('.prompt-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback for browsers that block clipboard
+    const ta = document.createElement('textarea');
+    ta.value = pre.textContent.trim();
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>

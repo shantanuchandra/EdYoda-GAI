@@ -12,14 +12,6 @@ Everything today runs on **one story: Lumière Bakery** — the same system you 
 
 **Open before you start:** your **Lumière Knowledge Agent** in Claude Projects (from Session 4). **Re-upload the latest `Lumiere_KB.md`** (in your S5 materials) into the Project's knowledge before you begin — the document gained a **branch-specific coupons** section since yesterday, and today's first exercise uses it. *(Re-uploading a changed document and watching the agent's answers update is exactly the dynamic-doc move you learned in Session 4.)* No project? Fresh Claude chat, attach the latest `Lumiere_KB.md` with the paperclip — every step works the same.
 
-**How to capture your answers:** wherever you see a grey box like this —
-
-```text
-↳ your answer here
-```
-
-— type directly between the lines (this workbook is a Google Doc; you don't need to print it).
-
 ---
 
 ## What you're designing today

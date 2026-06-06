@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<!--
+  LinkedIn Carousel — Field Guide No. 06
+  Topic: The Human-in-the-Loop pattern (n8n Wait node + Telegram approval)
+  Hook archetype: story/confession (aligned to HITL failure-mode story)
+  Cover: "I set up a workflow that handled 47 orders without touching my inbox. Then one slipped through."
+  Subhead: "4 nodes, one Telegram tap, and the Wait node between them. Here's how HITL automation actually works."
+  10 slides · 1080×1080 · Paper/terra editorial · Author byline only (no EdYoda branding)
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Carousel — The Wait Node · Field Guide No. 06</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5efe6; --paper-warm: #ede4d3; --paper-cream: #faf6ef;
+    --ink: #1a1814; --ink-soft: #4a463e; --ink-mute: #8a8478; --ink-faint: #b8b1a3;
+    --rule: #d4ccba; --rule-soft: #e3dccb;
+    --terra: #b8431b; --terra-soft: rgba(184,67,27,0.10);
+    --ink-blue: #1e3a5f; --warn: #a16207; --danger: #991b1b; --calm: #14532d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:#2a2724;font-family:'Geist',sans-serif;color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding:40px 20px;}
+  .stage{display:flex;flex-direction:column;gap:40px;align-items:center;}
+  .square{width:1080px;height:1080px;background:var(--paper);position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+  .square::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0.45;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");}
+  .square::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 55%,rgba(26,24,20,0.10) 100%);}
+  .square-content{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:80px 80px 90px;}
+  .running-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:14px;color:var(--ink-mute);letter-spacing:0.2em;text-transform:uppercase;font-weight:500;}
+  .running-head .pub-title{font-family:'Fraunces',serif;font-style:italic;font-size:16px;letter-spacing:0.02em;text-transform:none;color:var(--ink);font-weight:400;}
+  .running-head .left{display:flex;gap:24px;align-items:baseline;}
+  .running-head .left .dot{color:var(--ink-faint);}
+  .body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 0;}
+  .folio{position:absolute;bottom:30px;right:80px;font-family:'Fraunces',serif;font-weight:300;font-size:140px;line-height:0.8;color:var(--ink-faint);font-variant-numeric:tabular-nums oldstyle-nums;letter-spacing:-0.04em;z-index:0;opacity:0.55;}
+  .folio sup{font-size:0.32em;vertical-align:top;margin-left:0.15em;color:var(--ink-mute);font-weight:400;}
+  .swipe{position:absolute;bottom:38px;left:80px;font-family:'Geist Mono',monospace;font-size:14px;letter-spacing:0.2em;text-transform:uppercase;color:var(--terra);z-index:5;font-weight:500;}
+  .eyebrow{display:inline-block;font-family:'Geist Mono',monospace;font-size:16px;letter-spacing:0.24em;text-transform:uppercase;color:var(--terra);font-weight:500;margin-bottom:36px;position:relative;padding-left:2em;}
+  .eyebrow::before{content:'';position:absolute;left:0;top:50%;width:1.5em;height:1px;background:var(--terra);}
+  h1,.display,.mega{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:-0.025em;font-weight:300;}
+  h1{font-size:78px;line-height:1.02;font-variation-settings:'opsz' 144,'SOFT' 40,'WONK' 1;}
+  .display{font-size:104px;line-height:0.98;font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1;}
+  em.terra-em{font-style:italic;color:var(--terra);}
+  .lede{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;line-height:1.4;color:var(--ink-soft);max-width:22ch;font-variation-settings:'opsz' 60;}
+  .lede-block{font-family:'Fraunces',serif;font-size:26px;font-weight:300;line-height:1.45;color:var(--ink-soft);max-width:30ch;margin-top:36px;font-variation-settings:'opsz' 60;}
+  .lede-block strong{color:var(--ink);font-weight:400;} .lede-block em{font-style:italic;color:var(--terra);}
+  .rule-double{height:6px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin:32px 0;}
+
+  /* Pipeline */
+  .pipeline{display:flex;align-items:center;gap:0;margin:32px 0;}
+  .p-node{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .p-node .pn-box{border:2px solid var(--terra);background:var(--terra-soft);padding:16px 24px;text-align:center;min-width:130px;}
+  .p-node .pn-box.trigger{border-color:var(--calm);background:rgba(20,83,45,0.08);}
+  .p-node .pn-box.http{border-color:var(--ink-blue);background:rgba(30,58,95,0.08);}
+  .p-node .pn-box.gate{border-color:var(--warn);background:rgba(161,98,7,0.08);}
+  .p-node .pn-box.wait{border-color:var(--terra);background:var(--terra-soft);border-style:dashed;}
+  .p-node .pn-box.action{border-color:var(--calm);background:rgba(20,83,45,0.08);}
+  .p-node .pn-label{font-family:'Geist Mono',monospace;font-size:18px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink);}
+  .p-node .pn-sub{font-size:16px;color:var(--ink-mute);text-align:center;line-height:1.3;}
+  .p-arrow{font-size:28px;color:var(--ink-faint);padding:0 12px;margin-bottom:28px;}
+
+  /* Mechanism */
+  .mechanism{margin-top:32px;}
+  .mech-row{display:flex;gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--rule-soft);}
+  .mech-row:last-child{border-bottom:none;}
+  .mech-n{font-family:'Fraunces',serif;font-size:60px;font-weight:300;color:var(--terra);line-height:1;min-width:60px;font-variant-numeric:tabular-nums;}
+  .mech-body .mech-title{font-family:'Fraunces',serif;font-size:28px;font-weight:500;color:var(--ink);line-height:1.1;margin-bottom:6px;}
+  .mech-body .mech-desc{font-size:18px;color:var(--ink-soft);line-height:1.4;}
+  .mech-row.highlight .mech-n{color:var(--danger);}
+  .mech-row.highlight .mech-body .mech-title{color:var(--danger);}
+
+  /* VS cards */
+  .vs-cards{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;margin-top:40px;align-items:stretch;}
+  .vs-col .vs-label{font-family:'Geist Mono',monospace;font-size:14px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:20px;font-weight:500;}
+  .vs-col.after .vs-label{color:var(--terra);}
+  .vs-col .vs-head{font-family:'Fraunces',serif;font-size:30px;font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:14px;}
+  .vs-col .vs-body{font-family:'Fraunces',serif;font-style:italic;font-size:20px;color:var(--ink-soft);line-height:1.45;}
+  .vs-vdiv{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+  .vs-vdiv .vs-arrow{font-family:'Fraunces',serif;font-size:48px;color:var(--terra);}
+  .vs-vdiv .vline{width:1px;flex:1;background:linear-gradient(180deg,transparent 0%,var(--rule) 20%,var(--rule) 80%,transparent 100%);}
+
+  /* Snippet block */
+  .snippet-block{background:#1a1814;border-radius:4px;padding:32px 36px;margin-top:32px;position:relative;}
+  .snippet-block .sb-label{font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:20px;font-weight:500;}
+  .snippet-block pre{font-family:'Geist Mono',monospace;font-size:19px;line-height:1.7;color:#5eead4;white-space:pre-wrap;}
+  .snippet-block .sb-note{margin-top:20px;font-family:'Fraunces',serif;font-style:italic;font-size:17px;color:var(--ink-mute);line-height:1.4;}
+  .defence-num{position:absolute;right:80px;top:160px;font-family:'Fraunces',serif;font-size:280px;font-weight:300;color:var(--terra);opacity:0.08;line-height:0.85;font-variant-numeric:tabular-nums;z-index:0;}
+
+  /* Pull quote */
+  .pull-quote{font-family:'Fraunces',serif;font-size:52px;font-weight:300;font-style:italic;line-height:1.15;color:var(--ink);letter-spacing:-0.015em;font-variation-settings:'opsz' 100,'SOFT' 40;position:relative;padding-left:48px;}
+  .pull-quote::before{content:'';position:absolute;left:0;top:0.15em;width:3px;height:85%;background:var(--terra);}
+  .quote-sub{font-family:'Geist Mono',monospace;font-size:16px;letter-spacing:0.2em;text-transform:uppercase;color:var(--terra);margin-top:32px;font-weight:500;}
+
+  /* Platforms matrix */
+  .platforms{margin-top:32px;}
+  .pt-head{display:grid;grid-template-columns:200px repeat(4,1fr);gap:0;margin-bottom:12px;}
+  .pt-head .ph-col{font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-mute);text-align:center;padding:0 8px;}
+  .pt-row{display:grid;grid-template-columns:200px repeat(4,1fr);gap:0;padding:16px 0;border-bottom:1px solid var(--rule-soft);align-items:center;}
+  .pt-row:last-child{border-bottom:none;}
+  .pt-name{font-family:'Fraunces',serif;font-size:22px;font-weight:400;color:var(--ink);}
+  .pt-cell{text-align:center;font-family:'Geist Mono',monospace;font-size:13px;padding:4px 8px;}
+  .pt-cell.open{color:var(--calm);font-weight:600;}
+  .pt-cell.paid{color:var(--warn);}
+  .pt-cell.blocked{color:var(--ink-faint);}
+
+  /* Tip list (defences) */
+  .tip-list{margin-top:24px;}
+  .tip-row{display:flex;gap:24px;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--rule-soft);}
+  .tip-row:last-child{border-bottom:none;}
+  .tip-n{font-family:'Fraunces',serif;font-size:48px;font-weight:300;color:var(--terra);line-height:1;min-width:52px;}
+  .tip-body .tip-title{font-family:'Fraunces',serif;font-size:24px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+  .tip-body .tip-desc{font-size:17px;color:var(--ink-soft);line-height:1.4;}
+
+  /* Colophon (slide 10) */
+  .close-colophon{margin-top:auto;padding-top:28px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;align-items:baseline;}
+  .close-colophon .by{font-family:'Geist Mono',monospace;font-size:14px;text-transform:uppercase;letter-spacing:0.16em;color:var(--ink-mute);}
+  .close-colophon .name{display:block;font-family:'Fraunces',serif;font-size:22px;font-weight:400;font-style:italic;color:var(--ink);margin-top:4px;text-transform:none;letter-spacing:0;}
+  .close-colophon .linkedin{display:block;font-family:'Geist Mono',monospace;font-size:14px;color:var(--terra);letter-spacing:0.1em;text-transform:none;}
+  .close-colophon .series{font-family:'Geist Mono',monospace;font-size:13px;color:var(--ink-mute);text-align:right;letter-spacing:0.12em;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="stage">
+
+<!-- ==================== SLIDE 1 — COVER ==================== -->
+<div class="square" id="s1">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body" style="justify-content:space-between;padding:50px 0 0;">
+      <!-- SVG diagram — workflow pipeline, not text strip -->
+      <svg viewBox="0 0 920 160" width="920" height="160" style="margin-top:40px;display:block;overflow:visible;">
+        <!-- Trigger -->
+        <rect x="0" y="20" width="160" height="70" rx="4" fill="rgba(20,83,45,0.10)" stroke="#14532d" stroke-width="2"/>
+        <text x="80" y="52" font-family="Geist Mono,monospace" font-size="13" fill="#14532d" text-anchor="middle" letter-spacing="2" font-weight="600">GMAIL</text>
+        <text x="80" y="72" font-family="Geist Mono,monospace" font-size="13" fill="#14532d" text-anchor="middle" letter-spacing="2">TRIGGER</text>
+        <!-- Arrow -->
+        <line x1="162" y1="55" x2="198" y2="55" stroke="#b8b1a3" stroke-width="1.5"/>
+        <polygon points="198,50 208,55 198,60" fill="#b8b1a3"/>
+        <!-- HTTP -->
+        <rect x="210" y="20" width="160" height="70" rx="4" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2"/>
+        <text x="290" y="52" font-family="Geist Mono,monospace" font-size="13" fill="#1e3a5f" text-anchor="middle" letter-spacing="2" font-weight="600">HTTP</text>
+        <text x="290" y="72" font-family="Geist Mono,monospace" font-size="13" fill="#1e3a5f" text-anchor="middle" letter-spacing="2">REQUEST</text>
+        <!-- Arrow -->
+        <line x1="372" y1="55" x2="408" y2="55" stroke="#b8b1a3" stroke-width="1.5"/>
+        <polygon points="408,50 418,55 408,60" fill="#b8b1a3"/>
+        <!-- IF -->
+        <rect x="420" y="20" width="120" height="70" rx="4" fill="rgba(161,98,7,0.08)" stroke="#a16207" stroke-width="2"/>
+        <text x="480" y="52" font-family="Geist Mono,monospace" font-size="13" fill="#a16207" text-anchor="middle" letter-spacing="2" font-weight="600">IF</text>
+        <text x="480" y="72" font-family="Geist Mono,monospace" font-size="13" fill="#a16207" text-anchor="middle" letter-spacing="2">NODE</text>
+        <!-- Arrow to Wait (dashed) -->
+        <line x1="542" y1="55" x2="578" y2="55" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="6,4"/>
+        <polygon points="578,50 588,55 578,60" fill="#b8431b"/>
+        <!-- Wait -->
+        <rect x="590" y="20" width="120" height="70" rx="4" fill="rgba(184,67,27,0.10)" stroke="#b8431b" stroke-width="2" stroke-dasharray="6,4"/>
+        <text x="650" y="52" font-family="Geist Mono,monospace" font-size="13" fill="#b8431b" text-anchor="middle" letter-spacing="2" font-weight="600">WAIT</text>
+        <text x="650" y="72" font-family="Geist Mono,monospace" font-size="13" fill="#b8431b" text-anchor="middle" letter-spacing="2">NODE</text>
+        <!-- Arrow -->
+        <line x1="712" y1="55" x2="748" y2="55" stroke="#b8b1a3" stroke-width="1.5"/>
+        <polygon points="748,50 758,55 748,60" fill="#b8b1a3"/>
+        <!-- Telegram -->
+        <rect x="760" y="20" width="160" height="70" rx="4" fill="rgba(30,58,95,0.06)" stroke="#1e3a5f" stroke-width="2"/>
+        <text x="840" y="52" font-family="Geist Mono,monospace" font-size="13" fill="#1e3a5f" text-anchor="middle" letter-spacing="2" font-weight="600">TELEGRAM</text>
+        <text x="840" y="72" font-family="Geist Mono,monospace" font-size="13" fill="#1e3a5f" text-anchor="middle" letter-spacing="2">✅ / ❌</text>
+        <!-- Sub-caption -->
+        <text x="460" y="135" font-family="Geist Mono,monospace" font-size="12" fill="#8a8478" text-anchor="middle" letter-spacing="3">ORDER IN → AGENT CLASSIFIES → WAIT → HUMAN DECIDES → CONFIRMS OUT</text>
+      </svg>
+
+      <div style="margin-top:32px;">
+        <h1 style="font-size:72px;max-width:17ch;line-height:1.0;">I set up a workflow that handled <em class="terra-em">47 orders</em> without touching my inbox.</h1>
+        <p style="font-family:'Fraunces',serif;font-style:italic;font-size:26px;color:var(--ink-soft);margin-top:24px;max-width:36ch;line-height:1.45;font-variation-settings:'opsz' 60;">Then one slipped through. Here's the Wait node pattern that stops that from happening — 4 nodes, one Telegram tap.</p>
+      </div>
+    </div>
+  </div>
+  <div class="swipe">Swipe to see the pattern →</div>
+</div>
+
+<!-- ==================== SLIDE 2 — THESIS ==================== -->
+<div class="square" id="s2">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body" style="justify-content:center;">
+      <div class="pull-quote">"Automation without a human gate isn't faster. It's faster at making the wrong call confident."</div>
+      <div class="quote-sub">The thesis · Human-in-the-Loop automation</div>
+      <p class="lede-block" style="margin-top:48px;">A workflow that handles 100% of orders at machine speed is impressive. A workflow that handles 90% at machine speed and flags the other 10% to a human — <strong>that's the one you can trust.</strong></p>
+    </div>
+  </div>
+  <div class="folio">2<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 3 — MECHANISM ==================== -->
+<div class="square" id="s3">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">How it works</div>
+      <h1 style="font-size:62px;">The 4-node HITL pattern.</h1>
+      <div class="mechanism">
+        <div class="mech-row">
+          <div class="mech-n">1</div>
+          <div class="mech-body">
+            <div class="mech-title">Trigger — something happens</div>
+            <div class="mech-desc">An email arrives. A form submits. A schedule fires. The workflow wakes up.</div>
+          </div>
+        </div>
+        <div class="mech-row">
+          <div class="mech-n">2</div>
+          <div class="mech-body">
+            <div class="mech-title">HTTP Request — the agent classifies it</div>
+            <div class="mech-desc">Your AI agent reads the input and returns a structured decision: standard or escalate, with a draft response.</div>
+          </div>
+        </div>
+        <div class="mech-row">
+          <div class="mech-n">3</div>
+          <div class="mech-body">
+            <div class="mech-title">IF node — routes on the decision</div>
+            <div class="mech-desc">Standard → auto-handled at machine speed. Complex → goes to the Wait node.</div>
+          </div>
+        </div>
+        <div class="mech-row highlight">
+          <div class="mech-n">4</div>
+          <div class="mech-body">
+            <div class="mech-title">Wait node — the machine pauses for a human</div>
+            <div class="mech-desc">Not cancelled. Not timed out. Holding — until a human taps a button. This is the node most builders skip.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">3<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 4 — PROOF ==================== -->
+<div class="square" id="s4">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">The Lumière case</div>
+      <h1 style="font-size:58px;">A custom cake order. A dairy allergy. A 48-hour lead time.</h1>
+      <p class="lede-block">Three conditions that together mean <em>"don't auto-confirm this."</em> The agent classifies it. The IF node routes it right. The Wait node holds the workflow until the manager taps ✅ on Telegram.</p>
+      <div style="margin-top:40px;display:flex;gap:24px;align-items:stretch;">
+        <div style="flex:1;background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--calm);padding:24px;">
+          <div style="font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--calm);margin-bottom:12px;font-weight:600;">Standard → auto</div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;color:var(--ink);line-height:1.4;">2-tier vanilla sponge, ₹2,500, Saturday pickup → <strong>confirmed in 1 second.</strong></div>
+        </div>
+        <div style="flex:1;background:var(--terra-soft);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:24px;">
+          <div style="font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--terra);margin-bottom:12px;font-weight:600;">Complex → wait</div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;color:var(--ink);line-height:1.4;">3-tier fondant, dairy-free, 48hr → <strong>Telegram fires. Manager taps. Then it sends.</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">4<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 5 — RECEIPT ==================== -->
+<div class="square" id="s5">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">Expected vs actual</div>
+      <h1 style="font-size:58px;">What most builders ship. What actually ships.</h1>
+      <div class="vs-cards">
+        <div class="vs-col">
+          <div class="vs-label">What most people build</div>
+          <div class="vs-head">100% automated. Always fires.</div>
+          <div class="vs-body">Feels like the win. Then one order with a dietary restriction auto-confirms. Customer gets the wrong cake. You find out after it's baked.</div>
+        </div>
+        <div class="vs-vdiv">
+          <div class="vs-arrow">→</div>
+          <div class="vline"></div>
+        </div>
+        <div class="vs-col after">
+          <div class="vs-label">What you actually want</div>
+          <div class="vs-head">90% automated. 10% human-gated.</div>
+          <div class="vs-body">The standard orders confirm instantly. The edge cases pause and wait. The human makes one tap. The machine finishes. Nothing slips through.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">5<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 6 — GENERALISE ==================== -->
+<div class="square" id="s6">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">The pattern, generalised</div>
+      <h1 style="font-size:54px;">Every serious automation needs a human gate. The trigger changes. The Wait node doesn't.</h1>
+      <div class="platforms" style="margin-top:28px;">
+        <div class="pt-head">
+          <div></div>
+          <div class="ph-col">Domain</div>
+          <div class="ph-col">Standard</div>
+          <div class="ph-col">Escalate when</div>
+          <div class="ph-col">Human taps</div>
+        </div>
+        <div class="pt-row">
+          <div class="pt-name">Bakery</div>
+          <div class="pt-cell">Order triage</div>
+          <div class="pt-cell open">Auto-confirm</div>
+          <div class="pt-cell" style="font-size:13px;color:var(--ink-soft);">Allergy / &lt;72hr / fondant</div>
+          <div class="pt-cell open">✅ / ❌</div>
+        </div>
+        <div class="pt-row">
+          <div class="pt-name">Sales</div>
+          <div class="pt-cell">Lead routing</div>
+          <div class="pt-cell open">Auto-assign</div>
+          <div class="pt-cell" style="font-size:13px;color:var(--ink-soft);">Enterprise / C-suite / competitor</div>
+          <div class="pt-cell open">✅ / ❌</div>
+        </div>
+        <div class="pt-row">
+          <div class="pt-name">Finance</div>
+          <div class="pt-cell">Invoice approval</div>
+          <div class="pt-cell open">Auto-queue</div>
+          <div class="pt-cell" style="font-size:13px;color:var(--ink-soft);">&gt;₹50K / new vendor / no PO</div>
+          <div class="pt-cell open">✅ / ❌</div>
+        </div>
+        <div class="pt-row">
+          <div class="pt-name">HR</div>
+          <div class="pt-cell">Candidate triage</div>
+          <div class="pt-cell open">Auto-screen</div>
+          <div class="pt-cell" style="font-size:13px;color:var(--ink-soft);">VP+ role / referral / counter-offer</div>
+          <div class="pt-cell open">✅ / ❌</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">6<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 7 — DEFENCE 1 ==================== -->
+<div class="square" id="s7">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="defence-num">1</div>
+      <div class="eyebrow">Toolkit · Defence 1</div>
+      <h1 style="font-size:58px;max-width:14ch;">The classifier prompt that decides what's complex.</h1>
+      <div class="snippet-block">
+        <div class="sb-label">Paste into your HTTP Request body</div>
+        <pre>Classify as COMPLEX (human_gate: true) if ANY of:
+— Dietary restriction mentioned
+— Lead time under 72 hours
+— Budget outside your standard range
+— High-risk, irreversible, or unusual request
+
+Return: { "human_gate": true/false, "reason": "..." }</pre>
+        <div class="sb-note">The classifier is the only thing you customise per domain. The Wait node wiring stays identical.</div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">7<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 8 — DEFENCE 2 ==================== -->
+<div class="square" id="s8">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="defence-num">2</div>
+      <div class="eyebrow">Toolkit · Defence 2</div>
+      <h1 style="font-size:56px;max-width:16ch;">Two ears. One workflow. No dropped decisions.</h1>
+      <p class="lede-block">Most builders wire one entry point (the Trigger). HITL workflows need two. <em>Ear 1</em> starts the workflow. The Wait node pauses it. <em>Ear 2</em> (the Telegram Trigger) resumes it on the human's tap.</p>
+      <div style="margin-top:36px;display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:center;">
+        <div style="background:rgba(20,83,45,0.08);border:2px solid var(--calm);padding:24px;text-align:center;">
+          <div style="font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:var(--calm);font-weight:600;margin-bottom:8px;">Ear 1</div>
+          <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--ink);">Gmail Trigger</div>
+          <div style="font-size:16px;color:var(--ink-mute);margin-top:6px;">Order arrives → workflow starts</div>
+        </div>
+        <div style="text-align:center;font-family:'Fraunces',serif;font-size:40px;color:var(--terra);">⟷</div>
+        <div style="background:var(--terra-soft);border:2px dashed var(--terra);padding:24px;text-align:center;">
+          <div style="font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:8px;">Ear 2</div>
+          <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--ink);">Telegram Trigger</div>
+          <div style="font-size:16px;color:var(--ink-mute);margin-top:6px;">Manager taps → workflow resumes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">8<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 9 — DEFENCES 3+4 ==================== -->
+<div class="square" id="s9">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">Toolkit · Defences 3 + 4</div>
+      <div class="tip-list">
+        <div class="tip-row">
+          <div class="tip-n">3</div>
+          <div class="tip-body">
+            <div class="tip-title">The rejection branch is not optional.</div>
+            <div class="tip-desc">When the manager taps ❌, the workflow must do something — re-draft, escalate, notify. A rejection that goes nowhere is a failure mode. Wire it before you go live.</div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-n">4</div>
+          <div class="tip-body">
+            <div class="tip-title">Debug with three questions, not by guessing.</div>
+            <div class="tip-desc">When a workflow breaks: (1) which node is red? (2) what did it receive? (3) what did it expect? Answer all three before touching anything. The error is almost always in the mismatch between 2 and 3.</div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <div class="tip-n" style="font-size:36px;">+</div>
+          <div class="tip-body">
+            <div class="tip-title">Pin data. Stop flooding your inbox.</div>
+            <div class="tip-desc">After your first successful run, pin the Trigger's output. Every subsequent test replays the pinned email — no real sends, no OAuth re-auth, no test inbox clutter.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">9<sup>/10</sup></div>
+  <div class="swipe">Swipe →</div>
+</div>
+
+<!-- ==================== SLIDE 10 — CTA CLOSE ==================== -->
+<div class="square" id="s10">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 06</span></div>
+      <span class="pub-title">A Field Guide to Generative AI</span>
+    </div>
+    <div class="body" style="justify-content:center;">
+      <div class="eyebrow">What to do next</div>
+      <h1 style="font-size:66px;max-width:14ch;line-height:1.0;">Build the workflow that handles <em class="terra-em">your</em> edge cases.</h1>
+      <p class="lede-block">Take the classifier prompt from slide 7 and swap the conditions for your own domain — sales leads, invoices, HR candidates, medical referrals. The Wait node wiring is identical. Only the escalation rules change.</p>
+      <div style="margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div style="background:var(--terra-soft);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:20px;">
+          <div style="font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:var(--terra);margin-bottom:8px;font-weight:600;">Primary offer</div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;color:var(--ink);line-height:1.35;">DM me "HITL" and I'll send you the full classifier prompt template — customisable for 4 domains.</div>
+        </div>
+        <div style="background:var(--paper-cream);border:1px solid var(--rule);padding:20px;">
+          <div style="font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:8px;font-weight:600;">Secondary offer</div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;color:var(--ink);line-height:1.35;">Follow for Field Notes No. 07 — building the agent that lives inside the HTTP Request node.</div>
+        </div>
+      </div>
+    </div>
+    <div class="close-colophon">
+      <div class="by">Written &amp; facilitated by
+        <span class="name">Shantanu Chandra</span>
+        <span class="linkedin">linkedin.com/in/chandrashantanu</span>
+      </div>
+      <div class="series">Field Notes<br>A Field Guide to<br>Generative AI · No. 06</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /stage -->
+</body>
+</html>
