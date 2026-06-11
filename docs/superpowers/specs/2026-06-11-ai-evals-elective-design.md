@@ -142,8 +142,8 @@ The deepest section. Deck centerpiece = **hallucination & faithfulness** ("is th
 
 **Handbook (text):** all three challenges in full — judge ladder with examples, faithfulness/hallucination metric family, rubric-design worksheet.
 
-#### Act 5 — Audio · Image · Video: the metrics reference (18 min)
-You asked for "just share the metrics" here — so this act IS a guided walk through the **Modality Metrics Reference** (the handbook centerpiece). One slide per modality showing the headline metrics; the full table is the keepsake artifact. Goal: PMs know *what exists* and *what each metric misses*, fast.
+#### Act 5 — Audio · Image · Video: the metrics reference (20 min)
+You asked for "just share the metrics" here — so this act IS a guided walk through the **Modality Metrics Reference** (the handbook centerpiece). One slide per modality showing the headline metrics with real numbers; the full table is the keepsake artifact. Goal: PMs know *what exists* and *what each metric misses*, fast.
 
 **The Modality Metrics Reference (handbook artifact) — columns:**
 **Metric name + what it measures · Typical "good" value / benchmark · Who/what judges it (code / model / human) · What it MISSES (failure mode).**
@@ -201,7 +201,7 @@ A one-page handout they fill (not a lecture): pin **one eval to one agent**, wit
 Following the EdYoda template set ([[edyoda_genai_design_system]] → `templates/`):
 1. **`presenter_deck.html`** — Dark Console cockpit. `say:`/`doSteps:`/`note:`. Clock + timing (facilitator-only). Paired via `localStorage`.
 2. **`learner_deck.html`** — Paper Editorial. Same slide count as presenter. No timestamps/stage directions.
-3. **`01_Facilitator_Script.md`** — run sheet with minute markers, hard-stop discipline for the demo round (the binding act), the critique preview-vs-take-home script, what-if-X-breaks.
+3. **`01_Facilitator_Script.md`** — run sheet with minute markers, the §3 flex decisions, what-if-X-breaks.
 4. **`03_Learner_Handbook.md`** — the heavy reference (note: **Handbook**, the deeper artifact this cohort wants, not just a workbook). Contains: the 5 concepts, the qualifier, **all three text challenges in full** (judge ladder, faithfulness, rubric design), the **Modality Metrics Reference** (the one-stop table — the centerpiece), all three multimodal finale ideas with the math, the Eval Plan template, the critique checklist. Crisp recipe-card register ([[feedback_no_engagement_theater_in_workbook]]).
 5. **The 1-page Eval Plan template** (fillable — handout + slide; modality-aware).
 6. **The planted-issue eval report** (1-page handout) + facilitator answer key.
@@ -213,12 +213,9 @@ Following the EdYoda template set ([[edyoda_genai_design_system]] → `templates
 
 ---
 
-## 6. Open items & scheduled swaps
-- **DECIDED — Hard 4h cap.** Clock lands at exactly 4:00 (§3). Critique is preview + take-home. No overflow.
-- **DECIDED — JTBD is create + judge.** Build = create, Critique = judge. Outcomes copy + template reflect both.
-- **SCHEDULED SWAP 1 — IG eval stats** (§2, by 2026-06-12 AM): real today, refresh after tomorrow's run. Marker `‹STAT-2026-06-11›`. Only `wer` is a true placeholder.
-- **SCHEDULED SWAP 2 — Modality benchmark numbers** (§4 Act 5, within ~12h): currently **dummy-logical placeholders**, tagged `‹BENCH-2026-06-11›`. Research + swap real current sourcing (WER, MOS, CLIPScore, faithfulness norms). Don't present as authoritative until done ([[feedback_ground_before_claiming]]).
+## 6. Open items
+- **Tomorrow's stat swap** (§2) — blocking for final IG numbers; not blocking for the plan.
+- **Modality benchmark numbers** — the "typical good value" column needs real, current sourcing (WER, MOS, CLIPScore norms). Verify before shipping the Handbook.
 - Folder name for this elective. Suggest `AI Evals - Elective/` at project root.
 - Whether to produce the LinkedIn carousel (Artifact 7) for an internal Growth-X elective.
-
-> Both scheduled swaps are tracked in [[project_ai_evals_stat_swap]] — grep artifacts for `‹STAT-2026-06-11›` and `‹BENCH-2026-06-11›`, replace, then delete the memory.
+- §3 tail timing — confirm whether the block allows ~4:30, or critique goes take-home.
