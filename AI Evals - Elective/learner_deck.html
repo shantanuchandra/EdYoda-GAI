@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session {{SESSION_NUMBER}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===================== EDITORIAL DESIGN TOKENS ===================== */
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --ink-blue-soft: rgba(30, 58, 95, 0.08);
+
+    --warn:         #a16207;
+    --warn-soft:    rgba(161, 98, 7, 0.10);
+    --danger:       #991b1b;
+    --danger-soft:  rgba(153, 27, 27, 0.08);
+    --calm:         #14532d;
+    --calm-soft:    rgba(20, 83, 45, 0.08);
+
+    --s-1: 0.5rem;  --s-2: 1rem;  --s-3: 1.5rem;  --s-4: 2rem;
+    --s-5: 3rem;    --s-6: 4.5rem; --s-7: 6rem;    --s-8: 9rem;
+
+    --t-eyebrow: 0.72rem;
+    --t-meta:    0.78rem;
+    --t-body:    1.05rem;
+    --t-lede:    1.35rem;
+    --t-h3:      1.5rem;
+    --t-h2:      2.5rem;
+    --t-h1:      clamp(2.8rem, 5.2vw, 4.8rem);
+    --t-display: clamp(3.4rem, 6.6vw, 6.2rem);
+    --t-mega:    clamp(5rem, 11vw, 11rem);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur:  480ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%; width: 100%; overflow: hidden;
+    background: var(--paper); color: var(--ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  /* Paper grain — subtle, throughout */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.45; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(26, 24, 20, 0.08) 100%);
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; z-index: 2; }
+
+  /* ===================== SLIDE LAYOUT — EDITORIAL FRAME ===================== */
+  .slide {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; padding: 3.6vh 5vw 4.2vh;
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  .slide.active { display: flex; opacity: 1; }
+
+  .running-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: var(--s-2); border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .running-head .left { display: flex; gap: 1.4em; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+  .running-head .left .topic { color: var(--ink-soft); }
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 0.9rem; letter-spacing: 0.02em;
+    text-transform: none; color: var(--ink); font-weight: 400;
+  }
+
+  .slide-body {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: var(--s-4) 0; max-width: 1300px; margin: 0 auto; width: 100%;
+  }
+
+  .folio {
+    position: absolute; bottom: 1.2rem; right: 5vw;
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 8.5rem; line-height: 0.8; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums; letter-spacing: -0.04em;
+    pointer-events: none; user-select: none; z-index: 0; opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em; vertical-align: top; margin-left: 0.15em;
+    color: var(--ink-mute); font-weight: 400;
+  }
+
+  /* ===================== TYPOGRAPHY ===================== */
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--terra); font-weight: 500;
+    margin-bottom: var(--s-3); position: relative; padding-left: 1.8em;
+  }
+  .eyebrow::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: 1.2em; height: 1px; background: var(--terra);
+  }
+  .eyebrow.cool { color: var(--ink-blue); }
+  .eyebrow.cool::before { background: var(--ink-blue); }
+  .eyebrow.warn { color: var(--warn); }
+  .eyebrow.warn::before { background: var(--warn); }
+  .eyebrow.danger { color: var(--danger); }
+  .eyebrow.danger::before { background: var(--danger); }
+
+  h1, h2, h3, .display, .mega {
+    font-family: 'Fraunces', serif; color: var(--ink); letter-spacing: -0.02em;
+  }
+  h1 {
+    font-size: var(--t-h1); font-weight: 400; line-height: 1.02;
+    font-variation-settings: 'opsz' 120, 'SOFT' 30; margin-bottom: var(--s-4);
+  }
+  h2 {
+    font-size: var(--t-h2); font-weight: 400; line-height: 1.1;
+    font-variation-settings: 'opsz' 80; margin-bottom: var(--s-3);
+  }
+  h3 {
+    font-size: var(--t-h3); font-weight: 500; line-height: 1.2;
+    color: var(--ink); margin-bottom: var(--s-1);
+  }
+  .display {
+    font-size: var(--t-display); font-weight: 300; line-height: 1.05;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1; max-width: 18ch;
+  }
+  .mega {
+    font-size: var(--t-mega); font-weight: 300; line-height: 0.95;
+    font-variation-settings: 'opsz' 144, 'WONK' 1; letter-spacing: -0.04em;
+  }
+  p, li { font-size: var(--t-body); line-height: 1.6; color: var(--ink-soft); }
+  .lede {
+    font-family: 'Fraunces', serif; font-size: var(--t-lede);
+    font-weight: 300; font-style: italic; line-height: 1.45;
+    color: var(--ink-soft); max-width: 56ch;
+    font-variation-settings: 'opsz' 36;
+  }
+  .terra { color: var(--terra); }
+  .blue  { color: var(--ink-blue); }
+  .marked       { background: linear-gradient(180deg, transparent 60%, var(--terra-soft) 60%); padding: 0 0.05em; }
+  .marked-blue  { background: linear-gradient(180deg, transparent 60%, var(--ink-blue-soft) 60%); padding: 0 0.05em; }
+
+  .drop {
+    float: left; font-family: 'Fraunces', serif;
+    font-size: 5.2em; line-height: 0.82; font-weight: 400; color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  .rule { height: 1px; background: var(--rule); margin: var(--s-3) 0; }
+  .rule-double { height: 4px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: var(--s-3) 0; }
+
+  /* Code/prompt — like a fixed-width sidebar in a magazine */
+  .prompt {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink); padding: var(--s-3) var(--s-3);
+    font-family: 'Geist Mono', monospace; font-size: 0.95rem;
+    line-height: 1.7; color: var(--ink); white-space: pre-wrap; position: relative;
+  }
+  .prompt::before {
+    content: 'PROMPT'; position: absolute; top: -0.6em; left: var(--s-3);
+    background: var(--paper); padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.2em; color: var(--ink-mute); font-weight: 500;
+  }
+
+  /* Grid systems */
+  .grid { display: grid; gap: var(--s-3); }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .mt-3 { margin-top: var(--s-3); }
+  .mt-4 { margin-top: var(--s-4); }
+
+  /* Cover (slide 1) — special layout */
+  .cover {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: var(--s-6); align-items: end;
+    height: 100%; padding: var(--s-5) 0 var(--s-3);
+  }
+  .cover .vol {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.4em; text-transform: uppercase; color: var(--ink-mute);
+    align-self: stretch; border-right: 1px solid var(--rule); padding-right: var(--s-2);
+  }
+  .cover .cover-main h1.cover-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.5rem, 7vw, 6.4rem); font-weight: 300;
+    line-height: 0.94; letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; max-width: 16ch;
+  }
+  .cover .cover-byline {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.4rem; color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-3); max-width: 50ch; line-height: 1.4;
+  }
+  .cover .cover-foot {
+    margin-top: var(--s-5); display: flex; justify-content: space-between;
+    align-items: baseline; padding-top: var(--s-2); border-top: 1px solid var(--ink);
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-mute);
+  }
+  .byline {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.16em;
+  }
+
+  /* Exercise slide variant — oversized terra Fraunces letter */
+  .exercise-slide .slide-body {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: var(--s-5); align-items: start;
+  }
+  .exercise-slide .ex-letter {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(10rem, 22vw, 18rem); line-height: 0.85;
+    color: var(--terra);
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    letter-spacing: -0.04em;
+  }
+  .exercise-slide .ex-meta {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-meta);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-mute); margin-bottom: var(--s-2);
+  }
+  .exercise-slide .ex-timer {
+    position: absolute; bottom: 1.4rem; right: 5vw;
+    font-family: 'Fraunces', serif; font-weight: 300; font-size: 3rem;
+    color: var(--ink-mute); font-variant-numeric: tabular-nums oldstyle-nums;
+    z-index: 3;
+  }
+  .exercise-slide .folio { left: 5vw; right: auto; }
+
+  /* Nav — minimal */
+  .nav {
+    position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.4rem; z-index: 100;
+    background: rgba(245, 239, 230, 0.85); backdrop-filter: blur(8px);
+    padding: 4px; border-radius: 999px; border: 1px solid var(--rule);
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  body:hover .nav { opacity: 0.5; }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: transparent; border: none; color: var(--ink-soft);
+    cursor: pointer; font-size: 0.84rem; padding: 5px 12px;
+    border-radius: 999px; font-family: 'Geist Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    transition: background var(--dur) var(--ease);
+  }
+  .nav button:hover { background: var(--paper-warm); color: var(--ink); }
+
+  .progress-thread {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--terra); z-index: 200;
+    transition: width var(--dur) var(--ease);
+  }
+
+  /* Pre-class countdown — customizable "we begin in N min" timer on the COVER slide.
+     Facilitator-run (does NOT auto-start). Default 5 min; ± adjusts by 1 min.
+     Independent of the break clock. Hidden in print. JS: preclassToggle / preclassAdjust / preclassReset. */
+  .preclass-timer {
+    margin-top: var(--s-4); padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+    display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
+  }
+  .preclass-timer .pt-clock {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(3.4rem, 7vw, 5.4rem); line-height: 0.9;
+    color: var(--terra); font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.03em; font-variation-settings: 'opsz' 144, 'SOFT' 40;
+    min-width: 4.5ch;
+  }
+  .preclass-timer .pt-clock.warn { color: var(--warn); }
+  .preclass-timer .pt-clock.danger { color: var(--danger); }
+  .preclass-timer .pt-label {
+    font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
+    display: block; margin-bottom: 0.3em;
+  }
+  .preclass-timer .pt-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .preclass-timer button {
+    font-family: 'Geist Mono', monospace; font-size: 0.82rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    color: var(--ink-soft); padding: 0.5em 0.9em; border-radius: 4px;
+    cursor: pointer; transition: all 200ms var(--ease);
+  }
+  .preclass-timer button:hover { border-color: var(--terra); color: var(--terra); background: var(--terra-soft); }
+  .preclass-timer button.pt-primary { background: var(--terra); border-color: var(--terra); color: var(--paper); }
+  .preclass-timer button.pt-primary:hover { background: #9e3a17; color: #fff; }
+  .preclass-timer .pt-adjust { font-size: 1rem; min-width: 2.4em; padding: 0.4em 0; text-align: center; }
+  .preclass-timer .pt-hint { font-size: 0.92rem; color: var(--ink-mute); font-style: italic; }
+
+  /* Break slide — auto-countdown when navigated to. JS hook: startBreakClock(). */
+  .break-slide { align-items: center; justify-content: center; text-align: center; }
+  .break-slide .slide-body { align-items: center; justify-content: center; text-align: center; }
+  .break-clock {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(7rem, 16vw, 14rem);
+    font-weight: 300;
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144;
+    margin: var(--s-3) 0;
+  }
+  .break-clock.warn { color: var(--warn); }
+  .break-clock.danger { color: var(--danger); }
+  .break-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: var(--s-2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .nav, .progress-thread { transition: none !important; }
+  }
+  @media (max-width: 900px) {
+    .g-3 { grid-template-columns: 1fr 1fr; }
+    .cover { grid-template-columns: 1fr; }
+    .cover .vol { display: none; }
+  }
+
+  /* ===================== PRINT / PDF EXPORT =====================
+     Mirror of Session 1's working print CSS. Page is 13.333in × 7.5in (true 16:9
+     = 1280×720 px @ 96dpi), so the existing fluid clamp() type scale renders at
+     the same sizes it does in a typical browser window. DO NOT override h1, lede,
+     .display, .mega, .folio font sizes here — the fluid scale IS the source of
+     truth and is tuned for this exact viewport width. */
+  @media print {
+    @page {
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+    html, body {
+      width: 13.333in;
+      height: auto;
+      background: var(--paper) !important;
+      overflow: visible !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .deck {
+      width: 13.333in;
+      height: auto;
+      position: static;
+    }
+    /* Show ALL slides for print, one per page */
+    .slide {
+      position: relative !important;
+      inset: auto !important;
+      width: 13.333in !important;
+      height: 7.5in !important;
+      display: flex !important;
+      opacity: 1 !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      overflow: hidden;
+      padding: 0.4in 0.6in 0.5in !important;
+    }
+    .slide:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    /* Hide on-screen navigation */
+    .nav, .progress-thread, .preclass-timer { display: none !important; }
+    /* Strip the paper grain — it bloats the PDF by ~100MB. Keep the warm bg + vignette. */
+    body::before { background-image: none !important; opacity: 0 !important; }
+    /* Force color preservation */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread" style="width: 0%"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER -->
+  <!-- ====================================================== -->
+  <div class="slide active">
+    <div class="cover">
+      <div class="vol">Session {{SESSION_NUMBER_WORD}} · Two Hours · Live</div>
+      <div class="cover-main">
+        <div class="byline" style="margin-bottom: var(--s-4); color: var(--terra);">— Starting Shortly —</div>
+        <h1 class="cover-title">{{COVER_TITLE — e.g. "A field guide to <em style='font-style: italic; color: var(--terra);'>Prompt Engineering</em> for people who don't write code."}}</h1>
+        <p class="cover-byline">
+          {{COVER_BYLINE — 1–2 sentences describing the promise of this session.}}
+        </p>
+        <!-- Pre-class countdown — KEEP THIS on every learner-deck cover. Facilitator starts it
+             before going live; ± adjusts by a minute; Reset returns to the set base. -->
+        <div class="preclass-timer" id="preclassTimer">
+          <div>
+            <span class="pt-label">We begin in</span>
+            <div class="pt-clock" id="preclassClock">05:00</div>
+          </div>
+          <div class="pt-controls">
+            <button class="pt-adjust" onclick="preclassAdjust(-60)" title="minus 1 minute">−</button>
+            <button class="pt-primary" id="preclassStartBtn" onclick="preclassToggle()">Start</button>
+            <button class="pt-adjust" onclick="preclassAdjust(60)" title="plus 1 minute">+</button>
+            <button onclick="preclassReset()">Reset</button>
+          </div>
+          <span class="pt-hint">Set it, hit Start before you go live. ± adjusts by a minute.</span>
+        </div>
+        <div class="cover-foot">
+          <span>No. {{SESSION_NUMBER_PADDED}} / {{SESSION_SUBTITLE_SHORT}}</span>
+          <span>Reading time: 120 min</span>
+        </div>
+      </div>
+    </div>
+    <div class="folio">1<sup>/{{TOTAL_SLIDES}}</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — STANDARD CONTENT SLIDE (placeholder) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Session {{SESSION_NUMBER_PADDED}}</span><span class="dot">·</span><span class="topic">{{SLIDE_2_SECTION}}</span></div>
+      <span class="pub-title">{{PUB_TITLE — e.g. "A Field Guide to Generative AI"}}</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">{{SLIDE_2_EYEBROW — e.g. "The shift"}}</span>
+      <h1>{{SLIDE_2_TITLE — use <em class="terra" style="font-style: italic;">accent words</em> sparingly}}.</h1>
+      <p class="lede mt-3">{{SLIDE_2_LEDE — one-sentence opening, italic Fraunces.}}</p>
+      <div class="rule mt-4"></div>
+      <p class="mt-3">{{SLIDE_2_BODY — supporting body copy.}}</p>
+    </div>
+    <div class="folio">2<sup>/{{TOTAL_SLIDES}}</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — DISPLAY / QUOTE SLIDE (placeholder) -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Session {{SESSION_NUMBER_PADDED}}</span><span class="dot">·</span><span class="topic">{{SLIDE_3_SECTION}}</span></div>
+      <span class="pub-title">{{PUB_TITLE}}</span>
+    </div>
+    <div class="slide-body">
+      <p class="display"><span class="drop">{{DROP_CAP_LETTER}}</span>{{SLIDE_3_DISPLAY — large editorial sentence with optional <span class="marked">marked phrase</span>.}}</p>
+    </div>
+    <div class="folio">3<sup>/{{TOTAL_SLIDES}}</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — EXERCISE SLIDE (placeholder — variant layout) -->
+  <!-- ====================================================== -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Topic {{TOPIC_NUMBER}}</span><span class="dot">·</span><span class="topic">Exercise</span></div>
+      <span class="pub-title">{{PUB_TITLE}}</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">{{EXERCISE_LETTER — A, B, C, D, or E}}</div>
+      <div>
+        <div class="ex-meta">Exercise · {{EXERCISE_DURATION — e.g. "Seven minutes"}}</div>
+        <h1>{{EXERCISE_TITLE}}.</h1>
+        <p class="lede mt-3">{{EXERCISE_INSTRUCTION — what learners do, in one sentence.}}</p>
+        <div class="prompt mt-4">{{EXERCISE_PROMPT — paste-ready monospace block.}}</div>
+      </div>
+    </div>
+    <div class="ex-timer">{{EXERCISE_DURATION_MMSS — e.g. 07:00}}</div>
+    <div class="folio">4<sup>/{{TOTAL_SLIDES}}</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — BREAK SLIDE (place at the hard-break moment, ~0:55) -->
+  <!-- ====================================================== -->
+  <!-- The .break-slide class triggers startBreakClock() automatically when active. -->
+  <!-- The 10:00 countdown lives in #breakClock — do not change the id. -->
+  <!-- IMPORTANT: presenter must have a matching .tag === 'break' slide at the same index. -->
+  <div class="slide break-slide">
+    <div class="running-head">
+      <div class="left"><span>Session {{SESSION_NUMBER_PADDED}}</span><span class="dot">·</span><span class="topic">— Intermission —</span></div>
+      <span class="pub-title">{{PUB_TITLE}}</span>
+    </div>
+    <div class="slide-body">
+      <div class="break-label">— Break —</div>
+      <div class="break-clock" id="breakClock">10:00</div>
+      <p class="lede center mt-5" style="font-size: 1.6rem;">Stand up. Water. Stretch.</p>
+      <p class="byline mt-4" style="color: var(--terra); letter-spacing: 0.18em;">{{BREAK_TAGLINE — optional, e.g. "Memory, action, multi-step. See you on the other side."}}</p>
+    </div>
+    <div class="folio">5<sup>/{{TOTAL_SLIDES}}</sup></div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">Prev</button>
+  <button onclick="next()">Next</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const MASTER_KEY = 'genai_s{{SESSION_NUMBER}}_slide_master';
+  let current = 0;
+
+  function show(index) {
+    current = Math.max(0, Math.min(totalSlides - 1, index));
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+    try { localStorage.setItem('genai_s{{SESSION_NUMBER}}_learner_slide', String(current)); } catch (e) {}
+
+    // Break-clock: start on .break-slide, stop otherwise. Detect by class, not index.
+    if (slides[current] && slides[current].classList.contains('break-slide')) {
+      startBreakClock();
+    } else {
+      stopBreakClock();
+    }
+  }
+
+  function next() { if (current < totalSlides - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(totalSlides - 1);
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  // Break-clock — 10-min countdown, restarts each time we land on a .break-slide.
+  // Goes amber under 2 min, red under 30s via .warn/.danger modifiers on .break-clock.
+  let breakInterval = null;
+  function startBreakClock() {
+    stopBreakClock();
+    let total = 10 * 60;
+    const el = document.getElementById('breakClock');
+    if (!el) return;
+    function tick() {
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      el.classList.toggle('warn', total <= 120 && total > 30);
+      el.classList.toggle('danger', total <= 30);
+      total--;
+      if (total < 0) { stopBreakClock(); el.textContent = '00:00'; }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function stopBreakClock() {
+    if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+    const el = document.getElementById('breakClock');
+    if (el) el.classList.remove('warn', 'danger');
+  }
+
+  // Pre-class countdown — customizable "we begin in N min" timer on the cover slide.
+  // Facilitator-run (does NOT auto-start). Default 5 min; ± adjusts by 1 min.
+  // Independent of the break clock. Amber under 1 min, red under 15s. Hidden in print.
+  let preclassTotal = 5 * 60, preclassRemaining = 5 * 60, preclassInterval = null, preclassRunning = false;
+  function preclassRender() {
+    const el = document.getElementById('preclassClock');
+    if (!el) return;
+    const m = Math.floor(preclassRemaining / 60), s = preclassRemaining % 60;
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('warn', preclassRemaining <= 60 && preclassRemaining > 15);
+    el.classList.toggle('danger', preclassRemaining <= 15);
+  }
+  function preclassToggle() {
+    const btn = document.getElementById('preclassStartBtn');
+    if (preclassRunning) {
+      clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+      if (btn) btn.textContent = 'Resume';
+      return;
+    }
+    preclassRunning = true;
+    if (btn) btn.textContent = 'Pause';
+    preclassInterval = setInterval(() => {
+      preclassRemaining--;
+      if (preclassRemaining <= 0) {
+        preclassRemaining = 0; preclassRender();
+        clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+        if (btn) btn.textContent = 'Start';
+        return;
+      }
+      preclassRender();
+    }, 1000);
+  }
+  function preclassAdjust(delta) {
+    preclassTotal = Math.max(60, Math.min(60 * 60, preclassTotal + delta));
+    if (!preclassRunning) { preclassRemaining = preclassTotal; preclassRender(); }
+    else { preclassRemaining = Math.max(0, preclassRemaining + delta); preclassRender(); }
+  }
+  function preclassReset() {
+    clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+    preclassRemaining = preclassTotal;
+    const btn = document.getElementById('preclassStartBtn'); if (btn) btn.textContent = 'Start';
+    preclassRender();
+  }
+  preclassRender();
+
+  // Pair with presenter deck. Both decks MUST have identical slides.length —
+  // if the clamp ever triggers, the symmetry contract was broken.
+  // See memory: edyoda_facilitation_patterns.md § 3.
+  const PRINT_KEY = 'genai_s{{SESSION_NUMBER}}_print_request';
+  let lastPrintStamp = '';
+  window.addEventListener('storage', (e) => {
+    if (e.key === MASTER_KEY) {
+      const v = parseInt(e.newValue, 10);
+      if (isNaN(v)) return;
+      const target = Math.min(v, totalSlides - 1);
+      if (target !== current) show(target);
+      return;
+    }
+    if (e.key === PRINT_KEY && e.newValue && e.newValue !== lastPrintStamp) {
+      // Presenter pressed P → open Chrome's Save-as-PDF dialog on THIS tab.
+      // The @media print CSS forces landscape 3:2 one-slide-per-page.
+      lastPrintStamp = e.newValue;
+      printAsPdf();
+    }
+  });
+
+  // Chrome's Save-as-PDF dialog pre-populates the filename from document.title.
+  // Set it to "Session {N} - <session name>" right before print, restore after.
+  const PDF_FILENAME = 'Session {{SESSION_NUMBER}} - {{SESSION_TITLE}}';
+  const ORIGINAL_TITLE = document.title;
+
+  // Auto-scale: if any slide's content is taller than the print page can hold,
+  // shrink that slide's .slide-body with transform: scale() so nothing clips.
+  // The measurement uses the exact print geometry (13.333in × 7.5in @ 96dpi)
+  // so it matches what Chrome will render in the PDF.
+  function fitSlidesForPrint() {
+    const slides = document.querySelectorAll('.slide');
+    const SLIDE_W = 1280;      // 13.333in @ 96dpi
+    const SLIDE_H = 720;       // 7.5in  @ 96dpi
+    const PAD_TOP = 38.4;      // 0.4in
+    const PAD_X = 57.6;        // 0.6in
+    const PAD_BOTTOM = 48;     // 0.5in
+    const CONTENT_H = SLIDE_H - PAD_TOP - PAD_BOTTOM;
+
+    // Snapshot inline styles so we can restore them after measurement.
+    const snapshots = [];
+    slides.forEach(slide => {
+      snapshots.push({ el: slide, cssText: slide.style.cssText });
+      slide.style.cssText = `
+        position: absolute !important;
+        left: -10000px !important;
+        top: 0 !important;
+        width: ${SLIDE_W}px !important;
+        height: ${SLIDE_H}px !important;
+        padding: ${PAD_TOP}px ${PAD_X}px ${PAD_BOTTOM}px !important;
+        display: flex !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        transform: none !important;
+      `;
+    });
+    // Force a synchronous reflow so the off-screen measurement is accurate.
+    void document.body.offsetHeight;
+
+    slides.forEach(slide => {
+      const body = slide.querySelector('.slide-body');
+      if (!body) return;
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+      const naturalHeight = body.scrollHeight;
+      if (naturalHeight > CONTENT_H) {
+        const scale = CONTENT_H / naturalHeight;
+        body.style.transformOrigin = 'top left';
+        body.style.transform = `scale(${scale.toFixed(4)})`;
+        body.style.width = `${(100 / scale).toFixed(2)}%`;
+      }
+    });
+
+    // Restore inline styles (CSS rules re-apply for print).
+    snapshots.forEach(s => { s.el.style.cssText = s.cssText; });
+  }
+
+  function resetSlideFit() {
+    document.querySelectorAll('.slide-body').forEach(body => {
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+    });
+  }
+
+  function printAsPdf() {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+    setTimeout(() => { window.print(); }, 150);
+  }
+
+  // Also handle direct Cmd+P / Ctrl+P on the learner deck.
+  window.addEventListener('beforeprint', () => {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+  });
+  window.addEventListener('afterprint',  () => {
+    document.title = ORIGINAL_TITLE;
+    resetSlideFit();
+  });
+
+  // Init: follow presenter if a master is already set, otherwise resume own position.
+  (function init() {
+    try {
+      const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
+      if (!isNaN(master) && master >= 0) { show(Math.min(master, totalSlides - 1)); return; }
+      const saved = parseInt(localStorage.getItem('genai_s{{SESSION_NUMBER}}_learner_slide') || '0', 10);
+      if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
+    } catch (e) {}
+    show(0);
+  })();
+</script>
+</body>
+</html>
