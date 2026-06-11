@@ -502,6 +502,14 @@
       <p class="mt-2">Add a <strong>Gmail Trigger</strong> node. Trigger on: New Email. Poll time: every minute. Click <em>Test step</em> — pull a real email from your inbox.</p>
       <p class="mt-2">Confirm you see: <code style="font-family:'Geist Mono';color:var(--terra);">from</code> · <code style="font-family:'Geist Mono';color:var(--terra);">subject</code> · <code style="font-family:'Geist Mono';color:var(--terra);">text</code>. The <code style="font-family:'Geist Mono';color:var(--terra);">text</code> field is what we hand to the agent.</p>
       <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-mute);">OAuth failing? Pair with your neighbour — same workflow, your own copy at home.</p>
+      <div style="margin-top:var(--s-3);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.7rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.4rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.72rem;line-height:1.55;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n workflow builder, bakery automation.
+CONTEXT: New Lumière orders arrive as Gmail emails.
+TASK: Add a Gmail Trigger — new unread emails, pass subject + body + sender to next step.
+FORMAT: Name it "Gmail Trigger". Show credential connection.
+CONSTRAINTS: Poll every minute · INBOX only · don't auto-mark read.</div>
+      </div>
     </div>
   </div>
   <div class="folio">9<sup>/28</sup></div>
@@ -553,6 +561,14 @@
           </div>
         </div>
       </div>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n builder, continuing Lumière automation.
+CONTEXT: Gmail Trigger is placed. Need to send email to AI classifier.
+TASK: Add HTTP Request (POST) after trigger. Body: email_subject, email_body, email_from mapped from Gmail.
+FORMAT: Name "Order Classifier (AI)". Leave URL empty.
+CONSTRAINTS: Body type = JSON · use expressions, no hardcoded values.</div>
+      </div>
     </div>
   </div>
   <div class="folio">10<sup>/28</sup></div>
@@ -571,6 +587,14 @@
       <div class="wf-branch mt-3">
         <div class="wf-branch-arm standard"><div class="arm-label">false → standard</div><p style="font-size:var(--t-body-sm);">Auto-confirm via Gmail</p></div>
         <div class="wf-branch-arm complex"><div class="arm-label">true → complex</div><p style="font-size:var(--t-body-sm);">Human gate via Telegram</p></div>
+      </div>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n builder, continuing Lumière automation.
+CONTEXT: Classifier returns JSON with a human_gate boolean field.
+TASK: Add IF node after HTTP Request. Condition: human_gate equals false.
+FORMAT: Name "Standard or Custom?". TRUE = auto-confirm path. FALSE = human approval path.
+CONSTRAINTS: Strict equality · human_gate is boolean, not a string.</div>
       </div>
     </div>
   </div>
@@ -592,6 +616,14 @@
         <div class="nt-row" style="grid-template-columns:5rem 1fr;"><div class="nt-job">Body</div><div class="nt-rule"><code style="font-family:'Geist Mono';font-size:0.9rem;color:var(--terra);">{{ $('HTTP Request').item.json.draft_response }}</code></div></div>
       </div>
       <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-mute);">Run the full workflow with a standard order. Watch the confirmation fire in under a second.</p>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n builder, continuing Lumière automation.
+CONTEXT: IF node TRUE branch = standard order, safe to confirm automatically.
+TASK: Add Gmail node on TRUE branch. Send confirmation email to the original sender.
+FORMAT: Name "Auto-Confirm (Gmail)". TO = {{ $('Gmail Trigger').item.json.from }}. Subject starts with ✅.
+CONSTRAINTS: Under 80 words · don't mention the classifier · end with "We'll confirm your slot within 2 hours."</div>
+      </div>
     </div>
   </div>
   <div class="folio">12<sup>/28</sup></div>
@@ -705,6 +737,14 @@ Pick-up on Saturday afternoon. Thanks, Priya<button class="prompt-copy" onclick=
         <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">Button 2</div><div class="nt-rule">Text: <code style="font-family:'Geist Mono';color:var(--danger);">❌ Reject</code> · Callback: <code style="font-family:'Geist Mono';color:var(--danger);">reject</code></div></div>
       </div>
       <p class="mt-2" style="font-size:var(--t-body-sm);color:var(--ink-mute);">If inline keyboard doesn't show: check Reply Markup is set to "Inline Keyboard" not "Reply Keyboard".</p>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n builder, continuing Lumière automation.
+CONTEXT: IF FALSE branch = complex order. Manager must approve before we respond.
+TASK: Add Telegram node on FALSE branch. Send order summary with ✅ Approve / ❌ Reject inline keyboard.
+FORMAT: Name "Telegram — Notify Manager". Parse mode: Markdown. Leave chat_id empty.
+CONSTRAINTS: Inline Keyboard (not Reply Keyboard) · callback data: "approve" / "reject" (lowercase).</div>
+      </div>
     </div>
   </div>
   <div class="folio">19<sup>/28</sup></div>
@@ -725,6 +765,14 @@ Pick-up on Saturday afternoon. Thanks, Priya<button class="prompt-copy" onclick=
         <div class="sc-title">Pause, not stop.</div>
         <p>The frames are still in memory. When the Telegram callback fires, it presses play from exactly where it stopped.</p>
       </div>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n builder, continuing Lumière automation.
+CONTEXT: After Telegram send, workflow must pause until manager taps a button.
+TASK: Add a Wait node after Telegram. Set to resume on webhook — waits indefinitely.
+FORMAT: Name "Wait for Manager Decision". This is the bridge between the Two Ears.
+CONSTRAINTS: Resume mode = webhook · no timeout · do not set a time delay.</div>
+      </div>
     </div>
   </div>
   <div class="folio">20<sup>/28</sup></div>
@@ -744,6 +792,14 @@ Pick-up on Saturday afternoon. Thanks, Priya<button class="prompt-copy" onclick=
         <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">Condition</div><div class="nt-rule"><code style="font-family:'Geist Mono';color:var(--terra);">{{ $json.callback_query.data }}</code> equals <code style="font-family:'Geist Mono';color:var(--terra);">approve</code></div></div>
         <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">True</div><div class="nt-rule">Approval path → send confirmation</div></div>
         <div class="nt-row" style="grid-template-columns:6rem 1fr;"><div class="nt-job">False</div><div class="nt-rule">Rejection path → re-draft + revised response</div></div>
+      </div>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n builder, continuing Lumière automation.
+CONTEXT: Manager taps button — callback query fires. This is the second ear (Two Ears pattern).
+TASK: Add Telegram Trigger (separate entry point, not connected to main chain). Updates: callback_query. Then add IF node: callback_query.data equals "approve".
+FORMAT: Name trigger "Telegram Trigger (Manager Reply)". IF node: TRUE = approval, FALSE = rejection.
+CONSTRAINTS: callback_query updates only · exact string match "approve" · case-sensitive.</div>
       </div>
     </div>
   </div>
@@ -855,6 +911,14 @@ for Saturday — 2 days from now. Budget ₹3,000–₹3,500. — Meera<button c
         <div style="border-top:2px solid var(--warn);padding-top:0.4rem;"><span style="font-family:'Fraunces',serif;font-size:1.4rem;color:var(--warn);font-weight:300;">2</span><br><span style="font-size:0.85rem;color:var(--ink-soft);">What did it <strong>receive</strong>?</span></div>
         <div style="border-top:2px solid var(--calm);padding-top:0.4rem;"><span style="font-family:'Fraunces',serif;font-size:1.4rem;color:var(--calm);font-weight:300;">3</span><br><span style="font-size:0.85rem;color:var(--ink-soft);">What did it <strong>expect</strong>?</span></div>
       </div>
+      <div style="margin-top:var(--s-2);background:rgba(20,83,45,0.06);border:1px solid rgba(20,83,45,0.14);border-left:3px solid var(--calm);border-radius:6px;padding:0.6rem 0.9rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--calm);font-weight:700;margin-bottom:0.35rem;">✦ n8n AI Prompt (S3 RCTFC)</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:0.7rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;">ROLE: n8n debugging assistant.
+CONTEXT: My "Lumière Order Triage" workflow has a red error badge on one node after a test run.
+TASK: Check my execution history. Tell me: (1) which node failed, (2) what input it received, (3) what error it returned. Suggest the fix.
+FORMAT: Three bullets — Node / Received / Error — then one sentence fix.
+CONSTRAINTS: Don't guess. Base your answer only on the execution log. If you can't see it, tell me which tab to open.</div>
+      </div>
     </div>
   </div>
   <div class="folio">25<sup>/28</sup></div>
@@ -907,14 +971,29 @@ for Saturday — 2 days from now. Budget ₹3,000–₹3,500. — Meera<button c
   <div class="folio">27<sup>/28</sup></div>
 </section>
 
-<!-- SLIDE 28 — S7 bridge -->
+<!-- SLIDE 28 — Part 2 bridge (honest: we didn't finish) -->
 <section class="slide" id="s28">
-  <div class="running-head"><div class="left"><span>S6</span><span class="dot">·</span><span class="topic">Next Session</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+  <div class="running-head"><div class="left"><span>S7 · Part 1</span><span class="dot">·</span><span class="topic">Next Session</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
   <div class="slide-body" style="justify-content:center;">
-    <div class="eyebrow cool">Session 7 of 8</div>
-    <h1 style="font-size:clamp(2.8rem,5vw,4.8rem);">EdYoda Agent Builder — Build &amp; Host Your First Agent</h1>
-    <p class="lede mt-3">You called an agent today via HTTP Request — a URL, a JSON body, a JSON response. That agent lived at an endpoint we gave you. Next session, you build that endpoint yourself. Your own system prompt. Your own knowledge base. Your own shareable link.</p>
-    <p class="mt-3" style="font-size:var(--t-body-sm);color:var(--ink-mute);">Then swap it into today's workflow — everywhere you used our URL, you use yours.</p>
+    <div class="eyebrow cool">Session 7 · Part 2 of 2 · Next weekend</div>
+    <h1 style="font-size:clamp(2.6rem,4.8vw,4.4rem);max-width:22ch;">We shipped the loop. Next week we finish&nbsp;the&nbsp;promise.</h1>
+    <p class="lede mt-3">Part 1 today: Gmail in, Gemini extract, quote + payment link, two reply paths. Published and polling.</p>
+    <p class="lede mt-3" style="color:var(--terra);">Part 2 next session: harden the foundation (stable backend + retry), then add <strong>Telegram</strong> — both inbound (customers can DM the bakery) and outbound (you get a Telegram ping on every order). Same brain. Two ears. Two mouths.</p>
+    <div style="margin-top:var(--s-4);display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-2);max-width:760px;">
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--calm);padding:.8rem 1rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--calm);font-weight:600;">Shipped today</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ink);margin-top:.2rem;">Gmail → Gemini → Quote → Reply</div>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:.8rem 1rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;">Next: Part 2</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ink);margin-top:.2rem;">Hardening + Telegram (both directions)</div>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--ink-blue);padding:.8rem 1rem;">
+        <div style="font-family:'Geist Mono',monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-blue);font-weight:600;">Then: S8</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ink);margin-top:.2rem;">Your own business case · capstone</div>
+      </div>
+    </div>
+    <p class="mt-3" style="font-size:var(--t-body-sm);color:var(--ink-mute);">Keep your workflow Published this week. If it fires, screenshot it. If it crashes, screenshot it. We'll start Part 2 from your real evidence.</p>
     <div class="colophon">Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu">linkedin.com/in/chandrashantanu</a></div>
   </div>
   <div class="folio">28<sup>/28</sup></div>

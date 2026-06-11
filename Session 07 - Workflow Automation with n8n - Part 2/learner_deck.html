@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session 7 · Part 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f5efe6; --paper-warm:#ede4d3; --paper-cream:#faf6ef;
+    --ink:#1a1814; --ink-soft:#4a463e; --ink-mute:#8a8478; --ink-faint:#b8b1a3;
+    --rule:#d4ccba; --rule-soft:#e3dccb;
+    --terra:#b8431b; --terra-soft:rgba(184,67,27,0.10);
+    --ink-blue:#1e3a5f; --ink-blue-soft:rgba(30,58,95,0.08);
+    --warn:#a16207; --warn-soft:rgba(161,98,7,0.10);
+    --danger:#991b1b; --danger-soft:rgba(153,27,27,0.08);
+    --calm:#14532d; --calm-soft:rgba(20,83,45,0.08);
+    --s-1:.5rem; --s-2:1rem; --s-3:1.5rem; --s-4:2rem; --s-5:3rem; --s-6:4.5rem;
+    --t-eyebrow:.85rem; --t-meta:.92rem; --t-body:1.28rem; --t-body-sm:1.08rem;
+    --t-lede:1.7rem; --t-h3:1.85rem; --t-h2:3rem;
+    --t-h1:clamp(3.2rem,5.6vw,5.2rem); --t-display:clamp(3.8rem,7vw,6.6rem);
+    --ease:cubic-bezier(0.22,1,0.36,1); --dur:480ms;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;width:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.45;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 50%,rgba(26,24,20,0.08) 100%);}
+  .deck{position:relative;width:100vw;height:100vh;z-index:2;}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:3.4vh 4.6vw 4vh;opacity:0;transition:opacity var(--dur) var(--ease);}
+  .slide.active{display:flex;opacity:1;}
+  .running-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:var(--s-2);border-bottom:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:var(--t-eyebrow);color:var(--ink-mute);letter-spacing:0.18em;text-transform:uppercase;font-weight:500;}
+  .running-head .left{display:flex;gap:1.4em;align-items:baseline;}
+  .running-head .left .dot{color:var(--ink-faint);}
+  .running-head .left .topic{color:var(--ink-soft);}
+  .running-head .pub-title{font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;letter-spacing:0.02em;text-transform:none;color:var(--ink);font-weight:400;}
+  .slide-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:var(--s-3) 0;max-width:1320px;margin:0 auto;width:100%;}
+  .slide-body.fill-top{justify-content:flex-start;padding-top:var(--s-4);}
+  .folio{position:absolute;bottom:1rem;right:4.6vw;font-family:'Fraunces',serif;font-weight:300;font-size:7rem;line-height:0.8;color:var(--ink-faint);font-variant-numeric:tabular-nums oldstyle-nums;letter-spacing:-0.04em;pointer-events:none;user-select:none;z-index:0;opacity:0.5;}
+  .folio sup{font-size:0.32em;vertical-align:top;margin-left:0.15em;color:var(--ink-mute);font-weight:400;}
+  .eyebrow{display:inline-block;font-family:'Geist Mono',monospace;font-size:var(--t-eyebrow);letter-spacing:0.22em;text-transform:uppercase;color:var(--terra);font-weight:500;margin-bottom:var(--s-2);position:relative;padding-left:1.8em;}
+  .eyebrow::before{content:'';position:absolute;left:0;top:50%;width:1.2em;height:1px;background:var(--terra);}
+  .eyebrow.cool{color:var(--ink-blue);} .eyebrow.cool::before{background:var(--ink-blue);}
+  h1,h2,h3,.display{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:-0.02em;}
+  h1{font-size:var(--t-h1);font-weight:400;line-height:1.02;font-variation-settings:'opsz' 120,'SOFT' 30;margin-bottom:var(--s-3);}
+  h2{font-size:var(--t-h2);font-weight:400;line-height:1.08;font-variation-settings:'opsz' 80;margin-bottom:var(--s-2);}
+  h3{font-size:var(--t-h3);font-weight:500;line-height:1.2;color:var(--ink);margin-bottom:var(--s-1);}
+  .display{font-size:var(--t-display);font-weight:300;line-height:1.04;font-variation-settings:'opsz' 144,'SOFT' 40,'WONK' 1;max-width:18ch;}
+  p,li{font-size:var(--t-body);line-height:1.55;color:var(--ink-soft);}
+  .lede{font-family:'Fraunces',serif;font-size:var(--t-lede);font-weight:300;font-style:italic;line-height:1.4;color:var(--ink-soft);max-width:60ch;font-variation-settings:'opsz' 36;}
+  .terra{color:var(--terra);} .blue{color:var(--ink-blue);} .calm{color:var(--calm);} .warn-c{color:var(--warn);} .danger-c{color:var(--danger);}
+  .marked{background:linear-gradient(180deg,transparent 58%,var(--terra-soft) 58%);padding:0 0.05em;}
+  .rule{height:1px;background:var(--rule);margin:var(--s-3) 0;}
+  .grid{display:grid;gap:var(--s-3);} .g-2{grid-template-columns:1fr 1fr;} .g-3{grid-template-columns:repeat(3,1fr);}
+  .mt-1{margin-top:var(--s-1);} .mt-2{margin-top:var(--s-2);} .mt-3{margin-top:var(--s-3);} .mt-4{margin-top:var(--s-4);}
+
+  /* Cover */
+  .cover{display:grid;grid-template-columns:auto 1fr;gap:var(--s-6);align-items:end;height:100%;padding:var(--s-5) 0 var(--s-3);}
+  .cover .vol{writing-mode:vertical-rl;transform:rotate(180deg);font-family:'Geist Mono',monospace;font-size:0.85rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--ink-mute);align-self:stretch;border-right:1px solid var(--rule);padding-right:var(--s-2);}
+  .cover .cover-main h1.cover-title{font-family:'Fraunces',serif;font-size:clamp(3.8rem,7.4vw,7rem);font-weight:300;line-height:0.94;letter-spacing:-0.03em;font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1;max-width:15ch;}
+  .cover .cover-part{font-family:'Geist Mono',monospace;font-size:.95rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--terra);margin-bottom:var(--s-2);font-weight:600;}
+  .cover .cover-byline{font-family:'Fraunces',serif;font-style:italic;font-size:1.55rem;color:var(--ink-soft);font-variation-settings:'opsz' 36;margin-top:var(--s-3);max-width:48ch;line-height:1.4;}
+  .cover .cover-foot{margin-top:var(--s-5);display:flex;justify-content:space-between;align-items:baseline;padding-top:var(--s-2);border-top:1px solid var(--ink);font-family:'Geist Mono',monospace;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--ink-mute);}
+
+  /* Nav + progress */
+  .nav{position:fixed;bottom:1.1rem;left:50%;transform:translateX(-50%);display:flex;gap:0.4rem;z-index:100;background:rgba(245,239,230,0.85);backdrop-filter:blur(8px);padding:4px;border-radius:999px;border:1px solid var(--rule);opacity:0;transition:opacity var(--dur) var(--ease);}
+  body:hover .nav{opacity:0.5;} .nav:hover{opacity:1;}
+  .nav button{background:transparent;border:none;color:var(--ink-soft);cursor:pointer;font-size:0.9rem;padding:5px 12px;border-radius:999px;font-family:'Geist Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;transition:background var(--dur) var(--ease);}
+  .nav button:hover{background:var(--paper-warm);color:var(--ink);}
+  .progress-thread{position:fixed;top:0;left:0;height:2px;background:var(--terra);z-index:200;transition:width var(--dur) var(--ease);}
+
+  /* Break slide */
+  .break-slide{align-items:center;justify-content:center;text-align:center;}
+  .break-slide .slide-body{align-items:center;justify-content:center;text-align:center;}
+  .break-clock{font-family:'Fraunces',serif;font-size:clamp(7rem,16vw,14rem);font-weight:300;line-height:1;font-variant-numeric:tabular-nums oldstyle-nums;letter-spacing:-0.04em;color:var(--ink);font-variation-settings:'opsz' 144;margin:var(--s-3) 0;}
+  .break-clock.warn{color:var(--warn);} .break-clock.danger{color:var(--danger);}
+  .break-label{font-family:'Geist Mono',monospace;font-size:0.9rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:var(--s-2);}
+
+  /* Exercise slide */
+  .exercise-slide .slide-body{display:grid;grid-template-columns:auto 1fr;gap:var(--s-5);align-items:center;}
+  .exercise-slide .ex-letter{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(12rem,22vw,18rem);line-height:0.85;color:var(--terra);font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1;letter-spacing:-0.04em;}
+  .exercise-slide .ex-meta{font-family:'Geist Mono',monospace;font-size:var(--t-meta);letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:var(--s-2);}
+  .exercise-slide .folio{left:4.6vw;right:auto;}
+
+  /* === custom component classes for this deck === */
+
+  /* Recap two-column compare */
+  .recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-top:var(--s-2);}
+  .recap-col{background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-3);position:relative;}
+  .recap-col.shipped{border-left:3px solid var(--calm);}
+  .recap-col.missing{border-left:3px solid var(--danger);}
+  .recap-col h4{font-family:'Geist Mono',monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;margin-bottom:var(--s-2);}
+  .recap-col.shipped h4{color:var(--calm);}
+  .recap-col.missing h4{color:var(--danger);}
+  .recap-col ul{list-style:none;padding:0;}
+  .recap-col li{font-size:1.02rem;padding:.5rem 0 .5rem 1.6rem;position:relative;border-bottom:1px solid var(--rule-soft);color:var(--ink-soft);line-height:1.4;}
+  .recap-col li:last-child{border-bottom:none;}
+  .recap-col.shipped li::before{content:'✓';position:absolute;left:.1rem;top:.45rem;color:var(--calm);font-weight:700;}
+  .recap-col.missing li::before{content:'×';position:absolute;left:.25rem;top:.35rem;color:var(--danger);font-weight:700;font-size:1.25rem;}
+
+  /* Today's contract (three big numbered cards) */
+  .contract-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3);margin-top:var(--s-3);}
+  .contract-card{background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-3);position:relative;}
+  .contract-card .num{font-family:'Fraunces',serif;font-weight:300;font-size:5rem;color:var(--terra);line-height:.85;font-variation-settings:'opsz' 144,'WONK' 1;}
+  .contract-card .verb{font-family:'Geist Mono',monospace;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);margin-top:var(--s-1);font-weight:600;}
+  .contract-card h3{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:500;margin-top:var(--s-1);margin-bottom:.4rem;color:var(--ink);}
+  .contract-card p{font-size:1rem;color:var(--ink-soft);}
+
+  /* Backend hosts comparison */
+  .hosts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3);margin-top:var(--s-3);}
+  .host-card{background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-3);}
+  .host-card.fragile{border-top:3px solid var(--danger);}
+  .host-card.today{border-top:3px solid var(--calm);transform:scale(1.03);box-shadow:0 4px 20px rgba(0,0,0,.05);}
+  .host-card.future{border-top:3px solid var(--ink-blue);opacity:.85;}
+  .host-card .stage{font-family:'Geist Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;margin-bottom:.5rem;}
+  .host-card h4{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;color:var(--ink);}
+  .host-card code{display:block;font-family:'Geist Mono',monospace;font-size:.78rem;color:var(--ink-soft);background:var(--paper-warm);padding:.4rem .6rem;border-radius:4px;margin:.6rem 0;word-break:break-all;}
+  .host-card dl{display:grid;grid-template-columns:auto 1fr;gap:.3rem .8rem;font-size:.9rem;margin-top:.4rem;}
+  .host-card dt{font-family:'Geist Mono',monospace;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);}
+  .host-card dd{color:var(--ink-soft);}
+
+  /* Step-list (recipe card) */
+  .recipe{counter-reset:step;list-style:none;padding:0;margin-top:var(--s-2);}
+  .recipe>li{counter-increment:step;display:grid;grid-template-columns:3rem 1fr;gap:var(--s-2);padding:var(--s-2) 0;border-bottom:1px solid var(--rule-soft);font-size:1.05rem;color:var(--ink-soft);line-height:1.5;}
+  .recipe>li:last-child{border-bottom:none;}
+  .recipe>li::before{content:counter(step,decimal-leading-zero);font-family:'Geist Mono',monospace;font-weight:600;color:var(--terra);font-size:.95rem;letter-spacing:.04em;align-self:center;}
+  .recipe code{font-family:'Geist Mono',monospace;font-size:.88rem;background:var(--paper-warm);padding:.05em .35em;border-radius:3px;color:var(--ink);}
+
+  /* Two-mouths hub-and-spoke */
+  .hub-svg{display:block;margin:var(--s-2) auto 0;max-width:980px;width:100%;height:auto;}
+  .hub-cap{font-family:'Geist Mono',monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);text-align:center;margin-top:var(--s-2);}
+
+  /* Architecture card v2 */
+  .arch-row{display:grid;grid-template-columns:8rem 1fr;gap:var(--s-3);padding:var(--s-2) 0;border-bottom:1px solid var(--rule-soft);align-items:start;}
+  .arch-row:last-child{border-bottom:none;}
+  .arch-row .phase{font-family:'Geist Mono',monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);font-weight:600;padding-top:.3em;}
+  .arch-row .impl{font-family:'Fraunces',serif;font-size:1.35rem;color:var(--ink);font-weight:500;}
+  .arch-row .impl small{display:block;font-family:'Geist',sans-serif;font-size:.95rem;font-weight:400;color:var(--ink-mute);margin-top:.2em;font-style:normal;}
+
+  /* Workflow flow diagram (re-uses Part 1 style) */
+  .wf-flow{display:flex;align-items:center;gap:0;margin:var(--s-3) 0;flex-wrap:wrap;row-gap:var(--s-2);justify-content:center;}
+  .wf-node{display:flex;flex-direction:column;align-items:center;gap:0.3em;min-width:7rem;}
+  .wf-node .wn-box{background:var(--paper-cream);border:2px solid var(--terra);border-radius:8px;padding:0.55rem .9rem;text-align:center;width:100%;}
+  .wf-node .wn-box.trigger{border-color:var(--calm);background:var(--calm-soft);}
+  .wf-node .wn-box.http{border-color:var(--ink-blue);background:var(--ink-blue-soft);}
+  .wf-node .wn-box.gate{border-color:var(--warn);background:var(--warn-soft);}
+  .wf-node .wn-box.tag{border-color:var(--ink-mute);background:var(--paper-warm);border-style:dashed;}
+  .wf-node .wn-label{font-family:'Geist Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink);}
+  .wf-node .wn-sub{font-size:.72rem;color:var(--ink-mute);line-height:1.2;text-align:center;}
+  .wf-arrow{font-size:1.2rem;color:var(--ink-faint);padding:0 .25rem;flex-shrink:0;}
+
+  /* Side-by-side test grid */
+  .test-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-top:var(--s-3);}
+  .test-card{background:var(--paper-cream);border:1px solid var(--rule);border-radius:8px;padding:var(--s-3);}
+  .test-card.gmail{border-left:3px solid var(--ink-blue);}
+  .test-card.tg{border-left:3px solid var(--terra);}
+  .test-card .channel-label{font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;margin-bottom:.4rem;}
+  .test-card.gmail .channel-label{color:var(--ink-blue);}
+  .test-card.tg .channel-label{color:var(--terra);}
+  .test-card h4{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:500;color:var(--ink);margin-bottom:.6rem;}
+  .test-card .convo{background:var(--paper);border-left:2px solid var(--rule);padding:.5rem .8rem;margin:.4rem 0;font-size:.95rem;color:var(--ink-soft);font-family:'Geist',sans-serif;line-height:1.4;}
+  .test-card .convo.bot{border-left-color:var(--terra);background:var(--terra-soft);color:var(--ink);}
+
+  /* One-checkbox callout */
+  .checkbox-callout{display:grid;grid-template-columns:auto 1fr;gap:var(--s-3);background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:var(--s-3);align-items:center;margin-top:var(--s-2);}
+  .checkbox-callout .checkmark{width:3.4rem;height:3.4rem;border:3px solid var(--terra);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.4rem;color:var(--terra);line-height:1;}
+  .checkbox-callout h3{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--ink);margin-bottom:.2rem;}
+  .checkbox-callout p{font-size:1rem;color:var(--ink-soft);}
+
+  /* Stat strip */
+  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-2);margin-top:var(--s-3);}
+  .stat-cell{background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-2);text-align:center;}
+  .stat-cell .sc-n{font-family:'Fraunces',serif;font-size:2.6rem;font-weight:300;color:var(--terra);line-height:1;}
+  .stat-cell .sc-label{font-family:'Geist Mono',monospace;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);margin-top:.3em;}
+
+  /* Colophon */
+  .colophon{margin-top:var(--s-5);padding-top:var(--s-2);border-top:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:0.82rem;color:var(--ink-mute);letter-spacing:0.1em;}
+  .colophon a{color:var(--terra);text-decoration:none;} .colophon a:hover{text-decoration:underline;}
+
+  @media print{
+    body{overflow:auto;} .deck{height:auto;} .slide{position:relative;display:flex!important;opacity:1!important;page-break-after:always;height:100vh;}
+    .nav{display:none;} .progress-thread{display:none;} body::before{display:none;}
+    @page{size:11.25in 6.33in;margin:0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread"></div>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1 — Cover -->
+<section class="slide active" id="s1">
+  <div class="slide-body" style="justify-content:flex-end;padding-bottom:var(--s-3);">
+    <div class="cover">
+      <div class="vol">A Field Guide to Generative AI · Session 07 · Part 02</div>
+      <div class="cover-main">
+        <div class="cover-part">Part 2 of 2 · Hardening + Telegram</div>
+        <h1 class="cover-title">One Workflow, Two Channels.</h1>
+        <p class="cover-byline">Part 1 shipped the email loop. Part 2 finishes the job — we harden the foundation, then add Telegram as a real second channel. Customers can DM your bakery now.</p>
+        <div class="cover-foot">
+          <span>Generative AI for Non-Coders</span>
+          <span>EdYoda · Session 07 · Part 02</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 2 — Where we left off -->
+<section class="slide" id="s2">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">The honest recap</span></div><div class="pub-title">Where we left off</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Part 1 · what we actually shipped</div>
+    <h2>Where we left off — honest picture.</h2>
+    <p class="lede mt-2">We shipped a real, running thing last week. We also left three holes. The Part-1 deck title literally promised one of them. Today we close all three.</p>
+    <div class="recap-grid mt-3">
+      <div class="recap-col shipped">
+        <h4>✓ Shipped & Published</h4>
+        <ul>
+          <li>Gmail Trigger watching INBOX every 15 min</li>
+          <li>Keyword IF filter (cake · order · flavour · …)</li>
+          <li>Gemini extracts structured order JSON</li>
+          <li>Code node parses + checks missingFields</li>
+          <li>HTTP call to <code style="font-family:'Geist Mono',monospace;font-size:.92em;background:var(--paper-warm);padding:0 .25em;border-radius:2px;">/api/quote</code> for price + payment link</li>
+          <li>Two reply paths: thank-you OR we-need-more-info</li>
+        </ul>
+      </div>
+      <div class="recap-col missing">
+        <h4>× Not yet there</h4>
+        <ul>
+          <li>Backend on a <em>localtunnel</em> that dies every few hours</li>
+          <li>No retry — one bad poll = one missed customer</li>
+          <li><strong>Telegram</strong> — promised in the Part-1 title; never built</li>
+          <li>Only one inbound channel — Gmail or nothing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio">02<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 3 — Today's contract -->
+<section class="slide" id="s3">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">What we ship today</span></div><div class="pub-title">The contract</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Today · three deliverables</div>
+    <h2>What we ship today.</h2>
+    <p class="lede mt-2">Three builds, in order. Each one is one box ticked off the missing list.</p>
+    <div class="contract-grid">
+      <div class="contract-card">
+        <div class="num">01</div>
+        <div class="verb">Harden</div>
+        <h3>Stable backend + retry</h3>
+        <p>Replace localtunnel with a real hosted URL. Tick the one checkbox that prevents 90% of overnight failures.</p>
+      </div>
+      <div class="contract-card">
+        <div class="num">02</div>
+        <div class="verb">Telegram OUT</div>
+        <h3>Owner gets the ping</h3>
+        <p>Every successful order also pings the bakery owner's Telegram. One-line digest. Pure outbound.</p>
+      </div>
+      <div class="contract-card">
+        <div class="num">03</div>
+        <div class="verb">Telegram IN</div>
+        <h3>Customers can DM the bakery</h3>
+        <p>Second inbound channel. Same Gemini, same <code>/api/quote</code>. Reply lands on the channel the customer wrote in on.</p>
+      </div>
+    </div>
+    <p class="mt-3" style="font-size:1rem;color:var(--ink-mute);"><em>One rule for today: you will not leave with theory. You will leave with a workflow where a customer can DM your bakery on Telegram and get a real quote back inside 20 seconds.</em></p>
+  </div>
+  <div class="folio">03<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 4 — Build A title -->
+<section class="slide exercise-slide" id="s4">
+  <div class="slide-body">
+    <div class="ex-letter">A</div>
+    <div>
+      <div class="ex-meta">Build A · ~15 min · Harden</div>
+      <h1 style="font-size:clamp(2.6rem,4.6vw,4rem);">Move the backend off the&nbsp;crutch.</h1>
+      <p class="lede mt-3">Localtunnel was a teaching aid. Today we use a real host and tick the one checkbox that keeps the workflow alive overnight.</p>
+    </div>
+  </div>
+  <div class="folio">04<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 5 — Three places your backend can live -->
+<section class="slide" id="s5">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build A · concept</span></div><div class="pub-title">Where does the backend live?</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build A · the move</div>
+    <h2>Three places your backend can live.</h2>
+    <p class="lede mt-2">Same code. Different homes. Different lifespan.</p>
+    <div class="hosts-grid">
+      <div class="host-card fragile">
+        <div class="stage">Part 1</div>
+        <h4>Localtunnel</h4>
+        <code>wise-taxes-win.loca.lt</code>
+        <dl>
+          <dt>Lives</dt><dd>hours</dd>
+          <dt>Cost</dt><dd>free</dd>
+          <dt>For</dt><dd>demo only</dd>
+        </dl>
+      </div>
+      <div class="host-card today">
+        <div class="stage">Today ↓</div>
+        <h4>Stable host</h4>
+        <code>lumiere-bakery.onrender.com</code>
+        <dl>
+          <dt>Lives</dt><dd>until you delete it</dd>
+          <dt>Cost</dt><dd>free tier</dd>
+          <dt>For</dt><dd>cohort homework, beta users</dd>
+        </dl>
+      </div>
+      <div class="host-card future">
+        <div class="stage">Real prod</div>
+        <h4>Your domain</h4>
+        <code>api.lumiere.com</code>
+        <dl>
+          <dt>Lives</dt><dd>forever</dd>
+          <dt>Cost</dt><dd>your CFO's call</dd>
+          <dt>For</dt><dd>real customers</dd>
+        </dl>
+      </div>
+    </div>
+    <p class="mt-3" style="font-size:1rem;color:var(--ink-mute);"><em>We're not changing what the backend does — just where it lives. Five minutes.</em></p>
+  </div>
+  <div class="folio">05<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 6 — The one checkbox -->
+<section class="slide" id="s6">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build A · the move</span></div><div class="pub-title">Retry on Fail</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build A · the one checkbox</div>
+    <h2>One checkbox saves the weekend.</h2>
+    <div class="checkbox-callout mt-3">
+      <div class="checkmark">✓</div>
+      <div>
+        <h3>Retry on Fail · ON · 3 tries · 2000ms between</h3>
+        <p>Without it: one network blip = one lost customer. With it: n8n retries silently, you never hear about it.</p>
+      </div>
+    </div>
+    <ol class="recipe mt-3">
+      <li>Click the <strong>HTTP Request</strong> node → URL → paste the new stable URL (your facilitator shared it).</li>
+      <li>Open the <strong>Settings</strong> tab on the same node.</li>
+      <li>Toggle <strong>Retry on Fail</strong> → <strong>ON</strong>. Max Tries <code>3</code>. Wait Between Tries <code>2000</code>.</li>
+      <li>Execute step. Publish · version <code>v2 — Stable backend + retry hardening</code>.</li>
+    </ol>
+  </div>
+  <div class="folio">06<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 7 — Build B title -->
+<section class="slide exercise-slide" id="s7">
+  <div class="slide-body">
+    <div class="ex-letter">B</div>
+    <div>
+      <div class="ex-meta">Build B · ~25 min · Telegram OUT</div>
+      <h1 style="font-size:clamp(2.6rem,4.6vw,4rem);">Owner gets the&nbsp;ping.</h1>
+      <p class="lede mt-3">Every successful order also chimes the bakery owner's Telegram. One-line digest. Customers see nothing — this is operations.</p>
+    </div>
+  </div>
+  <div class="folio">07<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 8 — BotFather flow (visual) -->
+<section class="slide" id="s8">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build B · setup</span></div><div class="pub-title">Creating a Telegram bot</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build B · BotFather</div>
+    <h2>Three messages with BotFather → a bot exists.</h2>
+    <div class="grid g-2 mt-3" style="gap:var(--s-4);align-items:start;">
+      <div>
+        <ol class="recipe">
+          <li>Open Telegram → search <code>@BotFather</code> → tap the verified one.</li>
+          <li>Type <code>/newbot</code>. BotFather asks for a display name.</li>
+          <li>Display name: <em>Lumière Ops Notifier</em>.</li>
+          <li>Username: must be globally unique, must end in <code>Bot</code>. Append your initials.</li>
+          <li>BotFather replies with a link and the <strong>HTTP API token</strong> — copy it.</li>
+          <li>Tap the link → tap <strong>Start</strong> in the bot's chat.</li>
+          <li>Open <code>api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code> → find <code>chat.id</code>.</li>
+        </ol>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-3);border-radius:8px;">
+        <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.6rem;">Two pieces of state</div>
+        <div style="margin-bottom:1.4rem;">
+          <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--terra);margin-bottom:.2rem;">Token</div>
+          <code style="display:block;font-family:'Geist Mono',monospace;font-size:.78rem;background:var(--paper-warm);padding:.5rem .7rem;border-radius:4px;color:var(--ink);word-break:break-all;">7891234567:AAH...long-random-string</code>
+          <p style="font-size:.88rem;color:var(--ink-mute);margin-top:.4rem;font-style:italic;">Treat it like a password.</p>
+        </div>
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--terra);margin-bottom:.2rem;">Chat ID</div>
+          <code style="display:block;font-family:'Geist Mono',monospace;font-size:.78rem;background:var(--paper-warm);padding:.5rem .7rem;border-radius:4px;color:var(--ink);">123456789</code>
+          <p style="font-size:.88rem;color:var(--ink-mute);margin-top:.4rem;font-style:italic;">Who n8n is allowed to message.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">08<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 9 — Wire the ops Telegram node -->
+<section class="slide" id="s9">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build B · wire</span></div><div class="pub-title">Add the ops notifier</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build B · the wire</div>
+    <h2>Hang it off the True branch.</h2>
+    <div class="wf-flow mt-3">
+      <div class="wf-node"><div class="wn-box gate"><div class="wn-label">If1</div></div><div class="wn-sub">hasAllRequired?</div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box http"><div class="wn-label">HTTP</div></div><div class="wn-sub">/api/quote</div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--ink-blue);background:var(--ink-blue-soft);"><div class="wn-label">Gmail Reply</div></div><div class="wn-sub">to customer</div></div>
+      <span class="wf-arrow" style="color:var(--terra);font-weight:600;">+</span>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--terra);background:var(--terra-soft);"><div class="wn-label">Telegram</div></div><div class="wn-sub">to owner</div></div>
+    </div>
+    <ol class="recipe mt-3">
+      <li>On the output of <em>Reply to a message</em> (the success Gmail reply), click <code>+</code> → <strong>Telegram → Send a text message</strong>.</li>
+      <li>Credential: <em>Lumière BotFather</em> (paste your token).</li>
+      <li>Chat ID: your personal chat ID.</li>
+      <li>Text (Expression mode):</li>
+    </ol>
+    <pre style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--ink);padding:var(--s-2);font-family:'Geist Mono',monospace;font-size:.86rem;line-height:1.5;margin-top:var(--s-2);white-space:pre-wrap;color:var(--ink);">🎂 New order
+{{ $('Code in JavaScript').item.json.flavour }} · {{ $('Code in JavaScript').item.json.size }}
+for {{ $('Code in JavaScript').item.json.deliveryDate }}
+₹{{ $('HTTP Request').item.json.amount }} — payment link sent</pre>
+    <p class="mt-3" style="font-size:1rem;color:var(--ink-mute);"><em>Execute step. Publish · version <code>v3 — Telegram OUT (ops notifier)</code>.</em></p>
+  </div>
+  <div class="folio">09<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 10 — After Build B canvas -->
+<section class="slide" id="s10">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build B · debrief</span></div><div class="pub-title">One trigger, three replies</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">After Build B</div>
+    <h2>One trigger. Three outputs.</h2>
+    <p class="lede mt-2">You've already built one of the load-bearing shapes of automation work — fan-out from a single event into multiple actions. Tattoo this shape.</p>
+    <div class="stat-strip mt-3">
+      <div class="stat-cell"><div class="sc-n">1</div><div class="sc-label">Inbound</div></div>
+      <div class="stat-cell"><div class="sc-n">3</div><div class="sc-label">Outbound</div></div>
+      <div class="stat-cell"><div class="sc-n">2</div><div class="sc-label">Audiences</div></div>
+      <div class="stat-cell"><div class="sc-n">0</div><div class="sc-label">Lines of code</div></div>
+    </div>
+    <div class="rule mt-4"></div>
+    <p style="font-size:1.05rem;color:var(--ink-soft);"><strong>Audiences:</strong> the customer (Gmail reply) and the owner (Telegram). The customer sees the warm thank-you. The owner sees the operational digest. Same event, two different framings.</p>
+  </div>
+  <div class="folio">10<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 11 — Break -->
+<section class="slide break-slide" id="s11">
+  <div class="slide-body">
+    <div class="break-label">Pause · 10 minutes</div>
+    <div class="break-clock" id="breakClock">10:00</div>
+    <p class="lede" style="text-align:center;max-width:36ch;">When you're back, we add the second inbound channel — a customer-facing Telegram bot for the bakery.</p>
+  </div>
+  <div class="folio">11<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 12 — Build C title -->
+<section class="slide exercise-slide" id="s12">
+  <div class="slide-body">
+    <div class="ex-letter">C</div>
+    <div>
+      <div class="ex-meta">Build C · ~45 min · Telegram IN</div>
+      <h1 style="font-size:clamp(2.6rem,4.6vw,4rem);">Customers can DM the&nbsp;bakery.</h1>
+      <p class="lede mt-3">A second inbound channel. Same Gemini, same backend, same price. Reply lands on the channel the customer wrote in on.</p>
+    </div>
+  </div>
+  <div class="folio">12<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 13 — Two mouths concept (REAL VISUAL) -->
+<section class="slide" id="s13">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · concept</span></div><div class="pub-title">One brain, two mouths</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build C · the architectural move</div>
+    <h2>One brain. Two ears. Two mouths.</h2>
+    <p class="lede mt-2">The brain in the middle doesn't know or care which ear heard the order. A tag stamped at each ear is the only thing that decides which mouth replies.</p>
+    <svg class="hub-svg mt-3" viewBox="0 0 980 360" xmlns="http://www.w3.org/2000/svg" style="font-family:'Geist Mono',monospace;">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#8a8478"/>
+        </marker>
+      </defs>
+      <!-- Ear 1: Gmail (top-left) -->
+      <g>
+        <rect x="20" y="40" width="170" height="68" rx="8" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2"/>
+        <text x="105" y="70" text-anchor="middle" font-size="11" fill="#1e3a5f" font-weight="600" letter-spacing="1.5">EAR · GMAIL</text>
+        <text x="105" y="92" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces, serif" font-style="italic">Gmail Trigger</text>
+      </g>
+      <!-- Ear 2: Telegram (bottom-left) -->
+      <g>
+        <rect x="20" y="252" width="170" height="68" rx="8" fill="rgba(184,67,27,0.10)" stroke="#b8431b" stroke-width="2"/>
+        <text x="105" y="282" text-anchor="middle" font-size="11" fill="#b8431b" font-weight="600" letter-spacing="1.5">EAR · TELEGRAM</text>
+        <text x="105" y="304" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces, serif" font-style="italic">Telegram Trigger</text>
+      </g>
+      <!-- Central brain -->
+      <g>
+        <circle cx="490" cy="180" r="118" fill="#faf6ef" stroke="#1a1814" stroke-width="2"/>
+        <circle cx="490" cy="180" r="100" fill="none" stroke="#d4ccba" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="490" y="160" text-anchor="middle" font-size="13" fill="#8a8478" font-weight="600" letter-spacing="2">THE BRAIN</text>
+        <text x="490" y="185" text-anchor="middle" font-size="17" fill="#1a1814" font-family="Fraunces, serif">Tag → Merge → Gemini</text>
+        <text x="490" y="207" text-anchor="middle" font-size="15" fill="#4a463e" font-family="Fraunces, serif" font-style="italic">/api/quote</text>
+      </g>
+      <!-- Mouth 1: Gmail (top-right) -->
+      <g>
+        <rect x="790" y="40" width="170" height="68" rx="8" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2"/>
+        <text x="875" y="70" text-anchor="middle" font-size="11" fill="#1e3a5f" font-weight="600" letter-spacing="1.5">MOUTH · GMAIL</text>
+        <text x="875" y="92" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces, serif" font-style="italic">Gmail Reply</text>
+      </g>
+      <!-- Mouth 2: Telegram (bottom-right) -->
+      <g>
+        <rect x="790" y="252" width="170" height="68" rx="8" fill="rgba(184,67,27,0.10)" stroke="#b8431b" stroke-width="2"/>
+        <text x="875" y="282" text-anchor="middle" font-size="11" fill="#b8431b" font-weight="600" letter-spacing="1.5">MOUTH · TELEGRAM</text>
+        <text x="875" y="304" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces, serif" font-style="italic">Telegram Reply</text>
+      </g>
+      <!-- Inbound lines (with channel tags) -->
+      <path d="M 190 74 Q 320 74 380 150" fill="none" stroke="#1e3a5f" stroke-width="1.6" marker-end="url(#arr)"/>
+      <path d="M 190 286 Q 320 286 380 210" fill="none" stroke="#b8431b" stroke-width="1.6" marker-end="url(#arr)"/>
+      <text x="280" y="100" font-size="11" fill="#1e3a5f" font-weight="600" letter-spacing="1.2">channel: "gmail"</text>
+      <text x="280" y="264" font-size="11" fill="#b8431b" font-weight="600" letter-spacing="1.2">channel: "telegram"</text>
+      <!-- Outbound lines -->
+      <path d="M 600 150 Q 660 74 790 74" fill="none" stroke="#1e3a5f" stroke-width="1.6" marker-end="url(#arr)" stroke-dasharray="5,3"/>
+      <path d="M 600 210 Q 660 286 790 286" fill="none" stroke="#b8431b" stroke-width="1.6" marker-end="url(#arr)" stroke-dasharray="5,3"/>
+      <text x="660" y="100" font-size="11" fill="#1e3a5f" font-weight="600" letter-spacing="1.2">if channel == "gmail"</text>
+      <text x="660" y="264" font-size="11" fill="#b8431b" font-weight="600" letter-spacing="1.2">if channel == "telegram"</text>
+    </svg>
+    <div class="hub-cap">The tag is two lines of config. It's the entire reason this works.</div>
+  </div>
+  <div class="folio">13<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 14 — Add the second bot -->
+<section class="slide" id="s14">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · setup</span></div><div class="pub-title">Customer-facing bot</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build C · second bot</div>
+    <h2>One bot for ops. <span class="terra">A different one for customers.</span></h2>
+    <div class="grid g-2 mt-3" style="gap:var(--s-4);align-items:start;">
+      <div>
+        <p style="font-size:1.1rem;">Same BotFather flow as Build B, but a brand-new bot:</p>
+        <ol class="recipe mt-2">
+          <li><code>@BotFather</code> → <code>/newbot</code>.</li>
+          <li>Name: <em>Lumière Bakery — Order Bot</em>.</li>
+          <li>Username: <code>LumiereOrders_&lt;initials&gt;Bot</code>.</li>
+          <li>Copy the new token (different bot = different token).</li>
+          <li>In n8n: add credential <em>Lumière Customer Bot</em>.</li>
+          <li>Tap the bot link → tap <strong>Start</strong>.</li>
+        </ol>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:var(--s-3);">
+        <h3 style="font-family:'Fraunces',serif;font-size:1.3rem;margin-bottom:.6rem;">Why two bots?</h3>
+        <p style="font-size:1rem;color:var(--ink-soft);">The ops notifier talks to <strong>you</strong>. The customer bot talks to <strong>customers</strong>.</p>
+        <p class="mt-2" style="font-size:1rem;color:var(--ink-soft);">Separating them means you can't accidentally send a customer your internal notification format — and you can revoke either bot's token without affecting the other.</p>
+        <p class="mt-2" style="font-size:.95rem;color:var(--ink-mute);font-style:italic;">A small upfront discipline that pays back the first time someone leaks a token.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio">14<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 15 — Telegram trigger -->
+<section class="slide" id="s15">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · step C2</span></div><div class="pub-title">Telegram Trigger</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build C · the second ear</div>
+    <h2>Telegram Trigger — the second ear.</h2>
+    <ol class="recipe mt-2">
+      <li>Add a new starting node: search <strong>Telegram</strong> → <strong>Telegram Trigger</strong>.</li>
+      <li>Credential: <em>Lumière Customer Bot</em>. Updates: <code>Message</code>.</li>
+      <li>Execute step → on your phone, DM the bot any order text.</li>
+      <li>n8n shows the message payload. The three fields that matter:</li>
+    </ol>
+    <div class="grid g-3 mt-3" style="gap:var(--s-2);">
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-radius:6px;padding:var(--s-2);">
+        <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;">message.text</div>
+        <div style="font-size:.95rem;color:var(--ink-soft);margin-top:.3rem;">what the customer said</div>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-radius:6px;padding:var(--s-2);">
+        <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;">message.chat.id</div>
+        <div style="font-size:.95rem;color:var(--ink-soft);margin-top:.3rem;">where to reply</div>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);border-radius:6px;padding:var(--s-2);">
+        <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;">message.message_id</div>
+        <div style="font-size:.95rem;color:var(--ink-soft);margin-top:.3rem;">the specific message we threaded to</div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">15<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 16 — Tag channel (set + merge) -->
+<section class="slide" id="s16">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · step C3-C4</span></div><div class="pub-title">Tag & Merge</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build C · the keystone</div>
+    <h2>Tag each ear. Merge into one stream.</h2>
+    <p class="lede mt-2">This is the two-line move the whole pattern hangs on.</p>
+    <div class="wf-flow mt-3">
+      <div class="wf-node"><div class="wn-box trigger"><div class="wn-label">Gmail Trigger</div></div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box tag"><div class="wn-label">Set</div></div><div class="wn-sub">channel = "gmail"</div></div>
+      <span class="wf-arrow">↘</span>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--ink);background:var(--paper-warm);"><div class="wn-label">Merge</div></div><div class="wn-sub">Append, 2 inputs</div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--terra);background:var(--terra-soft);"><div class="wn-label">Gemini</div></div><div class="wn-sub">already wired</div></div>
+    </div>
+    <div class="wf-flow" style="margin-top:0;">
+      <div class="wf-node"><div class="wn-box trigger"><div class="wn-label">Telegram Trig.</div></div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box tag"><div class="wn-label">Set</div></div><div class="wn-sub">channel = "telegram"</div></div>
+      <span class="wf-arrow">↗</span>
+    </div>
+    <div class="grid g-2 mt-3" style="gap:var(--s-3);">
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-2) var(--s-3);">
+        <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:.4rem;">Set node config</div>
+        <p style="font-size:.95rem;color:var(--ink-soft);"><strong>Include Other Fields:</strong> ON ← critical, passes the original payload through.<br><strong>Field:</strong> <code>channel</code> = <code>"gmail"</code> (or <code>"telegram"</code>).</p>
+      </div>
+      <div style="background:var(--paper-cream);border:1px solid var(--rule);padding:var(--s-2) var(--s-3);">
+        <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-blue);font-weight:600;margin-bottom:.4rem;">Merge node config</div>
+        <p style="font-size:.95rem;color:var(--ink-soft);"><strong>Mode:</strong> Append.<br><strong>Inputs:</strong> 2 — one from each tag node.<br><strong>Output:</strong> one unified stream carrying <code>channel</code>.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio">16<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 17 — Channel-aware reply (two IFs) -->
+<section class="slide" id="s17">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · step C8-C10</span></div><div class="pub-title">Channel-aware replies</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build C · the fork</div>
+    <h2>Read the tag. Reply on the right channel.</h2>
+    <div class="wf-flow mt-3">
+      <div class="wf-node"><div class="wn-box gate"><div class="wn-label">If1</div></div><div class="wn-sub">hasAllRequired?</div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box http"><div class="wn-label">HTTP</div></div><div class="wn-sub">/api/quote</div></div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node"><div class="wn-box gate"><div class="wn-label">Reply via?</div></div><div class="wn-sub">channel == "telegram"?</div></div>
+      <span class="wf-arrow">↗</span>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--terra);background:var(--terra-soft);"><div class="wn-label">Telegram Reply</div></div></div>
+    </div>
+    <div class="wf-flow" style="margin-top:0;">
+      <span class="wf-arrow" style="margin-left:34rem;">↘</span>
+      <div class="wf-node"><div class="wn-box" style="border-color:var(--ink-blue);background:var(--ink-blue-soft);"><div class="wn-label">Gmail Reply</div></div></div>
+    </div>
+    <div style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--warn);padding:var(--s-2) var(--s-3);margin-top:var(--s-3);">
+      <div style="font-family:'Geist Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--warn);font-weight:600;margin-bottom:.3rem;">Gotcha</div>
+      <p style="font-size:1rem;color:var(--ink);">After HTTP Request, <code>$json</code> is the <em>quote</em> — not the channel tag. Always pull channel from <code>$('Code in JavaScript').item.json.channel</code>. The same rule applies on the missing-info path.</p>
+    </div>
+  </div>
+  <div class="folio">17<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 18 — Telegram reply message -->
+<section class="slide" id="s18">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · step C9</span></div><div class="pub-title">Telegram reply body</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Build C · the customer message</div>
+    <h2>What the customer sees in Telegram.</h2>
+    <div class="grid g-2 mt-3" style="gap:var(--s-3);align-items:start;">
+      <div>
+        <p style="font-size:1rem;color:var(--ink-soft);margin-bottom:.6rem;"><strong>Send a text message</strong> node config:</p>
+        <ul style="list-style:none;padding:0;font-size:1rem;">
+          <li style="padding:.3rem 0;border-bottom:1px solid var(--rule-soft);"><span style="font-family:'Geist Mono',monospace;font-size:.78rem;color:var(--ink-mute);">CREDENTIAL</span><br>Lumière Customer Bot</li>
+          <li style="padding:.3rem 0;border-bottom:1px solid var(--rule-soft);"><span style="font-family:'Geist Mono',monospace;font-size:.78rem;color:var(--ink-mute);">CHAT ID</span><br><code>{{ $('Code in JavaScript').item.json.chatId }}</code></li>
+          <li style="padding:.3rem 0;border-bottom:1px solid var(--rule-soft);"><span style="font-family:'Geist Mono',monospace;font-size:.78rem;color:var(--ink-mute);">REPLY TO MESSAGE ID</span><br><code>{{ $('Code in JavaScript').item.json.telegramMessageId }}</code></li>
+        </ul>
+      </div>
+      <div style="background:#0088cc;color:white;border-radius:14px;padding:var(--s-3);font-family:'Geist',sans-serif;line-height:1.5;font-size:.95rem;box-shadow:0 6px 20px rgba(0,136,204,0.2);">
+        <div style="opacity:.7;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:.6rem;">Lumière Bakery — Order Bot</div>
+        🎂 Your Lumière order is ready<br><br>
+        1.5kg red velvet · eggless<br>
+        Delivery: Saturday<br>
+        Address: Bandra West<br><br>
+        Total: ₹1,575<br>
+        Pay 50% advance: <span style="text-decoration:underline;">pay.lumiere.demo/order/LUM-…</span><br><br>
+        We bake fresh — see you Saturday.
+        <div style="text-align:right;font-size:.7rem;opacity:.6;margin-top:.4rem;">just now ✓✓</div>
+      </div>
+    </div>
+  </div>
+  <div class="folio">18<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 19 — Side-by-side test -->
+<section class="slide" id="s19">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Build C · end-to-end</span></div><div class="pub-title">Side-by-side test</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">End-to-end</div>
+    <h2>Same brain. Two channels. Two replies.</h2>
+    <p class="lede mt-2">Send the same order text on both channels within 30 seconds of each other.</p>
+    <div class="test-grid">
+      <div class="test-card tg">
+        <div class="channel-label">Channel · Telegram</div>
+        <h4>≈ 5 seconds end-to-end</h4>
+        <div class="convo">1kg chocolate eggless for Sunday, deliver to Andheri West</div>
+        <div class="convo bot">🎂 Your Lumière order is ready<br>1kg chocolate · eggless · Sunday · Andheri West<br>Total: ₹950 · Pay 50% advance: pay.lumiere.demo/…</div>
+        <p style="font-size:.9rem;color:var(--ink-mute);margin-top:.6rem;font-style:italic;">+ Owner's Telegram chimes with the ops digest.</p>
+      </div>
+      <div class="test-card gmail">
+        <div class="channel-label">Channel · Gmail</div>
+        <h4>≈ up to 15 min (next poll)</h4>
+        <div class="convo"><strong>Subject:</strong> Cake order<br>2kg red velvet for Saturday, Bandra West, eggless</div>
+        <div class="convo bot">HTML thank-you with order card, breakdown, and the terracotta <strong>Pay 50% advance →</strong> button.</div>
+        <p style="font-size:.9rem;color:var(--ink-mute);margin-top:.6rem;font-style:italic;">+ Owner's Telegram chimes with the ops digest.</p>
+      </div>
+    </div>
+    <p class="mt-3" style="font-size:1rem;color:var(--ink-mute);"><em>Same backend, same /api/quote call hit twice with the same payload — both customers get the same price.</em></p>
+  </div>
+  <div class="folio">19<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 20 — Architecture Card v2 -->
+<section class="slide" id="s20">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Debrief</span></div><div class="pub-title">Architecture Card v2</div></div>
+  <div class="slide-body">
+    <div class="eyebrow cool">What you actually built</div>
+    <h2>The same loop you drew in S5 — running.</h2>
+    <p class="lede mt-2">Find the loop trace from your S5 Architecture Card. Every phase is still here.</p>
+    <div class="mt-3">
+      <div class="arch-row"><div class="phase">Perceive</div><div class="impl">Gmail Trigger <em style="color:var(--ink-mute);">or</em> Telegram Trigger<small>Two ears, one event. The Set node tags which one fired.</small></div></div>
+      <div class="arch-row"><div class="phase">Reason</div><div class="impl">Gemini extraction<small>Same prompt for both channels — body-only or subject+body.</small></div></div>
+      <div class="arch-row"><div class="phase">Tool</div><div class="impl">HTTP → <code style="font-family:'Geist Mono',monospace;">/api/quote</code><small>The Lumière backend. Same call regardless of channel.</small></div></div>
+      <div class="arch-row"><div class="phase">Observe</div><div class="impl">Code node parses the JSON<small>Adds <code>channel</code>, <code>chatId</code>, <code>messageId</code> to the data carried forward.</small></div></div>
+      <div class="arch-row"><div class="phase">Reflect</div><div class="impl">If1 (hasAllRequired) → channel IF<small>Two gates: do we have everything, and which channel are we on.</small></div></div>
+      <div class="arch-row"><div class="phase">Final</div><div class="impl">Gmail HTML reply <em style="color:var(--ink-mute);">or</em> Telegram message<small>Channel-aware. Plus the ops Telegram, always.</small></div></div>
+    </div>
+    <p class="mt-3" style="font-size:1rem;color:var(--ink-mute);"><em>Workflow automation didn't replace agent architecture. It scaffolded it.</em></p>
+  </div>
+  <div class="folio">20<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 21 — Bridge to S8 -->
+<section class="slide" id="s21">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Bridge to S8</span></div><div class="pub-title">Next: Business Cases</div></div>
+  <div class="slide-body">
+    <div class="eyebrow">Next session</div>
+    <h2>S8 · Identify · Design · Build · Deploy.</h2>
+    <p class="lede mt-3">Next session — the last one — we don't build any new mechanics. Instead, we take the workflow you're now staring at and ask: <em>what business case at your work does this shape map onto?</em></p>
+    <div style="background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:var(--s-3);margin-top:var(--s-4);">
+      <div style="font-family:'Geist Mono',monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:.4rem;">Homework before S8</div>
+      <p style="font-size:1.1rem;color:var(--ink);">Bring <strong>three potential candidates</strong> from your own work. The shape we'll match against:</p>
+      <ul style="font-size:1rem;margin-top:.6rem;list-style:none;padding:0;">
+        <li style="padding:.3rem 0;">→ <strong>One trigger</strong> that fires often enough to matter (inbound email, message, form, calendar event…)</li>
+        <li style="padding:.3rem 0;">→ <strong>A small extract or classify step</strong> that's mostly mechanical</li>
+        <li style="padding:.3rem 0;">→ <strong>One or two outbound actions</strong> — a reply, an update, a notification</li>
+        <li style="padding:.3rem 0;">→ Currently done by a human, repeatedly, with low judgment</li>
+      </ul>
+    </div>
+    <p class="mt-3" style="font-size:1rem;color:var(--ink-mute);"><em>The bakery is the demo. Yours is the capstone.</em></p>
+  </div>
+  <div class="folio">21<sup>/22</sup></div>
+</section>
+
+<!-- SLIDE 22 — Close -->
+<section class="slide" id="s22">
+  <div class="running-head"><div class="left"><span>Session 07 · Part 02</span><span class="dot">·</span><span class="topic">Close</span></div><div class="pub-title">Workflow published</div></div>
+  <div class="slide-body" style="justify-content:center;text-align:center;align-items:center;">
+    <div class="eyebrow">Walk-out</div>
+    <h1 style="font-size:clamp(2.8rem,5vw,4.6rem);max-width:22ch;">Customers can DM your bakery now.</h1>
+    <p class="lede mt-3" style="text-align:center;">Try not to break it overnight.</p>
+    <div style="margin-top:var(--s-5);display:flex;gap:var(--s-3);justify-content:center;flex-wrap:wrap;">
+      <div class="stat-cell" style="min-width:9rem;"><div class="sc-n">2</div><div class="sc-label">Inbound channels</div></div>
+      <div class="stat-cell" style="min-width:9rem;"><div class="sc-n">3</div><div class="sc-label">Outbound paths</div></div>
+      <div class="stat-cell" style="min-width:9rem;"><div class="sc-n">0</div><div class="sc-label">Lines of code</div></div>
+      <div class="stat-cell" style="min-width:9rem;"><div class="sc-n">1</div><div class="sc-label">Workflow</div></div>
+    </div>
+    <div class="colophon" style="margin-top:var(--s-5);">Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu">linkedin.com/in/chandrashantanu</a></div>
+  </div>
+  <div class="folio">22<sup>/22</sup></div>
+</section>
+
+</div><!-- /deck -->
+
+<nav class="nav">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <button onclick="goSlide(0)">⏮</button>
+  <button onclick="goSlide(totalSlides-1)">⏭</button>
+</nav>
+
+<script>
+const MASTER_KEY = 'genai_s7p2_slide_master';
+const PRINT_KEY  = 'genai_s7p2_print_request';
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let current = 0;
+
+function goSlide(i) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(totalSlides - 1, i));
+  slides[current].classList.add('active');
+  document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+  try { localStorage.setItem(MASTER_KEY, String(current)); } catch(e) {}
+  if (slides[current].classList.contains('break-slide')) startBreakTimer();
+}
+function next() { goSlide(current + 1); }
+function prev() { goSlide(current - 1); }
+
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key))         { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End')  goSlide(totalSlides - 1);
+});
+
+window.addEventListener('storage', (e) => {
+  if (e.key === MASTER_KEY && e.newValue !== null) {
+    const idx = Math.min(parseInt(e.newValue, 10), totalSlides - 1);
+    if (!isNaN(idx)) goSlide(idx);
+  }
+  if (e.key === PRINT_KEY) window.print();
+});
+
+let breakInterval = null;
+function startBreakTimer() {
+  if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+  let remaining = 600;
+  const el = document.getElementById('breakClock');
+  if (!el) return;
+  function tick() {
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.className = 'break-clock' + (remaining <= 60 ? ' danger' : remaining <= 120 ? ' warn' : '');
+    remaining--;
+    if (remaining < 0) { clearInterval(breakInterval); breakInterval = null; }
+  }
+  tick();
+  breakInterval = setInterval(tick, 1000);
+}
+
+goSlide(0);
+</script>
+</body>
+</html>

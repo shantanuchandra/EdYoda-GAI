@@ -91,6 +91,15 @@ The Wait node is the bridge between the two ears. The workflow isn't cancelled �
 ### Step A1 — Gmail Trigger
 *(→ Slide 9)*
 
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder helping me automate a bakery order intake process.
+> CONTEXT: I run Lumière Bakery. New customer orders arrive as emails to my Gmail inbox. I want to capture them automatically the moment they arrive.
+> TASK: Add a Gmail Trigger node that watches my inbox for new unread emails and passes the full email — subject, body, and sender — to the next step.
+> FORMAT: Place the node on the left of the canvas. Name it "Gmail Trigger". Show me where to connect my Gmail credential.
+> CONSTRAINTS: Poll every minute. Watch INBOX only. Do not mark emails as read automatically.
+> ```
+
 1. Open a blank workflow in n8n.cloud. Click **+** to add your first node.
 2. Search for **Gmail** → choose **Gmail Trigger**.
 3. Configure:
@@ -108,6 +117,15 @@ The Wait node is the bridge between the two ears. The workflow isn't cancelled �
 
 ### Step A2 — HTTP Request (the agent call)
 *(→ Slide 10)*
+
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder continuing the Lumière bakery automation.
+> CONTEXT: The Gmail Trigger is already placed. Now I need to send the email content to an AI classifier that will decide whether the order is standard or needs human review.
+> TASK: Add an HTTP Request node connected to the Gmail Trigger. Set the method to POST. In the body, pass three fields: email_subject, email_body, and email_from — each mapped from the Gmail trigger output.
+> FORMAT: Name it "Order Classifier (AI)". Leave the URL field empty — I will fill in my agent endpoint. Show me the body mapping using n8n expressions.
+> CONSTRAINTS: Body type must be JSON. Do not hardcode any values — use {{ $json.subject }}, {{ $json.text }}, {{ $json.from }} from the Gmail node.
+> ```
 
 1. Add an **HTTP Request** node after the Gmail Trigger.
 2. Configure:
@@ -144,6 +162,15 @@ The Wait node is the bridge between the two ears. The workflow isn't cancelled �
 ### Step A3 — IF Node (the classifier's output becomes a decision)
 *(→ Slide 11)*
 
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder continuing the Lumière bakery automation.
+> CONTEXT: The classifier returns a JSON object. One of the fields is human_gate — it is either true (order needs a human to review) or false (order can be confirmed automatically).
+> TASK: Add an IF node connected to the HTTP Request. Set the condition to check whether the human_gate field from the classifier response equals false.
+> FORMAT: Name it "Standard or Custom?". The TRUE output leads to the auto-confirm path. The FALSE output leads to the human approval path.
+> CONSTRAINTS: Use strict equality. The value human_gate is a boolean — do not compare it as a string.
+> ```
+
 1. Add an **IF** node after the HTTP Request.
 2. Configure:
    - **Condition:** `{{ $json.human_gate }}` **equals** `true`
@@ -157,6 +184,15 @@ The Wait node is the bridge between the two ears. The workflow isn't cancelled �
 
 ### Step A4 — Gmail (auto-confirm, false branch)
 *(→ Slide 12)*
+
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder continuing the Lumière bakery automation.
+> CONTEXT: The IF node's TRUE branch means the order is standard and safe to confirm without human review.
+> TASK: Add a Gmail node on the TRUE branch. Configure it to send a reply email to the original sender confirming their order has been received and will be slotted within 2 hours.
+> FORMAT: Name it "Auto-Confirm (Gmail)". Set the TO field using {{ $('Gmail Trigger').item.json.from }}. The subject should start with ✅.
+> CONSTRAINTS: Keep the email warm but brief — under 80 words. Do not mention the classifier or the automation. End with "We'll confirm your slot within 2 hours."
+> ```
 
 1. Connect the **false (left)** output of the IF node to a new **Gmail** node.
 2. Action: **Send Email**
@@ -210,6 +246,15 @@ Pick-up on Saturday afternoon. Thanks, Priya
 ### Step B1 — Telegram Send (complex branch)
 *(→ Slide 19)*
 
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder continuing the Lumière bakery automation.
+> CONTEXT: The IF node's FALSE branch means the order is complex — dietary restriction, short lead time, or unusual request. The bakery manager needs to approve before we respond.
+> TASK: Add a Telegram node on the FALSE branch. Configure it to send a message to the manager summarising the order and offering two inline keyboard buttons: ✅ Approve and ❌ Reject.
+> FORMAT: Name it "Telegram — Notify Manager". Use Markdown parse mode. The inline keyboard JSON is: {"inline_keyboard":[[{"text":"✅ Approve","callback_data":"approve"},{"text":"❌ Reject","callback_data":"reject"}]]}.
+> CONSTRAINTS: Leave the chat_id field empty — I will fill it in. Pull the order summary from {{ $('Gmail Trigger').item.json.subject }} and {{ $('Gmail Trigger').item.json.text }}.
+> ```
+
 1. Connect the **true (right)** output of the IF node to a **Telegram** node.
 2. Action: **Send Message**
 3. Configure:
@@ -237,6 +282,15 @@ Pick-up on Saturday afternoon. Thanks, Priya
 ### Step B2 — Wait Node
 *(→ Slide 20)*
 
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder continuing the Lumière bakery automation.
+> CONTEXT: After the Telegram message is sent, the workflow must pause and do nothing until the manager taps a button. This is the Human-in-the-Loop gate — the workflow should not proceed automatically.
+> TASK: Add a Wait node connected after the Telegram node. Set it to resume on webhook — it will wait indefinitely until the Telegram Trigger fires.
+> FORMAT: Name it "Wait for Manager Decision". This is the pause between the two ears of the workflow.
+> CONSTRAINTS: Resume mode must be "webhook". Do not set a timeout — we want it to wait as long as needed.
+> ```
+
 1. Add a **Wait** node after the Telegram Send.
 2. Configure:
    - **Wait for:** On webhook call (not a time delay)
@@ -250,6 +304,15 @@ Pick-up on Saturday afternoon. Thanks, Priya
 
 ### Step B3 — Telegram Trigger (second ear)
 *(→ Slide 21)*
+
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n workflow builder continuing the Lumière bakery automation.
+> CONTEXT: When the manager taps ✅ or ❌ on Telegram, a callback query fires. This is the second entry point into the workflow — the Two Ears pattern. It resumes the paused execution.
+> TASK: Add a Telegram Trigger node configured to listen for callback_query updates. Then add an IF node after it: condition checks whether callback_query.data equals "approve".
+> FORMAT: Name the trigger "Telegram Trigger (Manager Reply)". Name the IF node "Approved or Rejected?". TRUE branch = approval path. FALSE branch = rejection path.
+> CONSTRAINTS: Listen for callback_query update type only. The callback data will be either the exact string "approve" or "reject" — case-sensitive match.
+> ```
 
 1. Add a **Telegram Trigger** node (separate from the main flow — this is a new entry point).
 2. Configure:
@@ -329,6 +392,15 @@ Can you confirm? — Meera
 
 ### The 3-Question Method
 *(→ Slide 25)*
+
+> **n8n AI prompt** — paste this into the ✨ AI button on the canvas:
+> ```
+> ROLE: You are an n8n debugging assistant.
+> CONTEXT: I have a workflow called "Lumière Order Triage". One of my nodes is showing a red error badge after a test run.
+> TASK: Look at my execution history and tell me: (1) which node failed, (2) what input data it received, and (3) what error it returned. Then suggest the most likely fix.
+> FORMAT: Answer as three bullets — Node / Received / Error — then one sentence fix.
+> CONSTRAINTS: Do not guess. Base your answer only on what the execution log shows. If you cannot see the log, tell me which tab to open.
+> ```
 
 Memorize this. Use it every time a workflow fails:
 

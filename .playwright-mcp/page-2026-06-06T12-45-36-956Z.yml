@@ -1,0 +1,68 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - text: Lumière
+      - subscript [ref=e4]: Bandra · Andheri · Powai
+    - generic [ref=e5]:
+      - button "Website" [ref=e6] [cursor=pointer]
+      - button "Admin" [ref=e7] [cursor=pointer]
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: Artisan Bakery · Mumbai · Since 2018
+        - heading "From order to oven." [level=1] [ref=e12]:
+          - text: From
+          - emphasis [ref=e13]: order
+          - text: to
+          - emphasis [ref=e14]: oven.
+        - paragraph [ref=e15]: Two agents at your service. The Order Assistant takes your cake order end to end — checks the rules, confirms lead time, books the slot. The Regulation Monitor watches food-safety rules and keeps Lumière compliant.
+      - generic [ref=e16]: 🎂
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "Two agents." [level=2] [ref=e19]:
+          - text: Two
+          - emphasis [ref=e20]: agents.
+        - generic [ref=e21]: S5 · Agent Architecture
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e24]: Customer-facing · Acts
+          - heading "Lumière Order Assistant" [level=3] [ref=e25]
+          - paragraph [ref=e26]: Takes a cake order end to end — reads the spec, checks against the rules, confirms lead time, applies coupons, books the slot, sends the summary.
+          - generic [ref=e27]: "Closes Gap #3 Tools + Gap #4 Autonomy"
+        - generic [ref=e28]:
+          - generic [ref=e29]: Operations · Watches
+          - heading "FSSAI Regulation Monitor" [level=3] [ref=e30]
+          - paragraph [ref=e31]: Watches India's food-safety regulator (FSSAI) for new rules. Auto-applies cosmetic updates. Escalates anything about allergens, ingredients, or safety to a human.
+          - generic [ref=e32]: "Closes Gap #1 Memory + Gap #5 Planning"
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - heading "Our branches." [level=2] [ref=e35]:
+          - text: Our
+          - emphasis [ref=e36]: branches.
+        - generic [ref=e37]: Each runs its own coupon
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Bandra West" [level=3] [ref=e40]
+          - paragraph [ref=e41]: 14, Pali Mala Road, Mumbai 400050
+          - generic [ref=e42]:
+            - text: Mon–Fri · 7:30am – 8:30pm
+            - text: Sat–Sun · 8:00am – 9:00pm
+          - generic [ref=e43]: BANDRA10
+        - generic [ref=e44]:
+          - heading "Andheri West" [level=3] [ref=e45]
+          - paragraph [ref=e46]: Shop 3, Solitaire Plaza, Mumbai 400058
+          - generic [ref=e47]:
+            - text: Mon–Fri · 8:00am – 8:00pm
+            - text: Sat–Sun · 8:30am – 9:00pm
+          - generic [ref=e48]: ANDHERI10
+        - generic [ref=e49]:
+          - heading "Powai" [level=3] [ref=e50]
+          - paragraph [ref=e51]: Galleria Mall, Hiranandani, Mumbai 400076
+          - generic [ref=e52]:
+            - text: Mon–Fri · 8:30am – 9:00pm
+            - text: Sat–Sun · 8:30am – 10:00pm
+          - generic [ref=e53]: POWAI10
+    - generic [ref=e55]:
+      - generic [ref=e56]: © Lumière Artisan Bakery · Mumbai
+      - generic [ref=e57]: Demo site · EdYoda GenAI · S05 · Agent Architecture
+  - button "Open chat" [ref=e58] [cursor=pointer]: 💬
