@@ -1,23 +1,24 @@
 # AI Evals — Elective Class Design
 
-**Status:** Approved (design phase). Ready for implementation planning.
+**Status:** Approved (design phase, v2 — modality-focused). Ready for implementation planning.
 **Date:** 2026-06-11
 **Type:** Standalone elective (NOT part of the canonical 8-session GenAI & AI Agents for Non-Coders curriculum)
-**Duration:** 4 hours 15 minutes (runs intentionally 15 min over a 4h block — flex accepted)
-**Audience:** 10 invited participants, majority **Product Managers** (non-coders). They sign off on AI features; they do not write code.
-**Title (working):** *AI Evals — Trust, but Verify*
+**Duration:** Targets a 4h block. Content through the Build + first deliverable lands at 3:30; the full serial run (incl. demo round + critique) reaches ~4:55. The tail flexes — see §3 (critique can go take-home to land ~4:35, or tighter). Facilitator resolves against the actual block length (§6 open item).
+**Audience:** 10 invited **Growth-X** participants, majority **Senior Product Managers** (non-coders). They sign off on AI features; they do not write code. Cohort appreciates depth — push rigor higher than a generic PM room.
+**Title (working):** *AI Evals — Verify first, Trust second*
 
 ---
 
 ## 1. Positioning & constraints
 
 - **Standalone elective.** No cohort dependency. Must land cold — assume nothing about prior sessions. **No callbacks** to S1–S8. **No "next session" bridge.**
-- **PM lens throughout.** The job-to-be-done is *judgment*: name the eval parts, read an eval report, push back on an engineer's eval claims, and decide whether to ship. Not building test harnesses by hand.
+- **PM lens throughout.** The job-to-be-done is *judgment*: name the eval parts, read an eval report, push back on an engineer's eval claims, decide whether to ship — and know **what to measure for which modality.** Not building test harnesses by hand.
+- **The spine is two-part:** **Part I — eval fundamentals** (taught once, modality-agnostic), then **Part II — modality deep-dive** (how evals actually change across text / audio / image / video / multimodal). **Text gets maximum depth; audio/image/video are delivered as the metrics reference; the multimodal/agent finale is the big payoff.**
 - **Two deliverables** (hard requirement):
   1. A filled-in **1-page Eval Plan** for an agent the PM actually owns (BYOA — bring your own agent).
   2. A **marked-up critique** of a planted-issue eval report.
 - **Register:** follows the EdYoda presenter≠learner split and design system ([[edyoda_genai_design_system]], [[edyoda_presenter_vs_learner]]). Dark Console for presenter deck, Paper Editorial for learner deck. `say:` fields are spoken English. No timestamps or stage directions on learner-facing artifacts. Minute markers live in the facilitator run sheet only ([[feedback_no_minute_callouts]]).
-- **Concept slides must SHOW, not describe** ([[feedback_visualize_concept_slides.md]]). Each of the five vocabulary concepts gets a real visual (a spreadsheet that looks like a spreadsheet, a gauge with a needle, a 2×2, a three-column judge comparison), never a row of text boxes with arrows.
+- **Concept slides must SHOW, not describe** ([[feedback_visualize_concept_slides.md]]). Every concept gets a real visual (a spreadsheet that looks like a spreadsheet, a gauge with a needle, a 2×2, a three-column judge comparison, a stage-gate pipeline with leak points), never a row of text boxes with arrows.
 - **Colophon** on the close page ([[edyoda_author_colophon]]).
 
 ### Explicit exclusions
@@ -26,143 +27,191 @@
 
 ---
 
-## 2. The two running cases
+## 2. The running cases
 
-### Case A — Email Reply Agent (the TEACHING anchor)
-A fictional **AI email-reply agent for a real-estate firm**. Chosen because every PM instantly understands it and its output is open-ended (so "did it work?" is genuinely hard). Threaded through all five vocabulary concepts in Act 2. Kept strictly **PM-lens** — framed as a product a PM would own and sign off on, not an engineering artifact.
+### Case A — Email Reply Agent (the TEACHING anchor for Part I)
+A fictional **AI email-reply agent for a real-estate firm**. Chosen because every PM instantly understands it and its output is open-ended (so "did it work?" is genuinely hard). Threaded through the five fundamentals in Part I. Kept strictly **PM-lens**.
 
-Golden-set shape for the anchor: 10 real customer emails the firm has answered before — **6 normal, 2 weird, 2 hostile.** Three metrics: (a) "did it answer the question?" (binary), (b) "did it sound on-brand?" (1–5), (c) "did it leak personal info?" (binary, single fail = catastrophe).
+Golden-set shape: 10 real customer emails the firm has answered before — **6 normal, 2 weird, 2 hostile.** Three metrics: (a) "did it answer the question?" (binary), (b) "did it sound on-brand?" (1–5), (c) "did it leak personal info?" (binary, single fail = catastrophe). This same agent is the worked example for the **deep text section** (hallucination & faithfulness centerpiece).
 
-### Case B — Wasabi Travels IG Reel Eval (the REAL live demo)
-A real, running eval the facilitator built. Source: `/Users/shantanuchandra/Downloads/journey-weaver/marketing/`. An agent (`gemma4` / `qwen2.5-vl:7b` local models) auto-generates a daily Japan-travel Instagram **reel** — script, voiceover, images, captions — with no human in the loop. The eval scores it.
+### Case B — Wasabi Travels IG Reel Eval (the REAL multimodal finale)
+A real, running eval the facilitator built. Source: `/Users/shantanuchandra/Downloads/journey-weaver/marketing/`. An agent (`gemma4` / `qwen2.5-vl:7b` local models) auto-generates a daily Japan-travel Instagram **reel** — script, voiceover, images, captions — with no human in the loop. The eval scores it across **all three modalities at once.**
 
-This case is used **full-candor** (facilitator's own failing project) as a 15-min "here's one I built for real" demo, AFTER the vocabulary act. It is NOT the teaching anchor and NOT the critique target.
+**Decision (v2):** the IG eval is NO LONGER a standalone early demo. It makes ONE powerful appearance — as the **multimodal/agent finale** (Part II climax), where it's most persuasive. Used **full-candor** (facilitator's own failing project). It is NOT the Part-I teaching anchor and NOT the critique target.
 
-**Real eval architecture (verified from code 2026-06-11):**
+**Why it's the perfect multimodal teaching artifact:** it already evaluates text (script/caption → WER + hook), audio (voiceover → `voice_dur_ratio`, `silence_gap`), and video (frames → VLM `style_consistency`, `composition`, `face_leak`) — AND the cross-modal relationships. The three finale ideas (§4, Act F) are each provable on this one artifact with real data.
 
-| Stage | What it scores | Judge type | Example metric |
-|---|---|---|---|
-| S1 | Asset quality | **Code** (deterministic) | `over_reused_count`, `location_fit_rate` |
-| S2 | TTS / audio timing | **Code** (ffprobe) | `voice_dur_ratio`, `silence_gap_max_s` |
-| S2b | Transcription accuracy | **Whisper** (model) | `wer` (Word Error Rate) |
-| S3 | Beat alignment | Code / perceptual hash | `vo_drift_mean_ms`, `cut_honored_rate` |
-| S4 | Frame quality | **VLM-judged** (qwen2.5-vl) | `style_consistency`, `composition`, `face_count_max` |
-| S5 | Captions | **Code** (ASS parse) | `min_display_violation`, `sync_delta_ms` |
-| S6b | Hook strength | **VLM-judged** (qwen2.5-vl) | `hook_score` (1–5) |
+**Real eval architecture (verified from code 2026-06-11) — the stage-gate model:**
 
-**Golden set:** `marketing/evals/calibration/reel/golden.json` — 5 reels, hand-scored by the facilitator on `hook_score`, `style_consistency`, `composition`, `face_count_expected`, with brutally honest free-text notes.
+| Stage | Modality | What it scores | Judge type | Example metric |
+|---|---|---|---|---|
+| S1 | Image/asset | Asset quality, reuse, location fit | **Code** (deterministic) | `over_reused_count`, `location_fit_rate` |
+| S2 | Audio | TTS / audio timing | **Code** (ffprobe) | `voice_dur_ratio`, `silence_gap_max_s` |
+| S2b | Text↔Audio | Transcription accuracy | **Whisper** (model) | `wer` (Word Error Rate) |
+| S3 | Audio↔Video | Beat alignment (cross-modal) | Code / perceptual hash | `vo_drift_mean_ms`, `cut_honored_rate` |
+| S4 | Video/frames | Frame quality | **VLM-judged** (qwen2.5-vl) | `style_consistency`, `composition`, `face_count_max` |
+| S5 | Text-on-screen | Captions | **Code** (ASS parse) | `min_display_violation`, `sync_delta_ms` |
+| S6b | Text+Video | Hook strength | **VLM-judged** (qwen2.5-vl) | `hook_score` (1–5) |
+
+This stage-gate table IS the finale's compounding-error argument: 6 gates, each a place to catch a different modality's failure.
+
+**Golden set:** `marketing/evals/calibration/reel/golden.json` — 5 reels, hand-scored on `hook_score`, `style_consistency`, `composition`, `face_count_expected`, with brutally honest free-text notes (incl. the cross-modal coherence example below).
 
 **Two pass-bar styles in one eval:**
 - **Hard violations** (binary instant-fail): face leak in a faceless reel, silence gap > 1.5s, caption < 0.6s, caption line > 32 chars.
 - **Distribution thresholds** (quality): a metric must beat the p10 of the last 5 runs' p50 values.
 
-**Judge calibration (the killer PM lesson):** every run re-scores the 5 golden reels with the VLM and checks whether the machine still agrees with the human ground truth within ±1 point (±2pp for WER). If the AI judge drifts from the human, the run flags `JUDGE_DRIFT_DETECTED`. → *"Calibrate your judge against a human before you trust its numbers."*
+**Judge calibration (the killer PM lesson):** every run re-scores the 5 golden reels with the VLM and checks whether the machine still agrees with the human ground truth within ±1 point (±2pp for WER). Drift → `JUDGE_DRIFT_DETECTED`. → *"Calibrate your judge against a human before you trust its numbers."*
 
-**The headline finding (REAL, full candor):** `hook_score` is **1/5 across all 5 golden reels.** A systemic failure the creator could not see by eyeballing — exactly what an eval exists to catch.
+**Real findings for the finale (full candor):**
+- **Weakest link:** `hook_score` = **1/5 across all 5 reels** while audio timing (`voice_dur_ratio` p50 ≈ 0.98) and composition (4–5/5) score well. The good parts can't save the bad hook.
+- **Cross-modal coherence break (real golden-set note):** *"the voice talks about lanterns but the image is that of dusk without any lanterns."* Audio fine alone, image fine alone — the pairing fails.
+- **Another real note:** *"the audio is complete garbage… the script is completely scrap and non-sensical."*
 
 #### ⚠️ TOMORROW-MORNING STAT SWAP (2026-06-12)
-A **fresh full eval run** lands tomorrow morning. The numbers in this class are REAL as of 2026-06-11 but must be refreshed:
-- **Deterministic metrics** (S1/S2/S3/S5) will be byte-identical — no change expected.
+A **fresh full eval run** lands tomorrow morning. Numbers are REAL as of 2026-06-11 but must be refreshed:
+- **Deterministic metrics** (S1/S2/S3/S5) will be byte-identical — verify, don't assume.
 - **LLM/VLM-judged metrics** (`hook_score`, `style_consistency`, `composition`, `wer`) may shift ±2–3pp.
-- **`wer` is currently `null`** in the golden set (whisper didn't populate it). If tomorrow's run fills it, that row is the ONLY place a placeholder/fictitious stat exists today — mark it clearly in every artifact and swap it.
-- **Action:** after the run, grep all class artifacts for the marker `‹STAT-2026-06-11›` and replace each with the fresh number. See [[project_ai_evals_stat_swap]] memory for the live checklist.
+- **`wer` is currently `null`** (whisper hadn't populated it). If the fresh run fills it, that row is the ONLY place a placeholder/fictitious stat exists today — mark and swap.
+- **Action:** grep all artifacts for `‹STAT-2026-06-11›`, replace each. See [[project_ai_evals_stat_swap]] for the live checklist.
 
 ---
 
-## 3. Session arc (8 acts + 2 breaks)
+## 3. Session arc (two parts, 10 content acts + 2 breaks)
 
-Clock runs to 4:15 (15 min over a 4h block — accepted). Minute markers are facilitator-only; they never appear on learner artifacts.
+Clock runs to 4:15 (15 min over a 4h block — accepted). Minute markers facilitator-only.
 
-| # | Act | Dur | Clock | Deliverable touchpoint |
-|---|---|---|---|---|
-| 1 | **Cold open: the silent failure** | 15 | 0:00–0:15 | — |
-| 2 | **The eval vocabulary (5 words)** | 45 | 0:15–1:00 | — |
-| 3 | **"Here's one I built" — real IG eval demo** | 15 | 1:00–1:15 | — |
-| — | **Break** (coffee + bio) | 15 | 1:15–1:30 | — |
-| 4 | **Does this agent even need an eval?** (qualifier) | 25 | 1:30–1:55 | — |
-| 5 | **Build: design an eval suite for YOUR agent** | 50 | 1:55–2:45 | **Deliverable 1** |
-| 6 | **Demo round: 10 PMs showcase** | 40 | 2:45–3:25 | Deliverable 1 shared |
-| — | **Stretch + eat** (meal break) | 20 | 3:25–3:45 | — |
-| 7 | **Critique: tear apart a fake report** | 20 | 3:45–4:05 | **Deliverable 2** |
-| 8 | **Close + Monday-morning plan** | 10 | 4:05–4:15 | — |
+| # | Part | Act | Dur | Clock | Deliverable |
+|---|---|---|---|---|---|
+| 1 | I | **Cold open: the silent failure** | 15 | 0:00–0:15 | — |
+| 2 | I | **The eval vocabulary (5 words)** | 40 | 0:15–0:55 | — |
+| 3 | I | **Does this agent even need an eval?** (qualifier) | 20 | 0:55–1:15 | — |
+| — | | **Break** (coffee + bio) | 15 | 1:15–1:30 | — |
+| 4 | II | **Evaluating TEXT (deep) — hallucination & faithfulness** | 35 | 1:30–2:05 | — |
+| 5 | II | **Audio · Image · Video — the metrics reference** | 20 | 2:05–2:25 | — |
+| 6 | II | **FINALE: evaluating a multimodal agent** (real IG reel) | 20 | 2:25–2:45 | — |
+| 7 | III | **Build: design an eval suite for YOUR agent** | 45 | 2:45–3:30 | **Deliverable 1** |
+| — | | **Stretch + eat** (meal break) | 20 | 3:30–3:50 | — |
+| 8 | III | **Demo round: 10 PMs showcase** | 35 | 3:50–4:25 | Deliverable 1 shared |
+| 9 | III | **Critique: tear apart a fake report** | 20 | 4:25–4:45 | **Deliverable 2** |
+| 10 | III | **Close + Monday-morning plan** | 10 | 4:45–4:55 | — |
+
+> **Note on the tail (honest accounting):** run strictly serial, the day ends at **4:55 — 40 min over** the 4h block. The front of the class (through Act 7, 3:30) is solid; the tail is where the facilitator flexes. Run-sheet options: (a) accept a ~4:45–4:55 finish if the block allows; (b) **make the critique (Act 9) a take-home** with a 5-min in-room preview → ends ~4:35; (c) trim demo to 3 min/PM flat AND critique to a 12-min preview → ends ~4:20. The two deliverables are non-negotiable; **demo-round length and critique-depth are the flex variables.** Pick live based on energy. This is flagged as an open item (§6) for the facilitator to resolve against the actual block length.
+
+**Key v2 changes from v1:** standalone IG demo cut (folded into finale); vocabulary 45→40; qualifier 25→20; added the three Part-II modality acts; finale leads with compounding math.
 
 ---
 
 ## 4. Act detail
 
-### Act 1 — Cold open: the silent failure (15 min)
-A real-feeling AI feature ships clean in the demo, then quietly fails in production. Land the single question the whole class answers: **"How would you have caught this before it shipped?"** PMs need the fire before the fire extinguisher. End by naming the promise: by the end of today you'll have a 1-page plan that catches this for your own agent.
+### PART I — FUNDAMENTALS
 
-### Act 2 — The eval vocabulary (45 min) — LOAD-BEARING
-Goal: every PM can finish *"To eval an agent you need a **golden set**, a **metric**, a **judge**, a **pass bar**, and a list of **failure modes**."* One worked example (Email Reply Agent) threaded through all five. ~8 min each + 3-min closer ("The Eval Stack" recap slide).
+#### Act 1 — Cold open: the silent failure (15 min)
+A real-feeling AI feature ships clean in the demo, fails quietly in production. Land the question the whole class answers: **"How would you have caught this before it shipped?"** Fire before the fire extinguisher. End on the promise: today you leave with a 1-page plan that catches this for your own agent — and a reference for what to measure no matter the modality.
 
-| # | Concept | One-line definition | Visual (SHOW it) | PM takeaway | Anti-pattern to name |
+#### Act 2 — The eval vocabulary, 5 words (40 min) — LOAD-BEARING
+Goal: every PM can finish *"To eval an agent you need a **golden set**, a **metric**, a **judge**, a **pass bar**, and a list of **failure modes**."* One worked example (Email Reply Agent) threaded through all five. ~7 min each + recap.
+
+| # | Concept | One-line | Visual (SHOW it) | PM takeaway | Anti-pattern |
 |---|---|---|---|---|---|
-| 1 | **Golden set** | The questions you already know the right answer to | A 10-row spreadsheet: input + *expected behavior* | "Your test, written before you ship. 10 hand-picked > 1000 random." | "We'll just watch live traffic" (no baseline) |
-| 2 | **Metric** | What you're actually measuring | A 2×2: binary↔scored × one-shot↔aggregate, with examples in each cell | "One metric is never enough — pick 3: correctness, quality, safety." | "Accuracy" as a single number on open-ended output |
-| 3 | **Judge** (10 min, longest) | Who decides if the answer was good | Three columns: Human / Code / LLM — cost, speed, good-at, fails-at | "LLM-as-judge is a junior reviewer — calibrate it against a human first." | "The LLM said the LLM did great" (self-eval bias) |
-| 4 | **Pass bar** | The number above which you ship | A gauge with red/yellow/green zones and the bar marked (NOT at 100%) | "Different metrics, different bars. Safety = zero tolerance. Quality = good-enough." | "We'll ship when it's better" (than what? by how much?) |
-| 5 | **Failure modes** | The specific ways THIS agent breaks | A tracker: agent in the center, 6 named failure bubbles around it with counts | "You can't eval failures you haven't named. First pass discovers them." | Treating "the eval failed" as one fact — *how* it failed is the signal |
+| 1 | **Golden set** | Questions you already know the answer to | 10-row spreadsheet: input + *expected behavior* | "Your test, written before you ship. 10 hand-picked > 1000 random." | "We'll just watch live traffic" |
+| 2 | **Metric** | What you're actually measuring | 2×2: binary↔scored × one-shot↔aggregate | "One metric is never enough — correctness, quality, safety." | "Accuracy" as one number on open output |
+| 3 | **Judge** | Who decides if it was good | 3 columns: Human / Code / LLM (cost·speed·good-at·fails-at) | "LLM-as-judge is a junior reviewer — calibrate vs a human first." | "The LLM said the LLM did great" |
+| 4 | **Pass bar** | The number above which you ship | Gauge, red/yellow/green, bar marked (NOT 100%) | "Different metrics, different bars. Safety = zero tolerance." | "We'll ship when it's better" |
+| 5 | **Failure modes** | The specific ways THIS agent breaks | Tracker: agent center, 6 named failure bubbles + counts | "You can't eval failures you haven't named." | "The eval failed" as one fact |
 
-Closer: a single **"The Eval Stack"** slide stacking all five terms. This is the picture every later act calls back to.
+Recap slide: **"The Eval Stack."** The picture every later act calls back to.
 
-### Act 3 — "Here's one I built" — real IG eval demo (15 min)
-Full-candor walk-through of Case B. Four beats:
-1. **The product** (2): the nightly auto-reel generator; the terrifying PM question.
-2. **The five words on a real screen** (7): map each Act-2 term to the actual `golden.json` / `_history.json` / scorer code. Show the three judge types co-existing (code / VLM / human).
-3. **The gut-punch** (4): hook_score 1/5 across all 5 reels — a blind spot the eval caught.
-4. **The pro move** (2): judge calibration — the eval re-checks its own AI judge against the human every run.
+#### Act 3 — Does this agent even need an eval? (20 min)
+The PM triage tool. A **4-question qualifier**: (1) user-facing? (2) cost of being wrong high? (3) output open-ended? (4) going to scale past you? **Two of four = yes → build an eval.** Three quick worked examples (obvious-yes, obvious-no, borderline). PMs leave with a triage rule, not just a build rule.
 
-### Act 4 — Does this agent even need an eval? (25 min)
-The PM triage tool — stops the "eval everything" reflex. A **4-question qualifier**:
-1. Is it **user-facing**?
-2. Is the **cost of being wrong** high?
-3. Is the output **open-ended** (vs a closed set you can spot-check)?
-4. Is it going to **scale past you** (you can't eyeball every output)?
+---
 
-**Two of four = yes → build an eval.** Worked through 3 quick agent examples (one obvious-yes, one obvious-no, one borderline). PMs leave with a triage rule, not just a build rule.
+### PART II — MODALITY DEEP-DIVE
 
-### Act 5 — Build: design an eval suite for YOUR agent (50 min) — DELIVERABLE 1
-Each PM fills a **1-page Eval Plan template** for an agent they actually own.
-- **Step 0 (5 min):** run their agent through the Act-4 qualifier — does it even need this? (If a PM's agent fails the qualifier, they pick a different agent or a hypothetical — facilitator floats to catch this.)
-- **Solo (30 min):** fill the template — golden set sketch (5–10 cases incl. weird + hostile), 3 metrics (correctness/quality/safety), judge choice per metric, pass bar per metric, 3+ named failure modes.
-- **Pair-swap critique (15 min):** trade sheets, each PM red-teams a peer's plan against the five concepts.
+#### Act 4 — Evaluating TEXT (deep): hallucination & faithfulness (35 min)
+The deepest section. Deck centerpiece = **hallucination & faithfulness** ("is the answer grounded, or did it make it up?") — the failure every Senior PM has been burned by. The other two text challenges (the **judge ladder** and **rubric design**) are referenced as the *mechanism* and live in full in the handbook.
 
-**Template sections:** Agent + JTBD · Qualifier score (X/4) · Golden set (cases, incl. edge/hostile) · Metrics (3, each tagged correctness/quality/safety) · Judge per metric (human/code/LLM + why) · Pass bar per metric (incl. which is zero-tolerance) · Top failure modes to watch.
+**Deck flow:**
+1. **Fluent ≠ correct (8 min).** Show two answers to the same customer email — both well-written; one invented a policy. The eye can't tell. This is why text is the hardest modality to grade.
+2. **The judge ladder, briefly (7 min):** exact-match (great for classification, useless for open text) → semantic similarity (closer, still misses meaning) → **LLM-as-judge with a rubric** (the only thing that scales for open text). Name each rung, cost of each. *Full ladder + when-to-use → handbook.*
+3. **Faithfulness, made measurable (12 min):** decompose "is it grounded?" into checkable claims; the groundedness check (does every claim trace to a source?); why a golden set with *known* answers is the only defense. Tie back to the Email Agent's "leak personal info" + "invent a policy" failure modes.
+4. **Rubric craft, the transferable bit (8 min):** turning "on-brand" into 3 scorable sub-criteria — the exact skill they'll use in the Build. *Full rubric-writing guide → handbook.*
 
-### Act 6 — Demo round: 10 PMs showcase (40 min) — DELIVERABLE 1 shared
-10 PMs × ~3.5 min (≈2 min present their filled template on one slide + ≈1.5 min one sharp note from cohort/facilitator). Hard time-keeping. 40 min absorbs transition slop; if a PM no-shows it's free buffer; if all run long, cut to 3 min flat. *(This demo round is the reason BYOA was chosen over a shared case — the participants explicitly asked for showcase time.)*
+**Handbook (text):** all three challenges in full — judge ladder with examples, faithfulness/hallucination metric family, rubric-design worksheet.
 
-### Act 7 — Critique: tear apart a fake report (20 min) — DELIVERABLE 2
-A facilitator-authored **1-page eval report that looks legitimate** but has **3–4 planted issues**:
-1. A **gamed metric** (e.g., 98% "accuracy" that's really just the easy 80% of cases).
-2. A **cherry-picked golden set** (all normal cases, no edge/hostile).
-3. **Missing failure-mode coverage** (a known break that isn't measured).
-4. **Vague pass criteria** ("performs well" — no number, no bar).
+#### Act 5 — Audio · Image · Video: the metrics reference (20 min)
+You asked for "just share the metrics" here — so this act IS a guided walk through the **Modality Metrics Reference** (the handbook centerpiece). One slide per modality showing the headline metrics with real numbers; the full table is the keepsake artifact. Goal: PMs know *what exists* and *what each metric misses*, fast.
 
-Solo mark-up (10) → reveal + group debrief (10). Deliverable = their marked-up critique.
+**The Modality Metrics Reference (handbook artifact) — columns:**
+**Metric name + what it measures · Typical "good" value / benchmark · Who/what judges it (code / model / human) · What it MISSES (failure mode).**
 
-### Act 8 — Close + Monday-morning plan (10 min)
-One-page "what I'll do this week": pin **one eval to one agent**. No "next session" tease (standalone elective). Colophon ([[edyoda_author_colophon]]).
+Coverage (real numbers go in the table; examples):
+- **Text:** WER (for transcripts), semantic similarity, faithfulness/groundedness score, LLM-judge rubric score, toxicity/PII flags.
+- **Audio:** WER (ASR accuracy, good < ~10%), MOS / naturalness (good > ~4.0/5), `voice_dur_ratio`, max silence gap, speaker consistency, latency.
+- **Image:** CLIPScore (image-text alignment), aesthetic/quality score (VLM 1–5), face/safety detection, OCR-legibility for text-in-image, style adherence.
+- **Video:** all of image PLUS temporal coherence, cut-honored rate, A/V sync drift (ms), hook/retention proxy.
+- **Multimodal:** cross-modal coherence, weakest-link aggregate, stage-gate pass rate.
+
+Each row's **"what it misses"** column is the one that makes a PM dangerous in a review (e.g., *"WER ignores meaning — a low WER can still be a nonsense sentence"*; *"CLIPScore rewards generic matches — it can miss that the brand style is wrong"*).
+
+#### Act 6 — FINALE: evaluating a multimodal agent (20 min) — the real IG reel
+The climax. Full-candor walk of Case B. **Leads with the scary number, then resolves it.** All three finale ideas are in the handbook; the deck tells the layered story on real data.
+
+1. **Open with the compounding math (5 min) — the hook.** Chain text→audio→image→video; even ~90%-good per stage ≈ **66% end-to-end**. "Your agent can be 'pretty good' at everything and still fail two times in three." The fix this argues for: **eval every stage, not just the final output.**
+2. **Resolve with weakest-link (7 min).** Show the real reel scores: audio timing ~0.98 (great), composition 4–5/5 (great), **hook 1/5 (sinks it).** A multimodal output is only as good as its worst modality — and stage-by-stage eval (S1–S6) is how you find *which* link broke. Map the 6 stages to the modalities.
+3. **The coherence twist (5 min).** The real golden-set note: *"voice talks about lanterns but the image is dusk without any lanterns."* Each modality fine alone; the *relationship* failed. Some failures live between the parts — eval the pairings too.
+4. **Land it (3 min).** "That's why my eval scores all 6 stages separately AND checks the cross-modal links — and why it re-checks its own AI judge against me every run." One artifact, every lesson from the day, proven on a real failing project.
+
+---
+
+### PART III — APPLY
+
+#### Act 7 — Build: design an eval suite for YOUR agent (45 min) — DELIVERABLE 1
+Each PM fills a **1-page Eval Plan template** for an agent they own.
+- **Step 0 (5 min):** run their agent through the Act-3 qualifier — does it even need this? (Fails qualifier → pick another agent or a hypothetical; facilitator floats.)
+- **Solo (25 min):** fill the template — golden set (5–10 cases incl. weird + hostile), 3 metrics (correctness/quality/safety), **judge per metric**, **pass bar per metric**, 3+ named failure modes. **Modality prompt:** if their agent has audio/image/video, the template points them at the Metrics Reference to pick modality-appropriate metrics.
+- **Pair-swap critique (15 min):** trade sheets, red-team a peer's plan against the five concepts.
+
+**Template sections:** Agent + JTBD · Qualifier score (X/4) · **Modality(ies)** · Golden set (incl. edge/hostile) · Metrics ×3 (tagged correctness/quality/safety) · Judge per metric (human/code/LLM + why) · Pass bar per metric (which is zero-tolerance) · Top failure modes.
+
+#### Act 8 — Demo round: 10 PMs showcase (35 min) — DELIVERABLE 1 shared
+10 PMs × ~3 min (≈2 present their filled template + ≈1 one sharp note from cohort/facilitator). Hard time-keeping. *(Demo round is why BYOA was chosen — the cohort asked for showcase time.)* Length is the session's flex variable (see §3 note).
+
+#### Act 9 — Critique: tear apart a fake report (20 min) — DELIVERABLE 2
+A facilitator-authored **1-page eval report that looks legitimate** with **3–4 planted issues**:
+1. **Gamed metric** — 98% "accuracy" that's really just the easy 80% of cases.
+2. **Cherry-picked golden set** — all normal cases, no edge/hostile.
+3. **Missing failure-mode coverage** — a known break that isn't measured (bonus: a known *modality* not evaluated, e.g., "they scored the script but never checked the voiceover").
+4. **Vague pass criteria** — "performs well," no number, no bar.
+
+Solo mark-up (10) → reveal + debrief (10). Deliverable = the marked-up critique. *(May become take-home + 5-min preview per §3 flex.)*
+
+#### Act 10 — Close + Monday-morning plan (10 min)
+One-page "what I'll do this week": pin **one eval to one agent**, with the right metrics for its modality. No "next session" tease. Colophon ([[edyoda_author_colophon]]).
 
 ---
 
 ## 5. Artifacts to produce (implementation phase)
 
 Following the EdYoda template set ([[edyoda_genai_design_system]] → `templates/`):
-1. **`presenter_deck.html`** — Dark Console cockpit. `say:`/`doSteps:`/`note:` fields. Clock + timing badges (facilitator-only). Paired via `localStorage`.
-2. **`learner_deck.html`** — Paper Editorial. Same slide count as presenter (pairing rule). No timestamps, no stage directions.
-3. **`01_Facilitator_Script.md`** — run sheet with the minute markers, what-if-X-breaks notes.
-4. **`02_Learner_Workbook.md`** — crisp recipe card ([[feedback_no_engagement_theater_in_workbook]]): the 5 concepts, the qualifier, the Eval Plan template, the critique checklist.
-5. **The 1-page Eval Plan template** (fillable — handout + slide).
-6. **The planted-issue eval report** (1-page handout) + an answer key (facilitator-only).
+1. **`presenter_deck.html`** — Dark Console cockpit. `say:`/`doSteps:`/`note:`. Clock + timing (facilitator-only). Paired via `localStorage`.
+2. **`learner_deck.html`** — Paper Editorial. Same slide count as presenter. No timestamps/stage directions.
+3. **`01_Facilitator_Script.md`** — run sheet with minute markers, the §3 flex decisions, what-if-X-breaks.
+4. **`03_Learner_Handbook.md`** — the heavy reference (note: **Handbook**, the deeper artifact this cohort wants, not just a workbook). Contains: the 5 concepts, the qualifier, **all three text challenges in full** (judge ladder, faithfulness, rubric design), the **Modality Metrics Reference** (the one-stop table — the centerpiece), all three multimodal finale ideas with the math, the Eval Plan template, the critique checklist. Crisp recipe-card register ([[feedback_no_engagement_theater_in_workbook]]).
+5. **The 1-page Eval Plan template** (fillable — handout + slide; modality-aware).
+6. **The planted-issue eval report** (1-page handout) + facilitator answer key.
 7. *(Optional)* **`linkedin_carousel.html`** — post-session recap.
 
-**Slide-geometry pre-ship check** ([[feedback_slide_geometry_clipping]]) for any arc text / decorative glyphs. Visual QA via `pdftoppm`-style render before shipping.
+**Modality Metrics Reference is the highest-value new artifact** — build it first and get the real numbers right (cross-check audio/image/video benchmarks against current sources; don't fabricate — [[feedback_ground_before_claiming]]).
+
+**Slide-geometry pre-ship check** ([[feedback_slide_geometry_clipping]]) for arc text / decorative glyphs; visual QA via `pdftoppm`-style render before shipping.
 
 ---
 
 ## 6. Open items
-- **Tomorrow's stat swap** (§2) — blocking for final artifact numbers; not blocking for the implementation plan.
-- Folder name for this elective (not a numbered session). Suggest `AI Evals - Elective/` at project root.
-- Whether the facilitator wants the LinkedIn carousel (Artifact 7) or to skip it for an internal elective.
+- **Tomorrow's stat swap** (§2) — blocking for final IG numbers; not blocking for the plan.
+- **Modality benchmark numbers** — the "typical good value" column needs real, current sourcing (WER, MOS, CLIPScore norms). Verify before shipping the Handbook.
+- Folder name for this elective. Suggest `AI Evals - Elective/` at project root.
+- Whether to produce the LinkedIn carousel (Artifact 7) for an internal Growth-X elective.
+- §3 tail timing — confirm whether the block allows ~4:30, or critique goes take-home.
