@@ -815,7 +815,7 @@ function exportLearnerPDF() {
   // Best-effort fallback: if no learner tab might be open, open one and resend after it loads.
   // We can't reliably detect "is the other tab open" — so we open a new window and resend.
   // If a learner tab already exists, the browser focuses it instead of duplicating in most setups.
-  const w = window.open('learner_deck.html', 'edyoda_learner_deck');
+  const w = window.open('learner_deck.html', 'aievals_learner_deck');
   if (w) {
     // Give the learner tab time to attach its storage listener and finish first render.
     setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);
