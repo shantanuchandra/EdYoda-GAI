@@ -11,11 +11,12 @@ You'll leave able to do two things: **create** an eval for an agent you own (bui
 1. **The 5 words** — the vocabulary the whole field runs on.
 2. **The qualifier** — does this agent even need an eval?
 3. **Evaluating text, in depth** — the hardest modality, all three challenges in full.
-4. **The Modality Metrics Reference** — the one-stop table: what to measure for text, audio, image, video. *(This is the part to bookmark.)*
-5. **Evaluating a multimodal agent** — the finale, with the math.
-6. **The Eval Plan template** — your build sheet (Deliverable 1).
-7. **The critique checklist** — your judge sheet (Deliverable 2).
-8. **This week** — what to actually do next.
+4. **The prompts** — the framework as copy-ready LLM prompts (build + judge). *(Steal these.)*
+5. **The Modality Metrics Reference** — the one-stop table: what to measure for text, audio, image, video. *(This is the part to bookmark.)*
+6. **Evaluating a multimodal agent** — the finale, with the math.
+7. **The Eval Plan template** — your build sheet (Deliverable 1).
+8. **The critique checklist** — your judge sheet (Deliverable 2).
+9. **This week** — what to actually do next.
 
 ---
 
@@ -137,7 +138,132 @@ The anchors (what a 5 vs a 3 vs a 1 looks like) are what make the score consiste
 
 ---
 
-# 4 · The Modality Metrics Reference
+# 4 · The prompts — the framework, as copy-ready LLM prompts
+
+The methods above (the judge ladder, faithfulness, rubric craft, the critique checklist) become real when you hand them to an LLM as a prompt. These are the actual prompts that run the framework — three for **building** an eval, one for **judging** one. Copy them, swap the `‹bracketed›` parts for your own, and you have a working eval harness with no code.
+
+> **A note on all four:** an LLM scoring its own kind of work is a *junior reviewer*, not an oracle. Run each prompt at **temperature 0** for repeatability, and **calibrate it** — score 5–10 cases by hand first, run the same cases through the prompt, and only trust it where it agrees with you within ~1 point. Where it doesn't, fix the rubric, not the score.
+
+## 4a · BUILD — the LLM-as-judge prompt (scores quality against a rubric)
+
+The workhorse. This is how you grade open-ended text at scale (rung 3 of the judge ladder). The whole skill is in the **rubric** — vague rubric, useless scores; anchored rubric, reliable scores.
+
+```text
+SYSTEM:
+You are a strict, consistent evaluator for ‹the agent's job, e.g. "a real-estate
+customer-support email assistant"›. You score one output at a time against the
+rubric below. Be specific and harsh — bland praise is useless. Output JSON only.
+
+USER:
+Score this output on a 1–5 scale for ‹the quality, e.g. "brand voice"›.
+
+RUBRIC (anchor every point — this is what makes you consistent):
+  5 = ‹what a perfect answer looks like — concrete, e.g. "warm, concise, uses
+       'we' not 'I', no jargon, ends with a clear next step"›
+  3 = ‹what a mediocre-but-acceptable answer looks like, e.g. "clear and correct
+       but generic; could be any company"›
+  1 = ‹what a failing answer looks like, e.g. "cold, rambling, or off-tone"›
+
+INPUT (what the user asked):
+‹the golden-set input›
+
+OUTPUT (what the agent produced):
+‹the agent's answer›
+
+Return JSON only:
+{ "score": <1-5>, "reason": "<one sentence citing the specific words that earned the score>" }
+```
+
+**Why it works:** the anchors pin the scale so two runs agree. The forced `reason` citing specific words stops the model from hand-waving a 4/5. The JSON shape makes it machine-aggregatable across your whole golden set.
+
+## 4b · BUILD — the faithfulness / hallucination prompt (is every claim grounded?)
+
+Use this for any agent that answers from a source (a policy doc, a knowledge base, a contract). It turns "did it hallucinate?" into a number.
+
+```text
+SYSTEM:
+You are a fact-checker. You will be given a SOURCE and an ANSWER. Your job is to
+break the ANSWER into individual factual claims and check each one against the
+SOURCE only. Do not use outside knowledge. Output JSON only.
+
+USER:
+SOURCE (the only ground truth allowed):
+‹paste the document / policy / retrieved context the agent was supposed to use›
+
+ANSWER (what the agent said):
+‹the agent's output›
+
+Steps:
+1. Split the ANSWER into atomic claims (one fact each).
+2. For each claim, label it: "supported" (the SOURCE backs it),
+   "unsupported" (the SOURCE doesn't mention it), or
+   "contradicted" (the SOURCE says otherwise).
+
+Return JSON only:
+{
+  "claims": [ { "claim": "<text>", "verdict": "supported|unsupported|contradicted" } ],
+  "faithfulness": <supported ÷ total, 0.0-1.0>,
+  "any_contradiction": <true|false>
+}
+```
+
+**Pass-bar tip:** for a high-stakes answer (legal, medical, financial), treat `any_contradiction = true` OR `faithfulness < 1.0` as a **zero-tolerance fail** — one invented claim is one too many.
+
+## 4c · BUILD — the failure-mode discovery prompt (find what breaks before you score it)
+
+Run this on a batch of v0 outputs *before* you write your metrics. It surfaces the failure modes you didn't think to look for — the ones that become your watch list.
+
+```text
+SYSTEM:
+You are a red-teamer reviewing outputs from ‹the agent's job›. You are looking
+for patterns of failure, not scoring individual answers. Be concrete.
+
+USER:
+Here are ‹N› real outputs from the agent:
+‹paste 10–20 outputs, ideally including weird and hostile inputs›
+
+Identify the recurring ways this agent goes wrong. For each failure mode:
+- name it in 2–4 words (e.g. "invents a policy", "leaks personal info", "too formal")
+- say how many of the ‹N› outputs show it
+- give one verbatim example
+
+Return a ranked list, most frequent first. Then name the ONE failure mode that
+would be most damaging in production, even if it's rare.
+```
+
+**Why it's first, not last:** you can't write a metric for a failure you haven't named. This prompt is the discovery run — its output becomes the failure-mode list in your Eval Plan (§7) and the safety metric you'd otherwise have missed.
+
+## 4d · JUDGE — the eval-report critique prompt (turn the checklist into a prompt)
+
+The mirror image: feed someone else's eval report to an LLM and have it run the §8 critique checklist for you. Useful as a first-pass before your own read — it never gets tired, and it catches the obvious gaps.
+
+```text
+SYSTEM:
+You are a skeptical head of product reviewing an eval report before signing off
+on shipping an AI feature. Assume the report is trying to look good. Your job is
+to find what's missing or gamed. Be specific and cite the report.
+
+USER:
+Here is the eval report:
+‹paste the report›
+
+Check it against these six questions and answer each with a finding:
+1. Golden set — is it real and hand-picked, or just live traffic?
+2. Edge + hostile cases — present, or all happy-path?
+3. Metrics — does it cover correctness AND quality AND safety? (A missing safety metric is the biggest red flag.)
+4. Headline number — "X% of what?" Is it measured on the easy cases only?
+5. Pass bar — is there a stated number, set before measuring? Or just "performs well"?
+6. Modality coverage — for a voice/image/video agent, did they evaluate that modality, or only the text?
+
+Return: a verdict (SHIP / DON'T SHIP / NOT ENOUGH INFO), then the 6 findings,
+then the single most dangerous gap.
+```
+
+**Why a human still reads it after:** the LLM catches the structural gaps fast, but it can't know your business stakes — whether *this* failure mode is the one that ends a customer relationship. The prompt gets you 80% of the way; you bring the judgment.
+
+---
+
+# 5 · The Modality Metrics Reference
 
 **The one-stop table.** What to measure for which modality, what "good" looks like, who judges it, and — the column that makes you dangerous in a review — **what each metric misses.**
 
@@ -197,7 +323,7 @@ The anchors (what a 5 vs a 3 vs a 1 looks like) are what make the score consiste
 
 ---
 
-# 5 · Evaluating a multimodal agent (the finale)
+# 6 · Evaluating a multimodal agent (the finale)
 
 A multimodal agent produces text **and** audio **and** image/video in one output. Three ideas decide whether it's any good. (All three are provable on one real, failing project — an AI that auto-generates a daily travel Reel: script, voiceover, images, captions, no human in the loop. Its real numbers below are marked `‹STAT-2026-06-11›`, pending a fresh run.)
 
@@ -220,7 +346,7 @@ That eval uses an AI judge to score the hook. So how do you trust the judge? Eve
 
 ---
 
-# 6 · The Eval Plan (your build sheet — Deliverable 1)
+# 7 · The Eval Plan (your build sheet — Deliverable 1)
 
 Fill this for an agent you own. *(Also handed out as a printed sheet in class.)*
 
@@ -230,7 +356,7 @@ Fill this for an agent you own. *(Also handed out as a printed sheet in class.)*
 
 **3. Golden set** — 5–10 cases you know the answer to. **Force in a weird one and a hostile one.** (input → expected behavior)
 
-**4. Metrics — pick 3:** one **correctness**, one **quality**, one **safety**. *(Audio/image/video? Use §4 above.)*
+**4. Metrics — pick 3:** one **correctness**, one **quality**, one **safety**. *(Audio/image/video? Use §5 above.)*
 
 **5. Judge per metric** — human / code / LLM, and *why*. If LLM: how will you calibrate it against a human?
 
@@ -240,7 +366,7 @@ Fill this for an agent you own. *(Also handed out as a printed sheet in class.)*
 
 ---
 
-# 7 · The critique checklist (your judge sheet — Deliverable 2)
+# 8 · The critique checklist (your judge sheet — Deliverable 2)
 
 Run this against any eval report someone hands you. Each "no" is a hole.
 
@@ -257,11 +383,11 @@ Run this against any eval report someone hands you. Each "no" is a hole.
 
 ---
 
-# 8 · This week
+# 9 · This week
 
 One agent. One eval. This week.
 
-1. **Pick one agent you own.** Fill the Eval Plan (§6) for it — even just the golden set and the three metrics.
+1. **Pick one agent you own.** Fill the Eval Plan (§7) for it — even just the golden set and the three metrics.
 2. **Finish the critique** you started in class. Mark up the planted-issue report; check it against the answer key when it's shared. (There were four issues plus one bonus: a whole modality they never checked.)
 
 You don't need a test harness or an engineer to start. You need a golden set, three metrics, and a pass bar. That's the whole beginning.
