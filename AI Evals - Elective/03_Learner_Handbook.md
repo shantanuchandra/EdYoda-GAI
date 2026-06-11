@@ -1,285 +1,272 @@
-# Generative AI for Non-Coders — Session {{SESSION_NUMBER}} Workbook
+# AI Evals — Handbook · *Verify first, Trust second*
 
-**{{SESSION_TITLE}}**
+**The keepsake reference for the elective.** Everything from the room is here, in full — plus the depth we only sampled on the slides. Keep this. It's built to be the one page you reopen the next time someone hands you an AI feature and asks "is it good enough to ship?"
 
-**{{WORKBOOK_HOOK_LINE — one-sentence welcome that calls back to the prior session and points at the deliverable.}}**
-
-By the end of these two hours, you will have {{LEARNER_DELIVERABLE — concrete thing they'll walk out with.}}.
-
-{{WORKBOOK_VIBE_LINE — one-sentence framing of what kind of session this is, e.g. "No code. No prep. Just you, the Builder, and this workbook."}}
-
-One rule for today: **{{ONE_RULE — same line as in the facilitator script.}}**
+You'll leave able to do two things: **build** an eval for an agent you own, and **judge** an eval someone hands you. This handbook serves both.
 
 ---
 
-## ✅ PRE-CLASS CHECKLIST
+## How this handbook is laid out
 
-**Before we start — please confirm you have ALL of these open in separate browser tabs:**
-
-- [ ] **{{REQUIRED_TAB_1}}** — {{REQUIRED_TAB_1_STATE}}
-- [ ] **{{REQUIRED_TAB_2}}** — {{REQUIRED_TAB_2_STATE}}
-- [ ] **{{REQUIRED_TAB_3}}** — {{REQUIRED_TAB_3_STATE}}
-
-**Bonus tabs (helpful, not required):**
-
-- [ ] **{{BONUS_TAB_1}}** — {{BONUS_TAB_1_STATE}}
-- [ ] **{{BONUS_TAB_2}}** — {{BONUS_TAB_2_STATE}}
-
-> If you can't {{COMMON_STUCK_SCENARIO — e.g. "log into the Builder in the first 5 minutes"}}, DM the facilitator or TA. {{COMMON_STUCK_REMEDY — e.g. "A backup agent for your track is one click away — you will not be left behind."}}
+1. **The 5 words** — the vocabulary the whole field runs on.
+2. **The qualifier** — does this agent even need an eval?
+3. **Evaluating text, in depth** — the hardest modality, all three challenges in full.
+4. **The Modality Metrics Reference** — the one-stop table: what to measure for text, audio, image, video. *(This is the part to bookmark.)*
+5. **Evaluating a multimodal agent** — the finale, with the math.
+6. **The Eval Plan template** — your build sheet (Deliverable 1).
+7. **The critique checklist** — your judge sheet (Deliverable 2).
+8. **Monday** — what to actually do this week.
 
 ---
 
-## 🟢 OPENING WARM-UP (Block 0)
+# 1 · The 5 words
 
-In the Zoom chat, type **{{WARMUP_INSTRUCTION — what learners should type, e.g. "ONE word that describes how Session N-1 landed for you."}}**
+Every eval, for any kind of AI, is built from these five. If you can name all five, you can hold your own in any eval conversation.
 
-> {{WARMUP_OPTIONS — example words, slash-separated, e.g. "Useful · Overwhelming · Sticky · Surprising · Skeptical · Curious · Other"}}
+> **To eval an agent you need a *golden set*, a *metric*, a *judge*, a *pass bar*, and a list of *failure modes*.**
 
-*({{WARMUP_NUDGE — e.g. "There are no wrong answers. Type whatever's true."}})*
+### Golden set — *the questions you already know the right answer to*
+A small, hand-picked set of inputs where you know what good looks like — written **before** you ship. Not "expected exact output" (AI outputs are fuzzy) but **expected behavior**.
+- **Takeaway:** 10 hand-picked cases beat 1,000 random ones. Include the normal, the weird, and the hostile.
+- **Anti-pattern:** *"We'll just watch live traffic."* That gives you no baseline and nothing to compare against.
 
-Then — quick second prompt:
+### Metric — *what you're actually measuring*
+The specific thing you score. Metrics come in shapes: **binary** (yes/no) vs **scored** (1–5), **one-shot** (per output) vs **aggregate** (across the set).
+- **Takeaway:** one metric is never enough. Pick **three** — one for **correctness**, one for **quality**, one for **safety**.
+- **Anti-pattern:** a single "accuracy" number on an open-ended output. It almost always hides more than it shows.
 
-> {{WARMUP_SECOND_PROMPT — usually an emoji-hand-raise that calls back to the prior session.}}
+### Judge — *who decides whether the answer was good*
+Three kinds, each with a cost:
 
-{{WARMUP_BRIDGE — one sentence that sets up the pain point for today.}}
+| Judge | Cost | Fast? | Best for | Fails at |
+|---|---|---|---|---|
+| **Human** | High | No | Subjective calls, safety, taste | Scale — you can't watch 10,000 outputs |
+| **Code** | ~Free | Yes | Structured/checkable outputs (format, length, a number, a banned word) | Anything open-ended or subjective |
+| **LLM-as-judge** | Low | Yes | Open-ended quality at scale | Bias — it's lenient, verbose-loving, and can be gamed |
+
+- **Takeaway:** LLM-as-judge is a *junior reviewer*. Useful, cheap, fast — and you **calibrate it against a human** before you trust its numbers.
+- **Anti-pattern:** *"The LLM said the LLM did great."* Self-evaluation bias is real.
+
+### Pass bar — *the number above which you ship*
+The threshold, decided **before** you measure. It is almost never 100%.
+- **Takeaway:** different metrics deserve different bars. **Safety = zero tolerance.** **Quality = good-enough.** Be explicit about which is which.
+- **Anti-pattern:** *"We'll ship when it's better."* Better than what? By how much? A pass bar is a number.
+
+### Failure modes — *the specific ways THIS agent breaks*
+The named list of how it goes wrong: hallucinates a date, refuses a normal request, leaks personal info, drifts off-brand, answers in the wrong language.
+- **Takeaway:** you can't test for a failure you haven't named. The **first** eval run exists to *discover* failure modes, not to score them.
+- **Anti-pattern:** treating "the eval failed" as one fact. *How* it failed is the actual signal.
+
+> **The Eval Stack (memorize this picture):** failure modes → metrics → pass bar → judge → golden set. The golden set is the exam; the metric is the grading scheme; the judge is the examiner; the pass bar is the cutoff; failure modes are the wrong answers you already know to look for.
 
 ---
 
-## 🧭 HOW THIS WORKBOOK WORKS
+# 2 · Does this agent even need an eval?
 
-{{WORKBOOK_STRUCTURE_INTRO — one sentence describing the session's organizing principle. e.g. "The build happens in five lettered steps. Your facilitator will call them out by letter:"}}
+Not everything earns the cost of an eval suite. Run the **4-question qualifier**:
 
-| Step | What you do | Time |
+| # | Question | |
 |---|---|---|
-| **{{STEP_LABEL_A — e.g. "BUILD STEP A" or "EXERCISE 1"}}** | {{STEP_A_DESC}} | ~{{STEP_A_TIME}} min |
-| **{{STEP_LABEL_B}}** | {{STEP_B_DESC}} | ~{{STEP_B_TIME}} min |
-| **{{STEP_LABEL_C}}** | {{STEP_C_DESC}} | ~{{STEP_C_TIME}} min |
-| **{{STEP_LABEL_D}}** | {{STEP_D_DESC}} | ~{{STEP_D_TIME}} min |
-| **{{STEP_LABEL_E}}** | {{STEP_E_DESC}} | ~{{STEP_E_TIME}} min |
+| 1 | Is it **user-facing**? | |
+| 2 | Is the **cost of being wrong** high? | |
+| 3 | Is the output **open-ended** (vs a closed set you can spot-check)? | |
+| 4 | Will it **scale past you** (you can't eyeball every output)? | |
 
-{{WORKBOOK_PAGE_MAP — e.g. "Pages 4–7 are the track pages. Pick the one closest to your day job and work from that page. Pages 8–10 are reference sheets you'll come back to during Steps C, D, and E."}}
+**Two or more "yes" → build an eval.**
 
-> **Pick your track now:**
-> 1. {{TRACK_1_NAME}} → **page 4**
-> 2. {{TRACK_2_NAME}} → **page 5**
-> 3. {{TRACK_3_NAME}} → **page 6**
-> 4. {{TRACK_4_NAME}} → **page 7**
+- **Obvious yes:** a customer-facing support bot that answers in its own words, all day, to thousands of users. (4/4.)
+- **Obvious no:** a one-off internal script that reformats a spreadsheet you check by hand each time. (0–1/4 — just look at it.)
+- **Borderline:** an internal meeting-notes summarizer. Not user-facing, but open-ended and scaling. (2/4 → yes, a light eval.)
 
----
-
-## 📒 TRACK 1 — {{TRACK_1_NAME}}
-
-**Your {{ARTIFACT_NOUN}} will become:** *{{TRACK_1_ARTIFACT_DESCRIPTION}}*
-
-{{TRACK_1_FRAMING — what role this learner is playing, what problems they'll solve.}}
-
-### Starter {{STEP_A_LABEL_SHORT — e.g. "System Prompt"}} (for {{STEP_LABEL_A}})
-
-```
-{{TRACK_1_STEP_A_STARTER}}
-```
-
-### {{STEP_B_LABEL_SHORT}} (for {{STEP_LABEL_B}})
-
-{{TRACK_1_STEP_B_STARTER}}
-
-### {{STEP_C_LABEL_SHORT}} (for {{STEP_LABEL_C}})
-
-{{TRACK_1_STEP_C_STARTER}}
-
-### {{STEP_D_LABEL_SHORT}} (for {{STEP_LABEL_D}})
-
-{{TRACK_1_STEP_D_STARTER}}
-
-### {{STEP_E_LABEL_SHORT}} (for {{STEP_LABEL_E}})
-
-{{TRACK_1_STEP_E_STARTER}}
-
-### One-Line Reflection
-
-{{TRACK_1_REFLECTION_PROMPT — fill in the blank for the learner. e.g. "The hardest moment of the build for me was ____."}}
+The qualifier protects you from both mistakes: over-engineering an eval for something trivial, and shipping something high-stakes with no eval at all.
 
 ---
 
-## 📒 TRACK 2 — {{TRACK_2_NAME}}
+# 3 · Evaluating text, in depth
 
-<!-- Mirror Track 1's structure. Keep section headings identical so the
-     facilitator can call out "Build Step C" once and every learner finds
-     it on their page. -->
+Text is the **hardest** modality to grade, because there is usually no single right answer and a wrong answer can be perfectly fluent. This section goes deep — three challenges, all the way down.
 
-**Your {{ARTIFACT_NOUN}} will become:** *{{TRACK_2_ARTIFACT_DESCRIPTION}}*
+## 3a · Fluent ≠ correct (the core problem)
 
-### Starter {{STEP_A_LABEL_SHORT}} (for {{STEP_LABEL_A}})
+Read these two replies from a real-estate email agent to the same question — *"Can I break my lease early?"*
 
-```
-{{TRACK_2_STEP_A_STARTER}}
-```
+- **Reply A:** "Yes! You can cancel anytime within 30 days, no penalty." *(Fluent. Confident. Invented. There is no such policy — this is a lawsuit.)*
+- **Reply B:** "Early termination depends on your specific lease. I've flagged this for a human agent who can check your contract." *(Less exciting. Correct.)*
 
-### {{STEP_B_LABEL_SHORT}} (for {{STEP_LABEL_B}})
+You **cannot** catch this by reading — both sound great. This is why text needs real evals, not a skim.
 
-{{TRACK_2_STEP_B_STARTER}}
+## 3b · The judge ladder — how to grade text, rung by rung
 
-### {{STEP_C_LABEL_SHORT}} (for {{STEP_LABEL_C}})
+When there's no single right answer, you climb a ladder of judging methods. Each rung costs more and catches more.
 
-{{TRACK_2_STEP_C_STARTER}}
+| Rung | Method | What it is | Good for | What it misses | Cost |
+|---|---|---|---|---|---|
+| 1 | **Exact match** | Output must equal the expected string | Classification, yes/no, extraction ("what's the order number?") | Anything open-ended — "Sure!" ≠ "Yes" but both are right | ~Free |
+| 2 | **Semantic similarity** | Embeddings: is the meaning close to a reference answer? | Paraphrase-tolerant correctness ("did it say roughly the right thing?") | Subtle but critical differences — "you may" vs "you may not" score as very similar | Low |
+| 3 | **LLM-as-judge + rubric** | An LLM scores the output against a written rubric | Open-ended quality, tone, faithfulness, helpfulness — the only thing that scales here | Bias and inconsistency unless calibrated against a human | Low–medium |
 
-### {{STEP_D_LABEL_SHORT}} (for {{STEP_LABEL_D}})
+**When to use which:** if your output is a closed value, stay on rung 1 — it's free and exact. The moment the output is a sentence someone *reads*, you're on rung 3, with rung 2 as a cheap pre-filter. Most PM-owned text agents live on rung 3.
 
-{{TRACK_2_STEP_D_STARTER}}
+## 3c · Faithfulness — making "is it grounded?" measurable
 
-### {{STEP_E_LABEL_SHORT}} (for {{STEP_LABEL_E}})
+"Hallucination" sounds vague. You make it concrete by checking **faithfulness**: does every claim in the answer trace back to a real source?
 
-{{TRACK_2_STEP_E_STARTER}}
+**How it's done (the PM version):**
+1. Take the answer and **decompose it into individual claims.** ("You can cancel anytime" / "within 30 days" / "no penalty" = three claims.)
+2. For each claim, ask: **is this supported by the source material** (the lease, the policy doc, the knowledge base)?
+3. **Faithfulness score** = supported claims ÷ total claims. One unsupported claim on a legal answer can be a zero-tolerance fail.
 
-### One-Line Reflection
+**Why the golden set matters here:** the only way to know a claim is *wrong* is to have cases where you already know the right answer. A golden set with known answers is your one real defense against confident nonsense.
 
-{{TRACK_2_REFLECTION_PROMPT}}
+> Tie-in: this is exactly the email agent's worst failure modes — "invents a policy" and "leaks personal info." Both are faithfulness failures. Both are invisible to a fluent-text skim.
 
----
+## 3d · Rubric craft — turning "good" into a number
 
-## 📒 TRACK 3 — {{TRACK_3_NAME}}
+An LLM judge is only as good as the rubric you hand it. The skill is **decomposing a vague quality into scorable sub-criteria.**
 
-**Your {{ARTIFACT_NOUN}} will become:** *{{TRACK_3_ARTIFACT_DESCRIPTION}}*
+**Vague:** "Is the reply on-brand?" → an LLM will give you a mushy 4/5 with no reasoning.
 
-### Starter {{STEP_A_LABEL_SHORT}} (for {{STEP_LABEL_A}})
+**Decomposed rubric (steal this shape):**
+> Score the reply 1–5 on **brand voice**, where:
+> - **5** = warm, concise, uses "we" not "I", no jargon, ends with a clear next step
+> - **3** = clear and correct but generic; could be any company
+> - **1** = cold, rambling, or off-tone (sales-y, robotic, or overly casual)
+> Give the score and one sentence of reasoning citing the specific words that earned it.
 
-```
-{{TRACK_3_STEP_A_STARTER}}
-```
-
-### {{STEP_B_LABEL_SHORT}} (for {{STEP_LABEL_B}})
-
-{{TRACK_3_STEP_B_STARTER}}
-
-### {{STEP_C_LABEL_SHORT}} (for {{STEP_LABEL_C}})
-
-{{TRACK_3_STEP_C_STARTER}}
-
-### {{STEP_D_LABEL_SHORT}} (for {{STEP_LABEL_D}})
-
-{{TRACK_3_STEP_D_STARTER}}
-
-### {{STEP_E_LABEL_SHORT}} (for {{STEP_LABEL_E}})
-
-{{TRACK_3_STEP_E_STARTER}}
-
-### One-Line Reflection
-
-{{TRACK_3_REFLECTION_PROMPT}}
+The anchors (what a 5 vs a 3 vs a 1 looks like) are what make the score consistent. **This is the exact skill you use on your own agent in the Eval Plan.**
 
 ---
 
-## 📒 TRACK 4 — {{TRACK_4_NAME}}
+# 4 · The Modality Metrics Reference
 
-**Your {{ARTIFACT_NOUN}} will become:** *{{TRACK_4_ARTIFACT_DESCRIPTION}}*
+**The one-stop table.** What to measure for which modality, what "good" looks like, who judges it, and — the column that makes you dangerous in a review — **what each metric misses.**
 
-### Starter {{STEP_A_LABEL_SHORT}} (for {{STEP_LABEL_A}})
+> ⚠️ **The "typical good" numbers below are placeholders** (`‹BENCH-2026-06-11›`) being replaced with sourced figures. Treat the *shape* as final and the *numbers* as provisional until your facilitator confirms the swap.
 
-```
-{{TRACK_4_STEP_A_STARTER}}
-```
+## Text
 
-### {{STEP_B_LABEL_SHORT}} (for {{STEP_LABEL_B}})
+| Metric | What it measures | Typical "good" | Who judges | What it MISSES |
+|---|---|---|---|---|
+| **Exact match** | Output equals the expected value | 100% on closed tasks `‹BENCH-2026-06-11›` | code | Everything open-ended — penalizes correct paraphrases |
+| **Semantic similarity** | Meaning is close to a reference answer | > ~0.80 cosine `‹BENCH-2026-06-11›` | code (embeddings) | Critical small flips — "may" vs "may not" score as similar |
+| **Faithfulness / groundedness** | Every claim traces to a source | > ~0.95 `‹BENCH-2026-06-11›` | LLM + human spot-check | A fluent answer that's confidently unsupported |
+| **LLM-judge rubric score** | Quality/tone against a rubric | ≥ 4 / 5 `‹BENCH-2026-06-11›` | LLM (calibrated) | Judge bias — leniency, verbosity preference |
+| **Toxicity / PII leak** | Harmful content or leaked personal data | 0 incidents (zero-tolerance) | code + human | Subtle leaks code misses; needs human review |
 
-{{TRACK_4_STEP_B_STARTER}}
+## Audio
 
-### {{STEP_C_LABEL_SHORT}} (for {{STEP_LABEL_C}})
+| Metric | What it measures | Typical "good" | Who judges | What it MISSES |
+|---|---|---|---|---|
+| **WER (Word Error Rate)** | Transcription accuracy vs the intended script | < ~10% `‹BENCH-2026-06-11›` | code (ASR/whisper) | **Meaning** — a low WER can still be a nonsense sentence |
+| **MOS / naturalness** | Does the voice sound human and pleasant? | > ~4.0 / 5 `‹BENCH-2026-06-11›` | human (or model proxy) | Correctness — a lovely voice reading wrong info |
+| **Voice duration ratio** | Actual length vs expected for the script | ~0.9–1.1 `‹BENCH-2026-06-11›` | code | Whether the content was any good |
+| **Max silence gap** | Longest dead-air stretch | < ~1.5s `‹BENCH-2026-06-11›` | code | Awkward pacing that's under the threshold |
+| **Speaker consistency** | Same voice throughout | pass/fail | code (speaker embeddings) | Tone shifts within the same voice |
+| **Latency** | Time to first audio | < ~1s `‹BENCH-2026-06-11›` | code | Quality of what's said once it starts |
 
-{{TRACK_4_STEP_C_STARTER}}
+## Image
 
-### {{STEP_D_LABEL_SHORT}} (for {{STEP_LABEL_D}})
+| Metric | What it measures | Typical "good" | Who judges | What it MISSES |
+|---|---|---|---|---|
+| **CLIPScore** | Image matches the text prompt | > ~0.30 `‹BENCH-2026-06-11›` | model | Rewards generic matches — can miss that the **brand style** is wrong |
+| **Aesthetic / quality score** | Is it well-composed, not muddy? | ≥ 4 / 5 `‹BENCH-2026-06-11›` | VLM (calibrated) | Subjective taste; brand fit |
+| **Face / safety detection** | Unwanted faces, unsafe content | 0 incidents (zero-tolerance) | code + VLM | Context — a fine image in the wrong place |
+| **OCR legibility** | Text rendered in the image is readable | > ~0.95 `‹BENCH-2026-06-11›` | code (OCR) | Whether the text is the *right* text |
+| **Style adherence** | Matches the required house style | ≥ 4 / 5 `‹BENCH-2026-06-11›` | VLM (calibrated) | Drift the judge wasn't anchored on |
 
-{{TRACK_4_STEP_D_STARTER}}
+## Video
 
-### {{STEP_E_LABEL_SHORT}} (for {{STEP_LABEL_E}})
+*All of the image + audio metrics, plus the temporal ones:*
 
-{{TRACK_4_STEP_E_STARTER}}
+| Metric | What it measures | Typical "good" | Who judges | What it MISSES |
+|---|---|---|---|---|
+| **Temporal coherence** | Frames flow; no flicker/morphing | ≥ 4 / 5 `‹BENCH-2026-06-11›` | VLM | Whether the story makes sense |
+| **Cut-honored rate** | Edits land where intended | > ~0.80 `‹BENCH-2026-06-11›` | code (perceptual hash) | Whether the cut was a *good* cut |
+| **A/V sync drift** | Audio aligned to video | < ~100ms `‹BENCH-2026-06-11›` | code | Cross-modal *meaning* mismatch (see below) |
+| **Hook / retention proxy** | Does the opening earn a watch? | ≥ 3 / 5 `‹BENCH-2026-06-11›` | VLM + (later) real watch-time | Everything after the first 3 seconds |
 
-### One-Line Reflection
+## Multimodal (the agent that mixes them)
 
-{{TRACK_4_REFLECTION_PROMPT}}
+| Metric | What it measures | Typical "good" | Who judges | What it MISSES |
+|---|---|---|---|---|
+| **Cross-modal coherence** | Do the modalities agree? (voice says "lanterns," image shows lanterns) | ≥ 4 / 5 `‹BENCH-2026-06-11›` | VLM + human | Each part can be fine alone while the pairing fails |
+| **Weakest-link aggregate** | The minimum across all modality scores | every stage ≥ its bar | code (rolls up the above) | Hides which stage broke unless you keep the per-stage scores |
+| **Stage-gate pass rate** | Fraction of pipeline stages that passed | all gates pass | code | A passing average can still hide one fatal stage |
 
----
-
-## 🛠 REFERENCE — {{REFERENCE_1_NAME — e.g. "ACTION TOOL MENU (for BUILD STEP C)"}}
-
-{{REFERENCE_1_INTRO — one-paragraph framing of what this reference is for and when to use it.}}
-
-| {{REF_COL_1}} | {{REF_COL_2}} | {{REF_COL_3}} |
-|---|---|---|
-| {{REF_ROW_1_A}} | {{REF_ROW_1_B}} | {{REF_ROW_1_C}} |
-| {{REF_ROW_2_A}} | {{REF_ROW_2_B}} | {{REF_ROW_2_C}} |
-| {{REF_ROW_3_A}} | {{REF_ROW_3_B}} | {{REF_ROW_3_C}} |
-
----
-
-## 🧠 REFERENCE — {{REFERENCE_2_NAME — e.g. "MEMORY SEEDS"}}
-
-{{REFERENCE_2_BODY}}
-
----
-
-## 🎯 REFERENCE — {{REFERENCE_3_NAME — e.g. "MULTI-STEP GOAL TEMPLATES"}}
-
-### The generic template (steal this)
-
-```
-{{GENERIC_TEMPLATE_BODY}}
-```
-
-### Worked examples (one per track)
-
-{{WORKED_EXAMPLES_BODY}}
-
-### What to do if your {{ARTIFACT_NOUN}} fails on a step
-
-1. {{FAILURE_RECOVERY_1}}
-2. {{FAILURE_RECOVERY_2}}
-3. {{FAILURE_RECOVERY_3}}
+> **The "what it misses" column is the most important one.** It's the question you ask in a review: *"Great, your WER is 6% — but did you check the audio actually meant anything?"*
 
 ---
 
-## 📊 YOUR WEEK-AFTER TRACKER
+# 5 · Evaluating a multimodal agent (the finale)
 
-Track what you do with this {{ARTIFACT_NOUN}} in the week after the session. {{TRACKER_RATIONALE — one sentence on why tracking matters.}}
+A multimodal agent produces text **and** audio **and** image/video in one output. Three ideas decide whether it's any good. (All three are provable on one real, failing project — an AI that auto-generates a daily travel Reel: script, voiceover, images, captions, no human in the loop. Its real numbers below are marked `‹STAT-2026-06-11›`, pending a fresh run.)
 
-| Day | What I tried | What worked / didn't | Time saved |
-|---|---|---|---|
-| Mon | | | |
-| Tue | | | |
-| Wed | | | |
-| Thu | | | |
-| Fri | | | |
+## Idea 1 — Compounding error (why you eval every stage)
+Chain the stages — text → audio → image → video. Even if each stage is **90% good**, the end-to-end output is `0.9 × 0.9 × 0.9 × 0.9 ≈ 0.66`. **Two times in three, something's off.** Your agent can be "pretty good at everything" and still fail most of the time. → **Eval every stage, not just the final video.**
 
-### End-of-week reflection (Friday, 5 minutes)
+## Idea 2 — The weakest link (a multimodal output is only as good as its worst part)
+On the real Reel agent, the stage scores were:
+- Audio timing: **~0.98** `‹STAT-2026-06-11›` (great)
+- Composition: **4–5 / 5** `‹STAT-2026-06-11›` (great)
+- **Hook strength: 1 / 5 — on all five reels** `‹STAT-2026-06-11›` (floor)
 
-1. {{REFLECTION_Q1}}
-2. {{REFLECTION_Q2}}
-3. {{REFLECTION_Q3}}
+The great parts can't save the broken hook. The eval caught a **systemic** failure the creator had watched for weeks and thought was fine. → **That's the whole point of an eval: it catches your blind spot.** And stage-by-stage scoring is how you find *which* link broke.
 
----
+## Idea 3 — Cross-modal coherence (some failures live *between* the parts)
+A real note from that agent's golden set: *"the voice talks about lanterns but the image is of dusk without any lanterns."* The audio was fine alone. The image was fine alone. The **pairing** failed. → **Eval the relationships, not just the parts.**
 
-## 📩 TAKE-HOME (reply to today's class email by {{TAKEHOME_DEADLINE — e.g. "Friday"}})
-
-{{TAKEHOME_INSTRUCTION — what learners should reply with. Keep to 2–4 sentences total.}}
-
-1. {{TAKEHOME_PROMPT_1}}
-2. {{TAKEHOME_PROMPT_2}}
+## And: calibrate the judge
+That eval uses an AI judge to score the hook. So how do you trust the judge? Every run, it **re-scores 5 hand-scored reels and checks it still agrees with the human within 1 point.** If the AI judge drifts from the human, the run flags itself. → **Calibrate your judge against a human before you trust its numbers.**
 
 ---
 
-## 📌 LINGERING QUESTIONS
+# 6 · The Eval Plan (your build sheet — Deliverable 1)
 
-Use this space during class for questions you want to come back to. The facilitator monitors the Parking Lot Google Doc and will reply to anything you write there by tomorrow morning.
+Fill this for an agent you own. *(Also handed out as a printed sheet in class.)*
 
-- _____________________________________________
-- _____________________________________________
-- _____________________________________________
+**1. The agent** — what it does (one line) · job-to-be-done · modality(ies): ☐ text ☐ audio ☐ image ☐ video ☐ multimodal
+
+**2. Qualifier** — user-facing? · high cost of wrong? · open-ended? · scales past you?  → **2+ = build.** Score __/4
+
+**3. Golden set** — 5–10 cases you know the answer to. **Force in a weird one and a hostile one.** (input → expected behavior)
+
+**4. Metrics — pick 3:** one **correctness**, one **quality**, one **safety**. *(Audio/image/video? Use §4 above.)*
+
+**5. Judge per metric** — human / code / LLM, and *why*. If LLM: how will you calibrate it against a human?
+
+**6. Pass bar per metric** — a number. Mark which one is **zero-tolerance** (usually safety).
+
+**7. Top failure modes** — name at least 3. The specific ways THIS agent breaks.
 
 ---
 
-## 🔮 WHAT'S NEXT — SESSION {{NEXT_SESSION_NUMBER}}: {{NEXT_SESSION_TITLE}}
+# 7 · The critique checklist (your judge sheet — Deliverable 2)
 
-{{NEXT_SESSION_TEASER — 2–3 sentences. Name the deliverable. Name the why-it-matters. Tie it to what they just built today.}}
+Run this against any eval report someone hands you. Each "no" is a hole.
 
-See you {{NEXT_SESSION_DATE_OR_CADENCE}}.
+- [ ] **Golden set is real** — hand-picked known answers, not just live traffic?
+- [ ] **Edge + hostile cases** — or is it all happy-path? (A set of only normal cases tests the easy 80%.)
+- [ ] **All three kinds of metric** — correctness *and* quality *and* **safety**? (A missing safety metric is the most dangerous gap.)
+- [ ] **The headline number is honest** — "98% of *what*?" Is it 98% of easy cases?
+- [ ] **A stated pass bar** — a number, set *before* measuring? Or just "performs well"?
+- [ ] **Failure modes covered** — are the known ways it breaks actually measured?
+- [ ] **Judge is trustworthy** — if LLM-judged, was it calibrated against a human?
+- [ ] **Every modality checked** — for a voice/image/video agent, did they score the audio/visual, or only the text?
+
+> Most real eval reports aren't lying. They're *incomplete in ways that hide risk* — confident, numeric, and quietly missing the thing that matters. Spotting the gap is the PM's job.
+
+---
+
+# 8 · Monday
+
+One agent. One eval. This week.
+
+1. **Pick one agent you own.** Fill the Eval Plan (§6) for it — even just the golden set and the three metrics.
+2. **Finish the critique** you started in class. Mark up the planted-issue report; check it against the answer key when it's shared. (There were four issues plus one bonus: a whole modality they never checked.)
+
+You don't need a test harness or an engineer to start. You need a golden set, three metrics, and a pass bar. That's the whole beginning.
+
+---
+
+*Field notes by **Shantanu Chandra** · [linkedin.com/in/chandrashantanu](https://linkedin.com/in/chandrashantanu)*
+*EdYoda · A Field Guide to Generative AI*
