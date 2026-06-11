@@ -1,5 +1,7 @@
 # Facilitator Script — AI Evals: Verify first, Trust second (standalone elective)
 
+*EdYoda · A Field Guide to Generative AI — facilitator-only run sheet*
+
 **Subtitle:** *By the end, you can design an eval suite for any AI agent you own — and tear apart an eval report someone hands you. You'll know what to measure for text, audio, image, and video.*
 **Duration:** 4h00 (hard cap) · **Format:** Live (in-room / virtual) · **Audience:** 10 invited Growth-X participants, majority Senior Product Managers. Non-coders — they sign off on AI features, they don't write code. The cohort appreciates depth; push rigor higher than a generic PM room.
 **Spine:** Fundamentals → Modality deep-dive → Apply (create + judge).

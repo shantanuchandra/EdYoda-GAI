@@ -2,7 +2,7 @@
 
 **The keepsake reference for the elective.** Everything from the room is here, in full — plus the depth we only sampled on the slides. Keep this. It's built to be the one page you reopen the next time someone hands you an AI feature and asks "is it good enough to ship?"
 
-You'll leave able to do two things: **build** an eval for an agent you own, and **judge** an eval someone hands you. This handbook serves both.
+You'll leave able to do two things: **create** an eval for an agent you own (build it from scratch), and **judge** an eval someone hands you. This handbook serves both.
 
 ---
 
@@ -269,4 +269,4 @@ You don't need a test harness or an engineer to start. You need a golden set, th
 ---
 
 *Field notes by **Shantanu Chandra** · [linkedin.com/in/chandrashantanu](https://linkedin.com/in/chandrashantanu)*
-*EdYoda · A Field Guide to Generative AI*
+*Growth-X · A Field Guide to Generative AI*
