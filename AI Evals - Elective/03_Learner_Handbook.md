@@ -15,7 +15,7 @@ You'll leave able to do two things: **create** an eval for an agent you own (bui
 5. **Evaluating a multimodal agent** — the finale, with the math.
 6. **The Eval Plan template** — your build sheet (Deliverable 1).
 7. **The critique checklist** — your judge sheet (Deliverable 2).
-8. **Monday** — what to actually do this week.
+8. **This week** — what to actually do next.
 
 ---
 
@@ -257,7 +257,7 @@ Run this against any eval report someone hands you. Each "no" is a hole.
 
 ---
 
-# 8 · Monday
+# 8 · This week
 
 One agent. One eval. This week.
 

@@ -61,4 +61,4 @@ The specific ways THIS agent breaks. You discover these by running v0 — not by
 3. ____________________________________________________
 
 ---
-*Monday: pick the one metric you'll measure first. Build the golden set for it. That's the whole start.*
+*This week: pick the one metric you'll measure first. Build the golden set for it. That's the whole start.*

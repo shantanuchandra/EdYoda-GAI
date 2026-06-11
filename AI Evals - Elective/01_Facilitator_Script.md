@@ -27,7 +27,7 @@
 
 ## Opening Hook Slide (up 5 min before start)
 
-> **"An AI feature that demoed perfectly shipped on Monday — and quietly started failing by Wednesday. Nobody noticed for nine days."**
+> **"An AI feature that demoed perfectly shipped — and quietly started failing two days later. Nobody noticed for nine days."**
 
 Soft music until you start.
 
@@ -166,7 +166,7 @@ Hand out the printed planted-issue report (report page only).
 
 > ⏱ **3:58.** This is the flex variable — if a future run has a longer block, restore the full 20-min in-room critique.
 
-### Act 10 — Close + Monday-morning plan · 3:58 – 4:00 · (slide 21)
+### Act 10 — Close + this-week plan · 3:58 – 4:00 · (slide 21)
 
 → One-page handout they fill (not a talk): *"Before you close your laptop tonight — one agent, one eval, this week. Write down which agent and the first metric you'll measure."* 
 
