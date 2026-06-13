@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<!--
+LinkedIn Carousel — One brain, many channels (S7 Part 2 · Workflow Automation with n8n)
+10 slides · 1080×1080 · paper-editorial · author byline (NOT EdYoda-branded)
+Hook archetype: story/confession + specific-stakes. Audience: builders + operators evaluating no-code AI.
+Real proof embedded on slide 4 (screenshots/lumiere-chat-conversation.png).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Carousel — One brain, many channels · A Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f5efe6; --paper-warm:#ede4d3; --paper-cream:#faf6ef;
+    --ink:#1a1814; --ink-soft:#4a463e; --ink-mute:#8a8478; --ink-faint:#b8b1a3;
+    --rule:#d4ccba; --rule-soft:#e3dccb;
+    --terra:#b8431b; --terra-soft:rgba(184,67,27,0.10);
+    --ink-blue:#1e3a5f; --warn:#a16207; --danger:#991b1b; --calm:#14532d;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:#2a2724; font-family:'Geist',sans-serif; color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; padding:40px 20px; }
+  .stage { display:flex; flex-direction:column; gap:40px; align-items:center; }
+  .square { width:1080px; height:1080px; background:var(--paper); position:relative; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.5); }
+  .square::before { content:''; position:absolute; inset:0; pointer-events:none; z-index:1; opacity:0.45; mix-blend-mode:multiply; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"); }
+  .square::after { content:''; position:absolute; inset:0; pointer-events:none; z-index:1; background:radial-gradient(ellipse at center,transparent 55%,rgba(26,24,20,0.10) 100%); }
+  .square-content { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; padding:80px 80px 90px; }
+  .running-head { display:flex; align-items:center; justify-content:space-between; padding-bottom:22px; border-bottom:1px solid var(--rule); font-family:'Geist Mono',monospace; font-size:14px; color:var(--ink-mute); letter-spacing:0.2em; text-transform:uppercase; font-weight:500; }
+  .running-head .pub-title { font-family:'Fraunces',serif; font-style:italic; font-size:16px; letter-spacing:0.02em; text-transform:none; color:var(--ink); font-weight:400; }
+  .running-head .left { display:flex; gap:24px; align-items:baseline; }
+  .running-head .left .dot { color:var(--ink-faint); }
+  .body { flex:1; display:flex; flex-direction:column; justify-content:center; padding:40px 0; }
+  .folio { position:absolute; bottom:30px; right:80px; font-family:'Fraunces',serif; font-weight:300; font-size:140px; line-height:0.8; color:var(--ink-faint); font-variant-numeric:tabular-nums oldstyle-nums; letter-spacing:-0.04em; z-index:0; opacity:0.55; }
+  .folio sup { font-size:0.32em; vertical-align:top; margin-left:0.15em; color:var(--ink-mute); font-weight:400; }
+  .swipe { position:absolute; bottom:38px; left:80px; font-family:'Geist Mono',monospace; font-size:14px; letter-spacing:0.2em; text-transform:uppercase; color:var(--terra); z-index:5; font-weight:500; }
+  .eyebrow { display:inline-block; font-family:'Geist Mono',monospace; font-size:16px; letter-spacing:0.24em; text-transform:uppercase; color:var(--terra); font-weight:500; margin-bottom:36px; position:relative; padding-left:2em; }
+  .eyebrow::before { content:''; position:absolute; left:0; top:50%; width:1.5em; height:1px; background:var(--terra); }
+  h1, .display, .mega { font-family:'Fraunces',serif; color:var(--ink); letter-spacing:-0.025em; font-weight:300; }
+  h1 { font-size:78px; line-height:1.02; font-variation-settings:'opsz' 144,'SOFT' 40,'WONK' 1; }
+  .display { font-size:104px; line-height:0.98; font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1; }
+  em.terra-em { font-style:italic; color:var(--terra); }
+  em.blue-em { font-style:italic; color:var(--ink-blue); }
+  .lede { font-family:'Fraunces',serif; font-size:30px; font-weight:300; font-style:italic; line-height:1.4; color:var(--ink-soft); max-width:24ch; font-variation-settings:'opsz' 60; }
+  .lede-block { font-family:'Fraunces',serif; font-size:26px; font-weight:300; line-height:1.45; color:var(--ink-soft); max-width:32ch; margin-top:36px; font-variation-settings:'opsz' 60; }
+  .lede-block strong { color:var(--ink); font-weight:400; }
+  .lede-block em { font-style:italic; color:var(--terra); }
+  .rule-double { height:6px; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); margin:32px 0; }
+
+  .change-num { font-family:'Fraunces',serif; font-size:280px; line-height:0.85; color:var(--terra); font-variant-numeric:tabular-nums oldstyle-nums; font-weight:300; letter-spacing:-0.04em; font-variation-settings:'opsz' 144,'WONK' 1; position:absolute; right:80px; top:140px; opacity:0.10; z-index:0; }
+
+  /* Hub-and-spoke "two ears, two mouths" SVG sits in .body */
+  .hub-wrap { margin-top:30px; display:flex; justify-content:center; }
+  .hub-cap { margin-top:24px; font-family:'Geist Mono',monospace; font-size:14px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ink-mute); text-align:center; font-weight:500; }
+
+  /* pull quote */
+  .pull-quote { font-family:'Fraunces',serif; font-size:76px; line-height:1.05; font-weight:300; color:var(--ink); letter-spacing:-0.025em; font-variation-settings:'opsz' 144,'SOFT' 50,'WONK' 1; font-style:italic; margin:36px 0 28px; position:relative; padding-left:1.1em; }
+  .pull-quote::before { content:'\201C'; position:absolute; left:0; top:0.1em; font-size:1.4em; color:var(--terra); font-style:normal; line-height:1; opacity:0.55; }
+  .pull-quote em { color:var(--terra); font-style:italic; }
+  .quote-sub { font-family:'Fraunces',serif; font-size:22px; font-weight:300; line-height:1.45; color:var(--ink-soft); margin-top:28px; padding-top:24px; border-top:1px solid var(--rule); max-width:40ch; font-variation-settings:'opsz' 36; }
+  .quote-sub strong { color:var(--ink); font-weight:500; font-variant-numeric:tabular-nums; }
+
+  /* mechanism */
+  .mechanism { margin-top:40px; display:grid; grid-template-columns:1fr; gap:16px; }
+  .mechanism .step { display:grid; grid-template-columns:60px 1fr auto; gap:24px; align-items:center; padding:22px 28px; background:var(--paper-cream); border:1px solid var(--rule); border-left:3px solid var(--ink); }
+  .mechanism .step.highlight { border-left-color:var(--terra); background:var(--terra-soft); }
+  .mechanism .step .m-num { font-family:'Fraunces',serif; font-size:40px; line-height:1; color:var(--ink-mute); font-weight:300; font-variant-numeric:tabular-nums oldstyle-nums; }
+  .mechanism .step.highlight .m-num { color:var(--terra); }
+  .mechanism .step .m-text { font-family:'Fraunces',serif; font-size:22px; line-height:1.3; color:var(--ink); font-variation-settings:'opsz' 60; }
+  .mechanism .step .m-text em { font-style:italic; color:var(--terra); }
+  .mechanism .step .m-tag { font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ink-mute); font-weight:500; white-space:nowrap; }
+
+  /* proof slide — real screenshot */
+  .proof-wrap { margin-top:30px; display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+  .proof-shot { border:1px solid var(--rule); box-shadow:0 16px 40px rgba(0,0,0,0.12); border-radius:6px; overflow:hidden; background:var(--paper-cream); }
+  .proof-shot img { display:block; width:100%; height:auto; }
+  .proof-read .pr-label { font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.24em; text-transform:uppercase; color:var(--terra); font-weight:500; margin-bottom:18px; }
+  .proof-read .pr-line { font-family:'Fraunces',serif; font-size:24px; line-height:1.4; color:var(--ink); padding:14px 0; border-bottom:1px dotted var(--rule); font-variation-settings:'opsz' 60; }
+  .proof-read .pr-line:last-child { border-bottom:none; }
+  .proof-read .pr-line em { font-style:italic; color:var(--terra); }
+  .proof-read .pr-line .k { font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:4px; }
+
+  /* build card */
+  .build-card { margin-top:36px; padding:32px; background:var(--paper-cream); border:1px solid var(--rule); border-top:4px solid var(--ink); }
+  .build-card .bc-head { font-family:'Geist Mono',monospace; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink-mute); font-weight:500; margin-bottom:18px; }
+  .build-card .bc-pipeline { display:grid; grid-template-columns:1fr 24px 1fr 24px 1fr 24px 1fr; gap:0; align-items:center; margin-bottom:22px; }
+  .build-card .bc-node { padding:14px 12px; background:var(--paper); border:1px solid var(--rule); border-top:2px solid var(--terra); text-align:center; }
+  .build-card .bc-node .bcn-num { font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--terra); font-weight:600; margin-bottom:6px; }
+  .build-card .bc-node .bcn-name { font-family:'Fraunces',serif; font-size:17px; color:var(--ink); line-height:1.15; font-variation-settings:'opsz' 60; }
+  .build-card .bc-arrow { text-align:center; font-family:'Fraunces',serif; font-size:24px; color:var(--terra); line-height:1; }
+  .build-card .bc-flow { font-family:'Fraunces',serif; font-style:italic; font-size:18px; color:var(--ink-soft); line-height:1.5; text-align:center; font-variation-settings:'opsz' 30; border-top:1px dotted var(--rule); padding-top:18px; }
+  .build-card .bc-flow strong { color:var(--ink); font-weight:500; font-style:normal; }
+
+  /* platforms (channels) */
+  .platforms { margin-top:36px; display:grid; grid-template-columns:1fr; gap:0; }
+  .platform { display:grid; grid-template-columns:56px 1fr auto; gap:18px; align-items:center; padding:20px 0; border-top:1px solid var(--rule); }
+  .platform:first-child { border-top:2px solid var(--ink); }
+  .platform .p-icon { font-family:'Fraunces',serif; font-size:30px; line-height:1; color:var(--ink); font-weight:500; text-align:center; }
+  .platform .p-name { font-family:'Fraunces',serif; font-size:24px; color:var(--ink); line-height:1.2; font-variation-settings:'opsz' 60; }
+  .platform .p-name em { font-style:italic; color:var(--ink-mute); font-size:14px; display:block; margin-top:3px; font-weight:300; }
+  .platform .p-status { font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; padding:6px 14px; font-weight:600; white-space:nowrap; }
+  .platform .p-status.live { background:var(--calm); color:var(--paper); }
+  .platform .p-status.same { background:var(--ink-mute); color:var(--paper); }
+
+  /* tip list */
+  .tip-list { margin-top:32px; display:flex; flex-direction:column; gap:0; }
+  .tip { display:grid; grid-template-columns:80px 1fr; gap:28px; padding:22px 0; border-top:1px solid var(--rule); align-items:baseline; }
+  .tip:last-child { border-bottom:1px solid var(--rule); }
+  .tip .t-num { font-family:'Fraunces',serif; font-size:56px; line-height:1; color:var(--terra); font-variant-numeric:tabular-nums oldstyle-nums; font-weight:300; font-variation-settings:'opsz' 144; }
+  .tip .t-body .t-head { font-family:'Fraunces',serif; font-size:24px; color:var(--ink); line-height:1.25; font-variation-settings:'opsz' 60; margin-bottom:6px; }
+  .tip .t-body .t-head em { font-style:italic; color:var(--terra); }
+  .tip .t-body .t-desc { font-family:'Fraunces',serif; font-style:italic; font-size:16px; color:var(--ink-soft); line-height:1.4; font-variation-settings:'opsz' 30; }
+
+  .defence-num { position:absolute; top:130px; right:80px; font-family:'Fraunces',serif; font-size:240px; line-height:0.85; color:var(--terra); font-weight:300; letter-spacing:-0.04em; font-variation-settings:'opsz' 144,'WONK' 1; opacity:0.10; z-index:0; font-variant-numeric:tabular-nums oldstyle-nums; }
+
+  .snippet-block { margin-top:28px; padding:26px 30px; background:var(--ink); color:var(--paper); border-left:4px solid var(--terra); font-family:'Geist Mono',monospace; font-size:16px; line-height:1.7; position:relative; }
+  .snippet-block .s-label { display:block; font-size:10px; letter-spacing:0.28em; text-transform:uppercase; color:var(--terra); font-weight:600; margin-bottom:16px; }
+  .snippet-block .s-code { display:block; white-space:pre-wrap; color:var(--paper); }
+  .snippet-block .s-code em { color:#f5c69a; font-style:normal; font-weight:600; }
+  .snippet-block .s-foot { display:block; margin-top:16px; padding-top:14px; border-top:1px solid rgba(245,239,230,0.18); font-family:'Fraunces',serif; font-style:italic; font-size:16px; color:rgba(245,239,230,0.75); line-height:1.45; font-variation-settings:'opsz' 30; }
+
+  /* stat strip */
+  .stat-strip { margin-top:40px; padding-top:26px; border-top:2px solid var(--ink); display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+  .stat-strip .cell { padding:0 18px; border-right:1px dotted var(--rule); text-align:center; }
+  .stat-strip .cell:last-child { border-right:none; }
+  .stat-strip .cell .label { font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:10px; font-weight:500; }
+  .stat-strip .cell .val { font-family:'Fraunces',serif; font-size:64px; line-height:1; color:var(--terra); font-variant-numeric:tabular-nums oldstyle-nums; font-weight:300; letter-spacing:-0.03em; font-variation-settings:'opsz' 144; }
+  .stat-strip .cell .note { font-family:'Fraunces',serif; font-style:italic; font-size:13px; color:var(--ink-mute); margin-top:6px; line-height:1.3; font-variation-settings:'opsz' 24; }
+
+  /* cover */
+  .cover-slide .body { justify-content:flex-end; padding-bottom:0; }
+  .cover-byline { font-family:'Geist Mono',monospace; font-size:15px; letter-spacing:0.3em; text-transform:uppercase; color:var(--terra); margin-bottom:28px; font-weight:500; }
+  .cover-footer { margin-top:32px; padding-top:22px; border-top:1px solid var(--ink); display:flex; justify-content:space-between; align-items:baseline; font-family:'Geist Mono',monospace; font-size:14px; text-transform:uppercase; letter-spacing:0.18em; color:var(--ink-mute); }
+  .cover-footer .terra { color:var(--terra); }
+
+  /* CTA */
+  .closing .body { justify-content:space-between !important; padding:40px 0 0 !important; }
+  .closing-stamp { font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.3em; text-transform:uppercase; color:var(--terra); font-weight:500; margin-bottom:28px; }
+  .ask-primary { margin-bottom:32px; }
+  .ask-primary .ask-headline { font-family:'Fraunces',serif; font-weight:300; font-size:72px; line-height:1.02; letter-spacing:-0.025em; color:var(--ink); font-variation-settings:'opsz' 144,'SOFT' 40,'WONK' 1; max-width:15ch; }
+  .ask-primary .ask-headline em { font-style:italic; color:var(--terra); }
+  .ask-primary .ask-help { font-family:'Fraunces',serif; font-style:italic; font-size:19px; color:var(--ink-mute); margin-top:18px; line-height:1.45; max-width:34ch; font-variation-settings:'opsz' 30; }
+  .ask-secondary { padding:24px 0; border-top:1px dotted var(--rule); border-bottom:1px dotted var(--rule); display:flex; align-items:baseline; gap:24px; }
+  .ask-secondary .a-mark { font-family:'Fraunces',serif; font-size:32px; color:var(--terra); line-height:1; flex-shrink:0; }
+  .ask-secondary .a-text { font-family:'Fraunces',serif; font-style:italic; font-size:20px; line-height:1.45; color:var(--ink-soft); font-variation-settings:'opsz' 36; }
+  .ask-secondary .a-text em { font-style:italic; color:var(--ink); font-weight:400; }
+  .sig-block { padding-top:32px; border-top:2px solid var(--ink); display:grid; grid-template-columns:1fr auto; gap:40px; align-items:end; padding-bottom:6px; }
+  .sig-block .sig-name { font-family:'Fraunces',serif; font-size:42px; font-weight:400; color:var(--ink); line-height:1; letter-spacing:-0.015em; font-variation-settings:'opsz' 80; }
+  .sig-block .sig-role { font-family:'Fraunces',serif; font-style:italic; font-size:17px; color:var(--ink-mute); margin-top:12px; font-variation-settings:'opsz' 24; max-width:34ch; line-height:1.4; }
+  .sig-block .sig-li { text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+  .sig-block .sig-li .li-icon { width:36px; height:36px; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:600; font-size:22px; line-height:1; }
+  .sig-block .sig-li .li-url { font-family:'Geist Mono',monospace; font-size:14px; color:var(--ink); font-weight:500; letter-spacing:-0.01em; }
+  .sig-block .sig-li .li-url .handle { color:var(--terra); }
+  .sig-block .sig-li .li-label { font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink-mute); font-weight:500; }
+
+  @media print {
+    @page { size:11.25in 11.25in; margin:0; }
+    html, body { background:white !important; padding:0 !important; margin:0 !important; width:11.25in; }
+    .stage { gap:0 !important; padding:0 !important; display:block !important; }
+    .square { width:11.25in !important; height:11.25in !important; box-shadow:none !important; page-break-after:always; page-break-inside:avoid; break-after:page; break-inside:avoid; display:block; position:relative; overflow:hidden; }
+    .square:last-child { page-break-after:auto; break-after:auto; }
+    .toolbar { display:none !important; }
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+    .square::before { background-image:none !important; opacity:0 !important; }
+    .square::after { opacity:1 !important; }
+  }
+  .toolbar { position:fixed; top:20px; right:20px; background:rgba(245,239,230,0.96); border:1px solid var(--rule); border-radius:999px; padding:10px 16px; display:flex; gap:12px; align-items:center; z-index:1000; backdrop-filter:blur(8px); box-shadow:0 8px 24px rgba(0,0,0,0.3); font-family:'Geist Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink); }
+  .toolbar button { background:var(--ink); color:var(--paper); border:none; padding:8px 16px; border-radius:999px; cursor:pointer; font-family:'Geist Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; font-weight:500; transition:background 200ms ease; }
+  .toolbar button:hover { background:var(--terra); }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>10 slides · 1080 × 1080</span>
+  <button onclick="window.print()">⤓ Export PDF</button>
+</div>
+
+<div class="stage">
+
+<!-- ===== SLIDE 1 — COVER ===== -->
+<section class="square cover-slide">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>A Field Guide to AI Agents</span><span class="dot">·</span><span>No. 07</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div class="cover-byline">Built this week · n8n + Gemini · no server to run</div>
+      <h1>My bakery's website chatbot takes <em class="terra-em">real orders.</em><br>I never ran a server.</h1>
+      <div class="hub-wrap">
+        <svg width="900" height="240" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg" style="font-family:'Geist Mono',monospace;">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a8478"/></marker>
+          </defs>
+          <!-- ears -->
+          <rect x="10" y="20" width="150" height="48" rx="6" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="85" y="49" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces,serif" font-style="italic">Gmail</text>
+          <rect x="10" y="96" width="150" height="48" rx="6" fill="rgba(184,67,27,0.10)" stroke="#b8431b" stroke-width="1.5"/>
+          <text x="85" y="125" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces,serif" font-style="italic">Telegram</text>
+          <rect x="10" y="172" width="150" height="48" rx="6" fill="rgba(20,83,45,0.10)" stroke="#14532d" stroke-width="1.5"/>
+          <text x="85" y="201" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces,serif" font-style="italic">Website chat</text>
+          <!-- brain -->
+          <circle cx="450" cy="120" r="92" fill="#faf6ef" stroke="#1a1814" stroke-width="1.5"/>
+          <circle cx="450" cy="120" r="78" fill="none" stroke="#d4ccba" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="450" y="108" text-anchor="middle" font-size="12" fill="#8a8478" letter-spacing="2" font-weight="600">ONE BRAIN</text>
+          <text x="450" y="132" text-anchor="middle" font-size="16" fill="#1a1814" font-family="Fraunces,serif">Gemini + quote</text>
+          <!-- mouths -->
+          <rect x="740" y="58" width="150" height="48" rx="6" fill="rgba(26,24,20,0.05)" stroke="#1a1814" stroke-width="1.5"/>
+          <text x="815" y="87" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces,serif" font-style="italic">Reply + price</text>
+          <rect x="740" y="134" width="150" height="48" rx="6" fill="rgba(26,24,20,0.05)" stroke="#1a1814" stroke-width="1.5"/>
+          <text x="815" y="163" text-anchor="middle" font-size="14" fill="#1a1814" font-family="Fraunces,serif" font-style="italic">Payment link</text>
+          <!-- lines in -->
+          <path d="M160 44 Q 300 60 360 100" fill="none" stroke="#8a8478" stroke-width="1.4" marker-end="url(#ar)"/>
+          <path d="M160 120 L 358 120" fill="none" stroke="#8a8478" stroke-width="1.4" marker-end="url(#ar)"/>
+          <path d="M160 196 Q 300 180 360 140" fill="none" stroke="#8a8478" stroke-width="1.4" marker-end="url(#ar)"/>
+          <!-- lines out -->
+          <path d="M542 100 Q 660 82 740 82" fill="none" stroke="#8a8478" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#ar)"/>
+          <path d="M542 140 Q 660 158 740 158" fill="none" stroke="#8a8478" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#ar)"/>
+        </svg>
+      </div>
+      <div class="hub-cap">Three ways in · one place to think · the right way back out</div>
+      <div class="cover-footer">
+        <span>Generative AI &amp; AI Agents for Non-Coders</span>
+        <span class="terra">Swipe →</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 2 — THESIS ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>The thesis</span><span class="dot">·</span><span>02</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">The fundamental</div>
+      <div class="pull-quote">A channel is just a <em>door.</em> Build one brain, then add doors.</div>
+      <div class="quote-sub">Most teams rebuild the whole assistant for every new channel — a bot for the website, another for WhatsApp, a third for email. <strong>That's three brains to keep in sync.</strong> The durable move is the opposite: one place that thinks, and thin adapters that carry messages in and out.</div>
+    </div>
+    <div class="folio">02<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 3 — MECHANISM ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>How it works</span><span class="dot">·</span><span>03</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">The mechanism · 4 moves</div>
+      <h1 style="font-size:52px;">Tag at the door. Decide at the&nbsp;exit.</h1>
+      <div class="mechanism">
+        <div class="step"><div class="m-num">1</div><div class="m-text">A message arrives — email, Telegram DM, or website chat</div><div class="m-tag">Perceive</div></div>
+        <div class="step highlight"><div class="m-num">2</div><div class="m-text">Stamp it with <em>where it came from</em> — one field: <em>channel</em></div><div class="m-tag">Tag</div></div>
+        <div class="step"><div class="m-num">3</div><div class="m-text">Same Gemini prompt reads the order; the quote API prices it</div><div class="m-tag">Think</div></div>
+        <div class="step highlight"><div class="m-num">4</div><div class="m-text">Read the tag → reply on the channel it <em>came in on</em></div><div class="m-tag">Act</div></div>
+      </div>
+      <div class="lede-block" style="margin-top:30px;font-size:22px;">The brain never learns what a "channel" is. <strong>Two lines of config</strong> do all the routing.</div>
+    </div>
+    <div class="folio">03<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 4 — PROOF (real screenshot) ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Real, not a mock</span><span class="dot">·</span><span>04</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">Live conversation · website channel</div>
+      <div class="proof-wrap">
+        <div class="proof-shot"><img src="screenshots/lumiere-chat-conversation.png" alt="Live Lumière bakery chatbot taking a real order with a ₹2180 quote"></div>
+        <div class="proof-read">
+          <div class="pr-label">What's actually happening</div>
+          <div class="pr-line"><span class="k">The ask</span>2kg eggless red velvet, Saturday, Carter Road</div>
+          <div class="pr-line"><span class="k">The reply</span>Order confirmed · <em>₹2,180</em> · ₹2,100 cake + ₹80 eggless</div>
+          <div class="pr-line"><span class="k">The receipt</span><em>POST → n8n chat webhook</em> · reply in 255 chars</div>
+          <div class="pr-line"><span class="k">What it tracked</span>Pulled the order together <em>from the thread</em>, then priced it</div>
+        </div>
+      </div>
+      <div class="lede-block" style="margin-top:30px;font-size:21px;max-width:60ch;">It held the order across the conversation and did the maths in reply — <strong>none of it hard-coded.</strong></div>
+    </div>
+    <div class="folio">04<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 5 — THE BUILD (one pipeline) ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>The whole thing</span><span class="dot">·</span><span>05</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">The build · one workflow</div>
+      <h1 style="font-size:50px;">Four nodes carry the website&nbsp;chat.</h1>
+      <div class="build-card">
+        <div class="bc-head">Website chat path · added alongside Gmail &amp; Telegram</div>
+        <div class="bc-pipeline">
+          <div class="bc-node"><div class="bcn-num">In</div><div class="bcn-name">Webhook</div></div>
+          <div class="bc-arrow">→</div>
+          <div class="bc-node"><div class="bcn-num">Think</div><div class="bcn-name">Gemini</div></div>
+          <div class="bc-arrow">→</div>
+          <div class="bc-node"><div class="bcn-num">Price</div><div class="bcn-name">Quote API</div></div>
+          <div class="bc-arrow">→</div>
+          <div class="bc-node"><div class="bcn-num">Out</div><div class="bcn-name">Respond</div></div>
+        </div>
+        <div class="bc-flow">Browser posts the message + the chat history → <strong>Gemini</strong> reads the menu and the thread → reply goes straight back to the browser. <strong>Memory comes from passing the history every turn.</strong></div>
+      </div>
+      <div class="lede-block" style="margin-top:30px;font-size:21px;max-width:58ch;">The site is a static page on Vercel. The "backend" is a serverless function for pricing. <strong>The intelligence lives in n8n — the page just talks to it.</strong></div>
+    </div>
+    <div class="folio">05<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 6 — GENERALISE (channels matrix) ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Why it scales</span><span class="dot">·</span><span>06</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">The pattern, generalised</div>
+      <h1 style="font-size:50px;">Adding a channel is adding a&nbsp;door.</h1>
+      <div class="platforms">
+        <div class="platform"><div class="p-icon">✉</div><div class="p-name">Gmail<em>customer emails an order</em></div><div class="p-status live">Live</div></div>
+        <div class="platform"><div class="p-icon">✈</div><div class="p-name">Telegram<em>customer DMs the bakery bot</em></div><div class="p-status live">Live</div></div>
+        <div class="platform"><div class="p-icon">💬</div><div class="p-name">Website chat<em>visitor types on the site</em></div><div class="p-status live">Live</div></div>
+        <div class="platform"><div class="p-icon">+</div><div class="p-name">WhatsApp · Instagram · a form<em>whatever's next</em></div><div class="p-status same">Same brain</div></div>
+      </div>
+      <div class="lede-block" style="margin-top:34px;font-size:22px;">Every new channel is a trigger + an adapter. <strong>The thinking never gets rewritten.</strong></div>
+    </div>
+    <div class="folio">06<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 7 — DEFENCE 1 ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Make it real</span><span class="dot">·</span><span>07</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="defence-num">1</div>
+    <div class="body">
+      <div class="eyebrow">Move 1 · tag at the entrance</div>
+      <h1 style="font-size:50px;">Stamp the channel the moment it&nbsp;arrives.</h1>
+      <div class="snippet-block">
+        <span class="s-label">Set node · right after every trigger</span>
+        <span class="s-code">channel = <em>"web"</em>     // or "gmail", "telegram"
+<span style="color:#b8b1a3;">// keep all the original fields too</span></span>
+        <span class="s-foot">One field, set once per door. Everything downstream reads it instead of guessing where the message came from.</span>
+      </div>
+      <div class="lede-block" style="font-size:21px;">Without the tag, your reply node has to reverse-engineer the source. With it, routing is a lookup.</div>
+    </div>
+    <div class="folio">07<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 8 — DEFENCE 2 ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Make it real</span><span class="dot">·</span><span>08</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="defence-num">2</div>
+    <div class="body">
+      <div class="eyebrow">Move 2 · give memory for free</div>
+      <h1 style="font-size:50px;">Pass the whole thread, every&nbsp;turn.</h1>
+      <div class="snippet-block">
+        <span class="s-label">What the browser sends to the webhook</span>
+        <span class="s-code">{ "message": <em>"2kg of that, eggless"</em>,
+  "history": [ ...previous turns ] }</span>
+        <span class="s-foot">The model has no memory of its own. You get continuity by handing it the conversation each time — so "that" still means the red velvet from two messages ago.</span>
+      </div>
+      <div class="lede-block" style="font-size:21px;">Stateless model + stateful client = a chat that remembers, with zero database.</div>
+    </div>
+    <div class="folio">08<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 9 — DEFENCE 3 + stats ===== -->
+<section class="square">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Make it real</span><span class="dot">·</span><span>09</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="defence-num">3</div>
+    <div class="body">
+      <div class="eyebrow">Move 3 · ship it where it can&apos;t die</div>
+      <h1 style="font-size:50px;">Static page. Serverless price. Hosted&nbsp;brain.</h1>
+      <div class="lede-block" style="margin-top:28px;font-size:22px;max-width:56ch;">No always-on server means nothing to crash at 2am. The site is a file; the price is a function that wakes on demand; the agent runs in n8n. <strong>Each piece scales to zero.</strong></div>
+      <div class="stat-strip">
+        <div class="cell"><div class="label">Inbound channels</div><div class="val">3</div><div class="note">Gmail · Telegram · web</div></div>
+        <div class="cell"><div class="label">Always-on servers</div><div class="val">0</div><div class="note">nothing to babysit</div></div>
+        <div class="cell"><div class="label">Web reply</div><div class="val">~4<span style="font-size:22px;font-style:italic;color:#8a8478;">s</span></div><div class="note">webhook round-trip</div></div>
+        <div class="cell"><div class="label">Brains to sync</div><div class="val">1</div><div class="note">one prompt, all doors</div></div>
+      </div>
+    </div>
+    <div class="folio">09<sup>/10</sup></div>
+    <div class="swipe">Swipe →</div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 10 — CTA / CLOSE ===== -->
+<section class="square closing">
+  <div class="square-content">
+    <div class="running-head">
+      <div class="left"><span>Your turn</span><span class="dot">·</span><span>10</span></div>
+      <span class="pub-title">One brain, many channels</span>
+    </div>
+    <div class="body">
+      <div>
+        <div class="closing-stamp">The takeaway</div>
+        <div class="ask-primary">
+          <div class="ask-headline">Pick the brain first. The <em>channels</em> are easy.</div>
+          <div class="ask-help">If you're rebuilding your assistant for every new surface, you're maintaining the same thing three times. Build it once. Add doors.</div>
+        </div>
+        <div class="ask-secondary">
+          <div class="a-mark">✦</div>
+          <div class="a-text">I teach non-coders to build agents like this. <em>What channel would you wire up first — and what would it do?</em> Tell me below.</div>
+        </div>
+      </div>
+      <div class="sig-block">
+        <div>
+          <div class="sig-name">Shantanu Chandra</div>
+          <div class="sig-role">Building and teaching applied AI agents · Generative AI for Non-Coders</div>
+        </div>
+        <div class="sig-li">
+          <div class="li-icon">in</div>
+          <div class="li-url">linkedin.com/in/<span class="handle">chandrashantanu</span></div>
+          <div class="li-label">Follow for the field guide</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

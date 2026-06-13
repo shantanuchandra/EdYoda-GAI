@@ -400,6 +400,66 @@ p, li { color: var(--ink-soft); }
   color: var(--ink-mute); margin-top: 0.3rem; letter-spacing: 0.04em;
 }
 
+/* ── Lead-capture survey card (appears after an order is confirmed) ───── */
+.lead-card {
+  align-self: stretch; max-width: 100%;
+  background: white; border: 1px solid var(--terra);
+  border-top: 3px solid var(--terra); border-radius: 12px;
+  padding: 0.95rem 1rem 1.05rem; margin-top: 0.2rem;
+  animation: leadIn 360ms cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes leadIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.lead-card .lc-kicker {
+  font-family: 'Geist Mono', monospace; font-size: 0.66rem;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra);
+  font-weight: 600; margin-bottom: 0.35rem;
+}
+.lead-card .lc-title {
+  font-family: 'Fraunces', serif; font-size: 1.18rem; line-height: 1.25;
+  color: var(--ink); margin-bottom: 0.3rem; font-weight: 400;
+}
+.lead-card .lc-sub {
+  font-size: 0.82rem; color: var(--ink-soft); line-height: 1.45; margin-bottom: 0.7rem;
+}
+.lead-card label {
+  display: block; font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute);
+  font-weight: 600; margin: 0.55rem 0 0.25rem;
+}
+.lead-card input[type=text], .lead-card input[type=email] {
+  width: 100%; padding: 0.55rem 0.7rem; border: 1px solid var(--rule);
+  border-radius: 8px; font-family: 'Geist', sans-serif; font-size: 0.9rem;
+  color: var(--ink); background: var(--paper-cream);
+}
+.lead-card input:focus { outline: none; border-color: var(--terra); }
+.lead-card .lc-checks { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.7rem; }
+.lead-card .lc-check {
+  display: flex; align-items: flex-start; gap: 0.55rem; cursor: pointer;
+  font-size: 0.86rem; color: var(--ink); line-height: 1.35;
+}
+.lead-card .lc-check input { margin-top: 0.15rem; accent-color: var(--terra); width: 16px; height: 16px; flex-shrink: 0; }
+.lead-card .lc-actions { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.9rem; }
+.lead-card .lc-submit {
+  background: var(--terra); color: var(--paper); border: none;
+  padding: 0.6rem 1.1rem; border-radius: 8px; font-family: 'Geist Mono', monospace;
+  font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+  font-weight: 600; cursor: pointer; transition: background 180ms ease;
+}
+.lead-card .lc-submit:hover { background: #9e3a17; }
+.lead-card .lc-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.lead-card .lc-err { font-size: 0.78rem; color: var(--danger); margin-top: 0.5rem; min-height: 1em; }
+.lead-card.done { border-color: var(--leaf); border-top-color: var(--leaf); text-align: center; }
+.lead-card.done .lc-kicker { color: var(--leaf); }
+
+/* ── Demo banner (top of chat panel) ─────────────────────────────────── */
+.demo-banner {
+  font-family: 'Geist Mono', monospace; font-size: 0.64rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute);
+  background: var(--paper-warm); border-bottom: 1px solid var(--rule);
+  padding: 0.4rem 0.9rem; text-align: center; line-height: 1.4;
+}
+.demo-banner b { color: var(--terra); }
+
 .trace {
   margin-top: 0.35rem; font-family: 'Geist Mono', monospace;
   font-size: 0.72rem; color: var(--ink-mute);
@@ -670,6 +730,7 @@ p, li { color: var(--ink-soft); }
     </div>
     <button class="chat-close" id="chatClose" aria-label="Close">×</button>
   </div>
+  <div class="demo-banner">Live demo · <b>real AI, fake bakery</b> · no order is actually placed</div>
   <div class="mode-switch" id="modeSwitch">
     <button data-mode="order" class="active">Order Assistant<span class="sub">customer-facing · acts</span></button>
     <button data-mode="monitor">Regulation Monitor<span class="sub">operations · watches</span></button>
@@ -705,8 +766,11 @@ const STATE = {
   // override it from Admin → Lumière agent.
   chatWebhookUrl: localStorage.getItem('lum_s5_chatWebhookUrl') ||
                   'https://shantanu1990.app.n8n.cloud/webhook/lumiere-chat',
+  leadWebhookUrl: localStorage.getItem('lum_s5_leadWebhookUrl') ||
+                  'https://shantanu1990.app.n8n.cloud/webhook/lumiere-lead',
   sessionId: '',                   // set in init() — keeps multi-turn memory in n8n
   chatHistory: [],                 // rolling { role, text } pairs sent to the webhook
+  leadCaptured: false,             // once true, don't show the survey again this session
   mode: 'order',                   // 'order' | 'monitor'
   connOk: false,
   kbText: '',
@@ -748,6 +812,26 @@ $$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.vie
 
 const CHAT_HISTORY_TURNS = 8;          // last N user+bot turns sent with each call
 const CHAT_REQUEST_TIMEOUT_MS = 30000; // n8n cold-start budget
+
+/* ── Client-side rate limit ───────────────────────────────────────────────
+   A public demo on free-tier keys (Gemini + n8n's 1000-exec cap) needs a
+   brake so one visitor can't drain the quota. This is a courtesy limit, not
+   security — it lives in localStorage and a determined user can bypass it.
+   It exists to keep honest traffic honest. The real spend cap is set on the
+   Gemini key itself.                                                        */
+const RATE_MAX_PER_WINDOW = 12;        // messages allowed…
+const RATE_WINDOW_MS = 10 * 60 * 1000; // …per rolling 10-minute window
+function rateLimitHit() {
+  const KEY = 'lum_s5_msgTimes';
+  let times = [];
+  try { times = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { times = []; }
+  const now = Date.now();
+  times = times.filter(t => now - t < RATE_WINDOW_MS);
+  if (times.length >= RATE_MAX_PER_WINDOW) return true;
+  times.push(now);
+  try { localStorage.setItem(KEY, JSON.stringify(times)); } catch {}
+  return false;
+}
 
 function uuidLike() {
   // Good-enough session ID for a teaching demo. Not security-critical.
@@ -1461,6 +1545,117 @@ function addBotReply(reply) {
   }
   log.appendChild(el); log.scrollTop = log.scrollHeight;
 }
+/* ── Lead capture ─────────────────────────────────────────────────────────
+   When the agent confirms an order, we ask the visitor for their email to
+   "send the order summary + a free agent-building guide", plus two interest
+   checkboxes. The lead POSTs to a separate n8n webhook that emails Shantanu.
+   This is the pipeline the LinkedIn post drives traffic into.              */
+
+// Detect a confirmed order from the bot's reply text. Looks for a price
+// (₹ or "Rs"/"INR" + digits) AND a confirmation/payment cue. Deliberately
+// conservative — better to miss a confirmation than to nag mid-conversation.
+function isOrderConfirmed(text) {
+  if (!text) return false;
+  const t = text.toLowerCase();
+  const hasPrice = /(₹|rs\.?\s|inr\s)\s*[\d,]{2,}/i.test(text) || /\btotal\b[^.]*\d/.test(t);
+  const hasConfirmCue = /payment link|confirm|booked|noted (down )?your order|i('| ha)ve noted|order (is )?(ready|confirmed)/.test(t);
+  return hasPrice && hasConfirmCue;
+}
+
+function maybeShowLeadCard() {
+  if (STATE.leadCaptured) return;
+  if ($('#leadCard')) return; // already shown this session
+  const log = $('#chatLog');
+  const card = document.createElement('div');
+  card.className = 'lead-card'; card.id = 'leadCard';
+  card.innerHTML = `
+    <div class="lc-kicker">One last step · get your summary</div>
+    <div class="lc-title">Where should I send your order summary?</div>
+    <div class="lc-sub">Drop your email and I'll send the summary — plus a short, free guide on how this whole order bot was built with no code.</div>
+    <label for="leadName">Your name</label>
+    <input type="text" id="leadName" autocomplete="name" placeholder="e.g. Priya Sharma">
+    <label for="leadEmail">Email</label>
+    <input type="email" id="leadEmail" autocomplete="email" placeholder="you@example.com">
+    <div class="lc-checks">
+      <label class="lc-check"><input type="checkbox" id="leadAgents" checked> I'd like to learn to build AI agents like this one</label>
+      <label class="lc-check"><input type="checkbox" id="leadEvals"> I'd also like to learn AI Evals (how to test &amp; trust AI)</label>
+    </div>
+    <div class="lc-actions">
+      <button class="lc-submit" id="leadSubmit">Send my summary →</button>
+    </div>
+    <div class="lc-err" id="leadErr"></div>`;
+  log.appendChild(card);
+  log.scrollTop = log.scrollHeight;
+  $('#leadEmail').focus();
+  $('#leadSubmit').addEventListener('click', submitLead);
+  $('#leadEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitLead(); });
+}
+
+async function submitLead() {
+  const name = ($('#leadName').value || '').trim();
+  const email = ($('#leadEmail').value || '').trim();
+  const wantsAgents = $('#leadAgents').checked;
+  const wantsEvals = $('#leadEvals').checked;
+  const err = $('#leadErr');
+  // Minimal validation — required to "get the link".
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    err.textContent = 'Please enter a valid email so I can send your summary.';
+    $('#leadEmail').focus();
+    return;
+  }
+  const btn = $('#leadSubmit');
+  btn.disabled = true; btn.textContent = 'Sending…'; err.textContent = '';
+
+  // Pull a compact order summary from the recent conversation for the email.
+  const lastBot = [...STATE.chatHistory].reverse().find(m => m.role === 'assistant');
+  const payload = {
+    type: 'lead',
+    name: name || null,
+    email,
+    interests: { agents: wantsAgents, evals: wantsEvals },
+    orderSummary: lastBot ? lastBot.text : null,
+    sessionId: STATE.sessionId,
+    channel: 'web',
+    site: 'lumiere-bakery-s5-app',
+    sourceUrl: location.href,
+    capturedAt: new Date().toISOString(),
+  };
+
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 15000);
+    const r = await fetch(STATE.leadWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctl.signal,
+    });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    STATE.leadCaptured = true;
+    const card = $('#leadCard');
+    card.classList.add('done');
+    const interestLine = (wantsAgents || wantsEvals)
+      ? `I'll be in touch about ${[wantsAgents && 'building agents', wantsEvals && 'AI Evals'].filter(Boolean).join(' and ')} too.`
+      : '';
+    const firstName = name ? name.split(' ')[0] : '';
+    // Build the success card with DOM methods (not innerHTML) so a visitor's
+    // name can't inject markup — this page is public.
+    card.replaceChildren();
+    const k = document.createElement('div'); k.className = 'lc-kicker'; k.textContent = '✓ Sent';
+    const ti = document.createElement('div'); ti.className = 'lc-title';
+    ti.textContent = `Thanks${firstName ? ', ' + firstName : ''} — check your inbox shortly.`;
+    const su = document.createElement('div'); su.className = 'lc-sub';
+    su.textContent = `Your order summary and the build guide are on the way. ${interestLine}`.trim();
+    card.append(k, ti, su);
+    $('#chatLog').scrollTop = $('#chatLog').scrollHeight;
+  } catch (e) {
+    console.error('Lead capture failed:', e);
+    err.textContent = "Couldn't send just now — please try again in a moment.";
+    btn.disabled = false; btn.textContent = 'Send my summary →';
+  }
+}
+
 function addTyping() {
   const log = $('#chatLog');
   const el = document.createElement('div'); el.className = 'msg bot'; el.id = 'typingMsg';
@@ -1516,6 +1711,16 @@ $('#sendBtn').addEventListener('click', sendMsg);
 async function sendMsg() {
   const text = $('#chatInput').value.trim();
   if (!text) return;
+  // Courtesy rate limit so a public demo can't drain the free-tier quota.
+  if (rateLimitHit()) {
+    $('#chatInput').value = '';
+    addUser(text);
+    addBotReply({
+      role: 'bot-refuse',
+      text: "You've sent a lot of messages in a short window — this is a free demo, so I pause here to keep the lights on. Give it ten minutes and try again, or reach out to Shantanu on LinkedIn to see the full build.",
+    });
+    return;
+  }
   $('#chatInput').value = '';
   addUser(text);
   STATE.chatHistory.push({ role: 'user', text });
@@ -1573,6 +1778,12 @@ async function sendMsg() {
     }
     removeTyping();
     addBotReply(reply);
+    // After the agent successfully closes an order, invite the visitor into
+    // the learning pipeline (once per session). We detect "order confirmed"
+    // from the reply: a price + a payment-link / confirmation cue.
+    if (STATE.mode === 'order' && !STATE.leadCaptured && isOrderConfirmed(reply.text)) {
+      maybeShowLeadCard();
+    }
   } catch (e) {
     removeTyping();
     console.error('Agent error:', e);
