@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumière — Mumbai's Artisan Bakery (S5)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23b8431b'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='58' font-family='Georgia,serif' fill='%23f5efe6'%3EL%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   LUMIÈRE — S5 Agent Architecture demo
+   Two agent modes in one chatbot: Order Assistant + FSSAI Regulation Monitor.
+   Each mode has its own tool chain. The bot's mode is the agent's "personality";
+   the tools are its hands; the visible trace shows every step.
+   ============================================================================ */
+:root {
+  --paper:        #f5efe6;
+  --paper-warm:   #ede4d3;
+  --paper-cream:  #faf6ef;
+  --ink:          #1a1814;
+  --ink-soft:     #4a463e;
+  --ink-mute:     #8a8478;
+  --ink-faint:    #b8b1a3;
+  --rule:         #d4ccba;
+  --rule-soft:    #e3dccb;
+
+  --terra:        #b8431b;
+  --terra-soft:   rgba(184, 67, 27, 0.10);
+  --terra-deep:   #8c2e10;
+  --gold:         #a16207;
+  --gold-soft:    rgba(161, 98, 7, 0.10);
+  --leaf:         #5a7a3c;
+  --leaf-soft:    rgba(90, 122, 60, 0.10);
+  --danger:       #991b1b;
+  --danger-soft:  rgba(153, 27, 27, 0.08);
+
+  --s-1: 0.5rem;  --s-2: 1rem;  --s-3: 1.5rem;  --s-4: 2rem;
+  --s-5: 3rem;    --s-6: 4.5rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur:  280ms;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper); color: var(--ink);
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 16px; line-height: 1.55; min-height: 100%;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  opacity: 0.35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3, .display { font-family: 'Fraunces', serif; color: var(--ink); letter-spacing: -0.02em; }
+h1 { font-size: clamp(2.6rem, 5vw, 4.4rem); font-weight: 400; line-height: 1.02;
+     font-variation-settings: 'opsz' 120, 'SOFT' 30; }
+h2 { font-size: clamp(2rem, 3.6vw, 3rem); font-weight: 400; line-height: 1.1; }
+h3 { font-size: 1.4rem; font-weight: 500; line-height: 1.2; }
+p, li { color: var(--ink-soft); }
+.lede { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 300;
+        font-style: italic; line-height: 1.45; color: var(--ink-soft); }
+.terra { color: var(--terra); }
+.mono { font-family: 'Geist Mono', monospace; font-size: 0.84rem; }
+
+/* ── TOP NAV ───────────────────────────────────────────────────────────── */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2.5vw; background: rgba(245, 239, 230, 0.92);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule);
+}
+.brand {
+  font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 400;
+  font-variation-settings: 'opsz' 144, 'SOFT' 50;
+}
+.brand .dot { color: var(--terra); }
+.brand sub { font-family: 'Geist Mono', monospace; font-size: 0.6rem;
+             color: var(--ink-mute); letter-spacing: 0.18em;
+             text-transform: uppercase; margin-left: 0.4em; }
+.tabs { display: flex; gap: 0.4rem; }
+.tab {
+  font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute);
+  padding: 0.55rem 1rem; border-radius: 999px;
+  border: 1px solid transparent; cursor: pointer; background: transparent;
+  transition: all var(--dur) var(--ease);
+}
+.tab:hover { color: var(--ink); background: var(--paper-cream); }
+.tab.active { color: var(--terra); border-color: var(--rule); background: var(--paper-cream); }
+
+.view { display: none; position: relative; z-index: 2; }
+.view.active { display: block; }
+
+/* ── HERO ──────────────────────────────────────────────────────────────── */
+.hero {
+  padding: 5rem 5vw 3rem; max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: center;
+}
+.hero-text .eyebrow {
+  font-family: 'Geist Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--terra);
+  margin-bottom: 1.2rem; padding-left: 1.8em; display: inline-block;
+  position: relative;
+}
+.hero-text .eyebrow::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: 1.2em; height: 1px; background: var(--terra);
+}
+.hero-text h1 em { font-style: italic; color: var(--terra);
+                   font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; }
+.hero-text p.lede { margin-top: 1.4rem; max-width: 38ch; }
+.hero-visual {
+  aspect-ratio: 4/5; border-radius: 4px;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 30%, rgba(184, 67, 27, 0.35), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 70%, rgba(161, 98, 7, 0.30), transparent 60%),
+    linear-gradient(135deg, #e8d4ae 0%, #c79966 100%);
+  position: relative; box-shadow: 0 20px 50px -20px rgba(26, 24, 20, 0.3);
+}
+.hero-visual::after {
+  content: '🎂'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9rem; opacity: 0.5;
+}
+
+.section { padding: 3rem 5vw; max-width: 1200px; margin: 0 auto; }
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule);
+}
+.section-head h2 em { font-style: italic; color: var(--terra); }
+.section-head .meta {
+  font-family: 'Geist Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute);
+}
+
+.cards-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.agent-card {
+  background: var(--paper-cream); border: 1px solid var(--rule);
+  border-left: 3px solid var(--terra);
+  padding: 1.4rem 1.6rem;
+}
+.agent-card h3 { margin-bottom: 0.4rem; }
+.agent-card .tag {
+  font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra);
+  font-weight: 600; margin-bottom: 0.6rem; display: block;
+}
+.agent-card p { font-size: 0.94rem; color: var(--ink-soft); line-height: 1.55; }
+.agent-card .gaps {
+  font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+  color: var(--ink-mute); margin-top: 0.7rem;
+  letter-spacing: 0.06em;
+}
+
+.loc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 0.5rem; }
+.loc-card {
+  background: var(--paper-cream); border: 1px solid var(--rule);
+  padding: 1.2rem; border-left: 3px solid var(--terra);
+}
+.loc-card h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+.loc-card .addr { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.5; }
+.loc-card .hours { font-family: 'Geist Mono', monospace; font-size: 0.72rem;
+                   color: var(--ink-mute); line-height: 1.7; margin-top: 0.5rem; }
+.loc-card .coupon {
+  display: inline-block; margin-top: 0.6rem; padding: 0.25rem 0.6rem;
+  background: var(--terra-soft); color: var(--terra);
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.04em; border-radius: 2px;
+}
+
+/* ── ADMIN VIEW ────────────────────────────────────────────────────────── */
+.admin-wrap { padding: 3rem 5vw 6rem; max-width: 1200px; margin: 0 auto; }
+.admin-wrap h1 { margin-bottom: 0.4rem; }
+.admin-wrap .lede { margin-bottom: 2.5rem; max-width: 60ch; }
+.admin-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 2.5rem; }
+.panel {
+  background: white; border: 1px solid var(--rule); border-radius: 3px;
+  padding: 1.4rem;
+}
+.panel h3 { font-size: 1.15rem; margin-bottom: 0.6rem; }
+.panel .desc { font-size: 0.88rem; color: var(--ink-mute); margin-bottom: 0.9rem; }
+.panel + .panel { margin-top: 1.2rem; }
+
+.conn-pill {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  padding: 0.35rem 0.8rem; border-radius: 999px;
+  border: 1px solid var(--rule); background: var(--paper-cream);
+}
+.conn-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); }
+.conn-pill.ok .dot { background: var(--leaf); box-shadow: 0 0 6px var(--leaf); }
+.conn-pill.err .dot { background: var(--danger); }
+.conn-pill.checking .dot { background: var(--gold); animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.field-row { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.field-row label {
+  font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);
+  min-width: 100px;
+}
+.field-row input, .field-row select {
+  flex: 1; min-width: 180px; padding: 0.5rem 0.8rem;
+  font-family: 'Geist Mono', monospace; font-size: 0.84rem;
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--paper-cream); color: var(--ink); outline: none;
+}
+.field-row input:focus, .field-row select:focus { border-color: var(--terra); background: white; }
+
+.btn {
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.6rem 1.2rem; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+  transition: all var(--dur) var(--ease);
+}
+.btn:hover { background: var(--terra-deep); border-color: var(--terra-deep); }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.ghost:hover { background: var(--paper-warm); }
+.btn.danger { background: var(--danger); border-color: var(--danger); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.kbd {
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  background: var(--paper-cream); border: 1px solid var(--rule);
+  padding: 0.18em 0.5em; border-radius: 2px; color: var(--ink);
+}
+
+/* Tool catalog visualization */
+.tools-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; }
+.tool-row {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: baseline; gap: 0.8rem; padding: 0.5rem 0;
+  border-bottom: 1px dotted var(--rule-soft);
+}
+.tool-row .n {
+  font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+  color: var(--terra); font-weight: 600;
+}
+.tool-row .name {
+  font-family: 'Geist Mono', monospace; font-size: 0.86rem;
+  color: var(--ink); font-weight: 500;
+}
+.tool-row .name + .desc {
+  grid-column: 2 / 3; grid-row: 2; font-size: 0.82rem; color: var(--ink-mute);
+  margin-top: -0.1rem;
+}
+.tool-row .perm {
+  font-family: 'Geist Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.06em; color: var(--ink-mute);
+  padding: 0.15rem 0.5rem; border: 1px solid var(--rule);
+  border-radius: 2px; white-space: nowrap;
+}
+.tool-row .perm.write { color: var(--gold); border-color: var(--gold-soft); background: var(--gold-soft); }
+.tool-row .perm.send { color: var(--terra); border-color: var(--terra-soft); background: var(--terra-soft); }
+.tool-row .perm.read { color: var(--leaf); border-color: var(--leaf-soft); background: var(--leaf-soft); }
+
+.escalation-feed {
+  background: var(--paper-cream); border: 1px solid var(--rule);
+  padding: 1rem; border-radius: 3px; margin-top: 1rem;
+  max-height: 18rem; overflow-y: auto;
+}
+.esc-item {
+  padding: 0.7rem 0; border-bottom: 1px solid var(--rule-soft);
+}
+.esc-item:last-child { border-bottom: none; }
+.esc-item .esc-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+.esc-item .esc-tag {
+  font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+  font-weight: 600; letter-spacing: 0.08em; padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+}
+.esc-item .esc-tag.escalate { background: var(--danger); color: white; }
+.esc-item .esc-tag.applied { background: var(--leaf); color: white; }
+.esc-item .esc-tag.asked { background: var(--gold); color: white; }
+.esc-item .esc-time {
+  font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+  color: var(--ink-mute);
+}
+.esc-item .esc-title { font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; }
+.esc-item .esc-body { font-size: 0.84rem; color: var(--ink-soft); line-height: 1.5; }
+
+/* ── FLOATING CHATBOT ──────────────────────────────────────────────────── */
+.chat-fab {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--terra); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; cursor: pointer; border: none;
+  box-shadow: 0 8px 24px -6px rgba(184, 67, 27, 0.5);
+  transition: transform var(--dur) var(--ease);
+}
+.chat-fab:hover { transform: scale(1.05); }
+.chat-fab.hide { display: none; }
+
+.chat-panel {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+  width: min(460px, calc(100vw - 3rem));
+  height: min(680px, calc(100vh - 3rem));
+  background: white; border: 1px solid var(--rule); border-radius: 8px;
+  box-shadow: 0 30px 80px -20px rgba(26, 24, 20, 0.4);
+  display: none; flex-direction: column; overflow: hidden;
+}
+.chat-panel.open { display: flex; }
+
+.chat-head {
+  padding: 0.8rem 1rem; background: var(--ink); color: var(--paper);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chat-head .who { display: flex; align-items: center; gap: 0.6rem; }
+.chat-head .who .av {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--terra);
+  display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+}
+.chat-head .who .name {
+  font-family: 'Fraunces', serif; font-size: 1rem; line-height: 1;
+}
+.chat-head .who .sub {
+  font-family: 'Geist Mono', monospace; font-size: 0.64rem;
+  color: var(--ink-faint); letter-spacing: 0.08em; margin-top: 0.2rem;
+}
+.chat-close {
+  background: transparent; border: none; color: var(--paper);
+  cursor: pointer; font-size: 1.2rem; opacity: 0.7;
+}
+.chat-close:hover { opacity: 1; }
+
+.mode-switch {
+  display: flex; background: var(--paper-cream); padding: 0.3rem;
+  border-bottom: 1px solid var(--rule);
+}
+.mode-switch button {
+  flex: 1; background: transparent; border: none; cursor: pointer;
+  font-family: 'Geist Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);
+  padding: 0.55rem 0.4rem; border-radius: 4px;
+  transition: all var(--dur) var(--ease);
+}
+.mode-switch button.active {
+  background: var(--ink); color: var(--paper); font-weight: 600;
+}
+.mode-switch button .sub {
+  display: block; font-size: 0.6rem; letter-spacing: 0.08em;
+  font-weight: 400; opacity: 0.7; margin-top: 0.15rem; text-transform: none;
+}
+
+.chat-log {
+  flex: 1; overflow-y: auto; padding: 1rem;
+  display: flex; flex-direction: column; gap: 0.8rem;
+  background: var(--paper-cream);
+}
+
+.msg { display: flex; flex-direction: column; max-width: 92%; }
+.msg.user { align-self: flex-end; align-items: flex-end; }
+.msg.bot { align-self: flex-start; }
+.msg.system { align-self: center; align-items: center; max-width: 96%; }
+.msg .bubble {
+  padding: 0.65rem 0.9rem; border-radius: 12px; line-height: 1.5;
+  font-size: 0.93rem; white-space: pre-wrap; word-wrap: break-word;
+}
+.msg.user .bubble {
+  background: var(--ink); color: var(--paper);
+  border-bottom-right-radius: 3px;
+}
+.msg.bot .bubble {
+  background: white; color: var(--ink);
+  border: 1px solid var(--rule); border-bottom-left-radius: 3px;
+}
+.msg.bot.refuse .bubble {
+  border-color: var(--gold); background: var(--gold-soft);
+}
+.msg.bot.success .bubble {
+  border-color: var(--leaf); background: var(--leaf-soft);
+}
+.msg.bot.escalate .bubble {
+  border-color: var(--danger); background: var(--danger-soft);
+  border-left: 3px solid var(--danger); padding-left: 0.7rem;
+}
+.msg.system .bubble {
+  background: var(--paper-warm); border: 1px solid var(--rule);
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.06em; color: var(--ink-mute);
+}
+.msg .src {
+  font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+  color: var(--ink-mute); margin-top: 0.3rem; letter-spacing: 0.04em;
+}
+
+.trace {
+  margin-top: 0.35rem; font-family: 'Geist Mono', monospace;
+  font-size: 0.72rem; color: var(--ink-mute);
+  background: rgba(26, 24, 20, 0.04);
+  border-left: 2px solid var(--ink-faint);
+  border-radius: 0 4px 4px 0; padding: 0.45rem 0.7rem;
+  max-width: 100%;
+}
+.trace summary {
+  cursor: pointer; user-select: none; color: var(--ink-soft);
+  font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  font-size: 0.64rem;
+}
+.trace[open] summary { color: var(--terra); }
+.trace .step { padding: 0.25rem 0; line-height: 1.4; }
+.trace .step .tag {
+  display: inline-block; min-width: 64px; margin-right: 0.5rem;
+  color: var(--terra); font-weight: 600;
+}
+.trace .step .tag::after { content: ' · '; color: var(--ink-faint); margin-left: 0.3rem; }
+.trace .step .result {
+  display: block; padding-left: 72px; color: var(--ink-mute);
+  font-size: 0.7rem; margin-top: 0.1rem;
+}
+
+.typing { display: flex; gap: 4px; padding: 0.65rem 0.9rem; }
+.typing span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint);
+  animation: bounce 1.2s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.chat-input {
+  padding: 0.7rem; border-top: 1px solid var(--rule);
+  display: flex; gap: 0.5rem; background: white;
+}
+.chat-input textarea {
+  flex: 1; resize: none; border: 1px solid var(--rule); border-radius: 18px;
+  padding: 0.55rem 0.85rem; font-family: inherit; font-size: 0.92rem;
+  line-height: 1.4; outline: none; max-height: 100px;
+  background: var(--paper-cream); color: var(--ink);
+}
+.chat-input textarea:focus { border-color: var(--terra); background: white; }
+.chat-input button {
+  border: none; background: var(--terra); color: white;
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  font-size: 1rem; flex-shrink: 0; align-self: flex-end;
+}
+.chat-input button:hover { background: var(--terra-deep); }
+.chat-input button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.suggest-row {
+  display: flex; flex-wrap: wrap; gap: 0.35rem;
+  padding: 0.5rem 0.8rem 0; background: var(--paper-cream);
+}
+.suggest-row button {
+  background: white; border: 1px solid var(--rule);
+  font-family: 'Geist Mono', monospace; font-size: 0.68rem;
+  padding: 0.3rem 0.6rem; border-radius: 999px;
+  color: var(--ink-soft); cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.suggest-row button:hover { border-color: var(--terra); color: var(--terra); }
+
+.foot {
+  border-top: 1px solid var(--rule); padding: 2rem 5vw;
+  margin-top: 3rem; background: var(--paper-warm);
+}
+.foot-inner {
+  max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between;
+  align-items: baseline;
+  font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+  color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.12em;
+}
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding-top: 3rem; }
+  .hero-visual { max-width: 400px; margin: 0 auto; }
+  .loc-grid { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .admin-grid { grid-template-columns: 1fr; }
+  .chat-panel { width: calc(100vw - 1rem); height: calc(100vh - 1rem);
+                bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">Lumi<span class="dot">è</span>re <sub>Bandra · Andheri · Powai</sub></div>
+  <div class="tabs">
+    <button class="tab active" data-view="website">Website</button>
+    <button class="tab" data-view="admin">Admin</button>
+  </div>
+</nav>
+
+<!-- ============================== WEBSITE ============================== -->
+<section class="view active" id="view-website">
+  <div class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Artisan Bakery · Mumbai · Since 2018</span>
+      <h1>From <em>order</em><br>to <em>oven.</em></h1>
+      <p class="lede">Two agents at your service. The Order Assistant takes your cake order end to end — checks the rules, confirms lead time, books the slot. The Regulation Monitor watches food-safety rules and keeps Lumière compliant.</p>
+    </div>
+    <div class="hero-visual"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Two <em>agents.</em></h2>
+      <span class="meta">S5 · Agent Architecture</span>
+    </div>
+    <div class="cards-grid">
+      <div class="agent-card">
+        <span class="tag">Customer-facing · Acts</span>
+        <h3>Lumière Order Assistant</h3>
+        <p>Takes a cake order end to end — reads the spec, checks against the rules, confirms lead time, applies coupons, books the slot, sends the summary.</p>
+        <div class="gaps">Closes Gap #3 Tools + Gap #4 Autonomy</div>
+      </div>
+      <div class="agent-card">
+        <span class="tag">Operations · Watches</span>
+        <h3>FSSAI Regulation Monitor</h3>
+        <p>Watches India's food-safety regulator (FSSAI) for new rules. Auto-applies cosmetic updates. Escalates anything about allergens, ingredients, or safety to a human.</p>
+        <div class="gaps">Closes Gap #1 Memory + Gap #5 Planning</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Our <em>branches.</em></h2>
+      <span class="meta">Each runs its own coupon</span>
+    </div>
+    <div class="loc-grid">
+      <div class="loc-card">
+        <h3>Bandra West</h3>
+        <p class="addr">14, Pali Mala Road, Mumbai 400050</p>
+        <div class="hours">Mon–Fri · 7:30am – 8:30pm<br>Sat–Sun · 8:00am – 9:00pm</div>
+        <div class="coupon">BANDRA10</div>
+      </div>
+      <div class="loc-card">
+        <h3>Andheri West</h3>
+        <p class="addr">Shop 3, Solitaire Plaza, Mumbai 400058</p>
+        <div class="hours">Mon–Fri · 8:00am – 8:00pm<br>Sat–Sun · 8:30am – 9:00pm</div>
+        <div class="coupon">ANDHERI10</div>
+      </div>
+      <div class="loc-card">
+        <h3>Powai</h3>
+        <p class="addr">Galleria Mall, Hiranandani, Mumbai 400076</p>
+        <div class="hours">Mon–Fri · 8:30am – 9:00pm<br>Sat–Sun · 8:30am – 10:00pm</div>
+        <div class="coupon">POWAI10</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div class="foot-inner">
+      <div>© Lumière Artisan Bakery · Mumbai</div>
+      <div>Demo site · EdYoda GenAI · S05 · Agent Architecture</div>
+    </div>
+  </footer>
+</section>
+
+<!-- ============================== ADMIN ============================== -->
+<section class="view" id="view-admin">
+  <div class="admin-wrap">
+    <h1>Admin · <em class="terra" style="font-style: italic;">Operations</em></h1>
+    <p class="lede">This is where the agents live. Connect to your local Ollama. Inspect both agents' tool manifests. Watch what the Regulation Monitor escalates.</p>
+
+    <div class="admin-grid">
+      <!-- LEFT: connection + tool manifests -->
+      <div>
+        <div class="panel">
+          <h3>Lumière agent</h3>
+          <p class="desc">The chat talks to an n8n workflow that runs <span class="kbd">Gemini</span> + the quote API. Multi-turn memory is held by n8n using the session ID below.</p>
+          <div class="field-row">
+            <label>Webhook URL</label>
+            <input type="text" id="chatWebhookUrl" placeholder="https://your-n8n.cloud/webhook/lumiere-chat">
+          </div>
+          <div class="field-row">
+            <label>Session ID</label>
+            <input type="text" id="sessionIdDisplay" readonly style="background:rgba(0,0,0,0.04); font-family: var(--mono); font-size: 0.82rem;">
+          </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center; margin-top: 0.4rem;">
+            <span class="conn-pill checking" id="connPill"><span class="dot"></span><span id="connText">checking…</span></span>
+            <button class="btn ghost" id="retestBtn" style="padding: 0.45rem 0.9rem;">Re-test</button>
+            <button class="btn ghost" id="resetSessionBtn" style="padding: 0.45rem 0.9rem;" title="Forget conversation memory">↺ New session</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Order Assistant · tool manifest</h3>
+          <p class="desc">Five tools. Each closes Gap #3 (Tools) or #4 (Autonomy).</p>
+          <div class="tools-list">
+            <div class="tool-row"><span class="n">01</span><span class="name">orderRulesReader</span><span class="perm read">READ</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Reads Lumière's KB — lead times, sizes, eggless, allergens.</span></div>
+            <div class="tool-row"><span class="n">02</span><span class="name">slotBooker</span><span class="perm write">READ+WRITE</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Production calendar only. Returns booking ID.</span></div>
+            <div class="tool-row"><span class="n">03</span><span class="name">confirmationSender</span><span class="perm send">SEND</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Templated WhatsApp message. Never freeform.</span></div>
+            <div class="tool-row"><span class="n">04</span><span class="name">weatherTool</span><span class="perm read">READ</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Mumbai forecast for the cake's delivery day.</span></div>
+            <div class="tool-row"><span class="n">05</span><span class="name">meltWindowCalc</span><span class="perm read">READ</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Pure compute. How long the icing survives at temp °C.</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Regulation Monitor · tool manifest</h3>
+          <p class="desc">Five tools. Closes Gap #1 (Memory — Seen-Rules Log) + Gap #5 (Planning).</p>
+          <div class="tools-list">
+            <div class="tool-row"><span class="n">01</span><span class="name">fetchRules</span><span class="perm read">READ</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Polls the FSSAI feed (simulated here).</span></div>
+            <div class="tool-row"><span class="n">02</span><span class="name">classifyRisk</span><span class="perm read">READ</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Sorts into buckets the human pre-defined. Never invents a bucket.</span></div>
+            <div class="tool-row"><span class="n">03</span><span class="name">autoApply</span><span class="perm write">WRITE</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Cosmetic rules only. Logs the change.</span></div>
+            <div class="tool-row"><span class="n">04</span><span class="name">escalateToHuman</span><span class="perm send">SEND</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Allergen / ingredient / safety → human gate.</span></div>
+            <div class="tool-row"><span class="n">05</span><span class="name">seenRulesLog</span><span class="perm write">READ+WRITE</span><span class="desc" style="grid-column: 2 / 4; font-size: 0.8rem; color: var(--ink-mute);">Episodic memory. localStorage. Never re-alerts.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: monitor live feed + controls -->
+      <div>
+        <div class="panel">
+          <h3>Regulation Monitor · live</h3>
+          <p class="desc">Trigger the monitor by hand, or watch the auto-run (every 60s). The Seen-Rules Log persists across reloads.</p>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.8rem;">
+            <button class="btn" id="checkNowBtn">Check now</button>
+            <button class="btn ghost" id="resetLogBtn">Reset Seen-Rules Log</button>
+            <label style="font-family:'Geist Mono',monospace; font-size:0.74rem; color:var(--ink-mute); display:flex; align-items:center; gap:0.3rem;">
+              <input type="checkbox" id="autoRunChk" checked> auto-run every 60s
+            </label>
+          </div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 0.74rem; color: var(--ink-mute);">
+            <span id="logCount">Log: 0 rules seen</span> · <span id="nextRunTxt">next auto-run: —</span>
+          </div>
+          <div class="escalation-feed" id="escFeed">
+            <p style="font-size: 0.84rem; color: var(--ink-mute); font-family: 'Geist Mono', monospace;">No rules processed yet.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>How this maps to the workbook</h3>
+          <p class="desc" style="font-size: 0.84rem;">Every concept from S5 is live here:</p>
+          <ul style="margin-left: 1.2rem; line-height: 1.9; color: var(--ink-soft); font-size: 0.88rem;">
+            <li><strong>The 6-stage loop</strong> — visible in every Agent steps trace.</li>
+            <li><strong>Four tool families</strong> — readers, writers, senders, computers — all five Order Assistant tools mapped.</li>
+            <li><strong>Episodic memory</strong> — the Seen-Rules Log. Refresh the page; it remembers.</li>
+            <li><strong>Risk bucketing</strong> — the human pre-defines buckets, the agent sorts. Allergen / safety always escalates.</li>
+            <li><strong>S2 hallucination cure</strong> — every tool has a narrow scope; the bot refuses cleanly when there's no tool for the job.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CHATBOT ============================== -->
+<button class="chat-fab" id="chatFab" aria-label="Open chat">💬</button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="who">
+      <div class="av">🤖</div>
+      <div>
+        <div class="name">Ask Lumière</div>
+        <div class="sub" id="chatSub">ORDER ASSISTANT · CITES · REFUSES · ACTS</div>
+      </div>
+    </div>
+    <button class="chat-close" id="chatClose" aria-label="Close">×</button>
+  </div>
+  <div class="mode-switch" id="modeSwitch">
+    <button data-mode="order" class="active">Order Assistant<span class="sub">customer-facing · acts</span></button>
+    <button data-mode="monitor">Regulation Monitor<span class="sub">operations · watches</span></button>
+  </div>
+  <div class="suggest-row" id="suggestRow"></div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-input">
+    <textarea id="chatInput" rows="1" placeholder="Tell me what cake you'd like…"></textarea>
+    <button id="sendBtn" aria-label="Send">→</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+   LUMIÈRE S5 — Two-agent demo
+   ─────────────────────────────────────────────────────────────────────────────
+   Architecture:
+     - One floating chat. Two modes: "order" and "monitor".
+     - Order Assistant: 5 tools. Plain JS state machine (no Ollama per turn).
+       It only calls Ollama to summarize the confirmation + handle freeform
+       chitchat when no tool is the right answer.
+     - Regulation Monitor: 5 tools. Triggered by hand or auto-timer.
+       Each rule is fetched → classified → routed (auto-apply / escalate / ask)
+       → logged. Seen-Rules Log is localStorage.
+     - Trace under every reply shows every tool call and its result.
+     - The KB is fetched from ../Lumiere_KB.md (one folder up — same pattern
+       as S4) so changes to the KB document update the bot's behaviour.
+   ============================================================================ */
+
+const STATE = {
+  // Bakery chat now talks to an n8n webhook instead of local Ollama.
+  // The default URL is the production webhook for this cohort; learners can
+  // override it from Admin → Lumière agent.
+  chatWebhookUrl: localStorage.getItem('lum_s5_chatWebhookUrl') ||
+                  'https://shantanu1990.app.n8n.cloud/webhook/lumiere-chat',
+  sessionId: '',                   // set in init() — keeps multi-turn memory in n8n
+  chatHistory: [],                 // rolling { role, text } pairs sent to the webhook
+  mode: 'order',                   // 'order' | 'monitor'
+  connOk: false,
+  kbText: '',
+  order: {
+    // Multi-turn state machine for the Order Assistant
+    step: 'idle',                  // idle | spec | confirm | done
+    spec: { size: null, flavour: null, eggless: null, branch: null, pickupDate: null, coupon: null },
+  },
+  monitor: {
+    autoRun: true,
+    autoTimer: null,
+    nextRunTs: null,
+    log: [],                       // hydrated from localStorage on init
+    feed: [],                      // recent processed rules for the right panel
+  },
+};
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+/* ── VIEW SWITCHING ───────────────────────────────────────────────────── */
+function showView(name) {
+  $$('.view').forEach(v => v.classList.remove('active'));
+  $('#view-' + name).classList.add('active');
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+
+/* ── LUMIÈRE CHAT (n8n webhook) ────────────────────────────────────────
+   Replaces the original Ollama integration. The browser now sends each
+   chat message to an n8n webhook; n8n runs Gemini + the quote API and
+   sends back a reply. A short rolling history is forwarded each turn so
+   Gemini can hold a multi-turn conversation.
+
+   ↳ The Ollama path remains in git history (see commit log) — it was a
+   teaching crutch for S5 and is intentionally NOT shipped to prod.
+   ────────────────────────────────────────────────────────────────────── */
+
+const CHAT_HISTORY_TURNS = 8;          // last N user+bot turns sent with each call
+const CHAT_REQUEST_TIMEOUT_MS = 30000; // n8n cold-start budget
+
+function uuidLike() {
+  // Good-enough session ID for a teaching demo. Not security-critical.
+  return 'lum-' + Math.random().toString(36).slice(2, 10) + '-' + Date.now().toString(36);
+}
+function getOrInitSessionId() {
+  let id = localStorage.getItem('lum_s5_sessionId');
+  if (!id) { id = uuidLike(); localStorage.setItem('lum_s5_sessionId', id); }
+  return id;
+}
+
+async function lumiereChat(userMessage, mode) {
+  const url = STATE.chatWebhookUrl;
+  if (!url) throw new Error('Chat webhook URL is not set. Open Admin → Lumière agent and paste your n8n webhook URL.');
+
+  // Trim history to the last N exchanges (user+bot pairs).
+  const history = STATE.chatHistory.slice(-CHAT_HISTORY_TURNS * 2)
+    .map(t => ({ role: t.role, content: t.text }));
+
+  const body = {
+    sessionId: STATE.sessionId,
+    mode,                 // 'order' | 'monitor' — gives n8n context if it wants it
+    message: userMessage,
+    history,
+    channel: 'web',
+    site: 'lumiere-bakery-s5-app',
+    sentAt: new Date().toISOString(),
+  };
+
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), CHAT_REQUEST_TIMEOUT_MS);
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: ctl.signal,
+    });
+    if (!r.ok) throw new Error('Webhook HTTP ' + r.status);
+    // n8n's "Respond to Webhook" can return JSON or plain text.
+    const ct = r.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const j = await r.json();
+      // Accept several reply shapes so the schema can evolve without breaking the chat.
+      return j.reply || j.text || j.message || j.output ||
+             (typeof j === 'string' ? j : JSON.stringify(j));
+    }
+    return await r.text();
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+async function checkConnection() {
+  const pill = $('#connPill'), text = $('#connText');
+  if (!pill || !text) return;
+  if (!STATE.chatWebhookUrl) {
+    pill.className = 'conn-pill err';
+    text.textContent = 'no webhook set';
+    STATE.connOk = false;
+    return;
+  }
+  pill.className = 'conn-pill ok';
+  text.textContent = 'webhook configured';
+  STATE.connOk = true;
+}
+
+const _webhookField = () => $('#chatWebhookUrl');
+if (_webhookField()) {
+  _webhookField().addEventListener('change', (e) => {
+    STATE.chatWebhookUrl = e.target.value.trim().replace(/\/$/, '');
+    localStorage.setItem('lum_s5_chatWebhookUrl', STATE.chatWebhookUrl);
+    checkConnection();
+  });
+}
+const _retestBtn = $('#retestBtn');
+if (_retestBtn) _retestBtn.addEventListener('click', checkConnection);
+
+/* ── KB LOADER ────────────────────────────────────────────────────────── */
+async function loadKB() {
+  try {
+    // Try ../ first (local-dev served from project root); fall back to ./
+    // (Vercel deploy where the bakery folder IS the deploy root).
+    let r = await fetch('../Lumiere_KB.md').catch(() => null);
+    if (!r || !r.ok) r = await fetch('./Lumiere_KB.md').catch(() => null);
+    if (!r || !r.ok) throw new Error('KB not found at ../ or ./');
+    STATE.kbText = await r.text();
+  } catch (e) {
+    console.warn('KB load failed:', e);
+    STATE.kbText = '';
+  }
+}
+
+/* ============================================================================
+   ORDER ASSISTANT — 5 TOOLS + STATE MACHINE
+   Each tool is a plain JS function. The agent loop reads the user's message,
+   updates the order spec, decides which tool(s) to call, then either asks
+   the next question or composes the confirmation.
+   ============================================================================ */
+
+const VALID_SIZES = ['500g', '1kg', '1.5kg', '2kg', '3kg', '5kg'];
+const VALID_FLAVOURS = ['chocolate', 'vanilla', 'red velvet', 'mango coconut',
+                        'hazelnut praline', 'lemon zest', 'black forest'];
+const VALID_BRANCHES = ['Bandra West', 'Andheri West', 'Powai'];
+const COUPONS = {
+  'BANDRA10':  { branch: 'Bandra West',  pct: 10, minOrder: 600, notes: 'Min ₹600. Not valid with LUMIERE15.' },
+  'ANDHERI10': { branch: 'Andheri West', pct: 10, minOrder: 500, notes: 'Min ₹500. Dine-in or pickup only.' },
+  'POWAI10':   { branch: 'Powai',        pct: 10, minOrder: 500, notes: 'Min ₹500. Whole cakes only.' },
+  'LUMIERE15': { branch: null,            pct: 15, minOrder: 0,   notes: 'City-wide. Requires 3+ days advance.' },
+};
+
+const PRICE_PER_KG = {
+  'chocolate': 950, 'vanilla': 850, 'red velvet': 1050,
+  'mango coconut': 1200, 'hazelnut praline': 1300,
+  'lemon zest': 950, 'black forest': 1000,
+};
+
+/* TOOL 1 — orderRulesReader (READ on Lumière KB) */
+function tool_orderRulesReader(field) {
+  // Returns the rule text for a given field. Hardcoded extracts from the KB
+  // (the KB is also fetched at load and could be searched here in a real build).
+  const rules = {
+    'leadTime': 'Standard custom cakes (≤3kg): minimum 48h advance notice. Cakes >3kg or with fondant: minimum 72h. Same-day custom orders are not accepted.',
+    'sizes': 'Available sizes: 500g, 1kg, 1.5kg, 2kg, 3kg, 5kg.',
+    'flavours': 'Available flavours: chocolate fudge, red velvet, mango coconut, hazelnut praline, lemon zest, black forest.',
+    'eggless': 'Eggless option available for all flavours at +₹80 per cake. Baked in same ovens as egg-containing products.',
+    'allergens': 'The kitchen is NOT a nut-free environment. Cross-contamination possible. Customers with severe allergies advised to consult their doctor.',
+    'delivery': 'Delivery within 8km of each Mumbai branch. Mumbai only — no Gurgaon, no Bangalore, no other cities. Self-collect for out-of-zone.',
+    'payment': '50% advance required at booking. Balance due on pickup or delivery.',
+  };
+  return rules[field] || null;
+}
+
+/* TOOL 2 — slotBooker (READ+WRITE on production calendar) */
+function tool_slotBooker(branch, date, kg) {
+  // Pretends to book a slot. Returns a booking ID.
+  // SCOPE: production calendar only — never staff personal calendars,
+  // never other branches.
+  const yyyy = new Date(date).getFullYear();
+  const mmdd = String(new Date(date).getMonth() + 1).padStart(2, '0') +
+               String(new Date(date).getDate()).padStart(2, '0');
+  const id = `LUM-${yyyy}-${mmdd}-${Math.floor(1000 + Math.random() * 8999)}`;
+  return { bookingId: id, branch, date, kg, status: 'reserved' };
+}
+
+/* TOOL 3 — confirmationSender (SEND — templated only) */
+function tool_confirmationSender(booking, spec, priceLine) {
+  // SCOPE: templated WhatsApp message only — never freeform.
+  return `Lumière confirmation #${booking.bookingId}
+Date: ${booking.date}
+Pickup at: ${booking.branch}
+Cake: ${spec.size} ${spec.flavour}${spec.eggless ? ' (eggless)' : ''}
+${priceLine}
+50% advance due at booking. Balance on pickup.`;
+}
+
+/* TOOL 4 — weatherTool (READ — Mumbai forecast for delivery day) */
+function tool_weatherTool(date) {
+  // Pretend forecast. Mumbai in summer is hot; winter is mild.
+  const d = new Date(date);
+  const m = d.getMonth(); // 0–11
+  // Apr–Jun (3..5): hot, 32–36C. Jul–Sep (6..8): monsoon, humid. Else mild.
+  if (m >= 3 && m <= 5) return { tempC: 34, humidity: 65, condition: 'hot, sunny' };
+  if (m >= 6 && m <= 8) return { tempC: 28, humidity: 88, condition: 'humid, monsoon' };
+  return { tempC: 26, humidity: 60, condition: 'mild, clear' };
+}
+
+/* TOOL 5 — meltWindowCalc (READ — pure compute) */
+function tool_meltWindowCalc(tempC, humidity, flavour) {
+  // SCOPE: pure mathematical estimation. The icing on cream-cheese (red velvet)
+  // and buttercream cakes melts much faster than fondant.
+  const base = (flavour === 'red velvet' || flavour === 'vanilla') ? 60 : 90; // minutes
+  // Penalise heat and humidity.
+  let mins = base - Math.max(0, (tempC - 26)) * 4 - Math.max(0, (humidity - 60)) / 4;
+  mins = Math.max(15, Math.round(mins / 5) * 5);
+  return { meltWindowMins: mins };
+}
+
+/* ── Spec extraction helpers ──────────────────────────────────────────── */
+function parseSpec(text, spec) {
+  const t = text.toLowerCase();
+  for (const sz of VALID_SIZES) if (t.includes(sz)) spec.size = sz;
+  if (/eggless|no egg|no eggs|vegan/i.test(t)) spec.eggless = true;
+  else if (/with egg|regular|standard/i.test(t) && spec.eggless == null) spec.eggless = false;
+  for (const fl of VALID_FLAVOURS) if (t.includes(fl)) spec.flavour = fl;
+  if (/chocolate/i.test(t)) spec.flavour = 'chocolate';
+  if (/red ?velvet/i.test(t)) spec.flavour = 'red velvet';
+  if (/mango/i.test(t)) spec.flavour = 'mango coconut';
+  if (/bandra/i.test(t)) spec.branch = 'Bandra West';
+  else if (/andheri/i.test(t)) spec.branch = 'Andheri West';
+  else if (/powai/i.test(t)) spec.branch = 'Powai';
+  // Date parsing — accept ISO, "Saturday", "next Friday", "DD MMM", and
+  // immediacy phrases ("same-day", "today", "asap", "now") which all map
+  // to today (and will then fail the 48h lead-time check — that's the
+  // teaching point: the bot has to detect intent + check the rule, not
+  // either alone).
+  const isoMatch = t.match(/(\d{4}-\d{2}-\d{2})/);
+  if (isoMatch) spec.pickupDate = isoMatch[1];
+  else if (/same.?day|today|asap|right now|by tonight/i.test(t)) {
+    spec.pickupDate = new Date().toISOString().slice(0, 10);
+  } else if (/tomorrow|tmrw/i.test(t)) {
+    const d = new Date(); d.setDate(d.getDate() + 1);
+    spec.pickupDate = d.toISOString().slice(0, 10);
+  } else {
+    const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    for (let i = 0; i < days.length; i++) {
+      if (t.includes(days[i])) {
+        spec.pickupDate = nextDayOfWeek(i).toISOString().slice(0, 10);
+        break;
+      }
+    }
+  }
+  // Coupon code: uppercase tokens
+  const codeMatch = text.match(/\b(BANDRA10|ANDHERI10|POWAI10|LUMIERE15)\b/);
+  if (codeMatch) spec.coupon = codeMatch[1];
+}
+function nextDayOfWeek(targetDow) {
+  const d = new Date();
+  const delta = (targetDow + 7 - d.getDay()) % 7 || 7;  // always future, never today
+  d.setDate(d.getDate() + delta);
+  return d;
+}
+function leadTimeOk(dateStr, kg) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const d = new Date(dateStr);
+  const hours = (d - today) / 36e5;
+  const required = (parseFloat(kg) > 3) ? 72 : 48;
+  return { ok: hours >= required, hours: Math.round(hours), required };
+}
+function specComplete(spec) {
+  return spec.size && spec.flavour && spec.branch && spec.pickupDate && spec.eggless != null;
+}
+function whatsMissing(spec) {
+  const m = [];
+  if (!spec.size) m.push('size (500g, 1kg, 1.5kg, 2kg, 3kg, or 5kg)');
+  if (!spec.flavour) m.push('flavour (chocolate, red velvet, vanilla, mango coconut, hazelnut praline, lemon zest, or black forest)');
+  if (spec.eggless == null) m.push('eggless or regular');
+  if (!spec.branch) m.push('which branch — Bandra West, Andheri West, or Powai');
+  if (!spec.pickupDate) m.push('pickup date');
+  return m;
+}
+
+/* ── Order Assistant agent loop ───────────────────────────────────────── */
+// NOTE (Jun 2026, S7 deployment): The chat UI now sends each message to an
+// n8n webhook instead of calling this function. We keep the deterministic
+// implementation below because the S5 facilitator script and workbook walk
+// learners through it as the canonical "agent loop" example — Tool Manifest,
+// PERCEIVE/REASON/TOOL trace, the 5 tools. It is intentional reference code
+// for S5 teaching, not dead code. Do not remove without updating S5 assets.
+async function runOrderAssistant(text, trace) {
+  // 1. Parse the message; update the order spec.
+  const spec = STATE.order.spec;
+  parseSpec(text, spec);
+  trace.push({ tag: 'PERCEIVE', text: 'Parsed user message → updated order spec.',
+               result: JSON.stringify(spec) });
+
+  // 2. EARLY REFUSAL: out-of-zone city mention. This fires BEFORE the
+  // spec-completeness check because no amount of filling in the spec
+  // will turn Gurgaon into Mumbai — better to surface the wall now than
+  // make the user fill out details for an order that can't ship.
+  if (/gurgaon|delhi|bangalore|bengaluru|chennai|hyderabad|pune|london|kolkata|jaipur|ahmedabad/i.test(text)) {
+    trace.push({ tag: 'REASON', text: 'Non-Mumbai city mentioned — checking delivery zones BEFORE asking for missing spec.' });
+    trace.push({ tag: 'TOOL', text: 'orderRulesReader(delivery) — checking delivery zones.',
+                 result: 'Mumbai only. Out-of-city → refuse.' });
+    // Reset spec so the next message starts clean.
+    STATE.order.spec = { size: null, flavour: null, eggless: null, branch: null, pickupDate: null, coupon: null };
+    return {
+      role: 'bot-refuse',
+      text: "I can only book pickups or deliveries within Mumbai — we don't deliver outside the city. The closest option is self-collect at one of our three branches (Bandra West, Andheri West, Powai). Want to pick one?",
+      source: 'Delivery → Zones',
+      trace,
+    };
+  }
+
+  // 3. EARLY REFUSAL: same-day intent → lead-time check up front.
+  // If the user said "same-day"/"today"/etc, parseSpec already set the
+  // pickupDate to today. We check lead time as soon as a date is set,
+  // not only when the whole spec is complete — otherwise the user has
+  // to fill in size + flavour + branch before we tell them we can't bake
+  // it in time.
+  if (spec.pickupDate) {
+    const lead = leadTimeOk(spec.pickupDate, spec.size || '1kg');
+    trace.push({ tag: 'TOOL', text: 'orderRulesReader(leadTime) — checking notice period.',
+                 result: `Need ${lead.required}h, have ${lead.hours}h → ${lead.ok ? 'OK' : 'TOO LATE'}` });
+    if (!lead.ok) {
+      STATE.order.spec = { size: null, flavour: null, eggless: null, branch: null, pickupDate: null, coupon: null };
+      return {
+        role: 'bot-refuse',
+        text: `I can't book this — we need ${lead.required} hours of notice for a custom cake, and your pickup date is only ${lead.hours} hours away. Same-day custom orders aren't accepted. Pick a date at least ${lead.required} hours out and I'll try again.`,
+        source: 'Custom Orders → Lead Times',
+        trace,
+      };
+    }
+  }
+
+  // 4. If spec is still incomplete, ask the next thing.
+  if (!specComplete(spec)) {
+    const missing = whatsMissing(spec);
+    trace.push({ tag: 'REASON', text: `Spec incomplete. Missing: ${missing.length} field(s).` });
+    return {
+      role: 'bot',
+      text: `Got it so far. To confirm the order I still need:\n• ${missing.join('\n• ')}`,
+      source: 'Custom Orders policy',
+      trace,
+    };
+  }
+
+  // 5. Coupon check (if any)
+  let couponLine = '';
+  let discountPct = 0;
+  if (spec.coupon) {
+    const c = COUPONS[spec.coupon];
+    trace.push({ tag: 'TOOL', text: `orderRulesReader(coupon ${spec.coupon}) — checking eligibility.`,
+                 result: c ? `Found. Branch: ${c.branch || 'any'}, ${c.pct}% off.` : 'Unknown code.' });
+    if (!c) {
+      couponLine = `Coupon ${spec.coupon} not found — order proceeds without discount.`;
+    } else if (c.branch && c.branch !== spec.branch) {
+      couponLine = `Coupon ${spec.coupon} is for ${c.branch} only — won't apply at ${spec.branch}.`;
+    } else {
+      discountPct = c.pct;
+      couponLine = `Coupon ${spec.coupon} applied: −${c.pct}% off.`;
+      // Eggless-eligibility caveat
+      if (spec.eggless) {
+        couponLine += ' (Eligibility on eggless versions isn\'t guaranteed — branch will confirm at pickup.)';
+        trace.push({ tag: 'NOTE', text: 'Eggless+coupon ambiguity flagged for branch confirmation.' });
+      }
+    }
+  }
+
+  // 6. Compute price
+  const kgNum = parseFloat(spec.size); // "1kg" → 1, "500g" → 500 (handle below)
+  const kg = spec.size.endsWith('g') && !spec.size.endsWith('kg')
+    ? parseFloat(spec.size) / 1000 : kgNum;
+  const base = (PRICE_PER_KG[spec.flavour] || 1000) * kg;
+  const eggSurcharge = spec.eggless ? 80 : 0;
+  const subtotal = base + eggSurcharge;
+  const discount = Math.round(subtotal * discountPct / 100);
+  const total = Math.round(subtotal - discount);
+  const priceLine = couponLine
+    ? `Price: ₹${subtotal} − ₹${discount} = ₹${total}. ${couponLine}`
+    : `Price: ₹${total}`;
+  trace.push({ tag: 'TOOL', text: 'priceQuote (internal) — computed total.',
+               result: `Base ₹${base}, eggless surcharge ₹${eggSurcharge}, discount ₹${discount}, total ₹${total}.` });
+
+  // 7. Weather + melt window (because Mumbai)
+  const w = tool_weatherTool(spec.pickupDate);
+  trace.push({ tag: 'TOOL', text: 'weatherTool(date) — checking pickup-day forecast.',
+               result: `${w.tempC}°C, ${w.humidity}% RH, ${w.condition}.` });
+  const m = tool_meltWindowCalc(w.tempC, w.humidity, spec.flavour);
+  trace.push({ tag: 'TOOL', text: 'meltWindowCalc(temp,humidity,flavour) — icing survival time.',
+               result: `${m.meltWindowMins} min outside refrigeration.` });
+  let meltAdvice = '';
+  if (m.meltWindowMins <= 30) {
+    meltAdvice = `\nHeads up: with ${w.tempC}°C forecast, the icing survives ~${m.meltWindowMins} min outside the fridge. Plan a short window from pickup to event.`;
+  }
+
+  // 8. Book the slot
+  const booking = tool_slotBooker(spec.branch, spec.pickupDate, kg);
+  trace.push({ tag: 'TOOL', text: `slotBooker(${spec.branch}, ${spec.pickupDate}, ${kg}kg) — booking slot.`,
+               result: `Booking ID ${booking.bookingId}.` });
+
+  // 9. Send confirmation (templated)
+  const conf = tool_confirmationSender(booking, spec, priceLine);
+  trace.push({ tag: 'TOOL', text: 'confirmationSender(booking, spec, price) — sending WhatsApp confirmation.',
+               result: 'Confirmation queued.' });
+
+  // 10. Reset spec for the next order
+  STATE.order.spec = { size: null, flavour: null, eggless: null, branch: null, pickupDate: null, coupon: null };
+
+  return {
+    role: 'bot-success',
+    text: conf + meltAdvice,
+    source: `Custom Orders · Branch Coupons · Booking ${booking.bookingId}`,
+    trace,
+  };
+}
+
+/* ============================================================================
+   FSSAI REGULATION MONITOR — 5 TOOLS
+   ============================================================================ */
+
+/* TOOL 1 — fetchRules (READ FSSAI feed; here we simulate it with a
+   hardcoded pool of plausible rules). */
+const RULE_POOL = [
+  { id: 'FSSAI-2026-0142', title: 'Updated nutritional-label format for packaged cakes',
+    body: 'All packaged baked goods must adopt the new front-of-pack label format by Sept 2026. Affects label artwork only; no ingredient changes.',
+    risk: 'cosmetic' },
+  { id: 'FSSAI-2026-0148', title: 'New deadline for annual food-safety filing',
+    body: 'The annual return form FoSCoS-FBO is now due Mar 31 (was Apr 30).',
+    risk: 'cosmetic' },
+  { id: 'FSSAI-2026-0151', title: 'Mandatory allergen warning for shared-equipment kitchens',
+    body: 'All bakeries with shared equipment must display a prominent allergen-warning notice at point of sale, listing every allergen handled in the facility.',
+    risk: 'allergen' },
+  { id: 'FSSAI-2026-0155', title: 'Hazelnut declared a Class-1 allergen for explicit declaration',
+    body: 'Hazelnut moves from common-allergen list to Class-1 — every product containing hazelnut must declare it in 14pt or larger.',
+    risk: 'allergen' },
+  { id: 'FSSAI-2026-0158', title: 'Portal URL change for compliance uploads',
+    body: 'Compliance portal moves from fbo.fssai.in to compliance.fssai.gov.in.',
+    risk: 'cosmetic' },
+  { id: 'FSSAI-2026-0163', title: 'Maximum sugar content threshold for "low-sugar" claims',
+    body: 'Products marketed as "low sugar" must contain ≤5g per 100g. Affects marketing copy and ingredient sourcing for any product carrying that claim.',
+    risk: 'safety' },
+  { id: 'FSSAI-2026-0167', title: 'Recall of red food colourant E129 from approved list',
+    body: 'Red food colour E129 (Allura Red) is removed from the approved colourants list effective immediately. Bakeries using it must reformulate within 90 days.',
+    risk: 'ingredient' },
+  { id: 'FSSAI-2026-0171', title: 'New form FoSCoS-7B for cold-chain compliance',
+    body: 'Cold-chain compliance now requires Form 7B (was 5A). Same data, new layout.',
+    risk: 'cosmetic' },
+];
+
+function tool_fetchRules() {
+  // Pretend network call. In real life, this would call the FSSAI API.
+  // Returns the full pool — the agent's job is to skip ones already in the log.
+  return [...RULE_POOL];
+}
+
+/* TOOL 2 — classifyRisk (READ — sorts into human-defined buckets)
+   The agent NEVER invents a bucket. Buckets are pre-defined here:
+   cosmetic, allergen, ingredient, safety. */
+function tool_classifyRisk(rule) {
+  // The rule pool already carries a `risk` field — in production this would
+  // be a small classifier, but the key teaching point is that the buckets
+  // are HUMAN-DEFINED. Allergen / ingredient / safety always escalate.
+  return rule.risk;
+}
+
+/* TOOL 3 — autoApply (WRITE — cosmetic only) */
+function tool_autoApply(rule) {
+  // Logs to the change journal. SCOPE: only rules pre-classified as 'cosmetic'.
+  const entry = {
+    id: rule.id, title: rule.title, action: 'auto-applied',
+    appliedAt: new Date().toISOString(),
+    note: 'Cosmetic update — no operational change needed.',
+  };
+  return entry;
+}
+
+/* TOOL 4 — escalateToHuman (SEND — non-cosmetic only) */
+function tool_escalateToHuman(rule) {
+  // SCOPE: anything classified as allergen / ingredient / safety.
+  // The escalation is what a real system would route to a human operator
+  // (Slack, email, ticket queue). Here we just add it to the feed.
+  return {
+    id: rule.id, title: rule.title, action: 'escalated',
+    risk: rule.risk,
+    escalatedAt: new Date().toISOString(),
+    reason: `Risk class "${rule.risk}" requires human review — agent does not decide on allergen / ingredient / safety changes.`,
+  };
+}
+
+/* TOOL 5 — seenRulesLog (READ+WRITE — episodic memory in localStorage) */
+const SEEN_KEY = 'lum_s5_seenRulesLog';
+function loadSeenRules() {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function saveSeenRules(log) {
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify(log)); } catch {}
+}
+function tool_seenRulesLog_has(id, log) {
+  return log.some(e => e.id === id);
+}
+function tool_seenRulesLog_add(entry, log) {
+  log.push(entry);
+  saveSeenRules(log);
+}
+
+/* ── Monitor agent loop ───────────────────────────────────────────────── */
+async function runMonitor(trace, opts = {}) {
+  trace.push({ tag: 'PERCEIVE', text: 'fetchRules() — polling FSSAI feed.', result: 'simulated feed.' });
+  const rules = tool_fetchRules();
+  const log = STATE.monitor.log;
+  const newOnes = rules.filter(r => !tool_seenRulesLog_has(r.id, log));
+  trace.push({ tag: 'REASON', text: `Found ${rules.length} rules total, ${newOnes.length} new (not in Seen-Rules Log).`,
+               result: `Already-seen: ${rules.length - newOnes.length}.` });
+
+  if (newOnes.length === 0) {
+    return {
+      role: 'bot',
+      text: `Checked FSSAI — no new rules since last run. (${rules.length} known rules in the feed, all already in the Seen-Rules Log.)`,
+      source: 'seenRulesLog',
+      trace,
+    };
+  }
+
+  const processed = [];
+  for (const r of newOnes) {
+    const risk = tool_classifyRisk(r);
+    trace.push({ tag: 'TOOL', text: `classifyRisk(${r.id}) — sorting into pre-defined bucket.`,
+                 result: `bucket: ${risk}` });
+    let actionEntry;
+    if (risk === 'cosmetic') {
+      actionEntry = tool_autoApply(r);
+      trace.push({ tag: 'TOOL', text: `autoApply(${r.id}) — cosmetic, applied + logged.`,
+                   result: 'logged change journal entry.' });
+    } else {
+      actionEntry = tool_escalateToHuman(r);
+      trace.push({ tag: 'TOOL', text: `escalateToHuman(${r.id}) — risk="${risk}", routing to human.`,
+                   result: 'queued for human review.' });
+    }
+    tool_seenRulesLog_add({ id: r.id, action: actionEntry.action, at: actionEntry.appliedAt || actionEntry.escalatedAt }, log);
+    processed.push({ rule: r, action: actionEntry, risk });
+  }
+
+  // Render the feed
+  renderEscFeed(processed);
+  updateLogCount();
+
+  const ap = processed.filter(p => p.action.action === 'auto-applied').length;
+  const es = processed.filter(p => p.action.action === 'escalated').length;
+  const escTitles = processed.filter(p => p.action.action === 'escalated')
+                             .map(p => `• ${p.rule.title} (${p.rule.id}, risk: ${p.risk})`)
+                             .join('\n');
+  const replyText = newOnes.length === 1 && es === 1
+    ? `One new rule, escalated to human:\n${escTitles}\n\nNothing auto-applied. See the Admin panel for the full action card.`
+    : `Processed ${newOnes.length} new rule${newOnes.length === 1 ? '' : 's'}: ${ap} auto-applied (cosmetic), ${es} escalated to human.${escTitles ? '\n\nEscalations:\n' + escTitles : ''}`;
+
+  return {
+    role: es > 0 ? 'bot-escalate' : (ap > 0 ? 'bot-success' : 'bot'),
+    text: replyText,
+    source: `fetchRules + classifyRisk + ${ap > 0 ? 'autoApply' : ''}${ap > 0 && es > 0 ? ' + ' : ''}${es > 0 ? 'escalateToHuman' : ''} + seenRulesLog`,
+    trace,
+  };
+}
+
+function renderEscFeed(processed) {
+  const feed = $('#escFeed');
+  // Prepend new items so newest is at top
+  for (const { rule, action, risk } of processed) {
+    STATE.monitor.feed.unshift({ rule, action, risk });
+  }
+  STATE.monitor.feed = STATE.monitor.feed.slice(0, 12);
+
+  while (feed.firstChild) feed.removeChild(feed.firstChild);
+  if (STATE.monitor.feed.length === 0) {
+    const p = document.createElement('p');
+    p.style.cssText = 'font-size: 0.84rem; color: var(--ink-mute); font-family: "Geist Mono", monospace;';
+    p.textContent = 'No rules processed yet.';
+    feed.appendChild(p);
+    return;
+  }
+  for (const { rule, action, risk } of STATE.monitor.feed) {
+    const item = document.createElement('div');
+    item.className = 'esc-item';
+
+    const head = document.createElement('div'); head.className = 'esc-head';
+    const tag = document.createElement('span'); tag.className = 'esc-tag';
+    if (action.action === 'escalated') { tag.classList.add('escalate'); tag.textContent = `ESCALATED · ${risk.toUpperCase()}`; }
+    else if (action.action === 'auto-applied') { tag.classList.add('applied'); tag.textContent = 'AUTO-APPLIED'; }
+    else { tag.classList.add('asked'); tag.textContent = 'ASKED'; }
+    const time = document.createElement('span'); time.className = 'esc-time';
+    time.textContent = new Date(action.appliedAt || action.escalatedAt).toLocaleTimeString();
+    head.appendChild(tag); head.appendChild(time);
+
+    const title = document.createElement('div'); title.className = 'esc-title';
+    title.textContent = `${rule.id} · ${rule.title}`;
+    const body = document.createElement('div'); body.className = 'esc-body';
+    body.textContent = action.reason || action.note || rule.body;
+
+    item.appendChild(head); item.appendChild(title); item.appendChild(body);
+    feed.appendChild(item);
+  }
+}
+
+function updateLogCount() {
+  $('#logCount').textContent = `Log: ${STATE.monitor.log.length} rule${STATE.monitor.log.length === 1 ? '' : 's'} seen`;
+}
+
+/* ── Monitor controls ─────────────────────────────────────────────────── */
+$('#checkNowBtn').addEventListener('click', async () => {
+  const trace = [];
+  // Run the monitor and post a system-style summary into the chat too
+  const result = await runMonitor(trace);
+  if ($('#chatPanel').classList.contains('open') && STATE.mode === 'monitor') {
+    addSystem('Manual "Check now" triggered.');
+    addBotReply(result);
+  } else {
+    // even if chat not open, surface it briefly
+    console.info('Monitor run:', result.text);
+  }
+});
+$('#resetLogBtn').addEventListener('click', () => {
+  if (!confirm('Reset Seen-Rules Log? The monitor will re-process every rule next time it runs.')) return;
+  STATE.monitor.log = [];
+  saveSeenRules([]);
+  STATE.monitor.feed = [];
+  renderEscFeed([]);
+  updateLogCount();
+});
+$('#autoRunChk').addEventListener('change', (e) => {
+  STATE.monitor.autoRun = e.target.checked;
+  setupAutoRun();
+});
+
+function setupAutoRun() {
+  if (STATE.monitor.autoTimer) { clearInterval(STATE.monitor.autoTimer); STATE.monitor.autoTimer = null; }
+  if (!STATE.monitor.autoRun) {
+    $('#nextRunTxt').textContent = 'next auto-run: off';
+    return;
+  }
+  // Tick every second to update "next run" countdown; trigger every 60s
+  let countdown = 60;
+  $('#nextRunTxt').textContent = `next auto-run: ${countdown}s`;
+  STATE.monitor.autoTimer = setInterval(async () => {
+    countdown -= 1;
+    if (countdown <= 0) {
+      countdown = 60;
+      const trace = [];
+      const result = await runMonitor(trace);
+      // Only surface in chat if it's open + on monitor mode AND there were new rules.
+      const newRules = /Processed (\d+) new/.exec(result.text);
+      if (newRules && parseInt(newRules[1]) > 0 &&
+          $('#chatPanel').classList.contains('open') && STATE.mode === 'monitor') {
+        addSystem('Auto-run · new rules found.');
+        addBotReply(result);
+      }
+    }
+    $('#nextRunTxt').textContent = `next auto-run: ${countdown}s`;
+  }, 1000);
+}
+
+/* ============================================================================
+   CHAT UI
+   ============================================================================ */
+
+const SUGGESTIONS = {
+  order: [
+    'I need a 1kg eggless chocolate cake for Saturday at Andheri',
+    'Can I get a 2kg red velvet for next Friday at Bandra? code BANDRA10',
+    'I want a same-day chocolate cake at Powai',
+    'Cake for delivery to Gurgaon',
+  ],
+  monitor: [
+    'Check for new FSSAI rules now',
+    'What\'s in the Seen-Rules Log?',
+    'Reset the log',
+    'How do you decide what to escalate?',
+  ],
+};
+function refreshSuggestions() {
+  const row = $('#suggestRow');
+  while (row.firstChild) row.removeChild(row.firstChild);
+  for (const s of SUGGESTIONS[STATE.mode] || []) {
+    const b = document.createElement('button');
+    b.textContent = s;
+    b.addEventListener('click', () => {
+      $('#chatInput').value = s;
+      sendMsg();
+    });
+    row.appendChild(b);
+  }
+}
+
+function addUser(text) {
+  const log = $('#chatLog');
+  const el = document.createElement('div'); el.className = 'msg user';
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  bubble.textContent = text;
+  el.appendChild(bubble);
+  log.appendChild(el); log.scrollTop = log.scrollHeight;
+}
+function addSystem(text) {
+  const log = $('#chatLog');
+  const el = document.createElement('div'); el.className = 'msg system';
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  bubble.textContent = text;
+  el.appendChild(bubble);
+  log.appendChild(el); log.scrollTop = log.scrollHeight;
+}
+function addBotReply(reply) {
+  const log = $('#chatLog');
+  const el = document.createElement('div');
+  let cls = 'msg bot';
+  if (reply.role === 'bot-refuse') cls += ' refuse';
+  if (reply.role === 'bot-success') cls += ' success';
+  if (reply.role === 'bot-escalate') cls += ' escalate';
+  el.className = cls;
+
+  // Mirror the visible reply into the rolling history we send to n8n next turn.
+  if (reply.text) STATE.chatHistory.push({ role: 'assistant', text: reply.text });
+
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  bubble.textContent = reply.text;
+  el.appendChild(bubble);
+
+  if (reply.source) {
+    const src = document.createElement('div'); src.className = 'src';
+    src.textContent = `(Source: ${reply.source})`;
+    el.appendChild(src);
+  }
+  if (reply.trace && reply.trace.length) {
+    const det = document.createElement('details'); det.className = 'trace'; det.open = true;
+    const sum = document.createElement('summary');
+    sum.textContent = `Agent steps · ${reply.trace.length}`;
+    det.appendChild(sum);
+    for (const s of reply.trace) {
+      const step = document.createElement('div'); step.className = 'step';
+      const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = s.tag;
+      step.appendChild(tag);
+      step.appendChild(document.createTextNode(s.text));
+      if (s.result) {
+        const res = document.createElement('span'); res.className = 'result';
+        res.textContent = '→ ' + s.result;
+        step.appendChild(res);
+      }
+      det.appendChild(step);
+    }
+    el.appendChild(det);
+  }
+  log.appendChild(el); log.scrollTop = log.scrollHeight;
+}
+function addTyping() {
+  const log = $('#chatLog');
+  const el = document.createElement('div'); el.className = 'msg bot'; el.id = 'typingMsg';
+  const t = document.createElement('div'); t.className = 'typing';
+  for (let i = 0; i < 3; i++) t.appendChild(document.createElement('span'));
+  el.appendChild(t);
+  log.appendChild(el); log.scrollTop = log.scrollHeight;
+}
+function removeTyping() {
+  const t = $('#typingMsg'); if (t) t.remove();
+}
+
+/* ── Mode switch ──────────────────────────────────────────────────────── */
+$$('#modeSwitch button').forEach(b => {
+  b.addEventListener('click', () => {
+    STATE.mode = b.dataset.mode;
+    $$('#modeSwitch button').forEach(x => x.classList.toggle('active', x === b));
+    $('#chatSub').textContent = STATE.mode === 'order'
+      ? 'ORDER ASSISTANT · CITES · REFUSES · ACTS'
+      : 'REGULATION MONITOR · WATCHES · CLASSIFIES · ESCALATES';
+    $('#chatInput').placeholder = STATE.mode === 'order'
+      ? "Tell me what cake you'd like…"
+      : "Ask me to check the FSSAI feed…";
+    refreshSuggestions();
+    // Reset order spec when leaving order mode mid-build
+    if (STATE.mode === 'monitor') STATE.order.spec = { size: null, flavour: null, eggless: null, branch: null, pickupDate: null, coupon: null };
+    addSystem(`Mode switched to ${STATE.mode === 'order' ? 'Order Assistant' : 'Regulation Monitor'}.`);
+  });
+});
+
+/* ── Chat input ───────────────────────────────────────────────────────── */
+$('#chatFab').addEventListener('click', () => {
+  $('#chatPanel').classList.add('open');
+  $('#chatFab').classList.add('hide');
+  if ($('#chatLog').children.length === 0) {
+    addBotReply({
+      role: 'bot',
+      text: "Hi — I'm Lumière's assistant. In ORDER mode I take cake orders end to end (read the rules, confirm lead time, apply coupons, book the slot, send confirmation). Switch to MONITOR mode and I check FSSAI for new food-safety rules: cosmetic ones I auto-apply, allergen/safety ones I escalate to a human.",
+      trace: [],
+    });
+  }
+  $('#chatInput').focus();
+});
+$('#chatClose').addEventListener('click', () => {
+  $('#chatPanel').classList.remove('open');
+  $('#chatFab').classList.remove('hide');
+});
+$('#chatInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+$('#sendBtn').addEventListener('click', sendMsg);
+
+async function sendMsg() {
+  const text = $('#chatInput').value.trim();
+  if (!text) return;
+  $('#chatInput').value = '';
+  addUser(text);
+  STATE.chatHistory.push({ role: 'user', text });
+  $('#sendBtn').disabled = true;
+  addTyping();
+  const trace = [];
+
+  try {
+    let reply;
+    if (STATE.mode === 'order') {
+      // Order Assistant: send the message + rolling history to n8n.
+      // n8n owns the agent loop now — Gemini extracts intent, calls /api/quote
+      // when it has all required fields, and replies in conversation voice.
+      trace.push({ tag: 'CALL', text: 'POST → n8n chat webhook (order mode)' });
+      const replyText = await lumiereChat(text, 'order');
+      trace.push({ tag: 'OBSERVE', text: 'n8n reply received', result: `${replyText.length} chars` });
+      reply = { role: 'bot', text: replyText, source: 'n8n + Gemini', trace };
+    } else {
+      // Monitor mode — interpret a few intents
+      const t = text.toLowerCase();
+      if (/check|run|fetch|poll|update/.test(t)) {
+        reply = await runMonitor(trace);
+      } else if (/log|seen|memory/.test(t)) {
+        const log = STATE.monitor.log;
+        trace.push({ tag: 'TOOL', text: 'seenRulesLog.read() — listing memory.', result: `${log.length} entries.` });
+        if (log.length === 0) {
+          reply = { role: 'bot', text: 'Seen-Rules Log is empty — no rules processed yet.', source: 'seenRulesLog', trace };
+        } else {
+          const lines = log.slice(-10).map(e => `• ${e.id} → ${e.action} @ ${new Date(e.at).toLocaleString()}`).join('\n');
+          reply = { role: 'bot', text: `Last ${Math.min(10, log.length)} entries in the Seen-Rules Log:\n${lines}`, source: 'seenRulesLog', trace };
+        }
+      } else if (/reset|clear/.test(t)) {
+        STATE.monitor.log = []; saveSeenRules([]); STATE.monitor.feed = []; renderEscFeed([]); updateLogCount();
+        trace.push({ tag: 'TOOL', text: 'seenRulesLog.reset() — log cleared.', result: 'all entries removed.' });
+        reply = { role: 'bot', text: 'Seen-Rules Log cleared. Next monitor run will re-process every rule in the feed.', source: 'seenRulesLog', trace };
+      } else if (/escalat|risk|allergen|safety|bucket/.test(t)) {
+        trace.push({ tag: 'REASON', text: 'Question about the escalation rule.', result: 'reading risk-policy.' });
+        reply = {
+          role: 'bot',
+          text: 'I sort every new rule into one of four buckets the human pre-defined: cosmetic, allergen, ingredient, safety. Cosmetic ones (label format, deadline, URL change) I auto-apply and log. Allergen / ingredient / safety I never apply on my own — I escalate to a human. I do not decide what counts as "safe enough to auto-apply." That call lives in the bucket definitions, not in me.',
+          source: 'Monitor risk policy', trace,
+        };
+      } else {
+        // Fallback for unrecognised monitor questions: ask the n8n webhook.
+        // n8n can either branch on mode='monitor' or fall back to a generic
+        // Gemini reply. Either way the chat stays useful.
+        if (STATE.connOk) {
+          trace.push({ tag: 'CALL', text: 'POST → n8n chat webhook (monitor mode — freeform)' });
+          const replyText = await lumiereChat(text, 'monitor');
+          reply = { role: 'bot', text: replyText || 'Say "check for new rules" to run me, or "show the log" to see what I\'ve seen.', source: 'n8n + Gemini', trace };
+        } else {
+          reply = { role: 'bot', text: 'Try one of these:\n• "Check for new rules"\n• "Show the log"\n• "What do you escalate?"\n• "Reset the log"', trace };
+        }
+      }
+    }
+    removeTyping();
+    addBotReply(reply);
+  } catch (e) {
+    removeTyping();
+    console.error('Agent error:', e);
+    addBotReply({
+      role: 'bot-refuse',
+      text: 'Something broke in my tool chain. Check the browser console for the trace.',
+      trace: trace.concat([{ tag: 'ERROR', text: e.message }]),
+    });
+  } finally {
+    $('#sendBtn').disabled = false;
+  }
+}
+
+/* ============================================================================
+   INIT
+   ============================================================================ */
+async function init() {
+  // Session ID — keeps multi-turn memory on the n8n side.
+  STATE.sessionId = getOrInitSessionId();
+  const sidField = $('#sessionIdDisplay');
+  if (sidField) sidField.value = STATE.sessionId;
+
+  // Restore webhook URL UI
+  const whField = $('#chatWebhookUrl');
+  if (whField) whField.value = STATE.chatWebhookUrl;
+
+  // "New session" button — forgets multi-turn memory by minting a fresh ID.
+  const resetSessionBtn = $('#resetSessionBtn');
+  if (resetSessionBtn) resetSessionBtn.addEventListener('click', () => {
+    STATE.sessionId = uuidLike();
+    localStorage.setItem('lum_s5_sessionId', STATE.sessionId);
+    STATE.chatHistory = [];
+    if (sidField) sidField.value = STATE.sessionId;
+    addSystem('New session — Lumière agent has forgotten the previous conversation.');
+  });
+
+  // Hydrate Seen-Rules Log from localStorage
+  STATE.monitor.log = loadSeenRules();
+  updateLogCount();
+  // Load KB (best-effort; the order assistant works without it but the demo
+  // makes more sense when learners can edit the doc and watch the bot change)
+  await loadKB();
+  // Confirm webhook is set
+  await checkConnection();
+  // Suggestions
+  refreshSuggestions();
+  // Auto-run
+  setupAutoRun();
+}
+init();
+</script>
+</body>
+</html>

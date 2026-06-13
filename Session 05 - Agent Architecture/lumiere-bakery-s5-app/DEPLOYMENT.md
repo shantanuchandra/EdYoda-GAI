@@ -1,6 +1,15 @@
 # Vercel deployment — Lumière Bakery
 
-This folder is deployed to Vercel as a self-contained mini-site:
+> **Where the deploy actually happens:** Vercel can't have spaces in a
+> serverless-function path, and this folder's path ("Session 05 - Agent
+> Architecture/…") has spaces. So the live deploy runs from a space-free mirror
+> at the **repo root: `lumiere-app/`**. Edit the app here, then copy the four
+> files (`index.html`, `Lumiere_KB.md`, `api/quote.js`, `vercel.json`) into
+> `lumiere-app/`. See `lumiere-app/README.md`.
+
+This folder is the canonical dev/teaching copy (with `server.js` + `start.command`
+for local dev). The notes below describe the original single-folder plan; the
+live Vercel root is `lumiere-app/`.
 
 - `index.html` — the bakery website with the floating chat
 - `Lumiere_KB.md` — the bakery knowledge base (fetched by the page)
