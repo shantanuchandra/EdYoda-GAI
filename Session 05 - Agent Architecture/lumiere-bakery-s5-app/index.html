@@ -578,19 +578,20 @@ p, li { color: var(--ink-soft); }
       <!-- LEFT: connection + tool manifests -->
       <div>
         <div class="panel">
-          <h3>Ollama connection</h3>
-          <p class="desc">Local model — no API keys, nothing leaves your machine. Default: <span class="kbd">qwen2.5:3b-instruct</span>.</p>
+          <h3>Lumière agent</h3>
+          <p class="desc">The chat talks to an n8n workflow that runs <span class="kbd">Gemini</span> + the quote API. Multi-turn memory is held by n8n using the session ID below.</p>
           <div class="field-row">
-            <label>Endpoint</label>
-            <input type="text" id="ollamaEndpoint" value="http://localhost:11434">
+            <label>Webhook URL</label>
+            <input type="text" id="chatWebhookUrl" placeholder="https://your-n8n.cloud/webhook/lumiere-chat">
           </div>
           <div class="field-row">
-            <label>Chat model</label>
-            <select id="chatModelSel"></select>
+            <label>Session ID</label>
+            <input type="text" id="sessionIdDisplay" readonly style="background:rgba(0,0,0,0.04); font-family: var(--mono); font-size: 0.82rem;">
           </div>
           <div style="display: flex; gap: 0.6rem; align-items: center; margin-top: 0.4rem;">
             <span class="conn-pill checking" id="connPill"><span class="dot"></span><span id="connText">checking…</span></span>
             <button class="btn ghost" id="retestBtn" style="padding: 0.45rem 0.9rem;">Re-test</button>
+            <button class="btn ghost" id="resetSessionBtn" style="padding: 0.45rem 0.9rem;" title="Forget conversation memory">↺ New session</button>
           </div>
         </div>
 
@@ -699,8 +700,13 @@ p, li { color: var(--ink-soft); }
    ============================================================================ */
 
 const STATE = {
-  endpoint: localStorage.getItem('lum_s5_endpoint') || 'http://localhost:11434',
-  chatModel: localStorage.getItem('lum_s5_chatModel') || 'qwen2.5:3b-instruct',
+  // Bakery chat now talks to an n8n webhook instead of local Ollama.
+  // The default URL is the production webhook for this cohort; learners can
+  // override it from Admin → Lumière agent.
+  chatWebhookUrl: localStorage.getItem('lum_s5_chatWebhookUrl') ||
+                  'https://shantanu1990.app.n8n.cloud/webhook/lumiere-chat',
+  sessionId: '',                   // set in init() — keeps multi-turn memory in n8n
+  chatHistory: [],                 // rolling { role, text } pairs sent to the webhook
   mode: 'order',                   // 'order' | 'monitor'
   connOk: false,
   kbText: '',
@@ -730,88 +736,104 @@ function showView(name) {
 }
 $$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
 
-/* ── OLLAMA CLIENT ────────────────────────────────────────────────────── */
-async function ollamaTags() {
-  const r = await fetch(STATE.endpoint + '/api/tags');
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  const j = await r.json();
-  return (j.models || []).map(m => m.name);
+/* ── LUMIÈRE CHAT (n8n webhook) ────────────────────────────────────────
+   Replaces the original Ollama integration. The browser now sends each
+   chat message to an n8n webhook; n8n runs Gemini + the quote API and
+   sends back a reply. A short rolling history is forwarded each turn so
+   Gemini can hold a multi-turn conversation.
+
+   ↳ The Ollama path remains in git history (see commit log) — it was a
+   teaching crutch for S5 and is intentionally NOT shipped to prod.
+   ────────────────────────────────────────────────────────────────────── */
+
+const CHAT_HISTORY_TURNS = 8;          // last N user+bot turns sent with each call
+const CHAT_REQUEST_TIMEOUT_MS = 30000; // n8n cold-start budget
+
+function uuidLike() {
+  // Good-enough session ID for a teaching demo. Not security-critical.
+  return 'lum-' + Math.random().toString(36).slice(2, 10) + '-' + Date.now().toString(36);
 }
-async function ollamaChat(messages, opts = {}) {
+function getOrInitSessionId() {
+  let id = localStorage.getItem('lum_s5_sessionId');
+  if (!id) { id = uuidLike(); localStorage.setItem('lum_s5_sessionId', id); }
+  return id;
+}
+
+async function lumiereChat(userMessage, mode) {
+  const url = STATE.chatWebhookUrl;
+  if (!url) throw new Error('Chat webhook URL is not set. Open Admin → Lumière agent and paste your n8n webhook URL.');
+
+  // Trim history to the last N exchanges (user+bot pairs).
+  const history = STATE.chatHistory.slice(-CHAT_HISTORY_TURNS * 2)
+    .map(t => ({ role: t.role, content: t.text }));
+
   const body = {
-    model: STATE.chatModel, messages, stream: false,
-    options: {
-      temperature: opts.temperature ?? 0.2,
-      num_predict: opts.maxTokens ?? 240,
-      num_ctx: opts.maxCtx ?? 4096,
-    },
+    sessionId: STATE.sessionId,
+    mode,                 // 'order' | 'monitor' — gives n8n context if it wants it
+    message: userMessage,
+    history,
+    channel: 'web',
+    site: 'lumiere-bakery-s5-app',
+    sentAt: new Date().toISOString(),
   };
-  const r = await fetch(STATE.endpoint + '/api/chat', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) throw new Error('Chat HTTP ' + r.status);
-  const j = await r.json();
-  return j.message?.content || '';
+
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), CHAT_REQUEST_TIMEOUT_MS);
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: ctl.signal,
+    });
+    if (!r.ok) throw new Error('Webhook HTTP ' + r.status);
+    // n8n's "Respond to Webhook" can return JSON or plain text.
+    const ct = r.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const j = await r.json();
+      // Accept several reply shapes so the schema can evolve without breaking the chat.
+      return j.reply || j.text || j.message || j.output ||
+             (typeof j === 'string' ? j : JSON.stringify(j));
+    }
+    return await r.text();
+  } finally {
+    clearTimeout(t);
+  }
 }
 
 async function checkConnection() {
   const pill = $('#connPill'), text = $('#connText');
-  pill.className = 'conn-pill checking'; text.textContent = 'checking…';
-  try {
-    const models = await ollamaTags();
-    STATE.connOk = true;
-    pill.className = 'conn-pill ok';
-    text.textContent = `connected · ${models.length} models`;
-    populateModelSelect(models);
-  } catch (e) {
-    STATE.connOk = false;
+  if (!pill || !text) return;
+  if (!STATE.chatWebhookUrl) {
     pill.className = 'conn-pill err';
-    text.textContent = 'no connection — is Ollama running?';
-    console.warn('Ollama connection failed:', e);
+    text.textContent = 'no webhook set';
+    STATE.connOk = false;
+    return;
   }
+  pill.className = 'conn-pill ok';
+  text.textContent = 'webhook configured';
+  STATE.connOk = true;
 }
-function populateModelSelect(models) {
-  const sel = $('#chatModelSel');
-  while (sel.firstChild) sel.removeChild(sel.firstChild);
-  // Prefer qwen2.5:3b-instruct → llama3.2:3b → smallest by name heuristic
-  const score = (m) => {
-    const lower = m.toLowerCase();
-    let s = 50;
-    if (/qwen2\.5/i.test(lower)) s -= 5;
-    if (/llama3\.2/i.test(lower)) s -= 4;
-    if (/3b|2b|1b/i.test(lower)) s -= 3;
-    if (/embed|minilm|nomic|bge/i.test(lower)) s += 100;
-    if (/preview|remote/i.test(lower)) s += 50;
-    return s;
-  };
-  const sorted = [...models].sort((a, b) => score(a) - score(b));
-  for (const m of sorted) {
-    const opt = document.createElement('option');
-    opt.value = m; opt.textContent = m;
-    sel.appendChild(opt);
-  }
-  const preferred = sorted[0] || STATE.chatModel;
-  sel.value = models.includes(STATE.chatModel) ? STATE.chatModel : preferred;
-  STATE.chatModel = sel.value;
-  localStorage.setItem('lum_s5_chatModel', STATE.chatModel);
+
+const _webhookField = () => $('#chatWebhookUrl');
+if (_webhookField()) {
+  _webhookField().addEventListener('change', (e) => {
+    STATE.chatWebhookUrl = e.target.value.trim().replace(/\/$/, '');
+    localStorage.setItem('lum_s5_chatWebhookUrl', STATE.chatWebhookUrl);
+    checkConnection();
+  });
 }
-$('#retestBtn').addEventListener('click', checkConnection);
-$('#ollamaEndpoint').addEventListener('change', (e) => {
-  STATE.endpoint = e.target.value.replace(/\/$/, '');
-  localStorage.setItem('lum_s5_endpoint', STATE.endpoint);
-  checkConnection();
-});
-$('#chatModelSel').addEventListener('change', (e) => {
-  STATE.chatModel = e.target.value;
-  localStorage.setItem('lum_s5_chatModel', STATE.chatModel);
-});
+const _retestBtn = $('#retestBtn');
+if (_retestBtn) _retestBtn.addEventListener('click', checkConnection);
 
 /* ── KB LOADER ────────────────────────────────────────────────────────── */
 async function loadKB() {
   try {
-    const r = await fetch('../Lumiere_KB.md');
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+    // Try ../ first (local-dev served from project root); fall back to ./
+    // (Vercel deploy where the bakery folder IS the deploy root).
+    let r = await fetch('../Lumiere_KB.md').catch(() => null);
+    if (!r || !r.ok) r = await fetch('./Lumiere_KB.md').catch(() => null);
+    if (!r || !r.ok) throw new Error('KB not found at ../ or ./');
     STATE.kbText = await r.text();
   } catch (e) {
     console.warn('KB load failed:', e);
@@ -969,6 +991,12 @@ function whatsMissing(spec) {
 }
 
 /* ── Order Assistant agent loop ───────────────────────────────────────── */
+// NOTE (Jun 2026, S7 deployment): The chat UI now sends each message to an
+// n8n webhook instead of calling this function. We keep the deterministic
+// implementation below because the S5 facilitator script and workbook walk
+// learners through it as the canonical "agent loop" example — Tool Manifest,
+// PERCEIVE/REASON/TOOL trace, the 5 tools. It is intentional reference code
+// for S5 teaching, not dead code. Do not remove without updating S5 assets.
 async function runOrderAssistant(text, trace) {
   // 1. Parse the message; update the order spec.
   const spec = STATE.order.spec;
@@ -1400,6 +1428,9 @@ function addBotReply(reply) {
   if (reply.role === 'bot-escalate') cls += ' escalate';
   el.className = cls;
 
+  // Mirror the visible reply into the rolling history we send to n8n next turn.
+  if (reply.text) STATE.chatHistory.push({ role: 'assistant', text: reply.text });
+
   const bubble = document.createElement('div'); bubble.className = 'bubble';
   bubble.textContent = reply.text;
   el.appendChild(bubble);
@@ -1487,6 +1518,7 @@ async function sendMsg() {
   if (!text) return;
   $('#chatInput').value = '';
   addUser(text);
+  STATE.chatHistory.push({ role: 'user', text });
   $('#sendBtn').disabled = true;
   addTyping();
   const trace = [];
@@ -1494,7 +1526,13 @@ async function sendMsg() {
   try {
     let reply;
     if (STATE.mode === 'order') {
-      reply = await runOrderAssistant(text, trace);
+      // Order Assistant: send the message + rolling history to n8n.
+      // n8n owns the agent loop now — Gemini extracts intent, calls /api/quote
+      // when it has all required fields, and replies in conversation voice.
+      trace.push({ tag: 'CALL', text: 'POST → n8n chat webhook (order mode)' });
+      const replyText = await lumiereChat(text, 'order');
+      trace.push({ tag: 'OBSERVE', text: 'n8n reply received', result: `${replyText.length} chars` });
+      reply = { role: 'bot', text: replyText, source: 'n8n + Gemini', trace };
     } else {
       // Monitor mode — interpret a few intents
       const t = text.toLowerCase();
@@ -1521,15 +1559,13 @@ async function sendMsg() {
           source: 'Monitor risk policy', trace,
         };
       } else {
-        // Fallback: use Ollama to answer in monitor's voice if connected
+        // Fallback for unrecognised monitor questions: ask the n8n webhook.
+        // n8n can either branch on mode='monitor' or fall back to a generic
+        // Gemini reply. Either way the chat stays useful.
         if (STATE.connOk) {
-          trace.push({ tag: 'LLM', text: `Calling ${STATE.chatModel} — no tool matched, freeform reply in monitor's voice.` });
-          const sys = `You are the Lumière FSSAI Regulation Monitor. You watch India's food-safety regulator for new rules. You auto-apply cosmetic updates and escalate allergen/ingredient/safety changes to a human. The user asked a freeform question. Reply briefly, in character, suggesting they say "check for new rules" to run the monitor or "show the log" to see seen rules. Do not invent rule data.`;
-          const out = await ollamaChat([
-            { role: 'system', content: sys },
-            { role: 'user', content: text },
-          ], { maxTokens: 160 });
-          reply = { role: 'bot', text: out || 'Say "check for new rules" to run me, or "show the log" to see what I\'ve seen.', source: STATE.chatModel, trace };
+          trace.push({ tag: 'CALL', text: 'POST → n8n chat webhook (monitor mode — freeform)' });
+          const replyText = await lumiereChat(text, 'monitor');
+          reply = { role: 'bot', text: replyText || 'Say "check for new rules" to run me, or "show the log" to see what I\'ve seen.', source: 'n8n + Gemini', trace };
         } else {
           reply = { role: 'bot', text: 'Try one of these:\n• "Check for new rules"\n• "Show the log"\n• "What do you escalate?"\n• "Reset the log"', trace };
         }
@@ -1554,15 +1590,32 @@ async function sendMsg() {
    INIT
    ============================================================================ */
 async function init() {
-  // Restore endpoint UI
-  $('#ollamaEndpoint').value = STATE.endpoint;
+  // Session ID — keeps multi-turn memory on the n8n side.
+  STATE.sessionId = getOrInitSessionId();
+  const sidField = $('#sessionIdDisplay');
+  if (sidField) sidField.value = STATE.sessionId;
+
+  // Restore webhook URL UI
+  const whField = $('#chatWebhookUrl');
+  if (whField) whField.value = STATE.chatWebhookUrl;
+
+  // "New session" button — forgets multi-turn memory by minting a fresh ID.
+  const resetSessionBtn = $('#resetSessionBtn');
+  if (resetSessionBtn) resetSessionBtn.addEventListener('click', () => {
+    STATE.sessionId = uuidLike();
+    localStorage.setItem('lum_s5_sessionId', STATE.sessionId);
+    STATE.chatHistory = [];
+    if (sidField) sidField.value = STATE.sessionId;
+    addSystem('New session — Lumière agent has forgotten the previous conversation.');
+  });
+
   // Hydrate Seen-Rules Log from localStorage
   STATE.monitor.log = loadSeenRules();
   updateLogCount();
   // Load KB (best-effort; the order assistant works without it but the demo
   // makes more sense when learners can edit the doc and watch the bot change)
   await loadKB();
-  // Check Ollama
+  // Confirm webhook is set
   await checkConnection();
   // Suggestions
   refreshSuggestions();
