@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 7 Part 2 — Learner Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm 16mm;
+  }
+  :root {
+    --paper:#f5efe6; --paper-warm:#ede4d3; --paper-cream:#faf6ef;
+    --ink:#1a1814; --ink-soft:#4a463e; --ink-mute:#8a8478; --ink-faint:#b8b1a3;
+    --rule:#d4ccba; --rule-soft:#e3dccb;
+    --terra:#b8431b; --terra-soft:rgba(184,67,27,0.10);
+    --ink-blue:#1e3a5f; --calm:#14532d;
+    --warn:#a16207; --danger:#991b1b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:10.5pt; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  .page{max-width:680px;margin:0 auto;padding:12mm 0;}
+
+  /* Running head */
+  .running-head{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:7.5pt;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-mute);font-weight:500;margin-bottom:24px;}
+  .running-head .pub{font-family:'Fraunces',serif;font-style:italic;font-size:10pt;letter-spacing:0.02em;text-transform:none;color:var(--ink);}
+
+  /* Cover */
+  .cover{page-break-after:always;display:flex;flex-direction:column;justify-content:center;min-height:80vh;padding:0 0 40px;}
+  .cover .eyebrow{display:inline-block;font-family:'Geist Mono',monospace;font-size:8pt;letter-spacing:0.22em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:14px;position:relative;padding-left:1.8em;}
+  .cover .eyebrow::before{content:'';position:absolute;left:0;top:50%;width:1.2em;height:1px;background:var(--terra);}
+  .cover h1{font-family:'Fraunces',serif;font-weight:300;font-size:36pt;line-height:1.05;letter-spacing:-0.02em;font-variation-settings:'opsz' 144,'SOFT' 40,'WONK' 1;margin-bottom:12px;}
+  .cover h1 em{font-style:italic;color:var(--terra);}
+  .cover .lede{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:14pt;line-height:1.4;color:var(--ink-soft);max-width:48ch;margin-bottom:16px;font-variation-settings:'opsz' 40;}
+  .cover .meta{font-family:'Geist Mono',monospace;font-size:8pt;color:var(--ink-mute);letter-spacing:0.04em;}
+  .cover .divider{width:60px;height:2px;background:var(--terra);margin:20px 0;}
+
+  /* Section headings */
+  h2{font-family:'Fraunces',serif;font-weight:400;font-size:18pt;line-height:1.15;margin:28px 0 10px;font-variation-settings:'opsz' 80;page-break-after:avoid;}
+  h3{font-family:'Fraunces',serif;font-weight:500;font-size:13pt;margin:18px 0 6px;page-break-after:avoid;}
+  h4{font-family:'Geist Mono',monospace;font-size:8.5pt;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--terra);margin:14px 0 4px;}
+
+  p{margin:6px 0;color:var(--ink-soft);}
+  p strong{color:var(--ink);font-weight:600;}
+  em.terra{color:var(--terra);font-style:italic;}
+
+  a{color:var(--terra);text-decoration:underline;text-underline-offset:2px;}
+
+  code{font-family:'Geist Mono',monospace;font-size:0.88em;background:var(--paper-warm);padding:0.1em 0.3em;border-radius:3px;color:var(--ink);}
+  pre{font-family:'Geist Mono',monospace;font-size:8.5pt;line-height:1.5;background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--ink-mute);padding:10px 14px;border-radius:0 5px 5px 0;margin:10px 0;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word;page-break-inside:avoid;}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:9.5pt;page-break-inside:avoid;}
+  th{font-family:'Geist Mono',monospace;font-size:8pt;letter-spacing:0.1em;text-transform:uppercase;text-align:left;padding:6px 8px;border-bottom:2px solid var(--ink);color:var(--ink);font-weight:600;}
+  td{padding:6px 8px;border-bottom:1px solid var(--rule-soft);color:var(--ink-soft);vertical-align:top;}
+  td strong{color:var(--ink);}
+  tr:last-child td{border-bottom:none;}
+
+  /* Callout box */
+  .callout{background:var(--paper-cream);border:1px solid var(--rule);border-left:3px solid var(--terra);padding:10px 14px;margin:12px 0;border-radius:0 5px 5px 0;page-break-inside:avoid;}
+  .callout .k{font-family:'Geist Mono',monospace;font-size:7pt;letter-spacing:0.18em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:3px;}
+  .callout p{margin:3px 0;font-size:9.5pt;}
+
+  /* Tip / troubleshooting box */
+  .tip{background:rgba(184,67,27,0.06);border:1px solid var(--rule);padding:8px 12px;margin:8px 0;border-radius:5px;font-size:9.5pt;page-break-inside:avoid;}
+  .tip .label{font-family:'Geist Mono',monospace;font-size:7pt;letter-spacing:0.16em;text-transform:uppercase;color:var(--terra);font-weight:600;}
+
+  /* Numbered steps */
+  .step{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--rule-soft);page-break-inside:avoid;}
+  .step:first-of-type{border-top:2px solid var(--ink);}
+  .step .n{font-family:'Fraunces',serif;font-weight:300;font-size:22pt;line-height:1;color:var(--terra);font-variant-numeric:tabular-nums oldstyle-nums;font-variation-settings:'opsz' 144;}
+  .step .body h3{margin-top:0;}
+  .step .body p{font-size:9.5pt;}
+
+  /* Flow chips */
+  .flow{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:10px 0;font-family:'Geist Mono',monospace;font-size:8pt;}
+  .flow .chip{background:var(--paper-cream);border:1px solid var(--rule);border-top:2px solid var(--terra);padding:4px 8px;border-radius:4px;color:var(--ink);}
+  .flow .arr{color:var(--ink-faint);}
+
+  /* Ordered list styling */
+  ol{padding-left:1.6em;margin:6px 0;}
+  ol li{margin:4px 0;color:var(--ink-soft);}
+  ol li strong{color:var(--ink);}
+
+  ul{padding-left:1.4em;margin:6px 0;}
+  ul li{margin:3px 0;color:var(--ink-soft);}
+
+  /* Diagram box */
+  .diagram{font-family:'Geist Mono',monospace;font-size:8pt;line-height:1.6;background:var(--paper-cream);border:1px solid var(--rule);padding:12px 16px;margin:10px 0;border-radius:5px;white-space:pre;overflow-x:auto;page-break-inside:avoid;}
+
+  /* Page break helpers */
+  .page-break{page-break-before:always;}
+
+  /* Section rule */
+  .rule{height:1px;background:var(--rule);margin:20px 0;}
+
+  /* Troubleshooting table */
+  .troubleshoot td:first-child{font-weight:600;color:var(--ink);white-space:nowrap;width:28%;}
+
+  /* Build header */
+  .build-header{background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:6px;margin:20px 0 12px;page-break-after:avoid;}
+  .build-header h2{color:var(--paper);margin:0 0 2px;font-size:16pt;}
+  .build-header .sub{font-family:'Geist Mono',monospace;font-size:7.5pt;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,239,230,0.6);}
+
+  /* Colophon */
+  .colophon{margin-top:28px;padding-top:10px;border-top:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:8pt;color:var(--ink-mute);letter-spacing:0.04em;}
+  .colophon a{color:var(--terra);}
+
+  /* Break banner */
+  .break-banner{background:var(--paper-warm);border:2px solid var(--rule);border-radius:8px;padding:14px 18px;margin:20px 0;text-align:center;page-break-inside:avoid;}
+  .break-banner .icon{font-size:22pt;margin-bottom:4px;}
+  .break-banner .text{font-family:'Fraunces',serif;font-size:13pt;font-style:italic;color:var(--ink-soft);}
+  .break-banner .sub{font-family:'Geist Mono',monospace;font-size:7.5pt;color:var(--ink-mute);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<!-- ═══════════ COVER ═══════════ -->
+<div class="cover">
+  <div class="running-head">
+    <span>GenAI &amp; AI Agents for Non-Coders · S07 Part 2</span>
+    <span class="pub">EdYoda</span>
+  </div>
+  <div class="eyebrow">Learner Handbook</div>
+  <h1>Take the bakery agent <em>live.</em></h1>
+  <p class="lede">GitHub → Vercel → n8n, end to end. By the last page your Lumière site is on the public internet, taking real orders, and emailing you every lead.</p>
+  <div class="divider"></div>
+  <p class="meta">Session 7 · Part 2 — Workflow Automation with n8n</p>
+  <p class="meta">Written &amp; maintained by Shantanu Chandra</p>
+</div>
+
+<!-- ═══════════ WHAT THIS IS ═══════════ -->
+
+<div class="running-head">
+  <span>S07 Part 2 · Learner Handbook</span>
+  <span class="pub">EdYoda</span>
+</div>
+
+<h2>What this is</h2>
+<p>This is a solo execution guide. By the end of it your Lumière bakery site will be <strong>live on the public internet</strong>, with a chatbot that takes real cake orders — and behind it, an n8n workflow that reads each message, prices the order, replies, and captures the customer as a lead in your inbox.</p>
+<p>In Part 1 you built the brain (the n8n workflow that reads order emails). Here you give it a face the world can reach: a website on a real URL, a serverless pricing function, a chat that talks to n8n, and a lead-capture email. Nothing here needs you to run a server or write more than a few lines of code.</p>
+<p>The workbook (<code>02_Learner_Workbook.md</code>) is the in-class companion; this handbook is its fuller sibling — everything from a blank GitHub account to a live, lead-generating site, in order. Work top to bottom. Don't skip <strong>The Ground Truth</strong> — the whole thing rests on one idea.</p>
+
+<div class="callout">
+  <div class="k">A note on the "Lumière" story</div>
+  <p>Lumière is a teaching demo — a real AI on a made-up bakery. The build is real; the cake shop isn't. When you take <em>your own</em> agent live later, the steps are identical — swap the names.</p>
+</div>
+
+<div class="rule"></div>
+
+<!-- ═══════════ BEFORE YOU START ═══════════ -->
+
+<h2>Before you start</h2>
+<p>Four free accounts. Each is a few minutes, and you'll likely already have some.</p>
+
+<table>
+  <tr><th>Thing</th><th>What to do</th><th>Where</th></tr>
+  <tr><td><strong>GitHub account</strong></td><td>Sign up (free). This is where your site's code lives.</td><td>github.com</td></tr>
+  <tr><td><strong>Vercel account</strong></td><td>Sign up with "Continue with GitHub" — it links the two for you.</td><td>vercel.com</td></tr>
+  <tr><td><strong>n8n.cloud account</strong></td><td>Sign in. Your Part-1 workflow should already be here.</td><td>n8n.cloud</td></tr>
+  <tr><td><strong>Google Gemini key</strong></td><td>A free API key for the chat's brain. Add it as a credential in n8n.</td><td>aistudio.google.com</td></tr>
+</table>
+
+<p>You also need the <strong>app files</strong> — the four files that make up the deployable site:</p>
+<ul>
+  <li><code>index.html</code> — the bakery site + chat widget</li>
+  <li><code>Lumiere_KB.md</code> — the menu/rules the chat reads</li>
+  <li><code>api/quote.js</code> — the pricing function</li>
+  <li><code>vercel.json</code> — one small config file</li>
+</ul>
+
+<div class="tip">
+  <span class="label">Note</span>
+  <p>Your facilitator shares these (or you copy them from the <code>lumiere-app/</code> folder in the course repo). You don't write them from scratch — you deploy them.</p>
+</div>
+
+<div class="rule"></div>
+
+<!-- ═══════════ THE GROUND TRUTH ═══════════ -->
+
+<h2>The Ground Truth</h2>
+<p>Before any clicking, hold this picture in your head. It's the whole architecture, and every step below is just one piece of it:</p>
+
+<div class="diagram">   GitHub  ──push──►  Vercel  ──hosts──►  your-site.vercel.app
+   (the code)         (the host)          (the live website + chat)
+                                                │
+                                       visitor types in chat
+                                                │
+                                                ▼
+                          n8n webhook  ──►  Gemini  ──►  reply + price
+                                                │
+                                       order finished?
+                                                │
+                                                ▼
+                                   lead email lands in your inbox</div>
+
+<p>Three things are doing the work, and <strong>none of them is a server you keep running:</strong></p>
+
+<ol>
+  <li><strong>GitHub holds the code.</strong> It's the source of truth. You push files here.</li>
+  <li><strong>Vercel watches GitHub and hosts the site.</strong> Push to GitHub → Vercel rebuilds and re-deploys automatically. The site is just files; the pricing is a function that wakes on demand.</li>
+  <li><strong>n8n is the brain.</strong> The website chat doesn't think — it forwards each message to n8n, which runs Gemini and sends the answer back.</li>
+</ol>
+
+<div class="callout">
+  <div class="k">The single idea</div>
+  <p>The website is a thin shell; the intelligence lives in n8n; GitHub + Vercel just put the shell online. If you understand that, the rest is wiring.</p>
+</div>
+
+<div class="rule"></div>
+
+<!-- ═══════════ WHAT YOU'RE BUILDING ═══════════ -->
+
+<h2>What you're building</h2>
+
+<table>
+  <tr><th>Build Part</th><th>What you do</th><th>Result</th></tr>
+  <tr><td><strong>1 — Repo</strong></td><td>Get the app files into a GitHub repository</td><td>Code lives somewhere Vercel can read it</td></tr>
+  <tr><td><strong>2 — Deploy</strong></td><td>Import the repo into Vercel, set the root directory, deploy</td><td>A live <code>*.vercel.app</code> URL serving the site + <code>/api/quote</code></td></tr>
+  <tr><td><strong>3 — Chat webhook</strong></td><td>Add a Webhook → Gemini → Respond chain in n8n</td><td>The website chat can talk to the brain</td></tr>
+  <tr><td><strong>4 — Point the site at n8n</strong></td><td>Tell the site which webhook URL to call</td><td>Live, working conversation on the public site</td></tr>
+  <tr><td><strong>5 — Lead capture</strong></td><td>A survey after each order → emails the lead to you</td><td>Every finished order becomes a contact</td></tr>
+  <tr><td><strong>6 — Test it live</strong></td><td>Order a cake on the real URL, watch it work</td><td>Proof, end to end</td></tr>
+</table>
+
+<!-- ═══════════ BUILD PART 1 ═══════════ -->
+
+<div class="build-header">
+  <div class="sub">Build Part 1</div>
+  <h2>The repo</h2>
+</div>
+
+<p><strong>Goal:</strong> get the four app files into a GitHub repository so Vercel has something to deploy.</p>
+
+<h3>1.1 — Create (or reuse) a repository</h3>
+<p>If you don't already have a repo for this, make one:</p>
+<ol>
+  <li>Go to <strong>github.com → New repository</strong> (the green <strong>New</strong> button, or <code>+</code> top-right → New repository).</li>
+  <li>Name it something like <code>bakery-agent</code>. Leave it <strong>Public</strong> (Vercel's free tier reads public repos with zero setup). Click <strong>Create repository</strong>.</li>
+</ol>
+
+<h3>1.2 — Put the app files in a clean, space-free folder</h3>
+<p>This one detail saves you a real headache: <strong>put the deployable files in a folder whose path has NO spaces</strong> — e.g. <code>lumiere-app/</code> at the top of the repo.</p>
+<p>Why: the pricing function becomes a Vercel "Serverless Function," and <strong>Vercel rejects function paths that contain spaces.</strong> The course materials live under folders like <code>Session 07 - Workflow Automation…</code> (spaces everywhere), so the four files get <strong>mirrored</strong> into a clean <code>lumiere-app/</code> folder for deploying.</p>
+
+<p>Your <code>lumiere-app/</code> folder should contain exactly:</p>
+<pre>lumiere-app/
+├── index.html        ← the site + chat
+├── Lumiere_KB.md     ← the menu/rules
+├── vercel.json       ← CORS config (one small file)
+└── api/
+    └── quote.js      ← the pricing function</pre>
+
+<h3>1.3 — Get the files onto GitHub</h3>
+<p>Two ways, pick whichever is comfortable:</p>
+<ul>
+  <li><strong>No command line:</strong> on the repo page click <strong>Add file → Upload files</strong>, drag the <code>lumiere-app</code> folder in, and <strong>Commit changes</strong>.</li>
+  <li><strong>Command line:</strong> from the folder on your computer:
+    <pre>git add lumiere-app
+git commit -m "Add bakery app for deploy"
+git push</pre>
+  </li>
+</ul>
+
+<div class="tip">
+  <span class="label">What you should see</span>
+  <p>The <code>lumiere-app</code> folder listed among your files on the GitHub repo page. That's all Part 1 needs.</p>
+</div>
+
+<!-- ═══════════ BUILD PART 2 ═══════════ -->
+
+<div class="build-header">
+  <div class="sub">Build Part 2</div>
+  <h2>Deploy to Vercel</h2>
+</div>
+
+<p><strong>Goal:</strong> turn the repo into a live URL.</p>
+
+<h3>2.1 — Import the repo</h3>
+<ol>
+  <li>Go to <strong>vercel.com → Add New… → Project</strong>.</li>
+  <li>Under <strong>Import Git Repository</strong>, find your repo and click <strong>Import</strong>. (If it's not listed, click <strong>Adjust GitHub App Permissions</strong> and grant Vercel access to <em>just this repo</em>.)</li>
+</ol>
+
+<h3>2.2 — Set the Root Directory</h3>
+<p>On the configure screen, before deploying:</p>
+
+<table>
+  <tr><th>Setting</th><th>Value</th></tr>
+  <tr><td><strong>Root Directory</strong></td><td><code>lumiere-app</code> ← click <strong>Edit</strong> and select the folder</td></tr>
+  <tr><td><strong>Framework Preset</strong></td><td>Other</td></tr>
+  <tr><td><strong>Build / Output / Install commands</strong></td><td>leave empty</td></tr>
+</table>
+
+<div class="callout">
+  <div class="k">Why Root Directory matters</div>
+  <p>It tells Vercel "the site lives <em>inside</em> this folder, not at the repo root." Everything <em>outside</em> that folder — your facilitator scripts, decks, notes — <strong>stays private</strong> and is never served to the public.</p>
+</div>
+
+<h3>2.3 — Deploy</h3>
+<p>Click <strong>Deploy</strong>. Wait ~30–60 seconds while it builds.</p>
+
+<div class="tip">
+  <span class="label">If the build fails</span>
+  <p>If you see <em>"A Serverless Function has an invalid name… must not contain any space"</em> — your Root Directory is pointing at a folder whose path has spaces. Go to <strong>Project → Settings → Build and Deployment → Root Directory</strong>, set it to the space-free <code>lumiere-app</code>, and <strong>Redeploy</strong>.</p>
+</div>
+
+<p>When it finishes you get a live URL like <code>https://your-project.vercel.app</code>. Open it — the bakery site loads.</p>
+
+<h3>2.4 — Confirm the pricing function is live</h3>
+<p>Open in your browser:</p>
+<pre>https://your-project.vercel.app/api/health</pre>
+<p>You should see a tiny JSON response like <code>{ "ok": true }</code>. That proves the serverless function deployed alongside the page.</p>
+
+<div class="tip">
+  <span class="label">Auto-deploy</span>
+  <p>From now on, any time you push a change to GitHub, Vercel rebuilds and updates the live site automatically. No "publish" button.</p>
+</div>
+
+<!-- ═══════════ BUILD PART 3 ═══════════ -->
+
+<div class="build-header">
+  <div class="sub">Build Part 3</div>
+  <h2>The chat webhook in n8n</h2>
+</div>
+
+<p><strong>Goal:</strong> give the website chat a brain to talk to. You'll add a small, <em>separate</em> chain to your workflow — it doesn't touch the email/Telegram paths from Part 1.</p>
+
+<p>The chain is three nodes:</p>
+
+<div class="flow">
+  <span class="chip">Webhook</span><span class="arr">→</span>
+  <span class="chip">Gemini</span><span class="arr">→</span>
+  <span class="chip">Respond to Webhook</span>
+</div>
+
+<h3>3.1 — Add a Webhook trigger</h3>
+<ol>
+  <li>Open your n8n workflow. Click <strong>+</strong> → search <strong>Webhook</strong> → choose <strong>Webhook</strong>.</li>
+  <li>Configure:
+    <ul>
+      <li><strong>HTTP Method:</strong> <code>POST</code></li>
+      <li><strong>Path:</strong> <code>lumiere-chat</code></li>
+      <li><strong>Respond:</strong> <code>Using 'Respond to Webhook' Node</code></li>
+    </ul>
+  </li>
+  <li>Click <strong>Add option → Allowed Origins (CORS)</strong> and set it to <code>*</code>.</li>
+</ol>
+
+<p>The node now shows a <strong>Production URL</strong> like:<br>
+<code>https://YOUR-N8N.app.n8n.cloud/webhook/lumiere-chat</code> — copy it for Part 4.</p>
+
+<h3>3.2 — Add the Gemini node</h3>
+<ol>
+  <li>On the Webhook's output, click <strong>+</strong> → search <strong>Google Gemini</strong> → <strong>Message a model</strong>.</li>
+  <li><strong>Credential:</strong> your Google Gemini key.</li>
+  <li><strong>Prompt:</strong> paste the following:</li>
+</ol>
+
+<pre>You are the order assistant for Lumière Bakery (Mumbai). Be warm and concise.
+
+MENU (per kg): Chocolate ₹950 · Vanilla ₹850 · Red Velvet ₹1050 ·
+Mango Coconut ₹1200 · Hazelnut Praline ₹1300 · Lemon Zest ₹950 · Black Forest ₹1000.
+Eggless +₹80. Lead time 48h (72h for fondant or 3kg+). Delivery within ~8km of
+Bandra/Andheri/Powai.
+
+To place an order you need: flavour, size, delivery date, delivery address.
+Ask for whatever is missing, one or two things at a time. When you have all four,
+confirm the order and give the price. If the customer is just chatting, answer
+naturally. Never invent flavours or prices. Keep replies to 2–5 sentences.
+
+If no subject is present, treat the body as the entire message.
+
+CONVERSATION SO FAR:
+{{ JSON.stringify($json.body.history || []) }}
+
+CUSTOMER'S NEW MESSAGE:
+{{ $json.body.message }}
+
+Reply as the assistant. Plain text only.</pre>
+
+<h3>3.3 — Add the Respond to Webhook node</h3>
+<ol>
+  <li>On the Gemini node's output, click <strong>+</strong> → search <strong>Respond to Webhook</strong> → add it.</li>
+  <li><strong>Respond With:</strong> <code>JSON</code></li>
+  <li><strong>Response Body</strong> — switch to <strong>Expression</strong> and paste:</li>
+</ol>
+
+<pre>{ "reply": {{ JSON.stringify($json.content?.parts?.[0]?.text || $json.parts?.[0]?.text || $json.text || "Sorry, please try again.") }} }</pre>
+
+<div class="callout">
+  <div class="k">Why this exact shape</div>
+  <p>The Gemini node returns its text nested under <code>parts</code>. This expression digs it out and wraps it in a clean <code>{ "reply": "…" }</code> the website knows how to read. If you skip this and return the raw node output, the chat shows <code>[object Object]</code>.</p>
+</div>
+
+<h3>3.4 — Publish</h3>
+<p>Click <strong>Publish</strong> (top-right). The production webhook is now live. Your existing Gmail/Telegram paths are untouched — you only <em>added</em> a chain.</p>
+
+<!-- ═══════════ BUILD PART 4 ═══════════ -->
+
+<div class="build-header">
+  <div class="sub">Build Part 4</div>
+  <h2>Point the site at n8n</h2>
+</div>
+
+<p><strong>Goal:</strong> connect the two halves. The site needs to know which webhook to call.</p>
+
+<p>The site reads its webhook URL from one place. If your build hard-codes the URL, set it in <code>index.html</code> (search for <code>chatWebhookUrl</code>), commit, and push — Vercel redeploys automatically. Paste your <strong>Production webhook URL</strong> from Step 3.1:</p>
+
+<pre>https://YOUR-N8N.app.n8n.cloud/webhook/lumiere-chat</pre>
+
+<p>That's the whole connection. The site now POSTs every chat message to n8n and shows whatever n8n sends back.</p>
+
+<!-- ═══════════ BUILD PART 5 ═══════════ -->
+
+<div class="build-header">
+  <div class="sub">Build Part 5</div>
+  <h2>Lead capture</h2>
+</div>
+
+<p><strong>Goal:</strong> turn a finished order into a contact in your inbox.</p>
+
+<p>When the agent confirms an order, the site shows a short survey — name, email, and "want to learn to build agents?" — framed as <em>"enter your email and we'll send your order summary + a free build guide."</em> That submission goes to a <strong>second n8n webhook</strong> that emails the lead to you.</p>
+
+<h3>5.1 — Add a lead webhook</h3>
+<p>In n8n, add another <strong>Webhook</strong> node (a separate trigger, not connected to the chat one):</p>
+<ul>
+  <li><strong>POST</strong>, <strong>Path:</strong> <code>lumiere-lead</code></li>
+  <li><strong>Respond:</strong> <code>When Last Node Finishes</code></li>
+  <li><strong>CORS:</strong> <code>*</code></li>
+</ul>
+
+<h3>5.2 — Email yourself the lead</h3>
+<p>On its output, add a <strong>Gmail → Send a message</strong> node:</p>
+<ul>
+  <li><strong>To:</strong> your address (e.g. <code>sensei@wasabitravels.com</code>)</li>
+  <li><strong>Subject:</strong> <code>New Lumiere lead</code></li>
+  <li><strong>Email Type:</strong> HTML</li>
+  <li><strong>Message:</strong> an HTML body that pulls the lead's details — <code>{{ $json.body.name }}</code>, <code>{{ $json.body.email }}</code>, their interests, and <code>{{ $json.body.orderSummary }}</code>.</li>
+</ul>
+
+<h3>5.3 — (Optional) Email the lead their guide</h3>
+<p>Add a <em>second</em> Gmail send node after the first, this time <strong>To:</strong> <code>{{ $('Webhook1').item.json.body.email }}</code> (the visitor's own email), with the build-guide link — e.g. <code>https://your-project.vercel.app/guide.html</code>.</p>
+
+<p><strong>Publish</strong> the workflow.</p>
+
+<div class="tip">
+  <span class="label">One gotcha that wastes an afternoon</span>
+  <p>If the email <em>from</em> address and the <em>to</em> address are the same Gmail account (e.g. n8n sends from your-gmail and the lead address forwards back to your-gmail), Gmail silently de-duplicates and hides it from your Inbox. The email <em>is</em> delivered — search <strong>All Mail</strong>, not just Inbox. To avoid it entirely, send from a different account than the one that receives.</p>
+</div>
+
+<!-- ═══════════ BUILD PART 6 ═══════════ -->
+
+<div class="build-header">
+  <div class="sub">Build Part 6</div>
+  <h2>Test it live</h2>
+</div>
+
+<p>The real test. On your <strong>public URL</strong> (not localhost):</p>
+
+<ol>
+  <li>Open the site, click the chat bubble.</li>
+  <li>Type a real order across a few messages — e.g. <em>"Hi, do you have red velvet?"</em> then <em>"2kg of that, eggless, for Saturday"</em> then <em>"deliver to Bandra West."</em></li>
+  <li>Watch the bot hold the order across turns, price it, and confirm.</li>
+  <li>Finish the order, fill the survey, and check that the lead email arrives (remember Part 5's All-Mail gotcha).</li>
+</ol>
+
+<p>If all three happen — multi-turn reply, correct price, lead email — <strong>you're live, end to end.</strong> A visitor anywhere in the world can now order a cake from your agent.</p>
+
+<div class="rule"></div>
+
+<!-- ═══════════ 3-QUESTION DEBUG ═══════════ -->
+
+<h2>The 3-question debug method</h2>
+<p>When something doesn't work, ask these in order — they map to the three pieces of the Ground Truth:</p>
+
+<div class="step">
+  <div class="n">1</div>
+  <div class="body">
+    <h3>Did the site load?</h3>
+    <p>If not → it's <strong>Vercel</strong>. Check the deploy status; check the Root Directory is <code>lumiere-app</code>.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">2</div>
+  <div class="body">
+    <h3>Did the chat reply at all?</h3>
+    <p>If it errors → it's the <strong>connection</strong>. Is the webhook URL pasted correctly? Is the n8n workflow <em>published</em>? Is CORS set to <code>*</code>?</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">3</div>
+  <div class="body">
+    <h3>Did it reply with junk like <code>[object Object]</code>?</h3>
+    <p>It's the <strong>Respond to Webhook</strong> node. The body expression in Step 3.3 — make sure it digs out <code>parts[0].text</code>.</p>
+  </div>
+</div>
+
+<p>Most problems are one of these three. Fix the layer, not the symptom.</p>
+
+<div class="rule"></div>
+
+<!-- ═══════════ TAKE-HOME ═══════════ -->
+
+<h2>Take-home — make it yours</h2>
+<p>You just deployed someone else's bakery. Now swap in your own idea:</p>
+<ul>
+  <li>Change the menu and prompt in the Gemini node for <em>your</em> business (a tutoring service, a salon, a consultancy — anything with "orders" and "questions").</li>
+  <li>Change the lead email recipient to yours.</li>
+  <li>Push any site edit to GitHub and watch Vercel redeploy in under a minute.</li>
+</ul>
+
+<div class="callout">
+  <div class="k">The shape never changes</div>
+  <p><strong>GitHub holds it, Vercel hosts it, n8n thinks.</strong> You now know how to put an AI agent on the open internet, with no server to run.</p>
+</div>
+
+<!-- ═══════════ COLOPHON ═══════════ -->
+
+<div class="colophon">
+  Written &amp; maintained by Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu">linkedin.com/in/chandrashantanu</a><br>
+  Generative AI &amp; AI Agents for Non-Coders · S07 Part 2
+</div>
+
+</div><!-- .page -->
+
+</body>
+</html>
