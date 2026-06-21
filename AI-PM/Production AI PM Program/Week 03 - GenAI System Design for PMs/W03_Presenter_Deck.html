@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · Production AI PM · Session 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ===================== TOPBAR ===================== */
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .topbar .title .accent { color: var(--accent); }
+  .clock-divider { width: 1px; height: 32px; background: var(--border); }
+  .clock-box { display: flex; flex-direction: column; line-height: 1.15; gap: 2px; }
+  .clock-box .label {
+    color: var(--text-dim); font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.14em; font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+  .topbar .grow { flex: 1; }
+  .topbar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary { background: var(--accent); color: #062420; border-color: var(--accent); font-weight: 600; }
+  .topbar button.primary:hover { background: #7df1de; }
+  .topbar .slide-counter {
+    color: var(--text-muted); font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2); border-left: 1px solid var(--border);
+  }
+
+  /* ===================== MAIN LAYOUT ===================== */
+  .main { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 64px - 56px); }
+  .panel-left { overflow-y: auto; padding: var(--s-3) var(--s-4); border-right: 1px solid var(--border); }
+  .panel-right { overflow-y: auto; background: var(--bg-1); padding: var(--s-3); }
+  .panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track, .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover, .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===================== BOTTOMBAR ===================== */
+  .bottombar {
+    height: 56px; background: var(--bg-1); border-top: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 var(--s-3); gap: var(--s-2); flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1; height: 4px; background: var(--surface); border-radius: 2px;
+    overflow: hidden; margin: 0 var(--s-2); border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%; background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  /* ===================== SLIDE CONTENT ===================== */
+  .timing-bar {
+    display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3);
+    padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration { color: var(--text-muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+  .timing-bar .block-title {
+    font-weight: 500; flex: 1; font-size: 0.88rem; color: var(--text-soft);
+    text-align: right; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--s-2);
+  }
+  .slide-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: var(--s-3); letter-spacing: -0.02em; color: var(--text);
+  }
+
+  .section {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 18px; margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+  .section .header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .section h3 {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+  .section.bridge .quote { border-left-color: #f472b6; }
+  .section.deeper .quote { border-left-color: #60a5fa; }
+
+  .quote {
+    color: var(--text); font-size: 1rem; line-height: 1.6;
+    padding-left: 12px; border-left: 2px solid var(--warm); margin: 0; font-weight: 400;
+  }
+  .section p { font-size: 0.94rem; line-height: 1.6; color: var(--text-soft); margin-bottom: 6px; }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list { counter-reset: step; list-style: none; padding-left: 0; margin: 0; }
+  .step-list > li {
+    counter-increment: step; padding-left: 36px; position: relative;
+    padding-bottom: 10px; font-size: 0.94rem; line-height: 1.55; color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: 0; top: 2px; width: 26px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    background: #060810; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem; color: var(--accent); white-space: pre-wrap;
+    line-height: 1.6; margin-top: 4px;
+  }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-section { margin-bottom: var(--s-3); }
+  .right-section h4 {
+    font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .preview-card {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title { font-size: 0.92rem; font-weight: 500; margin: 4px 0 2px; color: var(--text); line-height: 1.35; }
+  .preview-card .when {
+    font-size: 0.74rem; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 18px 16px; text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    line-height: 1; letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    text-transform: uppercase; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .timer-controls { display: flex; gap: 4px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
+  .timer-controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+  .quick-key kbd {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text-soft); font-weight: 500;
+    min-width: 22px; text-align: center; box-shadow: 0 1px 0 var(--border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">Production AI PM · Session 3</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 2:00</span>
+  </div>
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 03</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(180)">3m</button>
+          <button onclick="startExTimer(240)">4m</button>
+          <button onclick="startExTimer(360)">6m</button>
+          <button onclick="startExTimer(420)">7m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>3</kbd> <kbd>4</kbd> <kbd>6</kbd> <kbd>7</kbd> start timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA ===================== */
+const slides = [
+  {
+    num: 1,
+    when: "0:00 - 0:08",
+    duration: "8 min",
+    tag: "title",
+    title: "GenAI System Design for PMs",
+    say: "A senior AI PM does not need to write the system. But they must know what system they are asking engineering to build.",
+    doSteps: ["Welcome the room and confirm the workbook is open.", "Ask the opening chat prompt, then read 4-6 responses aloud.", "Name today's artifact: AI PRD v1."],
+    watch: "If answers drift into generic AI excitement, redirect to concrete product judgment.",
+    bridge: "The rule for today: If you cannot explain the system in plain English, you are not ready to ask engineering to build it."
+  },
+  {
+    num: 2,
+    when: "0:08 - 0:18",
+    duration: "10 min",
+    tag: "demo",
+    title: "Why this session matters",
+    say: "Explain a GenAI system clearly enough to work credibly with engineering.",
+    doSteps: ["Connect the session to the final Senior AI PM Portfolio Packet.", "Show where this week's artifact fits into the final packet."],
+    watch: "Make the value senior-level: judgment, tradeoffs, launch credibility.",
+    bridge: "Now give them the mental model."
+  },
+  {
+    num: 3,
+    when: "0:18 - 0:35",
+    duration: "17 min",
+    tag: "demo",
+    title: "Strategy lens",
+    say: "This is the judgment model for the week. Keep it visible while learners work.",
+    doSteps: ["Explain: User surface.", "Explain: Instruction layer.", "Explain: Model.", "Explain: Context/RAG.", "Explain: Tools/actions.", "Explain: Output/UX.", "Explain: Telemetry/evals."],
+    deeper: ["User surface", "Instruction layer", "Model", "Context/RAG", "Tools/actions", "Output/UX", "Telemetry/evals"],
+    bridge: "Now show the lens on the shared case before asking learners to apply it."
+  },
+  {
+    num: 4,
+    when: "0:35 - 0:55",
+    duration: "20 min",
+    tag: "demo",
+    title: "Applied walkthrough",
+    say: "Map Customer Success Copilot from inputs and retrieval to tools, output, approval, and telemetry.",
+    doSteps: ["Use the shared B2B SaaS Customer Success Copilot case.", "Narrate the product tradeoffs, not just the tool choices.", "Ask where the design could fail in production."],
+    watch: "Keep the walkthrough crisp. The second hour needs learner work.",
+    bridge: "Take the break before the studio block."
+  },
+  {
+    num: 5,
+    when: "0:55 - 1:05",
+    duration: "10 min",
+    tag: "break",
+    title: "Hard break",
+    say: "Real ten-minute break. Cameras off. Stand up. Water. We come back at the exact clock time on screen.",
+    doSteps: ["Let the countdown run.", "Mute yourself.", "Prepare the studio prompt for the return."],
+    watch: "Honor the break. Do not restart early.",
+    note: "The second half is critique-heavy; protect the reset."
+  },
+  {
+    num: 6,
+    when: "1:05 - 1:30",
+    duration: "25 min",
+    tag: "exercise",
+    title: "Studio: apply it",
+    say: "Convert the capstone strategy into a plain-English system map and AI PRD behavior spec.",
+    prompt: "System Design studio prompt:\n1. Apply the lens to your capstone.\n2. Mark the weakest assumption.\n3. Prepare one decision you want critiqued.",
+    doSteps: ["Give learners 8 minutes solo.", "Move to pair critique for 10 minutes.", "Invite 2 live shares."],
+    watch: "If critique is polite, require one sharpened question and one cut.",
+    bridge: "Now convert the discussion into the portfolio artifact."
+  },
+  {
+    num: 7,
+    when: "1:30 - 1:45",
+    duration: "15 min",
+    tag: "exercise",
+    title: "Build the artifact: AI PRD v1",
+    say: "The walk-out artifact is AI PRD v1.",
+    prompt: "AI PRD v1\n- What decision does it support?\n- What evidence does it include?\n- What assumption remains unresolved?\n- What would make it stronger before the next session?",
+    doSteps: ["Give learners 10 minutes to draft.", "Ask them to mark one section as strongest and one as weakest.", "Collect one example for live critique."],
+    watch: "If learners write too much, force one-page clarity.",
+    bridge: "Before they leave, make the quality bar explicit."
+  },
+  {
+    num: 8,
+    when: "1:45 - 1:53",
+    duration: "8 min",
+    tag: "demo",
+    title: "Quality bar",
+    say: "This is how the artifact will be judged.",
+    doSteps: ["Quality check: Specifies context and retrieval.", "Quality check: Names tools/actions.", "Quality check: Defines human approval points.", "Quality check: Lists failure modes."],
+    watch: "Tie every criterion back to senior AI PM credibility.",
+    bridge: "Now turn the quality bar into the take-home."
+  },
+  {
+    num: 9,
+    when: "1:53 - 1:58",
+    duration: "5 min",
+    tag: "exercise",
+    title: "Take-home",
+    say: "Refine AI PRD v1 and prepare a workflow sketch for autonomy design.",
+    doSteps: ["Show where to place the artifact in the portfolio packet.", "Name the due artifact for the next feedback checkpoint.", "Clarify optional advanced lab expectations if relevant."],
+    bridge: "Close by connecting this week to the next capability."
+  },
+  {
+    num: 10,
+    when: "1:58 - 2:00",
+    duration: "2 min",
+    tag: "title",
+    title: "Next: Agentic Product Design",
+    say: "Next session: Agentic Product Design.",
+    doSteps: ["Thank the cohort for the work.", "Remind them what to submit.", "Stop recording after questions."],
+    note: "Point forward only here; do not preview too much earlier."
+  }
+];
+
+/* Index of the break slide (0-based). Pressing B jumps here.
+   Auto-resolved from the slides array — works after reorderings.
+   Returns -1 if no break slide exists, in which case B is a no-op. */
+const BREAK_SLIDE_INDEX = slides.findIndex(s => s.tag === 'break');
+
+/* ===================== SAFE DOM RENDERING ===================== */
+const slidePane = document.getElementById('slidePane');
+
+function el(tag, opts = {}) {
+  const e = document.createElement(tag);
+  if (opts.cls) e.className = opts.cls;
+  if (opts.text) e.textContent = opts.text;
+  return e;
+}
+
+function makeSection(cls, title, contentBuilder) {
+  const section = el('div', { cls: `section ${cls}` });
+  const header = el('div', { cls: 'header' });
+  const h = el('h3', { text: title });
+  header.appendChild(h);
+  section.appendChild(header);
+  contentBuilder(section);
+  return section;
+}
+
+function renderSlide(s) {
+  while (slidePane.firstChild) slidePane.removeChild(slidePane.firstChild);
+
+  const bar = el('div', { cls: 'timing-bar' });
+  bar.appendChild(el('span', { cls: 'time-pill', text: s.when }));
+  bar.appendChild(el('span', { cls: 'duration', text: s.duration }));
+  bar.appendChild(el('span', { cls: 'block-title', text: `Slide ${String(s.num).padStart(2, '0')} of ${slides.length}` }));
+  slidePane.appendChild(bar);
+
+  slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
+  slidePane.appendChild(el('h1', { text: s.title }));
+
+  if (s.say) {
+    slidePane.appendChild(makeSection('say', 'Say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.say }));
+    }));
+  }
+  if (s.doSteps) {
+    slidePane.appendChild(makeSection('do', 'Do', (sec) => {
+      const ol = el('ol', { cls: 'step-list' });
+      s.doSteps.forEach(step => ol.appendChild(el('li', { text: step })));
+      sec.appendChild(ol);
+    }));
+  }
+  if (s.prompt) {
+    slidePane.appendChild(makeSection('prompt-section', 'Paste in chat', (sec) => {
+      sec.appendChild(el('div', { cls: 'prompt-box', text: s.prompt }));
+    }));
+  }
+  if (s.afterPause) {
+    slidePane.appendChild(makeSection('watch', 'Pause for', (sec) => {
+      sec.appendChild(el('p', { text: s.afterPause }));
+    }));
+  }
+  if (s.sayAfter) {
+    slidePane.appendChild(makeSection('say', 'Then say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.sayAfter }));
+    }));
+  }
+  if (s.watch) {
+    slidePane.appendChild(makeSection('watch', 'Watch for · contingency', (sec) => {
+      sec.appendChild(el('p', { text: s.watch }));
+    }));
+  }
+  if (s.deeper) {
+    slidePane.appendChild(makeSection('deeper', 'Deeper context · use if asked', (sec) => {
+      if (Array.isArray(s.deeper)) s.deeper.forEach(d => sec.appendChild(el('p', { text: d })));
+      else sec.appendChild(el('p', { text: s.deeper }));
+    }));
+  }
+  if (s.bridge) {
+    slidePane.appendChild(makeSection('bridge', 'Bridge to next slide', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.bridge }));
+    }));
+  }
+  if (s.note) {
+    slidePane.appendChild(makeSection('note', 'Note to self', (sec) => {
+      sec.appendChild(el('p', { text: s.note }));
+    }));
+  }
+}
+
+let current = 0;
+function show(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  renderSlide(slides[current]);
+  document.getElementById('slideCounter').textContent = `${String(current + 1).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  document.getElementById('nowNum').textContent = `SLIDE ${String(slides[current].num).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('nowTitle').textContent = slides[current].title;
+  document.getElementById('nowWhen').textContent = slides[current].when;
+
+  const nxt = slides[current + 1];
+  document.getElementById('nextNum').textContent = nxt ? `SLIDE ${String(nxt.num).padStart(2, '0')} / ${slides.length}` : '—';
+  document.getElementById('nextTitle').textContent = nxt ? nxt.title : 'End of deck';
+  document.getElementById('nextWhen').textContent = nxt ? nxt.when : '—';
+
+  const nxt2 = slides[current + 2];
+  document.getElementById('next2Num').textContent = nxt2 ? `SLIDE ${String(nxt2.num).padStart(2, '0')} / ${slides.length}` : '—';
+  document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
+  document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
+
+  try { localStorage.setItem('course_s3_slide_master', String(current)); } catch (e) {}
+
+  // Auto-fire the 10-min break timer on the break slide. Stop a phantom break
+  // timer (≥9 min remaining) if we navigated away early. Don't kill a regular
+  // exercise timer which never starts above 600s.
+  if (slides[current].tag === 'break') {
+    startExTimer(600);
+  } else if (typeof exSecs !== 'undefined' && exSecs > 540) {
+    stopExTimer();
+  }
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+function goSlide(i) { show(i); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') toggleClassClock();
+  if ((e.key === 'b' || e.key === 'B') && BREAK_SLIDE_INDEX >= 0) goSlide(BREAK_SLIDE_INDEX);
+  if (e.key === '3') startExTimer(180);
+  if (e.key === '4') startExTimer(240);
+  if (e.key === '6') startExTimer(360);
+  if (e.key === '7') startExTimer(420);
+  if (e.key === 'p' || e.key === 'P') exportLearnerPDF();
+});
+
+/* ===================== EXPORT LEARNER → PDF =====================
+   Signals the paired learner tab to open its own Chrome Save-as-PDF dialog.
+   If no learner tab is open, opens one first, then signals after a render delay.
+   The learner-side @page CSS forces landscape 16:9 one-slide-per-page. */
+function exportLearnerPDF() {
+  const PRINT_KEY = 'course_s3_print_request';
+  const MASTER_KEY = 'course_s3_slide_master';
+  // Bump the value so a repeat press still fires a 'storage' event in the other tab.
+  const stamp = Date.now().toString();
+  // Always write so a learner tab that's already open hears the signal.
+  try { localStorage.setItem(PRINT_KEY, stamp); } catch (e) {}
+  // Best-effort fallback: if no learner tab might be open, open one and resend after it loads.
+  // We can't reliably detect "is the other tab open" — so we open a new window and resend.
+  // If a learner tab already exists, the browser focuses it instead of duplicating in most setups.
+  const w = window.open('W03_Learner_Deck.html', 'course_learner_deck');
+  if (w) {
+    // Give the learner tab time to attach its storage listener and finish first render.
+    setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);
+  }
+}
+
+/* ===================== CLOCKS ===================== */
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(secs) { const m = Math.floor(secs / 60); const s = secs % 60; return `${pad(m)}:${pad(s)}`; }
+function fmtClass(secs) {
+  const m = Math.floor(Math.abs(secs) / 60);
+  const s = Math.abs(secs) % 60;
+  const sign = secs < 0 ? '-' : '';
+  return `${sign}${pad(m)}:${pad(s)}`;
+}
+function updateRealClock() {
+  const d = new Date();
+  document.getElementById('realClock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+let classStartTs = null;
+let paused = false;
+let pausedAt = 0;
+let pausedAccum = 0;
+
+function startClass() {
+  if (classStartTs === null) {
+    classStartTs = Date.now();
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  } else { toggleClassClock(); }
+}
+function toggleClassClock() {
+  if (classStartTs === null) { startClass(); return; }
+  if (!paused) { pausedAt = Date.now(); paused = true; document.getElementById('startBtn').textContent = '▶ Resume'; }
+  else { pausedAccum += Date.now() - pausedAt; paused = false; document.getElementById('startBtn').textContent = '⏸ Pause'; }
+}
+function resetClass() {
+  if (confirm('Reset class clock?')) {
+    classStartTs = null; paused = false; pausedAccum = 0;
+    document.getElementById('startBtn').textContent = '▶ Start Class';
+    updateClassClock();
+  }
+}
+function classElapsedSecs() {
+  if (classStartTs === null) return 0;
+  const now = paused ? pausedAt : Date.now();
+  return Math.floor((now - classStartTs - pausedAccum) / 1000);
+}
+function plannedSecsForCurrent() {
+  const w = slides[current].when;
+  if (!w || w === "Pre-start") return 0;
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return 0;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+function updateClassClock() {
+  const elapsed = classElapsedSecs();
+  document.getElementById('classClock').textContent = `${fmt(elapsed)} / 2:00`;
+  const planned = plannedSecsForCurrent();
+  if (classStartTs === null || planned === 0) {
+    document.getElementById('paceLabel').textContent = '—';
+    document.getElementById('paceLabel').className = 'big ok';
+    return;
+  }
+  const delta = elapsed - planned;
+  const labelEl = document.getElementById('paceLabel');
+  if (Math.abs(delta) < 60) { labelEl.textContent = 'on time'; labelEl.className = 'big ok'; }
+  else if (delta > 0) { labelEl.textContent = `+${fmtClass(delta)} late`; labelEl.className = delta > 180 ? 'big danger' : 'big warn'; }
+  else { labelEl.textContent = `${fmtClass(delta)} early`; labelEl.className = 'big ok'; }
+}
+setInterval(updateClassClock, 1000);
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval = null;
+let exSecs = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exSecs = secs;
+  const block = document.getElementById('timerBlock');
+  const disp = document.getElementById('exTimer');
+  function tick() {
+    disp.textContent = fmt(exSecs);
+    block.classList.remove('warn', 'danger');
+    if (exSecs <= 30) block.classList.add('danger');
+    else if (exSecs <= 60) block.classList.add('warn');
+    if (exSecs <= 0) { stopExTimer(); return; }
+    exSecs--;
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+function openLearnerDeck() { window.open('W03_Learner_Deck.html', '_blank'); }
+
+show(0);
+</script>
+</body>
+</html>

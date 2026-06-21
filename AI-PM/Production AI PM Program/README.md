@@ -57,8 +57,13 @@ By the end, learners will be able to lead an AI product from strategy to product
 | `00_Tool_Stack_and_Setup.md` | Required and optional tools |
 | `Week 01 - .../W01_Facilitator_Script.md` | Live run sheet for Week 01 |
 | `Week 01 - .../W01_Learner_Workbook.md` | Learner workbook for Week 01 |
+| `Week 01 - .../W01_Presenter_Deck.html` | Synced presenter deck for Week 01 |
+| `Week 01 - .../W01_Learner_Deck.html` | Synced learner deck for Week 01 |
 | `Week 02 - .../W02_Facilitator_Script.md` | Live run sheet for Week 02, and same pattern through Week 08 |
 | `Week 02 - .../W02_Learner_Workbook.md` | Learner workbook for Week 02, and same pattern through Week 08 |
+| `Week 02 - .../W02_Presenter_Deck.html` | Synced presenter deck for Week 02, and same pattern through Week 08 |
+| `Week 02 - .../W02_Learner_Deck.html` | Synced learner deck for Week 02, and same pattern through Week 08 |
+| `build_synced_decks.mjs` | Rebuilds all 16 HTML deck files from the cleaned templates |
 
 The reusable source templates live in the root `templates/` folder.
 
