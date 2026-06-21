@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <!--
 ================================================================
-LinkedIn Carousel Template — A Field Guide series
+LinkedIn Carousel Template
 ================================================================
 
 BEFORE YOU OPEN THE FIRST SLIDE:
-  1. Read [[linkedin_carousel_hook_research]] in memory. The cover is the
-     only KPI that matters; do not draft it without re-reading the four
-     hook archetypes and the under-200-char / specificity rules.
-  2. Read [[feedback_slide_geometry_clipping]] in memory. The cover
-     layout's SVG-margin-not-parent-padding rule is load-bearing — if you
-     break it, the cover footer disappears.
+  1. Make the cover specific. It is the only slide that earns the swipe.
+  2. Keep the hook under 200 characters and avoid generic "AI is changing
+     everything" language.
   3. Pick exactly ONE hook archetype for the cover: contrarian, research,
      story/confession, or specific-stakes. Match it to the carousel content.
+  4. Preserve the cover SVG geometry. The SVG uses margin on the SVG element,
+     not padding on the parent layout slot.
 
 USE OF PLACEHOLDERS:
   {{PLACEHOLDER}} = required, fill in.
@@ -64,7 +63,7 @@ REGENERATE PDF (after edits):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LinkedIn Carousel — {{HOOK_HEADLINE — one line, under 80 chars}} · A Field Guide</title>
+<title>LinkedIn Carousel — {{HOOK_HEADLINE — one line, under 80 chars}} · {{PUB_TITLE}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1389,7 +1388,7 @@ REGENERATE PDF (after edits):
 
   <!-- ====================================================== -->
   <!-- 01 — COVER : the only KPI is the swipe.
-       Before drafting: re-read [[linkedin_carousel_hook_research]] in memory.
+       Before drafting: choose one hook archetype and keep the hook specific.
        Pick ONE archetype: contrarian, research, story/confession, specific-stakes.
        Headline ≤ 80 chars on the rendered slide, ONE terra-italic accent word.
        Subhead carries the specificity (numbers, names, mechanism), ≤ 150 chars.
@@ -1399,12 +1398,12 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. {{ISSUE_NUMBER — e.g. 03}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
 
       <!-- Hero illustration.
            LOAD-BEARING LAYOUT (do not change without re-reading
-           [[feedback_slide_geometry_clipping]] memory note):
+           cover geometry note:
              - Flex slot has padding:0 so its full height goes to the SVG.
              - SVG dimensions are deliberately SMALLER than the viewBox
                (width 640, height 440 inside a 720×500 viewBox) so the
@@ -1491,7 +1490,7 @@ REGENERATE PDF (after edits):
         </h1>
         <p style="font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: var(--ink-mute); margin-top: 20px; max-width: 36ch; line-height: 1.4; font-variation-settings: 'opsz' 36;">{{HOOK_SUBHEAD — specifics + promise of teach + toolkit}}</p>
         <div class="cover-footer">
-          <span>A Field Guide to Generative AI · No. {{ISSUE_NUMBER}}</span>
+          <span>{{PUB_TITLE}} · No. {{ISSUE_NUMBER}}</span>
           <span class="terra">01 / {{TOTAL_SLIDES — usually 10}} · Swipe →</span>
         </div>
       </div>
@@ -1511,7 +1510,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S2_RUNNING_LEFT — e.g. "The fundamental"}}</span><span class="dot">·</span><span>{{S2_RUNNING_RIGHT — e.g. "One line"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="body" style="justify-content: center;">
         <span class="eyebrow">{{S2_EYEBROW — short label, will render in terra mono}}</span>
@@ -1538,7 +1537,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S3_RUNNING_LEFT — e.g. "The mechanism"}}</span><span class="dot">·</span><span>{{S3_RUNNING_RIGHT — e.g. "Why it happens"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="body">
         <span class="eyebrow">{{S3_EYEBROW}}</span>
@@ -1588,7 +1587,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S4_RUNNING_LEFT — e.g. "A real case"}}</span><span class="dot">·</span><span>{{S4_RUNNING_RIGHT — e.g. "Proof"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="body">
         <span class="eyebrow">{{S4_EYEBROW}}</span>
@@ -1639,7 +1638,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S5_RUNNING_LEFT — e.g. "The receipt"}}</span><span class="dot">·</span><span>{{S5_RUNNING_RIGHT — e.g. "Side by side"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="body">
         <span class="eyebrow">{{S5_EYEBROW}}</span>
@@ -1694,7 +1693,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S6_RUNNING_LEFT — e.g. "Generalise"}}</span><span class="dot">·</span><span>{{S6_RUNNING_RIGHT — e.g. "Beyond the case"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="body">
         <span class="eyebrow">{{S6_EYEBROW}}</span>
@@ -1756,7 +1755,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S7_RUNNING_LEFT — e.g. "Defence"}}</span><span class="dot">·</span><span>{{S7_RUNNING_RIGHT — e.g. "One of four"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="defence-num">01<span class="of">/{{TOTAL_DEFENCES — e.g. 04}}</span></div>
       <div class="body">
@@ -1789,7 +1788,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S8_RUNNING_LEFT — e.g. "Defence"}}</span><span class="dot">·</span><span>{{S8_RUNNING_RIGHT — e.g. "Two of four"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="defence-num">02<span class="of">/{{TOTAL_DEFENCES}}</span></div>
       <div class="body">
@@ -1824,7 +1823,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>{{S9_RUNNING_LEFT — e.g. "Defence"}}</span><span class="dot">·</span><span>{{S9_RUNNING_RIGHT — e.g. "Three & four"}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
       <div class="defence-num">03<span class="of">/{{TOTAL_DEFENCES}}</span></div>
       <div class="body">
@@ -1863,7 +1862,7 @@ REGENERATE PDF (after edits):
     <div class="square-content">
       <div class="running-head">
         <div class="left"><span>End Notes</span><span class="dot">·</span><span>No. {{TOTAL_SLIDES}}</span></div>
-        <span class="pub-title">A Field Guide to Generative AI</span>
+        <span class="pub-title">{{PUB_TITLE}}</span>
       </div>
 
       <div class="body">

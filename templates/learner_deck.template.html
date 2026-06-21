@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generative AI for Non-Coders — Session {{SESSION_NUMBER}}</title>
+<title>{{PROGRAM_TITLE}} — Session {{SESSION_NUMBER}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -426,7 +426,7 @@
       <div class="vol">Session {{SESSION_NUMBER_WORD}} · Two Hours · Live</div>
       <div class="cover-main">
         <div class="byline" style="margin-bottom: var(--s-4); color: var(--terra);">— Starting Shortly —</div>
-        <h1 class="cover-title">{{COVER_TITLE — e.g. "A field guide to <em style='font-style: italic; color: var(--terra);'>Prompt Engineering</em> for people who don't write code."}}</h1>
+        <h1 class="cover-title">{{COVER_TITLE — e.g. "A field guide to <em style='font-style: italic; color: var(--terra);'>AI Product Judgment</em> for senior PMs."}}</h1>
         <p class="cover-byline">
           {{COVER_BYLINE — 1–2 sentences describing the promise of this session.}}
         </p>
@@ -460,7 +460,7 @@
   <div class="slide">
     <div class="running-head">
       <div class="left"><span>Session {{SESSION_NUMBER_PADDED}}</span><span class="dot">·</span><span class="topic">{{SLIDE_2_SECTION}}</span></div>
-      <span class="pub-title">{{PUB_TITLE — e.g. "A Field Guide to Generative AI"}}</span>
+      <span class="pub-title">{{PUB_TITLE — e.g. "Production AI PM Field Notes"}}</span>
     </div>
     <div class="slide-body">
       <span class="eyebrow">{{SLIDE_2_EYEBROW — e.g. "The shift"}}</span>
@@ -537,14 +537,14 @@
 <script>
   const slides = document.querySelectorAll('.slide');
   const totalSlides = slides.length;
-  const MASTER_KEY = 'genai_s{{SESSION_NUMBER}}_slide_master';
+  const MASTER_KEY = 'course_s{{SESSION_NUMBER}}_slide_master';
   let current = 0;
 
   function show(index) {
     current = Math.max(0, Math.min(totalSlides - 1, index));
     slides.forEach((s, i) => s.classList.toggle('active', i === current));
     document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
-    try { localStorage.setItem('genai_s{{SESSION_NUMBER}}_learner_slide', String(current)); } catch (e) {}
+    try { localStorage.setItem('course_s{{SESSION_NUMBER}}_learner_slide', String(current)); } catch (e) {}
 
     // Break-clock: start on .break-slide, stop otherwise. Detect by class, not index.
     if (slides[current] && slides[current].classList.contains('break-slide')) {
@@ -643,8 +643,8 @@
 
   // Pair with presenter deck. Both decks MUST have identical slides.length —
   // if the clamp ever triggers, the symmetry contract was broken.
-  // See memory: edyoda_facilitation_patterns.md § 3.
-  const PRINT_KEY = 'genai_s{{SESSION_NUMBER}}_print_request';
+  // Print requests are sent by the paired presenter deck through localStorage.
+  const PRINT_KEY = 'course_s{{SESSION_NUMBER}}_print_request';
   let lastPrintStamp = '';
   window.addEventListener('storage', (e) => {
     if (e.key === MASTER_KEY) {
@@ -748,7 +748,7 @@
     try {
       const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
       if (!isNaN(master) && master >= 0) { show(Math.min(master, totalSlides - 1)); return; }
-      const saved = parseInt(localStorage.getItem('genai_s{{SESSION_NUMBER}}_learner_slide') || '0', 10);
+      const saved = parseInt(localStorage.getItem('course_s{{SESSION_NUMBER}}_learner_slide') || '0', 10);
       if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
     } catch (e) {}
     show(0);

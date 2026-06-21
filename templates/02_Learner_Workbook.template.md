@@ -1,12 +1,12 @@
-# Generative AI for Non-Coders — Session {{SESSION_NUMBER}} Workbook
+# {{PROGRAM_TITLE}} — Session {{SESSION_NUMBER}} Workbook
 
 **{{SESSION_TITLE}}**
 
 **{{WORKBOOK_HOOK_LINE — one-sentence welcome that calls back to the prior session and points at the deliverable.}}**
 
-By the end of these two hours, you will have {{LEARNER_DELIVERABLE — concrete thing they'll walk out with.}}.
+By the end of this 120-minute session, you will have {{LEARNER_DELIVERABLE — concrete thing they'll walk out with.}}.
 
-{{WORKBOOK_VIBE_LINE — one-sentence framing of what kind of session this is, e.g. "No code. No prep. Just you, the Builder, and this workbook."}}
+{{WORKBOOK_VIBE_LINE — one-sentence framing of what kind of session this is, e.g. "Strategy first, then studio critique, then one portfolio artifact you can improve after class."}}
 
 One rule for today: **{{ONE_RULE — same line as in the facilitator script.}}**
 
@@ -25,7 +25,7 @@ One rule for today: **{{ONE_RULE — same line as in the facilitator script.}}**
 - [ ] **{{BONUS_TAB_1}}** — {{BONUS_TAB_1_STATE}}
 - [ ] **{{BONUS_TAB_2}}** — {{BONUS_TAB_2_STATE}}
 
-> If you can't {{COMMON_STUCK_SCENARIO — e.g. "log into the Builder in the first 5 minutes"}}, DM the facilitator or TA. {{COMMON_STUCK_REMEDY — e.g. "A backup agent for your track is one click away — you will not be left behind."}}
+> If you can't {{COMMON_STUCK_SCENARIO — e.g. "access one of the tools in the first 5 minutes"}}, DM the facilitator or TA. {{COMMON_STUCK_REMEDY — e.g. "Use the shared fallback doc or paired critique flow — you will not be left behind."}}
 
 ---
 
@@ -47,7 +47,7 @@ Then — quick second prompt:
 
 ## 🧭 HOW THIS WORKBOOK WORKS
 
-{{WORKBOOK_STRUCTURE_INTRO — one sentence describing the session's organizing principle. e.g. "The build happens in five lettered steps. Your facilitator will call them out by letter:"}}
+{{WORKBOOK_STRUCTURE_INTRO — one sentence describing the session's organizing principle. e.g. "The session moves through five applied steps. Your facilitator will call them out by label:"}}
 
 | Step | What you do | Time |
 |---|---|---|

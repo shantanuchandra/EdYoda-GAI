@@ -1,10 +1,10 @@
-# Facilitator Script — {{SESSION_TITLE}} (Session {{SESSION_NUMBER}} of 3)
+# Facilitator Script — {{SESSION_TITLE}} (Session {{SESSION_NUMBER}} of {{TOTAL_SESSIONS}})
 
 **Subtitle:** *{{SESSION_SUBTITLE — one-sentence promise of what the learner will be able to do by the end.}}*
-**Duration:** 120 minutes · **Format:** Live virtual (Zoom/Meet) · **Audience:** {{AUDIENCE_DESCRIPTION — e.g. "Same room as Session N-1 — mixed India + international; marketing/sales, finance/consulting, at least one doctor."}}
-**Spine:** {{SESSION_SPINE — 3–4 phase arc, e.g. "Concept Sprint → Long Build → Pattern Debrief"}}
+**Duration:** 120 minutes · **Format:** Live virtual (Zoom/Meet) · **Audience:** {{AUDIENCE_DESCRIPTION — e.g. "Senior PMs and product leaders building AI product judgment and technical fluency."}}
+**Spine:** {{SESSION_SPINE — 3–4 phase arc, e.g. "Strategy Lens → Applied Walkthrough → Studio Critique → Portfolio Assignment"}}
 **Hands-on share:** ~{{HANDS_ON_PERCENT}}% (≈{{HANDS_ON_MINUTES}} min of learner activity).
-**Build artifact:** {{BUILD_ARTIFACT — what the learner walks out with, role-customized.}}
+**Session artifact:** {{BUILD_ARTIFACT — what the learner walks out with, personalized to their capstone or work context.}}
 **Tools assumed available:** {{TOOLS_LIST — every browser tab the facilitator needs pre-loaded.}}
 
 ---
@@ -12,7 +12,7 @@
 ## Pre-Class Checklist (do this 24 hours before)
 
 - [ ] {{PRECLASS_EMAIL_INSTRUCTION — the 1-line email to send learners with the calendar link and what to have open.}}
-- [ ] Send the **Session {{SESSION_NUMBER}} Learner Workbook** as a Google Doc (view-only). Confirm the link is in the calendar invite and the day-of email.
+- [ ] Send the **Session {{SESSION_NUMBER}} Learner Workbook** as a Google Doc or shared doc (view-only). Confirm the link is in the calendar invite and the day-of email.
 - [ ] {{PRECLASS_TOOL_PREP_1 — e.g. "Pre-build the demo agent you'll use in Build Step E."}}
 - [ ] {{PRECLASS_TOOL_PREP_2 — additional tool / backup prep.}}
 - [ ] Pre-load browser tabs on your machine:
@@ -26,7 +26,7 @@
 
 ---
 
-## Opening Hook Slide (have this up 5 min before class starts)
+## Opening Hook Slide (have this up 5 minutes before class starts)
 
 > **"{{OPENING_HOOK_LINE — one-sentence visceral hook that calls back to the prior session or the central pain.}}"**
 
@@ -34,9 +34,9 @@ Play soft instrumental music until you start. Welcoming, not awkward silence.
 
 ---
 
-# THE 120-MINUTE RUN SHEET
+# THE 120-MINUTE BLENDED RUN SHEET
 
-Each block has: **what you say (italics)**, **what you do**, **what learners do**, and **timing guard**.
+Each block blends strategy, applied walkthrough, studio critique, and portfolio work. Each block has: **what you say (italics)**, **what you do**, **what learners do**, and **timing guard**.
 
 ---
 
@@ -53,7 +53,7 @@ Each block has: **what you say (italics)**, **what you do**, **what learners do*
 
 > **Why this works:** {{COLD_OPEN_RATIONALE — research/UX note for facilitator.}}
 
-### {{BLOCK_0_SLOT_2}} — {{BLOCK_0_SLOT_2_NAME — e.g. "Session N-1 Callback"}}
+### {{BLOCK_0_SLOT_2}} — {{BLOCK_0_SLOT_2_NAME — e.g. "Prior Session Callback"}}
 
 *"{{CALLBACK_SPEECH — recall a specific moment from the prior session.}}"*
 
@@ -117,10 +117,10 @@ Read this slide aloud, briskly:
 
 → {{ACTION}}
 
-<!-- For build sessions, name steps with LETTERS:
+<!-- For hands-on sessions, name steps with LETTERS:
      BUILD STEP A, BUILD STEP B, BUILD STEP C, ... (so they match workbook).
-     For concept sessions, name steps with NUMBERS:
-     Sprint 1, Sprint 2, Sprint 3, ... -->
+     For strategy or critique sessions, name steps with NUMBERS:
+     Exercise 1, Exercise 2, Studio Review, ... -->
 
 ### {{BLOCK_2_SLOT_2}} — BUILD STEP {{BUILD_STEP_LETTER_1}}: {{BUILD_STEP_NAME}} ({{BUILD_STEP_DURATION}} hands-on)
 

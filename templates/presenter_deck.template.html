@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Presenter · GenAI for Non-Coders · Session {{SESSION_NUMBER}}</title>
+<title>Presenter · {{PROGRAM_TITLE}} · Session {{SESSION_NUMBER}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -308,7 +308,7 @@
 <body>
 
 <div class="topbar">
-  <span class="title">Presenter · <span class="accent">GenAI · Session {{SESSION_NUMBER}}</span></span>
+  <span class="title">Presenter · <span class="accent">{{PROGRAM_TITLE}} · Session {{SESSION_NUMBER}}</span></span>
   <div class="clock-divider"></div>
   <div class="clock-box real">
     <span class="label">Real clock</span>
@@ -577,7 +577,7 @@ function show(i) {
   document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
   document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
 
-  try { localStorage.setItem('genai_s{{SESSION_NUMBER}}_slide_master', String(current)); } catch (e) {}
+  try { localStorage.setItem('course_s{{SESSION_NUMBER}}_slide_master', String(current)); } catch (e) {}
 
   // Auto-fire the 10-min break timer on the break slide. Stop a phantom break
   // timer (≥9 min remaining) if we navigated away early. Don't kill a regular
@@ -613,8 +613,8 @@ document.addEventListener('keydown', (e) => {
    If no learner tab is open, opens one first, then signals after a render delay.
    The learner-side @page CSS forces landscape 16:9 one-slide-per-page. */
 function exportLearnerPDF() {
-  const PRINT_KEY = 'genai_s{{SESSION_NUMBER}}_print_request';
-  const MASTER_KEY = 'genai_s{{SESSION_NUMBER}}_slide_master';
+  const PRINT_KEY = 'course_s{{SESSION_NUMBER}}_print_request';
+  const MASTER_KEY = 'course_s{{SESSION_NUMBER}}_slide_master';
   // Bump the value so a repeat press still fires a 'storage' event in the other tab.
   const stamp = Date.now().toString();
   // Always write so a learner tab that's already open hears the signal.
@@ -622,7 +622,7 @@ function exportLearnerPDF() {
   // Best-effort fallback: if no learner tab might be open, open one and resend after it loads.
   // We can't reliably detect "is the other tab open" — so we open a new window and resend.
   // If a learner tab already exists, the browser focuses it instead of duplicating in most setups.
-  const w = window.open('learner_deck.html', 'edyoda_learner_deck');
+  const w = window.open('learner_deck.html', 'course_learner_deck');
   if (w) {
     // Give the learner tab time to attach its storage listener and finish first render.
     setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);
