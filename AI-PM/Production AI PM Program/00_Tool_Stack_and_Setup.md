@@ -29,6 +29,8 @@ For learners who want deeper technical credibility:
 - A hosted vector/RAG tool or lightweight framework.
 - PostHog, Amplitude, or equivalent product analytics tool.
 
+Use `00_Advanced_Technical_Companion.md` for the deeper optional path: system architecture, RAG, agents, evals, tracing, cost, latency, safety, and engineering review questions.
+
 ---
 
 ## Learner Setup Checklist
@@ -70,4 +72,3 @@ Before Week 8:
 - Add autonomy only when it improves measurable outcomes.
 - Treat every tool action as a product permission decision.
 - Keep tool choices replaceable.
-
