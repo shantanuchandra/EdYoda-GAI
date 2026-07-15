@@ -106,28 +106,29 @@ These two informed the FINAL locked live-build pair (see §1) — both adapted w
 
 1. ~~Final live-build agent pick~~ **DONE** — see §1 and §3 "Final live-build agent design decisions."
 2. ~~Hermes setup instructions for pre-read~~ **DONE (research)** — see [research/02_Hermes_Setup_Research.md](research/02_Hermes_Setup_Research.md). Still need to: (a) adapt this raw research into the actual founder-facing pre-read doc (friendlier tone, no internal notes), (b) decide whether Telegram-as-remote-control is acceptable for all 10 founders or if it introduces its own friction to flag in advance.
-3. **Session minute-by-minute structure** — not yet designed. Per [[feedback_no_minute_callouts]], minute markers belong in the facilitator run sheet only, never in learner-facing narration.
+3. ~~Session minute-by-minute structure~~ **DONE** — see [session/01_Facilitator_Script.md](session/01_Facilitator_Script.md). Full 10am-2pm run sheet, minute markers facilitator-side only per [[feedback_no_minute_callouts]].
 4. **Pre-read questionnaire design** — needs to be built to diagnose "which ops domain is your bottleneck," sent before the Saturday session. Now has a second job: also carry the Hermes setup instructions.
-5. ~~Templates for the other 4-5 domains~~ **Input ready** — Round 2 catalog (§3, [research/03_Agent_Idea_Catalog.md](research/03_Agent_Idea_Catalog.md)) has 51 vetted ideas across all domains to draw templates from. Still need to actually design the template hand-out format.
+5. ~~Templates for the other 4-5 domains~~ **Input ready** — Round 2 catalog (§3, [research/03_Agent_Idea_Catalog.md](research/03_Agent_Idea_Catalog.md)) has 51 vetted ideas across all domains to draw templates from. Used directly in the Generalize block of the facilitator script.
 6. **Workbook / handbook design** — per [[feedback_no_engagement_theater_in_workbook]], keep this a crisp recipe card, no facilitator-side reassurance language.
-7. **Verify Hermes actually supports the business-ops pattern we need** — trigger (webhook/schedule) → tool call (GitHub API / web-search) → LLM reasoning (draft digest/outreach) → action (Gmail draft / message). Confirmed Hermes has cron scheduler, webhooks, MCP servers, and 40+ tools in principle — but no concrete "hello world" business-ops example has been verified yet. Needs a dry-run build before Saturday to make sure the live demo actually works on this platform.
-8. **Curated fallback investor list** — needs to be compiled (real seed-stage investors, sourced/verified — not fabricated) as the backup path for Agent 2 if live web-search underperforms in the room.
+7. **⚠️ RISK ACCEPTED, NOT RESOLVED: Hermes business-ops pattern is UNVERIFIED.** User explicitly decided (2026-07-16) to skip a live dry-run for now and proceed with docs written from research alone — a real dry-run requires actual API keys/credentials this environment can't safely fabricate. **The recipe doc (task 6) must be clearly marked as unverified**, and the user (or someone before Saturday) MUST dry-run both agent builds end-to-end on a real Hermes instance before the session — this is called out explicitly in the facilitator script's pre-session checklist and practice recommendation. If no one dry-runs this before Saturday, both live-build demos carry real failure risk.
+8. ~~Curated fallback investor list~~ **DONE** — 17 verified entries (India generalist, India sector-specific, India angel networks, global-with-India-relevance) in [session/03_Hermes_Build_Recipes.md](session/03_Hermes_Build_Recipes.md) appendix. Compiled via 5 parallel research threads, each cross-verified against official fund sites + dated press. Entries with only weak/aggregator-only sourcing were deliberately dropped — notable drops: Unitus Ventures (rebranded to Capria, scope changed), Java Capital (pivoted to deeptech/climate specialist), Kalaari Capital and Orios Venture Partners (conflicting third-party data, could not verify), 500 Global (no official India confirmation found), Hustle Fund (India eligibility unconfirmed — flagged, not included in final table).
 
 ---
 
-## 8. Asset Production Scope (locked 2026-07-16)
+## 8. Asset Production Scope (locked 2026-07-16) — ALL 6 ARTIFACTS COMPLETE
 
-Per user direction — build these 5 artifacts, reusing the `templates/` design system where it fits a 4-hour hands-on session (not the 8-session cohort course it was built for):
+Per user direction — built these artifacts, reusing the `templates/` design system where it fits a 4-hour hands-on session (not the 8-session cohort course it was built for). All now live in `session/`:
 
-1. **Pre-read** — sent before Saturday. Carries: (a) the "which ops domain is your bottleneck" diagnostic, (b) full Hermes + OpenAI setup instructions adapted from [research/02_Hermes_Setup_Research.md](research/02_Hermes_Setup_Research.md), (c) what to bring (own GitHub repo access, round details for the investor agent).
-2. **Learner workbook** — crisp recipe-card companion for the room. Per [[feedback_no_engagement_theater_in_workbook]]: no emoji-reaction prompts, no reassurance paragraphs.
-3. **Hermes-specific build recipe doc** — ONE combined doc, two sections: Part 1 = Weekly Repo/Product Digest Agent, Part 2 = Investor Qualification + Outreach Agent. This is the literal step-by-step "type this, configure that" reference founders follow while building.
-4. **Learner deck** — paper/editorial mode, reading artifact, per `templates/learner_deck.template.html`.
-5. **Presenter deck** — dark console/cockpit mode, JS-rendered from `slides` array, per `templates/presenter_deck.template.html`.
+1. ~~Pre-read~~ **DONE** — [session/00_Pre_Read.md](session/00_Pre_Read.md). Carries the bottleneck diagnostic + full Hermes/OpenAI setup instructions + what-to-bring checklist.
+2. ~~Facilitator run sheet~~ **DONE** — [session/01_Facilitator_Script.md](session/01_Facilitator_Script.md). Full 10am-2pm minute-by-minute spine + contingency guide.
+3. ~~Learner workbook~~ **DONE** — [session/02_Learner_Workbook.md](session/02_Learner_Workbook.md). Crisp recipe-card tone, no engagement theater.
+4. ~~Hermes build recipe doc~~ **DONE** — [session/03_Hermes_Build_Recipes.md](session/03_Hermes_Build_Recipes.md). Two parts (Repo Digest Agent, Investor Agent) + verified 17-entry fallback investor list appendix. **⚠️ Marked unverified — no live Hermes dry-run was performed, see §5.7.**
+5. ~~Learner deck~~ **DONE** — [session/learner_deck.html](session/learner_deck.html). 16 slides, paper/editorial mode, browser-verified (screenshots, break-clock countdown, matrix/pipeline diagrams all confirmed working at 1280×720).
+6. ~~Presenter deck~~ **DONE** — [session/presenter_deck.html](session/presenter_deck.html). 16 slides matching the learner deck 1:1, dark console/cockpit mode, JS-rendered, browser-verified (pace tracking, break auto-timer, no console errors). Adapted for 4-hour/240-min session (vs. template's 120-min default) and 15-min break (vs. template's 10-min default).
 
 **Explicitly skipped for now:** LinkedIn carousel — to be built later, after the session has real outcomes/screenshots to show.
 
-**Build order** (per `templates/README.md` recommended order, adapted): facilitator-script-equivalent structure first (embedded in the presenter deck's `slides` data + the build recipe doc), then workbook, then learner deck, then presenter deck. Carousel deferred entirely.
+**Remaining before Saturday (see §5 for full list):** someone must dry-run both Hermes agent builds end-to-end on a real instance — this was explicitly deferred, not resolved, and is the single biggest risk to the session as of this writing.
 
 ---
 
