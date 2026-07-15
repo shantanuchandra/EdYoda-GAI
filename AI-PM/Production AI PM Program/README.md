@@ -53,6 +53,7 @@ By the end, learners will be able to lead an AI product from strategy to product
 | File or folder | Purpose |
 |---|---|
 | `index.html` | Local clickable navigator for all course-level docs and weekly materials |
+| `md-viewer.html` | Local Markdown viewer used by the navigator for `.md` files |
 | `00_Master_Index.md` | Complete package map and recommended setup order |
 | `00_Cohort_Operating_Plan.md` | How to run the cohort week by week |
 | `00_Learner_Handbook.md` | Learner-facing guide to the cohort, artifacts, critique, confidentiality, and portfolio expectations |

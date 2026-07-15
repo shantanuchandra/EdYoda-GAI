@@ -133,6 +133,23 @@
       padding-top: 20px;
       border-top: 1px solid var(--line);
     }
+    .viewer-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fffdf8;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .viewer-note a {
+      color: var(--accent-dark);
+      font-weight: 800;
+      text-decoration: none;
+    }
     @media (max-width: 720px) {
       header, main { padding-left: 18px; padding-right: 18px; }
       .links { grid-template-columns: 1fr; }
@@ -147,6 +164,7 @@
       <div class="kicker">Production AI PM</div>
       <h1>Program Navigator</h1>
       <p class="subtitle">A local index for the complete cohort package: strategy docs, learner assets, instructor operations, rubrics, casebook, prompt library, synced decks, and weekly workbooks.</p>
+      <div class="viewer-note">Markdown docs open in the <a href="md-viewer.html">built-in viewer</a>.</div>
     </div>
   </header>
   <main>
@@ -262,5 +280,11 @@
       </div>
     </div>
   </main>
+  <script>
+    for (const link of document.querySelectorAll('a[href$=".md"]')) {
+      const source = decodeURIComponent(link.getAttribute("href"));
+      link.href = "md-viewer.html?file=" + encodeURIComponent(source);
+    }
+  </script>
 </body>
 </html>

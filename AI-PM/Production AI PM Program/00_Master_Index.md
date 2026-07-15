@@ -32,6 +32,7 @@ Use this file as the first internal reference when preparing the cohort.
 |---|---|---|
 | `README.md` | Internal | Quick package overview and folder map |
 | `index.html` | Internal / facilitator | Clickable local navigator for docs, decks, and weekly materials |
+| `md-viewer.html` | Internal / facilitator / learners | Local Markdown viewer for course docs |
 | `00_Master_Index.md` | Internal | Complete package map |
 | `00_Cohort_Operating_Plan.md` | Internal | Cohort rhythm, feedback checkpoints, and facilitation principles |
 | `00_Learner_Handbook.md` | Learners | How to move through the program and build the portfolio |
