@@ -4,3 +4,5 @@
 .firecrawl/
 .brainstorm/
 .playwright-mcp/
+Founder's Guide to Agents/.env.template
+*.env*
