@@ -1,7 +1,7 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/00_Pre_Read.html" },
-    { "source": "/presenter", "destination": "/presenter.html" },
+    { "source": "/presenter", "destination": "/presenter_deck.html" },
     { "source": "/handbook", "destination": "/handbook.html" },
     { "source": "/learner", "destination": "/learner_deck.html" },
     { "source": "/runbook", "destination": "/runbook.html" }
