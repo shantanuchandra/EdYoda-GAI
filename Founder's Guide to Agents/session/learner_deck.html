@@ -754,7 +754,31 @@
 
   const slides = document.querySelectorAll('.slide');
   const totalSlides = slides.length;
-  const MASTER_KEY = 'founders_guide_agents_slide_master';
+  const MASTER_KEY = 'founders_guide_agents_slide_master_v2';
+  const learnerStageIndex = {
+    opener: 1,
+    model: 2,
+    'agent-test': 3,
+    roadmap: 4,
+    'repo-intro': 5,
+    'repo-build': 6,
+    'repo-debrief': 7,
+    break: 8,
+    'investor-intro': 9,
+    'round-form': 10,
+    'investor-build': 11,
+    'investor-debrief': 13,
+    generalize: 14,
+    sketch: 14,
+    'peer-share': 14,
+    close: 15
+  };
+
+  function stageToLearnerIndex(stage) {
+    return Object.prototype.hasOwnProperty.call(learnerStageIndex, stage)
+      ? learnerStageIndex[stage]
+      : null;
+  }
   let current = 0;
 
   function show(index) {
@@ -857,9 +881,10 @@
   let lastPrintStamp = '';
   window.addEventListener('storage', (e) => {
     if (e.key === MASTER_KEY) {
-      const v = parseInt(e.newValue, 10);
-      if (isNaN(v)) return;
-      const target = Math.min(v, totalSlides - 1);
+      let state;
+      try { state = JSON.parse(e.newValue || ''); } catch (err) { return; }
+      const target = stageToLearnerIndex(state.stage);
+      if (target === null) return;
       if (target !== current) show(target);
       return;
     }
@@ -942,8 +967,9 @@
 
   (function init() {
     try {
-      const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
-      if (!isNaN(master) && master >= 0) { show(Math.min(master, totalSlides - 1)); return; }
+      const state = JSON.parse(localStorage.getItem(MASTER_KEY) || 'null');
+      const master = state && stageToLearnerIndex(state.stage);
+      if (master !== null && master !== undefined) { show(master); return; }
       const saved = parseInt(localStorage.getItem('founders_guide_agents_learner_slide') || '0', 10);
       if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
     } catch (e) {}

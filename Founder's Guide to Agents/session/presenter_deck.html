@@ -390,7 +390,7 @@
 <script>
 const slides = [
   {
-    num: 1, when: "10:00 – 10:10", duration: "10 min", tag: "title",
+    num: 1, sync: "opener", when: "10:00 – 10:10", duration: "10 min", tag: "title",
     title: "Round-Robin Opener",
     ask: "What is the one repetitive operational task you would happily never do again?",
     say: "Go around the room — 30 seconds each. Your one-line pitch, and the one ops task that's eating your week right now. Not your product roadmap — the annoying, repetitive thing that isn't your product but won't leave you alone.",
@@ -403,7 +403,7 @@ const slides = [
     bridge: "Straight into the mental model — the framework for everything today."
   },
   {
-    num: 2, when: "10:10 – 10:20", duration: "10 min", tag: "demo",
+    num: 2, sync: "model", when: "10:10 – 10:20", duration: "10 min", tag: "demo",
     title: "The Mental Model — 2×2",
     ask: "Where does your chosen task sit today — and what evidence says it needs an agent rather than a tool or a human?",
     say: "Here's the one framework I want you to leave with today — not just for what we build in this room, but for every future 'should I build an agent for this' decision you'll ever make.",
@@ -416,7 +416,7 @@ const slides = [
     bridge: "Now the harder question — how do you tell a real agent from a fancy prompt?"
   },
   {
-    num: 3, when: "10:20 – 10:30", duration: "10 min", tag: "demo",
+    num: 3, sync: "agent-test", when: "10:20 – 10:30", duration: "10 min", tag: "demo",
     title: "Agent vs. Prompt: The Real Distinction",
     ask: "Which of the three tests does your current AI workflow fail?",
     say: "Quick gut check — raise your hand if you've ever asked ChatGPT or Claude to draft something and called it 'using AI.' That's not an agent. That's a smart prompt.",
@@ -430,7 +430,7 @@ const slides = [
     bridge: "Time to make the promise concrete — here's what you're walking out with."
   },
   {
-    num: 4, when: "10:30 – 10:35", duration: "5 min", tag: "title",
+    num: 4, sync: "roadmap", when: "10:30 – 10:35", duration: "5 min", tag: "title",
     title: "The Promise + Roadmap",
     ask: "What will count as proof that you have a working agent by 2pm?",
     say: "By 2pm, you will have built two working agents on your own machine, connected to your own tools. Not a demo. Not a template you'll never open again. Something you can leave running Monday morning.",
@@ -442,7 +442,7 @@ const slides = [
     bridge: "First build starts now — the simpler of the two, to build confidence."
   },
   {
-    num: 5, when: "10:35 – 10:40", duration: "5 min", tag: "demo",
+    num: 5, sync: "repo-intro", when: "10:35 – 10:40", duration: "5 min", tag: "demo",
     title: "Build Block A — Setup: Repo Digest Agent",
     ask: "Who is the non-technical reader of this digest, and what decision should it help them make?",
     say: "First agent: it watches your repo, and every week it tells you — in plain English, not git-speak — what actually shipped. Useful for your own memory, for a co-founder who doesn't read code, for an investor update you'll build the muscle for later today.",
@@ -453,7 +453,7 @@ const slides = [
     bridge: "Hands-on time starts — 45 minutes."
   },
   {
-    num: 6, when: "10:40 – 11:25", duration: "45 min", tag: "exercise",
+    num: 6, sync: "repo-build", when: "10:40 – 11:25", duration: "45 min", tag: "exercise",
     title: "BUILD STEP A: Repo Digest Agent",
     ask: "Can you point to one live source, one output, and one successful run before moving on?",
     say: "Follow Part 1 of your recipe doc. I'll walk the room — flag me the second something breaks, don't sit stuck for more than 2 minutes.",
@@ -467,7 +467,7 @@ const slides = [
     bridge: "Debrief, then straight into the break."
   },
   {
-    num: 7, when: "11:25 – 11:35", duration: "10 min", tag: "demo",
+    num: 7, sync: "repo-debrief", when: "11:25 – 11:35", duration: "10 min", tag: "demo",
     title: "Build Block A — Debrief",
     ask: "Did the output explain what changed clearly enough for someone who never reads GitHub?",
     say: "Notice what just happened — that agent read something live (your actual commits), did something no static prompt could do (reached into your repo), and it'll do this again next week without you touching it. That's the three-part test again, just proven with your own hands.",
@@ -479,7 +479,7 @@ const slides = [
     bridge: "15-minute break. Real break."
   },
   {
-    num: 8, when: "11:35 – 11:50", duration: "15 min", tag: "break", block: "BREAK",
+    num: 8, sync: "break", when: "11:35 – 11:50", duration: "15 min", tag: "break", block: "BREAK",
     title: "🟢 BREAK · 15 minutes · NON-NEGOTIABLE",
     ask: "What is the one blocker you need cleared before Build B starts?",
     say: "15 minutes. Real break — grab coffee, stretch, check your phone. Back at 11:50 sharp.",
@@ -492,7 +492,7 @@ const slides = [
     watch: "Honor the break. Do not start Build B early."
   },
   {
-    num: 9, when: "11:50 – 11:55", duration: "5 min", tag: "demo",
+    num: 9, sync: "investor-intro", when: "11:50 – 11:55", duration: "5 min", tag: "demo",
     title: "Build Block B — Setup: Investor Agent",
     ask: "Where is the human approval gate, and what must never happen automatically?",
     say: "This one has real stakes — it's touching your actual fundraise. Here's the shape: you tell it your round — stage, sector, geography, check size. It goes and searches for investors who actually fit that shape. It scores them. And for the good matches, it writes you a personalized outreach email — not sent, just sitting in your Gmail drafts, waiting for you to read it, fix anything that's off, and hit send yourself.",
@@ -503,7 +503,7 @@ const slides = [
     bridge: "Founders fill their round-description form first."
   },
   {
-    num: 10, when: "11:55 – 12:10", duration: "15 min", tag: "exercise",
+    num: 10, sync: "round-form", when: "11:55 – 12:10", duration: "15 min", tag: "exercise",
     title: "Round-Description Form",
     ask: "What facts would make an investor a credible fit — not just a name in a search result?",
     say: "Before the agent can search, it needs to know what it's searching for. Fill in your round shape — stage, sector, geography, check size, anything else that matters to your specific fundraise.",
@@ -515,7 +515,7 @@ const slides = [
     bridge: "Now the real build — search, score, draft."
   },
   {
-    num: 11, when: "12:10 – 12:50", duration: "40 min", tag: "exercise",
+    num: 11, sync: "investor-build", when: "12:10 – 12:50", duration: "40 min", tag: "exercise",
     title: "BUILD STEP B: Investor Agent",
     ask: "Can every recommended investor be traced to a current source before a draft is created?",
     say: "Time to build. Search for matching investors, score them, draft personalized outreach — all landing in Gmail drafts, never sent.",
@@ -529,7 +529,7 @@ const slides = [
     bridge: "Debrief, then the block everyone's own domain gets applied."
   },
   {
-    num: 12, when: "12:50 – 1:05", duration: "15 min", tag: "demo",
+    num: 12, sync: "investor-debrief", when: "12:50 – 1:05", duration: "15 min", tag: "demo",
     title: "Build Block B — Debrief",
     ask: "Would you be comfortable reviewing this draft — and can you explain why it was written for this investor?",
     say: "Two agents built. Both pass the same three-part test: live data, real action in another system, running without you re-prompting it every time. That's the whole pattern. Everything else is just... which tools, which data.",
@@ -541,7 +541,7 @@ const slides = [
     bridge: "Now founders apply this to their own bottleneck domain."
   },
   {
-    num: 13, when: "1:05 – 1:15", duration: "10 min", tag: "demo",
+    num: 13, sync: "generalize", when: "1:05 – 1:15", duration: "10 min", tag: "demo",
     title: "Generalize — Reintroduce the Catalog",
     ask: "Which bottleneck has enough frequency and enough structure to earn a one-week experiment?",
     say: "This morning you each named your own ops bottleneck. Your pre-read diagnostic scored it too. Now — same pattern, your domain.",
@@ -552,7 +552,7 @@ const slides = [
     bridge: "Sketch time — 20 minutes."
   },
   {
-    num: 14, when: "1:15 – 1:35", duration: "20 min", tag: "exercise",
+    num: 14, sync: "sketch", when: "1:15 – 1:35", duration: "20 min", tag: "exercise",
     title: "Sketch Your Next Agent",
     ask: "What is the smallest safe first version — trigger, data, reasoning, action, and human check?",
     say: "Same pattern. Your bottleneck. Sketch it using trigger, live data, reasoning, action — the exact shape of both agents you built today.",
@@ -565,7 +565,7 @@ const slides = [
     bridge: "Peer share-outs — who wants to show their sketch?"
   },
   {
-    num: 15, when: "1:35 – 1:50", duration: "15 min", tag: "demo",
+    num: 15, sync: "peer-share", when: "1:35 – 1:50", duration: "15 min", tag: "demo",
     title: "Peer Share-Outs",
     ask: "What would make this agent useful next Monday rather than merely impressive today?",
     say: "Quick round — who wants to share their sketch? Not the whole thing, just: trigger, and the one action it takes.",
@@ -576,7 +576,7 @@ const slides = [
     bridge: "Time to close."
   },
   {
-    num: 16, when: "1:50 – 2:00", duration: "10 min", tag: "title",
+    num: 16, sync: "close", when: "1:50 – 2:00", duration: "10 min", tag: "title",
     title: "Close",
     ask: "What is the single scheduled run or review you will set up before the week ends?",
     say: "You came in this morning with an idea of what an agent is. You're leaving with two of them actually running, and a sketch of a third. That's not a framework you'll forget by Monday — that's muscle memory.",
@@ -590,6 +590,7 @@ const slides = [
 ];
 
 const BREAK_SLIDE_INDEX = slides.findIndex(s => s.tag === 'break');
+const SYNC_KEY = 'founders_guide_agents_slide_master_v2';
 
 const slidePane = document.getElementById('slidePane');
 
@@ -698,7 +699,7 @@ function show(i) {
   document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
   document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
 
-  try { localStorage.setItem('founders_guide_agents_slide_master', String(current)); } catch (e) {}
+  try { localStorage.setItem(SYNC_KEY, JSON.stringify({ stage: slides[current].sync, at: Date.now() })); } catch (e) {}
 
   if (slides[current].tag === 'break') {
     startExTimer(15 * 60);
@@ -828,7 +829,7 @@ function stopExTimer() {
   document.getElementById('timerBlock').classList.remove('warn', 'danger');
 }
 
-function openLearnerDeck() { window.open('learner_deck.html', '_blank'); }
+function openLearnerDeck() { window.open('/learner', '_blank'); }
 
 show(0);
 </script>
