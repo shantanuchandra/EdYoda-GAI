@@ -36,25 +36,7 @@ Bring this with you. You'll use it in the last block of the session, where you s
 
 ## Part 2 — Get Hermes Running
 
-### Step 1 — Set up OpenAI as your model provider
-
-1. Get an API key from `platform.openai.com/api-keys`
-2. Put it in `~/.hermes/.env`:
-   ```
-   OPENAI_API_KEY=sk-...
-   ```
-3. Set the provider in `~/.hermes/config.yaml` — **the provider id is `openai-api`, not `openai`**:
-   ```yaml
-   model:
-     provider: "openai-api"
-     default: "gpt-5.6-sol"
-   ```
-4. Or skip the files entirely and one-line it:
-   ```
-   hermes chat --provider openai-api --model gpt-5.6-sol
-   ```
-
-### Step 2 — Install Hermes
+### Step 1 — Install Hermes
 
 Works on Linux, macOS, WSL2, and Termux (Android). Windows has a separate path below.
 
@@ -67,13 +49,36 @@ Windows:
 iex (irm https://hermes-agent.nousresearch.com/install.ps1)
 ```
 
-Then, in a fresh terminal:
+**You don't need to pre-install anything else** — the installer handles Python, Node.js, and everything else it needs. You do need Git already on your machine (Linux also needs `curl` and `xz-utils`).
+
+Open a fresh terminal after install and confirm it worked:
 ```bash
-hermes model      # pick your model provider
-hermes status     # verify
+hermes --version
 ```
 
-**You don't need to pre-install anything else** — the installer handles Python, Node.js, and everything else it needs. You do need Git already on your machine (Linux also needs `curl` and `xz-utils`).
+### Step 2 — Connect OpenAI as your model provider
+
+1. Get an API key from `platform.openai.com/api-keys`
+2. Add it to `~/.hermes/.env` (this file now exists after install):
+   ```
+   OPENAI_API_KEY=sk-...
+   ```
+3. Set the provider in `~/.hermes/config.yaml` — **the provider id is `openai-api`, not `openai`**:
+   ```yaml
+   model:
+     provider: "openai-api"
+     default: "gpt-5.6-sol"
+   ```
+4. Verify it's wired up:
+   ```bash
+   hermes model      # should show openai-api / gpt-5.6-sol
+   hermes status     # should show healthy connection
+   ```
+
+If you'd rather do it in one line without editing files:
+```
+hermes chat --provider openai-api --model gpt-5.6-sol
+```
 
 ### Step 3 — Wire up Telegram
 
@@ -109,10 +114,16 @@ If the answer is coherent, you're done. Arrive Saturday with all five checked.
 
 | Problem | Fix |
 |---|---|
-| Provider not authenticated | Re-run `hermes model`. Check the OpenAI key is in `~/.hermes/.env` with no trailing spaces. |
-| OpenAI key set but Hermes won't start | Check the provider id is `openai-api` (not `openai`) and the model id is `gpt-5.6-sol` in `~/.hermes/config.yaml`. Verify with `hermes status`. |
-| Telegram bot token copied wrong | Re-run `hermes gateway setup`, paste again. |
-| Telegram user ID wrong | Get the numeric ID from `@userinfobot` or `@get_id_bot`, re-run `hermes gateway setup`. |
+| `hermes: command not found` after install | Open a brand-new terminal window — the PATH update from the installer only takes effect in a fresh shell. |
+| Install fails on macOS | Make sure Git is installed (`git --version`). If you're on Apple Silicon, run `softwareupdate --install-rosetta` first. |
+| Provider not authenticated | Check the OpenAI key is in `~/.hermes/.env` with no trailing spaces or extra quotes. Re-run `hermes model` to re-select. |
+| OpenAI key set but Hermes won't use it | Check the provider id is `openai-api` (not `openai`) and the model id is `gpt-5.6-sol` in `~/.hermes/config.yaml`. Verify with `hermes status`. |
+| `SSL: CERTIFICATE_VERIFY_FAILED`, `unable to get local issuer certificate`, or `self-signed certificate in certificate chain` | This usually means a work, school, or VPN network is inspecting HTTPS traffic and Hermes does not yet trust that network's certificate. Do **not** disable certificate verification. Switch to an unrestricted network if possible; otherwise ask your IT team for the organisation CA certificate and add it through the approved Hermes/IT process. Restart Hermes, then test in a new session. |
+| `API call failed after 3 retries: Connection error` | First distinguish network from provider issues: check that normal web access works, then run `hermes status` and confirm the selected provider/model. On a managed network, check the certificate issue above before changing keys or reinstalling. |
+| Hermes asks to configure a different provider or says a subscription/credential is exhausted | The current provider is unavailable, even if another key exists on your machine. Select the intended provider explicitly, confirm it in `hermes status`, and use the approved credential for that provider. For this workshop, the intended route is direct OpenAI API access. |
+| A new chat works but an older chat still shows errors or outdated setup advice | Chats can retain the state that existed when they were created. After changing a provider, credentials, or network certificate settings, fully restart Hermes and begin a **new session**. Keep the earlier chat only as a record; do not use it to judge whether the current setup works. |
+| Telegram bot token copied wrong | Re-run `hermes gateway setup`, paste the token again carefully — no spaces at either end. |
+| Telegram user ID wrong | Get the numeric ID (not your username) from `@userinfobot` or `@get_id_bot`, then re-run `hermes gateway setup`. |
 
 ---
 
