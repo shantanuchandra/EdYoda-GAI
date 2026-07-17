@@ -390,7 +390,21 @@
 <script>
 const slides = [
   {
-    num: 1, when: "10:00 – 10:10", duration: "10 min", tag: "title",
+    num: 1, when: "09:55 – 10:00", duration: "5 min", tag: "title",
+    title: "Cover — Pre-Session",
+    ask: "Is everyone's Hermes running and the learner deck open?",
+    say: "Get settled. Learner deck should be open on your screen — the paper-toned one. Have your GitHub repo URL ready and your Hermes bot awake. We start at 10:00 sharp.",
+    doSteps: [
+      "Put the learner deck on the projector — slide 1, the cover.",
+      "Start the pre-class countdown on the learner deck cover (click Start).",
+      "Scan the room: anyone who hasn't confirmed Hermes is alive, help them now.",
+      "Start the class clock at 10:00 when the round-robin begins."
+    ],
+    watch: "If more than 2 founders still have Hermes problems at 10:00, delay the round-robin by 5 min and use that time to unblock them — do not start the mental model until setup failures are cleared.",
+    bridge: "At 10:00 exactly: start class clock, go straight into round-robin."
+  },
+  {
+    num: 2, when: "10:00 – 10:10", duration: "10 min", tag: "title",
     title: "Round-Robin Opener",
     ask: "Who's got the most painful ops task in the room right now — let's find out.",
     say: "Go around the room — 30 seconds each. Your one-line pitch, and the one ops task that's eating your week right now. Not your product roadmap — the annoying, repetitive thing that isn't your product but won't leave you alone.",
