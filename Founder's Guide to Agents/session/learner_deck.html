@@ -167,6 +167,18 @@
     font-family: 'Geist Mono', monospace; font-size: 0.95rem;
     line-height: 1.7; color: var(--ink); white-space: pre-wrap; position: relative;
   }
+  .slide-question {
+    margin-top: var(--s-3); max-width: 58ch;
+    display: flex; gap: var(--s-2); align-items: flex-start;
+    background: var(--ink-blue-soft); border: 1px solid rgba(30, 58, 95, 0.22);
+    border-left: 3px solid var(--ink-blue); padding: var(--s-2) var(--s-3);
+    position: relative; z-index: 1;
+  }
+  .slide-question .q-label {
+    flex: 0 0 auto; font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-blue); font-weight: 600;
+  }
+  .slide-question p { color: var(--ink-blue); line-height: 1.45; font-weight: 500; }
   .prompt::before {
     content: 'PROMPT'; position: absolute; top: -0.6em; left: var(--s-3);
     background: var(--paper); padding: 0 0.6em;
@@ -710,6 +722,36 @@
 </div>
 
 <script>
+  const slideQuestions = [
+    "What would make today worth four hours of your time?",
+    "Which repetitive operational task would you happily stop doing yourself?",
+    "Where does that task sit on frequency and judgment — and is an agent actually the right answer?",
+    "Which of the three agent tests does your current AI workflow fail?",
+    "What proof will you have by 2pm that an agent is genuinely working?",
+    "Who needs this digest, and what decision should it make easier?",
+    "Can you show one live source, one output, and one successful run?",
+    "Could a non-technical co-founder understand what changed from this output?",
+    "What single blocker should you clear before Build B begins?",
+    "Where is your human approval gate — and what must never auto-send?",
+    "What facts would make an investor a credible fit rather than a search result?",
+    "Can every recommendation be traced to a current source before a draft is created?",
+    "If search is weak, what is your safe fallback instead of guessing?",
+    "Would you be comfortable reviewing this draft, and can you explain its personalization?",
+    "What is the smallest safe version of your next agent you could test for one week?",
+    "What scheduled run or review will you set up before the week ends?"
+  ];
+
+  document.querySelectorAll('.slide').forEach((slide, index) => {
+    const body = slide.querySelector('.slide-body');
+    const question = slideQuestions[index];
+    if (!body || !question) return;
+    const card = document.createElement('aside');
+    card.className = 'slide-question';
+    card.setAttribute('aria-label', 'Question to answer');
+    card.innerHTML = `<span class="q-label">Question</span><p>${question}</p>`;
+    body.appendChild(card);
+  });
+
   const slides = document.querySelectorAll('.slide');
   const totalSlides = slides.length;
   const MASTER_KEY = 'founders_guide_agents_slide_master';
