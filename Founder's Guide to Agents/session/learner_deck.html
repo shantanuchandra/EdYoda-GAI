@@ -698,7 +698,40 @@
     <div class="folio">15<sup>/16</sup></div>
   </div>
 
-  <!-- 16 — CLOSE -->
+  <!-- 16 — SKETCH YOUR NEXT AGENT -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">Sketch</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter">D</div>
+      <div>
+        <div class="ex-meta">Sketch · 20 minutes</div>
+        <h1>Same pattern. Your bottleneck.</h1>
+        <p class="lede mt-3">Choose the smallest safe version you could run for one week. Keep a human review where the stakes are high.</p>
+        <div class="prompt mt-4">TRIGGER → LIVE DATA → LLM REASONING → ACTION → HUMAN CHECK</div>
+      </div>
+    </div>
+    <div class="folio">16<sup>/18</sup></div>
+  </div>
+
+  <!-- 17 — PEER SHARE-OUTS -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">Share</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow cool">Peer share-out</span>
+      <h1>Share the trigger and the one action your agent takes.</h1>
+      <p class="lede mt-3">Keep it short: what starts the agent, what it reads, and the outcome a human can review.</p>
+      <div class="prompt mt-4">“When [trigger] happens, my agent reads [live data], decides [reasoning], then [action]. A human checks [approval gate].”</div>
+    </div>
+    <div class="folio">17<sup>/18</sup></div>
+  </div>
+
+  <!-- 18 — CLOSE -->
   <div class="slide">
     <div class="running-head">
       <div class="left"><span>Close</span><span class="dot">·</span><span class="topic">— End —</span></div>
@@ -738,6 +771,8 @@
     "If search is weak, what is your safe fallback instead of guessing?",
     "Would you be comfortable reviewing this draft, and can you explain its personalization?",
     "What is the smallest safe version of your next agent you could test for one week?",
+    "Can you state the trigger, data, reasoning, action, and human check in one sentence?",
+    "What would make this agent useful next Monday rather than merely impressive today?",
     "What scheduled run or review will you set up before the week ends?"
   ];
 
@@ -754,31 +789,10 @@
 
   const slides = document.querySelectorAll('.slide');
   const totalSlides = slides.length;
-  const MASTER_KEY = 'founders_guide_agents_slide_master_v2';
-  const learnerStageIndex = {
-    opener: 1,
-    model: 2,
-    'agent-test': 3,
-    roadmap: 4,
-    'repo-intro': 5,
-    'repo-build': 6,
-    'repo-debrief': 7,
-    break: 8,
-    'investor-intro': 9,
-    'round-form': 10,
-    'investor-build': 11,
-    'investor-debrief': 13,
-    generalize: 14,
-    sketch: 14,
-    'peer-share': 14,
-    close: 15
-  };
-
-  function stageToLearnerIndex(stage) {
-    return Object.prototype.hasOwnProperty.call(learnerStageIndex, stage)
-      ? learnerStageIndex[stage]
-      : null;
-  }
+  const MASTER_KEY = 'founders_guide_agents_slide_master';
+  document.querySelectorAll('.folio').forEach((folio, index) => {
+    folio.innerHTML = `${index + 1}<sup>/${totalSlides}</sup>`;
+  });
   let current = 0;
 
   function show(index) {
@@ -881,10 +895,8 @@
   let lastPrintStamp = '';
   window.addEventListener('storage', (e) => {
     if (e.key === MASTER_KEY) {
-      let state;
-      try { state = JSON.parse(e.newValue || ''); } catch (err) { return; }
-      const target = stageToLearnerIndex(state.stage);
-      if (target === null) return;
+      const target = parseInt(e.newValue, 10);
+      if (isNaN(target) || target < 0 || target >= totalSlides) return;
       if (target !== current) show(target);
       return;
     }
@@ -967,9 +979,8 @@
 
   (function init() {
     try {
-      const state = JSON.parse(localStorage.getItem(MASTER_KEY) || 'null');
-      const master = state && stageToLearnerIndex(state.stage);
-      if (master !== null && master !== undefined) { show(master); return; }
+      const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
+      if (!isNaN(master) && master >= 0 && master < totalSlides) { show(master); return; }
       const saved = parseInt(localStorage.getItem('founders_guide_agents_learner_slide') || '0', 10);
       if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
     } catch (e) {}

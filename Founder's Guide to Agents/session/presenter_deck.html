@@ -390,6 +390,18 @@
 <script>
 const slides = [
   {
+    num: 1, when: "09:55 – 10:00", duration: "5 min", tag: "title",
+    title: "Build two working agents before lunch",
+    ask: "What would make today worth four hours of your time?",
+    say: "Welcome. Get comfortable, open the learner deck, and have your repository URL ready. We start at 10:00 sharp.",
+    doSteps: [
+      "Confirm the learner deck is open on the shared screen.",
+      "Ask founders to have their repository URL or the fallback demo repo ready.",
+      "Start the class clock when the round-robin begins."
+    ],
+    bridge: "At 10:00, go straight into the round-robin opener."
+  },
+  {
     num: 1, sync: "opener", when: "10:00 – 10:10", duration: "10 min", tag: "title",
     title: "Round-Robin Opener",
     ask: "What is the one repetitive operational task you would happily never do again?",
@@ -529,6 +541,17 @@ const slides = [
     bridge: "Debrief, then the block everyone's own domain gets applied."
   },
   {
+    num: 13, when: "12:50 – 12:52", duration: "2 min", tag: "demo",
+    title: "If Search Comes Up Thin",
+    ask: "If search is weak, what is your safe fallback instead of guessing?",
+    say: "Generic, outdated, or unsourced results are a normal constraint — not a reason to invent a recommendation. Switch to the curated fallback investor list in the recipe appendix.",
+    doSteps: [
+      "Show the fallback list and point out the source links.",
+      "Remind the room: a source-backed short list is better than a confident-looking guess."
+    ],
+    bridge: "With that guardrail clear, move into the debrief."
+  },
+  {
     num: 12, sync: "investor-debrief", when: "12:50 – 1:05", duration: "15 min", tag: "demo",
     title: "Build Block B — Debrief",
     ask: "Would you be comfortable reviewing this draft — and can you explain why it was written for this investor?",
@@ -589,8 +612,9 @@ const slides = [
   }
 ];
 
+slides.forEach((slide, index) => { slide.num = index + 1; });
 const BREAK_SLIDE_INDEX = slides.findIndex(s => s.tag === 'break');
-const SYNC_KEY = 'founders_guide_agents_slide_master_v2';
+const SYNC_KEY = 'founders_guide_agents_slide_master';
 
 const slidePane = document.getElementById('slidePane');
 
@@ -699,7 +723,7 @@ function show(i) {
   document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
   document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
 
-  try { localStorage.setItem(SYNC_KEY, JSON.stringify({ stage: slides[current].sync, at: Date.now() })); } catch (e) {}
+  try { localStorage.setItem(SYNC_KEY, String(current)); } catch (e) {}
 
   if (slides[current].tag === 'break') {
     startExTimer(15 * 60);
