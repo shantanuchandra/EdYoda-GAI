@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/00_Pre_Read.html"
+    }
+  ]
+}
