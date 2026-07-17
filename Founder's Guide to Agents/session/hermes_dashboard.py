@@ -852,6 +852,392 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     .card, #history-section { animation: none; }
     .badge.running::before { animation: none; }
   }
+
+  /* ── VC Evaluation Panel ── */
+  #vc-section {
+    grid-column: 1 / -1;
+    background: var(--card-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid rgba(251,191,36,.22);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card), 0 0 60px rgba(251,191,36,.07);
+    animation: fadeInUp .35s ease .28s both;
+    overflow: hidden;
+  }
+  .vc-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.025);
+    position: relative;
+  }
+  .vc-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #fbbf24 0%, rgba(251,191,36,.3) 50%, transparent 80%);
+  }
+  .vc-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .vc-title {
+    font-family: "Fira Code", monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fbbf24;
+    letter-spacing: -.01em;
+  }
+  .vc-subtitle {
+    font-size: 11px;
+    font-family: "Fira Code", monospace;
+    color: var(--text-muted);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .vc-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .vc-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+  .vc-stat-num {
+    font-family: "Fira Code", monospace;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .vc-stat-num.amber { color: #fbbf24; }
+  .vc-stat-num.green { color: #4ade80; }
+  .vc-stat-num.blue  { color: #60a5fa; }
+  .vc-stat-num.slate { color: #94a3b8; }
+  .vc-stat-label {
+    font-size: 10px;
+    font-family: "Fira Code", monospace;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .vc-stat-sep {
+    width: 1px; height: 28px;
+    background: var(--border);
+  }
+
+  /* VC table */
+  .vc-table-wrap {
+    padding: 16px 24px 8px;
+    overflow-x: auto;
+  }
+  #vc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  #vc-table th {
+    font-family: "Fira Code", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  #vc-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    vertical-align: middle;
+    color: var(--text-sub);
+    font-family: "Fira Sans", sans-serif;
+    font-size: 12px;
+  }
+  #vc-table tr:last-child td { border-bottom: none; }
+  #vc-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+  #vc-table td.vc-name {
+    font-family: "Fira Code", monospace;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .score-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: "Fira Code", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+  .score-3 { background: rgba(34,197,94,.15); color: #4ade80; border: 1px solid rgba(34,197,94,.25); }
+  .score-2 { background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.22); }
+  .score-1 { background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.2); }
+
+  .crit-cell {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .crit-chip {
+    font-family: "Fira Code", monospace;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .crit-H { background: rgba(34,197,94,.15);   color: #4ade80; }
+  .crit-M { background: rgba(251,191,36,.12);  color: #fbbf24; }
+  .crit-L { background: rgba(248,113,113,.12); color: #f87171; }
+  .crit-U { background: rgba(100,116,139,.15); color: #94a3b8; }
+
+  .route-email {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-family: "Fira Code", monospace;
+    color: #4ade80; background: rgba(34,197,94,.1);
+    border: 1px solid rgba(34,197,94,.2);
+    padding: 3px 8px; border-radius: 99px;
+  }
+  .route-form {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-family: "Fira Code", monospace;
+    color: #fbbf24; background: rgba(251,191,36,.1);
+    border: 1px solid rgba(251,191,36,.2);
+    padding: 3px 8px; border-radius: 99px;
+  }
+  .form-link {
+    font-size: 10px; font-family: "Fira Code", monospace;
+    color: #fbbf24;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(251,191,36,.45);
+    transition: color .15s, border-color .15s;
+  }
+  .form-link:hover { color: #fde68a; border-color: #fbbf24; }
+
+  .btn-view-draft {
+    font-family: "Fira Code", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(129,140,248,.35);
+    background: rgba(129,140,248,.08);
+    color: var(--accent1);
+    cursor: pointer;
+    transition: background .15s, border-color .15s, box-shadow .15s;
+    white-space: nowrap;
+  }
+  .btn-view-draft:hover {
+    background: rgba(129,140,248,.18);
+    border-color: var(--accent1);
+    box-shadow: 0 0 10px rgba(129,140,248,.2);
+  }
+
+  /* Drawer overlay */
+  .drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  .drawer-overlay.open { display: flex; }
+
+  .drawer {
+    width: min(560px, 96vw);
+    background: rgba(8,14,36,.92);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border-left: 1px solid var(--border-bright);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.22,1,.36,1);
+    overflow: hidden;
+  }
+  .drawer-overlay.open .drawer { transform: translateX(0); }
+
+  .drawer-top {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.025);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .drawer-vc-name {
+    font-family: "Fira Code", monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .drawer-vc-meta {
+    font-size: 11px;
+    font-family: "Fira Code", monospace;
+    color: var(--text-muted);
+    letter-spacing: .04em;
+  }
+  .drawer-close {
+    margin-left: auto;
+    flex-shrink: 0;
+    background: rgba(255,255,255,.07);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background .15s, color .15s;
+  }
+  .drawer-close:hover { background: rgba(248,113,113,.12); color: #f87171; border-color: rgba(248,113,113,.25); }
+
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .drawer-section-label {
+    font-size: 9px;
+    font-family: "Fira Code", monospace;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .score-box {
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .score-box-label {
+    font-size: 9px;
+    font-family: "Fira Code", monospace;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    margin-bottom: 4px;
+  }
+  .score-box-val {
+    font-family: "Fira Code", monospace;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .score-box-val.H { color: #4ade80; }
+  .score-box-val.M { color: #fbbf24; }
+  .score-box-val.L { color: #f87171; }
+  .score-box-val.U { color: #94a3b8; }
+
+  .draft-box {
+    background: rgba(0,0,0,.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(129,140,248,.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: "Fira Code", monospace;
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .draft-subject {
+    font-weight: 700;
+    color: var(--accent1);
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .draft-to {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-cta-box {
+    background: rgba(251,191,36,.06);
+    border: 1px solid rgba(251,191,36,.25);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .form-cta-label {
+    font-size: 11px;
+    font-family: "Fira Code", monospace;
+    color: #fbbf24;
+    font-weight: 600;
+  }
+  .form-cta-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .btn-form-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Fira Code", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 9px;
+    border: 1px solid rgba(251,191,36,.4);
+    background: rgba(251,191,36,.1);
+    color: #fbbf24;
+    text-decoration: none;
+    transition: background .15s, box-shadow .15s;
+    align-self: flex-start;
+    cursor: pointer;
+  }
+  .btn-form-link:hover {
+    background: rgba(251,191,36,.2);
+    box-shadow: 0 0 14px rgba(251,191,36,.2);
+  }
+
+  #vc-section { animation-delay: .28s; }
+  @media (max-width: 820px) {
+    #vc-section { grid-column: 1; }
+    .score-grid { grid-template-columns: 1fr 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -999,6 +1385,314 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </table>
     </div>
   </section>
+
+  <!-- ── VC EVALUATION PANEL — WASABI TRAVELS ── -->
+  <section id="vc-section">
+    <div class="vc-header">
+      <div class="vc-title-row">
+        <span class="vc-title">&#x1F4BC; VC Evaluation — Wasabi Travels Pre-Seed</span>
+      </div>
+      <div class="vc-subtitle">Pragya + Varta run &#x2022; 2026-07-18 02:33 IST &#x2022; Wasabi Travels &#x2022; US$500K &#x2022; India region</div>
+      <div class="vc-stats-row">
+        <div class="vc-stat">
+          <span class="vc-stat-num amber">4</span>
+          <span class="vc-stat-label">Evaluated</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num green">2</span>
+          <span class="vc-stat-label">Qualified</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num blue">2</span>
+          <span class="vc-stat-label">Drafts Created</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num slate">2</span>
+          <span class="vc-stat-label">Form-Only</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num" style="color:#f87171">0</span>
+          <span class="vc-stat-label">Sent</span>
+        </div>
+      </div>
+    </div>
+    <div class="vc-table-wrap">
+      <table id="vc-table">
+        <thead>
+          <tr>
+            <th>Fund</th>
+            <th>Stage</th>
+            <th>Sector</th>
+            <th>Geography</th>
+            <th>Check Size</th>
+            <th>Overall</th>
+            <th>Route</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="vc-name">Titan Capital</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="score-pill score-3">3 / 3</span></td>
+            <td><span class="route-email">&#x2709; Email</span></td>
+            <td><button class="btn-view-draft" onclick="openDrawer('titan')">View Draft</button></td>
+          </tr>
+          <tr>
+            <td class="vc-name">India Quotient</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-email">&#x2709; Email</span></td>
+            <td><button class="btn-view-draft" onclick="openDrawer('iq')">View Draft</button></td>
+          </tr>
+          <tr>
+            <td class="vc-name">First Cheque</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="score-pill score-3">3 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Form</span></td>
+            <td><a class="btn-form-link" href="https://bit.ly/ApplytoFC" target="_blank" rel="noopener">Open Form &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">Indian Angel Network</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Form</span></td>
+            <td><a class="btn-form-link" href="https://iangroup.vc/submit-plan/" target="_blank" rel="noopener">Open Form &#x2197;</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── VC EVALUATION PANEL — VAKILDIARY (TEST RUN 2026-07-18) ── -->
+  <section id="vc-section-vd" style="margin-top:24px">
+    <div class="vc-header">
+      <div class="vc-title-row">
+        <span class="vc-title">&#x2696;&#xFE0F; VC Evaluation — VakilDiary Pre-Seed (Test Run)</span>
+      </div>
+      <div class="vc-subtitle">Pragya + Varta run &#x2022; 2026-07-18 03:14 IST &#x2022; VakilDiary &#x2022; US$500K&#x2013;750K &#x2022; Dubai / UAE &#x2022; 24-agent workflow</div>
+      <div class="vc-stats-row">
+        <div class="vc-stat">
+          <span class="vc-stat-num amber">14</span>
+          <span class="vc-stat-label">Evaluated</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num green">13</span>
+          <span class="vc-stat-label">Qualified (2+)</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num blue">4</span>
+          <span class="vc-stat-label">Drafts Created</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num slate">9</span>
+          <span class="vc-stat-label">Form / Programme</span>
+        </div>
+        <div class="vc-stat-sep"></div>
+        <div class="vc-stat">
+          <span class="vc-stat-num" style="color:#f87171">0</span>
+          <span class="vc-stat-label">Sent</span>
+        </div>
+      </div>
+    </div>
+    <div class="vc-table-wrap">
+      <table id="vc-table-vd">
+        <thead>
+          <tr>
+            <th>Fund</th>
+            <th>Stage</th>
+            <th>Sector</th>
+            <th>Geography</th>
+            <th>Check Size</th>
+            <th>Overall</th>
+            <th>Route</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Email-route qualified VCs with drafts -->
+          <tr>
+            <td class="vc-name">TA Ventures</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-email">&#x2709; Email</span></td>
+            <td><button class="btn-view-draft" onclick="openDrawer('vd_ta')">View Draft</button></td>
+          </tr>
+          <tr>
+            <td class="vc-name">Nuwa Capital</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-email">&#x2709; Email</span></td>
+            <td><button class="btn-view-draft" onclick="openDrawer('vd_nuwa')">View Draft</button></td>
+          </tr>
+          <tr>
+            <td class="vc-name">Wamda Capital</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-email">&#x2709; Email</span></td>
+            <td><button class="btn-view-draft" onclick="openDrawer('vd_wamda')">View Draft</button></td>
+          </tr>
+          <tr>
+            <td class="vc-name">VentureSouq</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-email">&#x2709; Email</span></td>
+            <td><button class="btn-view-draft" onclick="openDrawer('vd_venturesouq')">View Draft</button></td>
+          </tr>
+          <!-- Form/programme route — top-scored first -->
+          <tr>
+            <td class="vc-name">Village Global &#x2605;</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="score-pill score-3">3 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Form</span></td>
+            <td><a class="btn-form-link" href="https://www.villageglobal.com/velocity" target="_blank" rel="noopener">Open Form &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">BECO Capital</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Form</span></td>
+            <td><a class="btn-form-link" href="https://www.becocapital.com/contact/" target="_blank" rel="noopener">Open Form &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">Shorooq Partners</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Form</span></td>
+            <td><a class="btn-form-link" href="https://shorooqpartners.typeform.com/getfunded" target="_blank" rel="noopener">Open Form &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">DIFC Innovation Hub</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-U">U</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Accelerator</span></td>
+            <td><a class="btn-form-link" href="https://www.innovationhub.difc.ae/accelerators/startup-programs" target="_blank" rel="noopener">Apply &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">Hub71 Access</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Programme</span></td>
+            <td><a class="btn-form-link" href="https://www.hub71.com/program/access-programme/apply" target="_blank" rel="noopener">Apply &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">500 Global (Sanabil)</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Programme</span></td>
+            <td><a class="btn-form-link" href="https://500.co/mena" target="_blank" rel="noopener">Apply &#x2197;</a></td>
+          </tr>
+          <tr>
+            <td class="vc-name">Flat6Labs Ignite</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="score-pill score-2">2 / 3</span></td>
+            <td><span class="route-form">&#x1F4CB; Accelerator</span></td>
+            <td><a class="btn-form-link" href="https://flat6labs.com/programs/ignite/" target="_blank" rel="noopener">Apply &#x2197;</a></td>
+          </tr>
+          <!-- Contact-unknown qualified VCs -->
+          <tr style="opacity:0.6">
+            <td class="vc-name">Oryx Fund &#x2605;&#x2605;</td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="score-pill score-3">3 / 3</span></td>
+            <td><span style="color:#8993a6;font-size:11px">&#x2753; No public contact</span></td>
+            <td><a class="btn-form-link" href="https://salicainvestments.com/fund/oryx-fund/" target="_blank" rel="noopener">Visit Fund &#x2197;</a></td>
+          </tr>
+          <!-- Disqualified -->
+          <tr style="opacity:0.35">
+            <td class="vc-name"><s>MEVP</s></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="score-pill score-2" style="opacity:0.4">1 / 3</span></td>
+            <td><span style="color:#f87171;font-size:11px">&#x26D4; Stage mismatch</span></td>
+            <td><span style="font-size:11px;color:#5a6377">Disqualified — Stage LOW</span></td>
+          </tr>
+          <tr style="opacity:0.35">
+            <td class="vc-name"><s>Global Ventures</s></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-M">M</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-H">H</span></span></td>
+            <td><span class="crit-cell"><span class="crit-chip crit-L">L</span></span></td>
+            <td><span class="score-pill score-2" style="opacity:0.4">2 / 3</span></td>
+            <td><span style="color:#8993a6;font-size:11px">&#x26A0; Check mismatch</span></td>
+            <td><a class="btn-form-link" href="https://www.global.vc/pitch-to-us" target="_blank" rel="noopener" style="opacity:0.5">Open Form &#x2197;</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── DRAWER OVERLAY ── -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawerOnBg(event)">
+    <div class="drawer" id="vc-drawer">
+      <div class="drawer-top">
+        <div>
+          <div class="drawer-vc-name" id="drawer-title">—</div>
+          <div class="drawer-vc-meta" id="drawer-meta">—</div>
+        </div>
+        <button class="drawer-close" onclick="closeDrawer()" title="Close">&#x2715;</button>
+      </div>
+      <div class="drawer-body" id="drawer-body">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
 
 </main>
 
@@ -1381,6 +2075,277 @@ async function init() {
 }
 
 init();
+
+// ── VC Drawer ─────────────────────────────────────────────────────────────
+
+const VC_DATA = {
+  titan: {
+    name: 'Titan Capital',
+    meta: 'Score 3/3 · Stage H · Sector H · Geography H · Check H · Gmail draft saved',
+    route: 'email',
+    to: 'startups@titancapital.vc',
+    subject: 'Wasabi Travels — US$500K pre-seed | Japan planning-to-commerce',
+    source: 'Source: Titan Capital official contact page — titancapital.vc',
+    scores: { Stage: 'H', Sector: 'H', Geography: 'H', 'Check Size': 'H' },
+    body: `Hi Titan Capital team,
+
+I'm Shantanu Chandra, founder of Wasabi Travels, a live pre-revenue beta for independent Japan travelers: https://wasabitravels.com.
+
+Wasabi turns a 10-question planning flow into a personalized day-by-day Japan itinerary. The product combines:
+- tailored itinerary generation based on travel style and trip constraints;
+- transport guidance and a JR Pass-versus-point-to-point decision surface; and
+- curated Japan places that move travelers from research toward a practical next action.
+
+The intended user journey is simple: a traveler discovers Wasabi while planning Japan, answers the quiz, receives a usable trip plan, edits it for their own needs, checks off planned items, and then moves to booking-adjacent decisions such as rail, hotels, activities, connectivity, and insurance. Wasabi is not trying to become another OTA; the thesis is to own the planning decision layer before the booking window closes.
+
+The beta has had approximately 3,000 views in the past month and 15 engaged itineraries. An engaged itinerary is one where a user edited the plan and checked off at least two Japan-trip items. We have no payment integration, affiliate revenue, or paid subscribers yet.
+
+We are raising a US$500K pre-seed round to improve activation, instrument the planning-to-commerce funnel, validate affiliate and premium planning monetization, and establish one repeatable acquisition channel. India incorporation is planned before investment.
+
+Directional TAM/SAM/SOM planning assumptions — not reported market facts: TAM is 8–12M annual English-language independent Japan-planning sessions; SAM is 1.5–2.5M multi-city or rail-heavy planners for whom structured itinerary and transit decisions are most valuable; our 24-month SOM is 25K engaged itineraries, roughly 1–2% of the SAM midpoint. The round is intended to test and refine these assumptions with actual funnel and booking data.
+
+Titan's focus on consumer internet and marketplace businesses from India makes your perspective particularly relevant. Could I share the short deck and product walkthrough?
+
+Best,
+Shantanu Chandra
+Founder, Wasabi Travels
+https://www.linkedin.com/in/chandrashantanu/
+https://wasabitravels.com`,
+    verify: 'Verify: Confirm fund is still actively doing pre-seed — last press reference checked July 2026.'
+  },
+  iq: {
+    name: 'India Quotient',
+    meta: 'Score 2/3 · Stage H · Sector H · Geography MED · Check H · Gmail draft saved',
+    route: 'email',
+    to: 'anand@indiaquotient.in',
+    subject: 'Wasabi Travels — US$500K pre-seed | Japan planning-to-commerce',
+    source: 'Source: India Quotient team page — indiaquotient.in lists Anand Lunia as Founding Partner. Used [firstname]@indiaquotient.in convention.',
+    scores: { Stage: 'H', Sector: 'H', Geography: 'M', 'Check Size': 'H' },
+    body: `Hi Anand,
+
+I'm Shantanu Chandra, founder of Wasabi Travels, a live pre-revenue beta for independent Japan travelers: https://wasabitravels.com.
+
+Wasabi turns a 10-question planning flow into a personalized day-by-day Japan itinerary. The product combines:
+- tailored itinerary generation based on travel style and trip constraints;
+- transport guidance and a JR Pass-versus-point-to-point decision surface; and
+- curated Japan places that move travelers from research toward a practical next action.
+
+The intended user journey is simple: a traveler discovers Wasabi while planning Japan, answers the quiz, receives a usable trip plan, edits it for their own needs, checks off planned items, and then moves to booking-adjacent decisions such as rail, hotels, activities, connectivity, and insurance. Wasabi is not trying to become another OTA; the thesis is to own the planning decision layer before the booking window closes.
+
+The beta has had approximately 3,000 views in the past month and 15 engaged itineraries. An engaged itinerary is one where a user edited the plan and checked off at least two Japan-trip items. We have no payment integration, affiliate revenue, or paid subscribers yet.
+
+We are raising a US$500K pre-seed round to improve activation, instrument the planning-to-commerce funnel, validate affiliate and premium planning monetization, and establish one repeatable acquisition channel. India incorporation is planned before investment.
+
+Directional TAM/SAM/SOM planning assumptions — not reported market facts: TAM is 8–12M annual English-language independent Japan-planning sessions; SAM is 1.5–2.5M multi-city or rail-heavy planners for whom structured itinerary and transit decisions are most valuable; our 24-month SOM is 25K engaged itineraries, roughly 1–2% of the SAM midpoint. The round is intended to test and refine these assumptions with actual funnel and booking data.
+
+India Quotient's consumer and curated-travel-marketplace experience makes your perspective particularly valuable. We are building a narrow, Japan-specific planning product first, then testing whether planning intent can create efficient affiliate and partner conversion. Could I share the short deck and product walkthrough?
+
+Best,
+Shantanu Chandra
+Founder, Wasabi Travels
+https://www.linkedin.com/in/chandrashantanu/
+https://wasabitravels.com`,
+    verify: 'Verify: Email constructed from published naming convention. Confirm Anand Lunia is the right contact for early-stage India consumer deals.'
+  }
+};
+
+const FORM_DATA = {
+  firstcheque: {
+    name: 'First Cheque',
+    meta: 'Score 3/3 · Form-only · Google auth wall — no email attempted',
+    url: 'https://bit.ly/ApplytoFC',
+    note: 'First Cheque application page resolves to a Google-authenticated form. Gmail draft not applicable — fill manually using the submission packet at ~/Wasabi_Travels_Fundraising/PRIORITY_1_SUBMISSION_PACKET.md'
+  },
+  ian: {
+    name: 'Indian Angel Network',
+    meta: 'Score 2/3 · Form-only · Submit Plan page',
+    url: 'https://iangroup.vc/submit-plan/',
+    note: 'IAN uses a "Submit Plan" form on their website. No email route confirmed — fill manually using the submission packet at ~/Wasabi_Travels_Fundraising/PRIORITY_1_SUBMISSION_PACKET.md'
+  },
+  // ── VakilDiary VCs (test run 2026-07-18) ────────────────────────────────
+  vd_ta: {
+    name: 'TA Ventures',
+    meta: 'Score 2/3 · Stage H · Sector H · Geo H · Check M · Gmail draft saved · VakilDiary run',
+    route: 'email',
+    to: 'info@taventures.vc',
+    subject: 'VakilDiary — AI legal SaaS for UAE | pre-seed | US$500K',
+    source: 'Source: lucidityinsights.com/news/qanooni-raises-2m-pre-seed — TA Ventures co-invested with Oryx Fund + Village Global in Qanooni UAE legaltech pre-seed, June 2025',
+    scores: { Stage: 'H', Sector: 'H', Geography: 'H', 'Check Size': 'M' },
+    draftId: 'r1081684019003708418',
+    body: `Hi TA Ventures team,
+
+Your co-investment with Oryx Fund and Village Global in Qanooni's $2M UAE legaltech pre-seed (June 2025) caught our attention.
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We offer AI document drafting, client matter management, DIFC/ADGM compliance tracking, court deadline management, and bilingual Arabic/English support. We have early design partners in Dubai.
+
+Would you have 20 minutes this week for a call?
+
+Shantanu Chandra
+Founder, VakilDiary
+sensei@wasabitravels.com`,
+    verify: 'Verify: Confirm TA Ventures Qanooni co-investment is still current — source: lucidityinsights.com/news/qanooni-raises-2m-pre-seed (June 2025). Update subject line to add your name before sending.'
+  },
+  vd_nuwa: {
+    name: 'Nuwa Capital',
+    meta: 'Score 2/3 · Stage M · Sector H · Geo H · Check M · Gmail draft saved · VakilDiary run',
+    route: 'email',
+    to: 'hello@nuwacapital.io',
+    subject: 'VakilDiary — AI legal SaaS for UAE | pre-seed | US$500K',
+    source: 'Source: nuwacapital.io/contact — direct contact email listed on website. Nafes (AI procurement SaaS) confirmed in portfolio.',
+    scores: { Stage: 'M', Sector: 'H', Geography: 'H', 'Check Size': 'M' },
+    draftId: 'r6602756412192891445',
+    body: `Hi Nuwa Capital team,
+
+Your portfolio company Nafes — AI procurement SaaS for the MENA region — caught my attention as a close parallel to what we are building in legal.
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We offer AI document drafting, DIFC/ADGM compliance tracking, court deadline management, and bilingual Arabic/English support. We have early design partners in Dubai and are targeting the same underserved MENA professional-services segment Nuwa Capital has backed consistently across its portfolio.
+
+Would you have 20 minutes this week for a call?
+
+Shantanu Chandra
+Founder, VakilDiary
+sensei@wasabitravels.com`,
+    verify: 'Verify: Confirm Nafes is still in Nuwa Capital portfolio (source: nuwacapital.io portfolio page). Nuwa primary focus is Seed ($1M+) — VakilDiary pre-seed may be slightly early; note this in call. Update subject line with your name before sending.'
+  },
+  vd_wamda: {
+    name: 'Wamda Capital',
+    meta: 'Score 2/3 · Stage M · Sector H · Geo H · Check M · Gmail draft saved · VakilDiary run',
+    route: 'email',
+    to: 'connect@wamda.com',
+    subject: 'VakilDiary — AI legal SaaS for UAE | pre-seed | US$500K',
+    source: 'Source: wamda.com homepage — connect@wamda.com listed directly. Tarjama $15M Series A participation verified via public announcement May 2025.',
+    scores: { Stage: 'M', Sector: 'H', Geography: 'H', 'Check Size': 'M' },
+    draftId: 'r2554042097995219939',
+    body: `Hi Wamda Capital team,
+
+Your participation in Tarjama's $15M Series A (May 2025) signals conviction in Arabic-language AI infrastructure across the region.
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We handle AI document drafting, client matter management, DIFC/ADGM compliance tracking, court deadline management, and bilingual Arabic/English workflows — built for the structural complexity of UAE legal practice. Early design partners are onboarded in Dubai.
+
+Would you have 20 minutes this week for a call?
+
+Shantanu Chandra
+Founder, VakilDiary
+sensei@wasabitravels.com`,
+    verify: 'Verify: Confirm Tarjama Series A participation (source: crunchbase or press, May 2025). Wamda typical check is $1M+ — flag to them that this is an earlier pre-seed entry. Update subject with your name before sending.'
+  },
+  vd_venturesouq: {
+    name: 'VentureSouq',
+    meta: 'Score 2/3 · Stage M · Sector M · Geo H · Check M · Gmail draft saved · VakilDiary run',
+    route: 'email',
+    to: 'info@venturesouq.com',
+    subject: 'VakilDiary — AI legal SaaS for UAE | pre-seed | US$500K',
+    source: 'Source: info@venturesouq.com listed on venturesouq.com. FinTech Fund II close (September 2025) sourced from public announcement.',
+    scores: { Stage: 'M', Sector: 'M', Geography: 'H', 'Check Size': 'M' },
+    draftId: 'r-6043997022286703510',
+    body: `Hi VentureSouq team,
+
+VentureSouq's FinTech Fund II — backed by Mubadala, PIF's Jada, and SVC, which closed September 2025 — shows your continued conviction in MENA-native financial and professional infrastructure.
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We have early design partners in Dubai and are building for DIFC/ADGM compliance, court deadline management, and bilingual Arabic/English workflows — a segment your portfolio has not yet addressed.
+
+Would you have 20 minutes this week for a call?
+
+Shantanu Chandra
+Founder, VakilDiary
+sensei@wasabitravels.com`,
+    verify: 'Verify: Confirm VentureSouq FinTech Fund II close date and LPs (source: press/site). VentureSouq is primarily a fintech fund — legaltech adjacency is genuine but not their core. Worth the outreach given UAE focus. Update subject with your name before sending.'
+  }
+};
+
+function openDrawer(key) {
+  const overlay = document.getElementById('drawer-overlay');
+  const body    = document.getElementById('drawer-body');
+  const title   = document.getElementById('drawer-title');
+  const meta    = document.getElementById('drawer-meta');
+
+  if (VC_DATA[key]) {
+    const d = VC_DATA[key];
+    title.textContent = d.name;
+    meta.textContent  = d.meta;
+
+    const scoreBoxes = Object.entries(d.scores).map(([k,v]) =>
+      '<div class="score-box"><div class="score-box-label">' + k + '</div><div class="score-box-val ' + v + '">' +
+      (v === 'H' ? 'HIGH' : v === 'M' ? 'MEDIUM' : v === 'L' ? 'LOW' : 'UNKNOWN') + '</div></div>'
+    ).join('');
+
+    // Build DOM nodes — no innerHTML with variable content
+    body.textContent = '';
+
+    // Scoring section
+    const scoreSection = document.createElement('div');
+    const scoreLbl = document.createElement('div');
+    scoreLbl.className = 'drawer-section-label';
+    scoreLbl.textContent = 'Scoring Breakdown';
+    const scoreGrid = document.createElement('div');
+    scoreGrid.className = 'score-grid';
+    scoreGrid.innerHTML = scoreBoxes; // scoreBoxes is hardcoded template strings, safe
+    scoreSection.append(scoreLbl, scoreGrid);
+
+    // Draft section
+    const draftSection = document.createElement('div');
+    const draftLbl = document.createElement('div');
+    draftLbl.className = 'drawer-section-label';
+    draftLbl.textContent = 'Gmail Draft — saved, not sent';
+
+    const draftBox = document.createElement('div');
+    draftBox.className = 'draft-box';
+
+    const draftTo = document.createElement('div');
+    draftTo.className = 'draft-to';
+    draftTo.textContent = 'To: ' + d.to;
+
+    const draftSubj = document.createElement('div');
+    draftSubj.className = 'draft-subject';
+    draftSubj.textContent = d.subject;
+
+    const draftBody = document.createElement('div');
+    draftBody.textContent = d.body; // plain textContent — no XSS risk
+
+    draftBox.append(draftTo, draftSubj, draftBody);
+    draftSection.append(draftLbl, draftBox);
+
+    // Verify note
+    const noteBox = document.createElement('div');
+    noteBox.style.cssText = 'font-size:10px;font-family:"Fira Code",monospace;color:var(--text-muted);padding:8px 12px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;line-height:1.6;';
+    const noteLine1 = document.createElement('div');
+    noteLine1.textContent = '⚠ ' + d.verify;
+    const noteLine2 = document.createElement('div');
+    noteLine2.style.marginTop = '4px';
+    noteLine2.textContent = 'ℹ ' + d.source;
+    noteBox.append(noteLine1, noteLine2);
+    if (d.draftId) {
+      const noteLine3 = document.createElement('div');
+      noteLine3.style.marginTop = '4px';
+      noteLine3.textContent = '📧 Gmail Draft ID: ' + d.draftId + ' — check Drafts folder at shantanu.msp@gmail.com';
+      noteBox.appendChild(noteLine3);
+    }
+
+    body.append(scoreSection, draftSection, noteBox);
+  }
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeDrawerOnBg(e) {
+  if (e.target === document.getElementById('drawer-overlay')) closeDrawer();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 </script>
 <footer>Hermes Dashboard &#x2022; Founder&#x2019;s Guide to Agents &#x2022; Saturday 2026-07-19</footer>
 </body>

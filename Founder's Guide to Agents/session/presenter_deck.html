@@ -295,8 +295,49 @@
     min-width: 22px; text-align: center; box-shadow: 0 1px 0 var(--border);
   }
 
+  /* ── SVG MOTION GRAPHICS ── */
+  @keyframes p-drawLine {
+    from { stroke-dashoffset: var(--dl, 200); }
+    to   { stroke-dashoffset: 0; }
+  }
+  @keyframes p-popIn {
+    0%   { opacity: 0; transform: scale(0.86); }
+    60%  { transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes p-fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes p-pulse {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0.45; }
+  }
+  @keyframes p-dotFlow {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+
+  .p-svg-wrap {
+    margin: 14px 0 8px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 12px 12px;
+    overflow: visible;
+  }
+  .p-svg-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .p-anim-node { opacity: 0; animation: p-popIn 0.36s cubic-bezier(0.22,1,0.36,1) both; }
+  .p-anim-line { animation: p-drawLine 0.48s cubic-bezier(0.22,1,0.36,1) both; }
+  .p-anim-label { opacity: 0; animation: p-fadeUp 0.36s cubic-bezier(0.22,1,0.36,1) both; }
+  .p-anim-quad  { opacity: 0; animation: p-fadeUp 0.42s cubic-bezier(0.22,1,0.36,1) both; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
+    .p-anim-node, .p-anim-line, .p-anim-label, .p-anim-quad { opacity: 1; animation: none !important; }
   }
 </style>
 </head>
@@ -419,6 +460,39 @@ const slides = [
   {
     num: 2, sync: "model", when: "10:10 – 10:20", duration: "10 min", tag: "demo",
     title: "The Mental Model — 2×2",
+    // svgHtml is static hardcoded markup — no user/external data injected, innerHTML is safe here
+    svgHtml: `<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="pm-arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 Z" fill="#5eead4" opacity="0.6"/>
+    </marker>
+  </defs>
+  <!-- axes -->
+  <line class="p-anim-line" x1="240" y1="20" x2="240" y2="260" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="240" style="--dl:240;animation-delay:.05s" opacity="0.45"/>
+  <line class="p-anim-line" x1="20"  y1="140" x2="460" y2="140" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="440" style="--dl:440;animation-delay:.15s" opacity="0.45"/>
+  <!-- axis labels -->
+  <text class="p-anim-label" x="240" y="13" text-anchor="middle" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">HIGH JUDGMENT</text>
+  <text class="p-anim-label" x="240" y="272" text-anchor="middle" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">LOW JUDGMENT</text>
+  <text class="p-anim-label" x="14" y="143" text-anchor="start" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">RARE</text>
+  <text class="p-anim-label" x="446" y="143" text-anchor="end" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">DAILY</text>
+  <!-- Q1 top-left: high-judgment rare → hire/consult -->
+  <rect class="p-anim-quad" x="28" y="28" width="200" height="104" rx="8" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.2)" stroke-width="1" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="128" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#fbbf24" font-family="Inter,sans-serif" style="animation-delay:.52s">Hire / Consult</text>
+  <text class="p-anim-quad" x="128" y="90" text-anchor="middle" font-size="9.5" fill="#8993a6" font-family="Inter,sans-serif" style="animation-delay:.58s">High judgment, one-off decisions</text>
+  <!-- Q2 top-right: high-judgment daily → augment -->
+  <rect class="p-anim-quad" x="252" y="28" width="200" height="104" rx="8" fill="rgba(167,139,250,0.07)" stroke="rgba(167,139,250,0.22)" stroke-width="1" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="352" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#a78bfa" font-family="Inter,sans-serif" style="animation-delay:.52s">Augment</text>
+  <text class="p-anim-quad" x="352" y="90" text-anchor="middle" font-size="9.5" fill="#8993a6" font-family="Inter,sans-serif" style="animation-delay:.58s">Daily + judgment — AI assists you</text>
+  <!-- Q3 bottom-left: low-judgment rare → buy a tool -->
+  <rect class="p-anim-quad" x="28" y="148" width="200" height="104" rx="8" fill="rgba(148,163,184,0.05)" stroke="rgba(148,163,184,0.15)" stroke-width="1" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="128" y="192" text-anchor="middle" font-size="13" font-weight="600" fill="#94a3b8" font-family="Inter,sans-serif" style="animation-delay:.52s">Buy a Tool</text>
+  <text class="p-anim-quad" x="128" y="210" text-anchor="middle" font-size="9.5" fill="#8993a6" font-family="Inter,sans-serif" style="animation-delay:.58s">Low judgment, happens rarely</text>
+  <!-- Q4 bottom-right: low-judgment daily → BUILD AN AGENT (hero) -->
+  <rect class="p-anim-quad" x="252" y="148" width="200" height="104" rx="8" fill="rgba(94,234,212,0.09)" stroke="rgba(94,234,212,0.4)" stroke-width="1.5" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="352" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" style="animation-delay:.52s">BUILD AN AGENT</text>
+  <text class="p-anim-quad" x="352" y="203" text-anchor="middle" font-size="9.5" fill="#5eead4" opacity="0.75" font-family="Inter,sans-serif" style="animation-delay:.58s">Daily + low judgment = automate it</text>
+  <text class="p-anim-quad" x="352" y="220" text-anchor="middle" font-size="9" fill="#5eead4" opacity="0.55" font-family="JetBrains Mono,monospace" style="animation-delay:.64s">← this is today's session</text>
+</svg>`,
     ask: "Where does your chosen task sit today — and what evidence says it needs an agent rather than a tool or a human?",
     say: "Here's the one framework I want you to leave with today — not just for what we build in this room, but for every future 'should I build an agent for this' decision you'll ever make.",
     doSteps: [
@@ -432,6 +506,32 @@ const slides = [
   {
     num: 3, sync: "agent-test", when: "10:20 – 10:30", duration: "10 min", tag: "demo",
     title: "Agent vs. Prompt: The Real Distinction",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="at-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#5eead4" opacity="0.7"/>
+    </marker>
+  </defs>
+  <!-- node 1: Live Data -->
+  <rect class="p-anim-node" x="8" y="22" width="118" height="56" rx="10" fill="rgba(94,234,212,0.08)" stroke="rgba(94,234,212,0.38)" stroke-width="1.5" style="animation-delay:.08s"/>
+  <text x="67" y="46" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.18s">Acts on Live Data</text>
+  <text x="67" y="62" text-anchor="middle" font-size="9" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.24s">pulls repo / web / inbox</text>
+  <!-- connector 1→2 -->
+  <line class="p-anim-line" x1="126" y1="50" x2="162" y2="50" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="36" style="--dl:36;animation-delay:.32s" opacity="0.55" marker-end="url(#at-arr)"/>
+  <!-- node 2: Real Action -->
+  <rect class="p-anim-node" x="164" y="22" width="118" height="56" rx="10" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.35)" stroke-width="1.5" style="animation-delay:.26s"/>
+  <text x="223" y="46" text-anchor="middle" font-size="11.5" font-weight="600" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.36s">Takes Real Action</text>
+  <text x="223" y="62" text-anchor="middle" font-size="9" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.42s">writes file · creates draft</text>
+  <!-- connector 2→3 -->
+  <line class="p-anim-line" x1="282" y1="50" x2="318" y2="50" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="36" style="--dl:36;animation-delay:.50s" opacity="0.55" marker-end="url(#at-arr)"/>
+  <!-- node 3: Trigger -->
+  <rect class="p-anim-node" x="320" y="22" width="150" height="56" rx="10" fill="rgba(167,139,250,0.08)" stroke="rgba(167,139,250,0.38)" stroke-width="1.5" style="animation-delay:.44s"/>
+  <text x="395" y="46" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a78bfa" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.54s">Runs on a Trigger</text>
+  <text x="395" y="62" text-anchor="middle" font-size="9" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.60s">schedule · webhook · event</text>
+  <!-- "all 3 = agent" label -->
+  <text x="240" y="92" text-anchor="middle" font-size="9" fill="#5eead4" opacity="0.6" font-family="JetBrains Mono,monospace" class="p-anim-label" letter-spacing="0.06em" style="animation-delay:.72s">MISSING ANY ONE → it's a prompt with a costume on</text>
+</svg>`,
     ask: "Which of the three tests does your current AI workflow fail?",
     say: "Quick gut check — raise your hand if you've ever asked ChatGPT or Claude to draft something and called it 'using AI.' That's not an agent. That's a smart prompt.",
     doSteps: [
@@ -446,6 +546,38 @@ const slides = [
   {
     num: 4, sync: "roadmap", when: "10:30 – 10:35", duration: "5 min", tag: "title",
     title: "The Promise + Roadmap",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 86" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="rd-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#5eead4" opacity="0.65"/>
+    </marker>
+  </defs>
+  <!-- Node A: Build Agent 1 -->
+  <rect class="p-anim-node" x="6" y="18" width="108" height="50" rx="8" fill="rgba(94,234,212,0.09)" stroke="rgba(94,234,212,0.45)" stroke-width="1.5" style="animation-delay:.06s"/>
+  <text x="60" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.16s">Build Agent 1</text>
+  <text x="60" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.22s">Repo Digest</text>
+  <!-- connector -->
+  <line class="p-anim-line" x1="114" y1="43" x2="140" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="26" style="--dl:26;animation-delay:.30s" opacity="0.5" marker-end="url(#rd-arr)"/>
+  <!-- BREAK node -->
+  <rect class="p-anim-node" x="142" y="18" width="90" height="50" rx="8" fill="rgba(74,222,128,0.07)" stroke="rgba(74,222,128,0.35)" stroke-width="1.5" stroke-dasharray="4 3" style="animation-delay:.22s"/>
+  <text x="187" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#4ade80" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.32s">BREAK</text>
+  <text x="187" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.38s">15 min</text>
+  <!-- connector -->
+  <line class="p-anim-line" x1="232" y1="43" x2="258" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="26" style="--dl:26;animation-delay:.46s" opacity="0.5" marker-end="url(#rd-arr)"/>
+  <!-- Node B: Build Agent 2 -->
+  <rect class="p-anim-node" x="260" y="18" width="108" height="50" rx="8" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.38)" stroke-width="1.5" style="animation-delay:.38s"/>
+  <text x="314" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.48s">Build Agent 2</text>
+  <text x="314" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.54s">Investor Outreach</text>
+  <!-- connector -->
+  <line class="p-anim-line" x1="368" y1="43" x2="394" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="26" style="--dl:26;animation-delay:.62s" opacity="0.5" marker-end="url(#rd-arr)"/>
+  <!-- Node D: Apply to Your Domain -->
+  <rect class="p-anim-node" x="396" y="18" width="78" height="50" rx="8" fill="rgba(167,139,250,0.07)" stroke="rgba(167,139,250,0.35)" stroke-width="1.5" style="animation-delay:.54s"/>
+  <text x="435" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#a78bfa" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.64s">Generalize</text>
+  <text x="435" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.70s">Your domain</text>
+  <!-- bottom label -->
+  <text x="240" y="80" text-anchor="middle" font-size="9" fill="#5eead4" opacity="0.55" font-family="JetBrains Mono,monospace" class="p-anim-label" letter-spacing="0.06em" style="animation-delay:.78s">YOU LEAVE WITH TWO RUNNING AGENTS · NOT NOTES</text>
+</svg>`,
     ask: "What will count as proof that you have a working agent by 2pm?",
     say: "By 2pm, you will have built two working agents on your own machine, connected to your own tools. Not a demo. Not a template you'll never open again. Something you can leave running Monday morning.",
     doSteps: [
@@ -469,6 +601,33 @@ const slides = [
   {
     num: 6, sync: "repo-build", when: "10:40 – 11:25", duration: "45 min", tag: "exercise",
     title: "BUILD STEP A: Repo Digest Agent",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 86" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="ra-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#5eead4" opacity="0.65"/>
+    </marker>
+  </defs>
+  <rect class="p-anim-node" x="4" y="14" width="106" height="58" rx="9" fill="rgba(94,234,212,0.08)" stroke="rgba(94,234,212,0.4)" stroke-width="1.5" style="animation-delay:.06s"/>
+  <text x="57" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.16s">TRIGGER</text>
+  <text x="57" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.22s">Monday 9am</text>
+  <text x="57" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.26s">cron · on-demand</text>
+  <line class="p-anim-line" x1="110" y1="43" x2="138" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="28" style="--dl:28;animation-delay:.32s" opacity="0.5" marker-end="url(#ra-arr)"/>
+  <rect class="p-anim-node" x="140" y="14" width="106" height="58" rx="9" fill="rgba(94,234,212,0.06)" stroke="rgba(94,234,212,0.28)" stroke-width="1.5" style="animation-delay:.24s"/>
+  <text x="193" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.34s">LIVE DATA</text>
+  <text x="193" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.40s">GitHub commits</text>
+  <text x="193" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.44s">7-day window</text>
+  <line class="p-anim-line" x1="246" y1="43" x2="274" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="28" style="--dl:28;animation-delay:.50s" opacity="0.5" marker-end="url(#ra-arr)"/>
+  <rect class="p-anim-node" x="276" y="14" width="106" height="58" rx="9" fill="rgba(94,234,212,0.06)" stroke="rgba(94,234,212,0.28)" stroke-width="1.5" style="animation-delay:.42s"/>
+  <text x="329" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.52s">REASONING</text>
+  <text x="329" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.58s">summarize themes</text>
+  <text x="329" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.62s">plain English</text>
+  <line class="p-anim-line" x1="382" y1="43" x2="410" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="28" style="--dl:28;animation-delay:.68s" opacity="0.5" marker-end="url(#ra-arr)"/>
+  <rect class="p-anim-node" x="412" y="14" width="64" height="58" rx="9" fill="rgba(94,234,212,0.1)" stroke="rgba(94,234,212,0.5)" stroke-width="2" style="animation-delay:.60s"/>
+  <text x="444" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.70s">ACTION</text>
+  <text x="444" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.76s">Telegram</text>
+  <text x="444" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.80s">digest msg</text>
+</svg>`,
     ask: "Can you point to one live source, one output, and one successful run before moving on?",
     say: "Follow Part 1 of your recipe doc. I'll walk the room — flag me the second something breaks, don't sit stuck for more than 2 minutes.",
     prompt: "1. Point Hermes at your GitHub repo (auth + repo URL)\n2. Configure the trigger: on-demand for today's demo\n3. Write the prompt that turns raw commit data into a plain-language digest\n4. Run it — confirm the digest lands somewhere you can see it\n5. Thin commit activity? Use the shared fallback demo repo",
@@ -533,6 +692,36 @@ const slides = [
   {
     num: 11, sync: "investor-build", when: "12:10 – 12:50", duration: "40 min", tag: "exercise",
     title: "BUILD STEP B: Investor Agent",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="ib-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#fbbf24" opacity="0.65"/>
+    </marker>
+  </defs>
+  <rect class="p-anim-node" x="4" y="16" width="96" height="56" rx="9" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.35)" stroke-width="1.5" style="animation-delay:.06s"/>
+  <text x="52" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.16s">TRIGGER</text>
+  <text x="52" y="53" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.22s">your round desc</text>
+  <text x="52" y="65" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.26s">on-demand</text>
+  <line class="p-anim-line" x1="100" y1="44" x2="124" y2="44" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="24" style="--dl:24;animation-delay:.30s" opacity="0.5" marker-end="url(#ib-arr)"/>
+  <rect class="p-anim-node" x="126" y="16" width="96" height="56" rx="9" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.25)" stroke-width="1.5" style="animation-delay:.24s"/>
+  <text x="174" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.34s">LIVE DATA</text>
+  <text x="174" y="53" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.40s">web search</text>
+  <text x="174" y="65" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.44s">2-pass · sourced</text>
+  <line class="p-anim-line" x1="222" y1="44" x2="246" y2="44" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="24" style="--dl:24;animation-delay:.48s" opacity="0.5" marker-end="url(#ib-arr)"/>
+  <rect class="p-anim-node" x="248" y="16" width="96" height="56" rx="9" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.25)" stroke-width="1.5" style="animation-delay:.40s"/>
+  <text x="296" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.50s">SCORE</text>
+  <text x="296" y="53" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.56s">stage/sector</text>
+  <text x="296" y="65" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.60s">geo/check</text>
+  <line class="p-anim-line" x1="344" y1="44" x2="368" y2="44" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="24" style="--dl:24;animation-delay:.65s" opacity="0.5" marker-end="url(#ib-arr)"/>
+  <!-- ACTION node — heavy border, "never auto-sent" emphasis -->
+  <rect class="p-anim-node" x="370" y="10" width="106" height="68" rx="9" fill="rgba(251,191,36,0.11)" stroke="#fbbf24" stroke-width="2.5" style="animation-delay:.58s"/>
+  <text x="423" y="33" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.68s">GMAIL DRAFT</text>
+  <text x="423" y="49" text-anchor="middle" font-size="8" fill="#fb7185" font-weight="600" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.74s">never auto-sent</text>
+  <text x="423" y="62" text-anchor="middle" font-size="8" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.80s">you review · you send</text>
+  <!-- "human gate" label below -->
+  <text x="423" y="88" text-anchor="middle" font-size="8.5" fill="#fbbf24" opacity="0.7" font-family="JetBrains Mono,monospace" class="p-anim-label" letter-spacing="0.05em" style="animation-delay:.86s">← HUMAN GATE</text>
+</svg>`,
     ask: "Can every recommended investor be traced to a current source before a draft is created?",
     say: "Time to build. Search for matching investors, score them, draft personalized outreach — all landing in Gmail drafts, never sent.",
     prompt: "1. Configure Hermes's web-search tool with your round-description as the query seed\n2. Add scoring logic: does stage/sector/geography/check-size actually match?\n3. For matches, draft personalized outreach referencing what specifically would sway this investor\n4. Wire output to create a Gmail draft (not send)\n5. Thin/wrong live search results? Switch to the curated fallback investor list immediately",
@@ -639,6 +828,12 @@ function renderSlide(s) {
 
   slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
   slidePane.appendChild(el('h1', { text: s.title }));
+
+  if (s.svgHtml) {
+    const wrap = el('div', { cls: 'p-svg-wrap' });
+    wrap.innerHTML = s.svgHtml;
+    slidePane.appendChild(wrap);
+  }
 
   if (s.say) {
     slidePane.appendChild(makeSection('say', 'Say', (sec) => {
