@@ -1,114 +1,420 @@
 # Hermes Build Recipes — Founder's Guide to Agents
 
-> ⚠️ **FACILITATOR NOTE — READ BEFORE SATURDAY:** These recipes are written from Hermes's documentation and README, not from a live end-to-end dry-run (no dry-run was performed — see source-of-truth doc §5.7 for why). **Someone must run through both recipes on a real Hermes instance before Saturday** to confirm the exact commands, config keys, and tool names below are accurate. Treat every command in this doc as "best available from docs, unverified in practice" until that dry-run happens. If commands differ once tested, update this doc and note what changed.
+> **FACILITATOR NOTE — DRY-RUN COMPLETE (2026-07-17):** Both recipes below have been verified end-to-end on a real Hermes instance (v0.18.2, macOS, OpenAI GPT-5.6-sol, Telegram delivery). The "challenges + solutions" sections document what actually broke and exactly how it was fixed. Use these when founders hit the same walls — they will.
 
-This doc has two parts — one recipe per agent. Both assume you've already completed the pre-read: Hermes installed, OpenAI configured, Telegram wired, checkpoint passed.
+This doc has two parts — one recipe per agent.
 
 ---
 
 ## Part 1 — Weekly Repo/Product Digest Agent
 
-**What you're building:** an agent that reads your GitHub repo's recent commits and writes a plain-language "what shipped this week" summary.
+**What you're building:** an agent that reads your GitHub repo's recent commits and writes a plain-language "what shipped this week" summary — for yourself, a non-technical co-founder, or as raw material for an investor update. Once scheduled, it runs every Monday morning without you touching it.
 
-### Step 1 — Give Hermes access to your repo
+---
 
-Hermes needs to read your GitHub repo. The most direct path is a GitHub personal access token (read-only is enough).
+### Step 1 — Confirm Hermes can see your GitHub
 
-1. Generate a token: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens. Scope: **read-only, Contents + Metadata**, limited to the one repo you're using today.
-2. Add it to `~/.hermes/.env`:
-   ```
-   GITHUB_TOKEN=ghp_...
-   ```
-3. Confirm Hermes can see your tools: inside a chat, run `/reload-mcp` if you've just added a GitHub MCP server, or check `hermes skills browse` for a built-in git/GitHub tool.
+Open a terminal and run:
 
-*(If Hermes's built-in tool set includes a native git/GitHub reader, prefer that over a manual token setup — check `hermes skills browse` first. This is one of the things the pre-Saturday dry-run needs to confirm: which path is actually simplest on the current Hermes build.)*
+```bash
+gh auth status
+```
 
-### Step 2 — Point it at your repo
+You should see your GitHub account logged in with `repo` scope. If you see "not logged in", run:
 
-Message your Hermes bot on Telegram:
+```bash
+gh auth login
+```
 
-> "Look at the last 7 days of commits on `<your-github-username>/<your-repo-name>`. List what changed."
+Follow the browser flow. When it asks for scopes, make sure `repo` (read access) is checked.
 
-Confirm it returns real commit data — actual commit messages and file changes, not a generic non-answer. If it can't reach the repo, check:
-- Token scope includes the right repo
-- Repo isn't private in a way the token doesn't cover
-- `hermes status` still shows a healthy connection
+> **Challenge we hit:** The Hermes `.env` had a `GITHUB_TOKEN` that had expired ("Bad credentials"). The `gh` CLI had a separate, valid token in the system keychain — that's the one that actually works. **Solution:** always test with `gh auth status` first, not by assuming the `.env` token is live.
 
-### Step 3 — Write the digest prompt
+---
 
-This is the part that turns raw commits into something a non-technical co-founder or investor could read. Send this to your bot, adjusting the repo name:
+### Step 2 — Confirm your repo is accessible
 
-> "You just read the commits on `<repo>`. Now write a 3-5 sentence summary of what shipped this week, in plain English. No git jargon — explain it like you're telling a co-founder who doesn't read code what's new. Group related commits into one story if they're part of the same feature."
+```bash
+gh repo view <your-github-username>/<your-repo-name> --json name,isPrivate,updatedAt
+```
 
-Iterate on this prompt live — if the output still sounds like commit messages, add: *"Rewrite this as if you're explaining it to someone outside the company for the first time."*
+You should see the repo name and metadata come back. If you get a 404:
+- Double-check the exact repo name (case-sensitive)
+- If the repo is private, make sure your token has `repo` scope (not just `public_repo`)
 
-### Step 4 — (Optional, if time allows) Make it recurring
+> **Challenge we hit:** The commits endpoint returned 404 even though the repo existed — because the repo had no commits on `main` (it was initialized without a first commit). The branches endpoint revealed it. **Solution:** always confirm the branch name first — `gh api "repos/<owner>/<repo>/branches" --jq '.[].name'`. If your default branch is `master` instead of `main`, use `master` in the script.
 
-In production, this agent should run weekly without you asking. Check if your Hermes build supports a cron-style schedule:
+---
 
-> "Set up a weekly schedule: every Monday at 9am, do the last-7-days commit summary for `<repo>` and send it to me here."
+### Step 3 — Create the digest script
 
-Hermes has a built-in cron scheduler per its docs — the exact command may be `hermes schedule add` or a conversational instruction like the one above. **Confirm the actual mechanism during the pre-Saturday dry-run** and update this step.
+This script does the actual data-fetching. Create the file:
+
+```bash
+mkdir -p ~/.hermes/scripts
+```
+
+Then create `~/.hermes/scripts/all_repos_digest.sh` with this content:
+
+```bash
+#!/bin/bash
+# Fetches last 7 days of commits across ALL your repos.
+# Outputs per-repo commit lists for the agent to summarise.
+
+OWNER="<your-github-username>"
+SINCE=$(date -u -v-7d "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -u -d "7 days ago" "+%Y-%m-%dT%H:%M:%SZ")
+TODAY=$(date -u "+%Y-%m-%d")
+
+echo "=== Weekly Repo Digest — All Repos for @$OWNER ==="
+echo "Period: last 7 days (since $SINCE)"
+echo "Generated: $TODAY"
+echo ""
+
+REPOS=$(gh api "users/$OWNER/repos" -X GET -f sort=updated -f per_page=50 \
+  --jq '.[].name' 2>/dev/null)
+
+ACTIVE_COUNT=0
+
+for REPO in $REPOS; do
+  COMMITS=$(gh api "repos/$OWNER/$REPO/commits" -X GET \
+    -f sha=main -f since="$SINCE" -f per_page=50 \
+    --jq '.[] | "[\(.sha[0:7])] \(.commit.author.date[0:10]) — \(.commit.message | split("\n")[0])"' \
+    2>/dev/null)
+
+  if [ -z "$COMMITS" ]; then
+    COMMITS=$(gh api "repos/$OWNER/$REPO/commits" -X GET \
+      -f sha=master -f since="$SINCE" -f per_page=50 \
+      --jq '.[] | "[\(.sha[0:7])] \(.commit.author.date[0:10]) — \(.commit.message | split("\n")[0])"' \
+      2>/dev/null)
+  fi
+
+  if [ -n "$COMMITS" ]; then
+    ACTIVE_COUNT=$((ACTIVE_COUNT + 1))
+    COUNT=$(echo "$COMMITS" | wc -l | tr -d ' ')
+    echo "--- REPO: $REPO ($COUNT commits) ---"
+    echo "https://github.com/$OWNER/$REPO"
+    echo "$COMMITS"
+    echo ""
+  fi
+done
+
+if [ "$ACTIVE_COUNT" -eq 0 ]; then
+  echo "No commits found across any repo in the last 7 days."
+else
+  echo "=== END: $ACTIVE_COUNT repo(s) had activity this week ==="
+fi
+```
+
+Also create `~/.hermes/scripts/repo_menu.sh` for on-demand single-repo lookups:
+
+```bash
+#!/bin/bash
+# Usage:
+#   repo_menu.sh            — list all repos with numbers
+#   repo_menu.sh <reponame> — fetch 7-day commits for that specific repo
+
+OWNER="<your-github-username>"
+SINCE=$(date -u -v-7d "+%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -u -d "7 days ago" "+%Y-%m-%dT%H:%M:%SZ")
+
+REPOS=$(gh api "users/$OWNER/repos" -X GET -f sort=updated -f per_page=50 \
+  --jq '.[] | [.name, .updated_at[0:10]] | join("|")' 2>/dev/null)
+
+if [ -z "$1" ]; then
+  echo "=== @$OWNER GitHub Repos ==="
+  echo "Reply with a number or repo name to get the 7-day digest."
+  echo ""
+  INDEX=1
+  while IFS='|' read -r NAME UPDATED; do
+    echo "$INDEX. $NAME  (last updated: $UPDATED)"
+    INDEX=$((INDEX + 1))
+  done <<< "$REPOS"
+  echo ""
+  echo "Or say 'all' for a digest of every repo with activity this week."
+else
+  REPO="$1"
+  echo "=== 7-day digest: $REPO ==="
+  echo "Repo: https://github.com/$OWNER/$REPO"
+  echo "Period: last 7 days (since $SINCE)"
+  echo ""
+
+  COMMITS=$(gh api "repos/$OWNER/$REPO/commits" -X GET \
+    -f sha=main -f since="$SINCE" -f per_page=50 \
+    --jq '.[] | "[\(.sha[0:7])] \(.commit.author.date[0:10]) — \(.commit.message | split("\n")[0])"' \
+    2>/dev/null)
+
+  if [ -z "$COMMITS" ]; then
+    COMMITS=$(gh api "repos/$OWNER/$REPO/commits" -X GET \
+      -f sha=master -f since="$SINCE" -f per_page=50 \
+      --jq '.[] | "[\(.sha[0:7])] \(.commit.author.date[0:10]) — \(.commit.message | split("\n")[0])"' \
+      2>/dev/null)
+  fi
+
+  if [ -z "$COMMITS" ]; then
+    echo "No commits in the last 7 days on this repo."
+  else
+    COUNT=$(echo "$COMMITS" | wc -l | tr -d ' ')
+    echo "$COMMITS"
+    echo ""
+    echo "--- Total: $COUNT commit(s) ---"
+  fi
+fi
+```
+
+Make both scripts executable:
+
+```bash
+chmod +x ~/.hermes/scripts/all_repos_digest.sh
+chmod +x ~/.hermes/scripts/repo_menu.sh
+```
+
+Test the menu script before wiring anything:
+
+```bash
+~/.hermes/scripts/repo_menu.sh
+```
+
+You should see a numbered list of your repos. If you see an error, check `gh auth status` again.
+
+---
+
+### Step 4 — Schedule the weekly digest
+
+```bash
+hermes cron create \
+  "0 9 * * 1" \
+  "The script below shows all commits across every GitHub repo in the last 7 days. Write a plain-English weekly digest — one short paragraph per repo that had activity. Group commits into themes. Skip repos with no commits. Lead with the most active repo. No git jargon." \
+  --name "Weekly Repo Digest — All Repos" \
+  --script all_repos_digest.sh \
+  --deliver telegram \
+  --skill github-repo-management
+```
+
+This schedules a digest every **Monday at 9am** delivered to Telegram.
+
+> **Challenge we hit:** The `--deliver telegram` flag resolved to the wrong target — `TELEGRAM_HOME_CHANNEL` in `.env` was set to a username string (`shantanuchandra`) but Telegram requires a numeric chat ID. The cron job ran and produced a perfect digest, then failed at the delivery step with "Chat not found". **Solution:** send any message to your Hermes bot on Telegram first (say `/start` or `hi`). This makes the bot aware of your chat. Then find your numeric chat ID in the gateway log:
+
+```bash
+grep "Blocked unauthorized user" ~/.hermes/logs/gateway.log | tail -3
+```
+
+The number after "user" is your chat ID. Update `.env`:
+
+```
+TELEGRAM_ALLOWED_USERS=<your-numeric-id>
+TELEGRAM_HOME_CHANNEL=<your-numeric-id>
+```
+
+Then restart the gateway:
+
+```bash
+hermes gateway restart
+```
+
+And re-run the job to confirm delivery:
+
+```bash
+hermes cron run <job-id>
+```
+
+> **Second challenge:** Even after seeing the bot on Telegram, it replied "Blocked unauthorized user" — our user ID was not in the allowlist. The root cause: Hermes's `TELEGRAM_ALLOWED_USERS` only accepts numeric user IDs, not usernames. A username string passes silently but blocks every incoming message. **Solution:** use the numeric ID from the log (same fix as above).
+
+---
+
+### Step 5 — Enable on-demand repo lookups via Telegram
+
+Add standing instructions to Hermes's persistent system prompt so it knows how to handle repo requests interactively. Edit `~/.hermes/SOUL.md` and append:
+
+```
+## GitHub Repo Digest — standing instructions
+
+When the user asks for a repo digest, repo update, or "what shipped", follow this routing:
+
+"show my repos" / "list repos" / "repo menu":
+Run: ~/.hermes/scripts/repo_menu.sh
+Present the numbered list. Tell the user to reply with a number or repo name.
+
+User replies with a number or a repo name:
+Run: ~/.hermes/scripts/repo_menu.sh <reponame>
+Write a 3-5 sentence plain-English digest of what shipped in the last 7 days.
+Group commits into themes. No git jargon.
+
+"digest all" / "all repos" / "everything this week":
+Run: ~/.hermes/scripts/all_repos_digest.sh
+Write one short paragraph per active repo. Skip repos with no activity.
+```
+
+Now in Telegram you can message your bot:
+- `"show my repos"` → numbered list
+- Reply `"2"` or `"cardcompass"` → 7-day digest for that repo
+- `"digest all"` → summary of every repo with activity
+
+> **Design decision made:** Telegram's native inline buttons cap at 4 choices. With 6 repos, buttons don't work cleanly. Number-reply navigation was chosen instead — it scales to any number of repos and is easier to explain to a room of founders.
+
+---
 
 ### Done-state checklist
 
-- [ ] Hermes successfully read real commit data from your repo
-- [ ] The digest reads like plain English, not git log output
-- [ ] (Stretch) A recurring schedule is configured
-
-### If your repo has no recent commits
-
-Ask your facilitator for the shared fallback demo repo. This is a rehearsal of the pattern, not a test of your shipping velocity this week.
+- [ ] `gh auth status` shows your account with `repo` scope
+- [ ] Menu script lists your repos correctly
+- [ ] Test run of the cron job produced a real plain-English digest
+- [ ] Digest delivered to your Telegram
+- [ ] Typing `"show my repos"` in Telegram gives a numbered list
+- [ ] Replying with a repo name gives a 7-day summary
+- [ ] Weekly schedule confirmed (Monday 9am)
 
 ---
 
 ## Part 2 — Investor Qualification + Outreach Agent
 
-**What you're building:** an agent that takes your round description, searches for matching investors, scores them, and drafts personalized outreach directly into your Gmail drafts — never sent automatically.
+**What you're building:** an agent that takes your round description, searches for matching investors, scores them, and drafts personalized outreach directly into your Gmail drafts — never sent automatically. You read, validate, and send it yourself.
 
-### Step 1 — Give Hermes access to Gmail
+---
 
-1. Set up Gmail access per Hermes's gateway/tool docs — check `hermes gateway setup` for a Gmail/Google option, or `hermes skills browse` for a Gmail MCP tool.
-2. Confirm it can create (not send) a draft:
+### Step 1 — Set up Google OAuth (one-time)
 
-> "Create a Gmail draft addressed to me, subject 'Hermes test', body 'This is a test draft.' Do not send it."
+Hermes ships a Google Workspace skill with an OAuth helper script. This step gives it permission to create Gmail drafts on your behalf.
 
-Check your Gmail drafts folder. If nothing appears, this is the most likely failure point of this whole build — flag your facilitator immediately, don't sit stuck.
+**1a — Get your Google Cloud credentials**
 
-### Step 2 — Describe your round
+1. Go to [console.cloud.google.com](https://console.cloud.google.com) → select or create a project
+2. Navigate to **APIs & Services → Credentials**
+3. Click **Create Credentials → OAuth client ID → Desktop App**
+4. Download the generated JSON file — it will be named something like `client_secret_<project-id>.apps.googleusercontent.com.json`
+5. Copy it into the Hermes config folder:
 
-Message your bot with your own round details from the pre-read:
+```bash
+cp ~/Downloads/client_secret_*.json ~/.hermes/google_client_secret.json
+```
 
-> "I'm raising a [stage] round in [sector], based in [geography], looking for [check size] checks. Here's anything else that matters: [your notes]."
+**1b — Enable the Gmail API**
 
-### Step 3 — Live web-search for matching investors
+In the same Google Cloud Console, go to **APIs & Services → Library**, search for "Gmail API", and click **Enable**.
+
+> **Challenge we hit:** We had the OAuth client set up but the API itself was not enabled. When `gmail_draft.py` ran it returned `HttpError 403 — Gmail API has not been used in project <id>`. The fix is a single click in the Library page — took 30 seconds but would have killed momentum in the room. Enable this before the OAuth flow, not after.
+
+**1c — Add your email as a test user**
+
+If your OAuth app is in "Testing" mode (it will be, by default), you must explicitly whitelist your own Google account:
+
+1. In Google Cloud Console → **APIs & Services → OAuth consent screen**
+2. Scroll to **Test users → Add Users**
+3. Add the Gmail address you'll be authenticating with
+
+> **Challenge we hit:** Without this step, the browser OAuth screen shows "Access blocked: [your-app-name] has not completed the Google verification process" and blocks you entirely. Adding your own email as a test user takes 10 seconds and resolves it immediately.
+
+**1d — Run the Hermes OAuth setup**
+
+```bash
+cd ~/.hermes/hermes-agent/skills/productivity/google-workspace/scripts
+python3 setup.py --client-secret ~/.hermes/google_client_secret.json
+```
+
+This generates an auth URL. Copy it, open it in a browser, sign in with your Google account, grant the requested permissions, and copy the authorization code from the redirect URL back to the terminal.
+
+> **The auth session expires in ~5 minutes** — complete the browser flow and run `--auth-code` promptly. If you get "No pending OAuth session found", just re-run `--auth-url` to get a fresh URL and start again.
+
+```bash
+python3 setup.py --auth-code <paste-code-here>
+```
+
+Verify the token was saved correctly:
+
+```bash
+python3 setup.py --check
+```
+
+You should see `AUTHENTICATED` and a list of granted scopes. If you see `NOT AUTHENTICATED`, re-run steps 1d from the top.
+
+---
+
+### Step 2 — Confirm Gmail draft creation works
+
+Hermes's built-in `google_api.py` does not expose a draft subcommand — its email tools cover send and read, not create-draft. We use a custom helper script instead:
+
+```bash
+python3 ~/.hermes/scripts/gmail_draft.py \
+  --to your.email@gmail.com \
+  --subject "Hermes test draft" \
+  --body "This confirms Gmail draft creation is working. Do not send."
+```
+
+You should see:
+
+```json
+{
+  "status": "draft_created",
+  "draft_id": "r-...",
+  "message_id": "..."
+}
+```
+
+Check your Gmail **Drafts** folder — the message should be there.
+
+> **What this script does:** it imports Hermes's own `build_service` helper (from `google_api.py`) for auth, then calls `service.users().drafts().create()` directly. The script is at `~/.hermes/scripts/gmail_draft.py`. Source is in the appendix if you need to recreate it.
+
+---
+
+### Step 3 — Describe your round
+
+Message your bot on Telegram:
+
+> "I'm raising a [stage] round in [sector], based in [geography], looking for [check size] checks. Here's anything else that matters for this specific round: [your notes]."
+
+---
+
+### Step 4 — Live web-search for matching investors
 
 > "Search for active [stage] investors in [sector] who invest in [geography]-based startups, with check sizes around [your target]. Give me a list of 5-8 real, currently active funds or investors with their typical check size, stage focus, and a source link for each."
 
-**Watch for:** results that are generic, outdated, or don't cite a real source. If this happens — **switch immediately to the fallback list in the appendix below.** This isn't a sign anything is broken; live search coverage varies a lot by sector and geography.
+Watch for results that are generic, outdated, or cite no real source. If this happens — **switch immediately to the fallback list in the appendix below.** Live search coverage varies by sector and geography; the fallback exists for exactly this.
 
-### Step 4 — Score the matches
+---
+
+### Step 5 — Score the matches
 
 > "For each investor/fund you just found, score how well they fit my round on a scale of 1-3 (low/medium/high fit) based on stage, sector, geography, and check size match. Explain the score in one sentence."
 
-### Step 5 — Draft personalized outreach
+---
+
+### Step 6 — Draft personalized outreach
 
 For your top 2-3 matches:
 
-> "For [investor/fund name], draft a short, personalized outreach email. Reference what specifically about their thesis or portfolio makes them a fit for my round. Keep it under 150 words. Create it as a Gmail draft — do not send it."
+> "For [investor/fund name], draft a short, personalized outreach email. Reference what specifically about their thesis or portfolio makes them a fit for my round. Keep it under 150 words. Create it as a Gmail draft using the draft creation tool — do not send it."
 
-Check your Gmail drafts folder for the result.
+Hermes will call `gmail_draft.py` via its tool layer. Check your **Gmail Drafts** folder for the result.
+
+---
 
 ### Done-state checklist
 
-- [ ] Gmail draft-creation test succeeded (Step 1)
+- [ ] `google_client_secret.json` in `~/.hermes/`
+- [ ] Gmail API enabled in Google Cloud Console
+- [ ] Your email added as a test user on the OAuth consent screen
+- [ ] `setup.py --check` returns `AUTHENTICATED`
+- [ ] `gmail_draft.py` test returned `draft_created` and the draft appeared in Gmail
 - [ ] Got either live search results or switched cleanly to the fallback list
 - [ ] At least one scored investor match
-- [ ] At least one personalized draft sitting in Gmail drafts, unsent
+- [ ] At least one personalized draft sitting in Gmail Drafts, unsent
 
-### If live search underperforms
+---
 
-Switch to the appendix below. Feed the same list format into Step 4 (scoring) and Step 5 (drafting) instead of live search results.
+## General Troubleshooting (both agents)
+
+| Problem | Fix |
+|---|---|
+| `gh auth status` shows not logged in | Run `gh auth login` and follow the browser flow |
+| Commits endpoint returns 404 | Check the branch name — try `master` if `main` returns nothing |
+| Hermes doesn't respond at all on Telegram | Check `hermes gateway` is still running — `cat ~/.hermes/gateway_state.json` |
+| Telegram blocks your messages ("unauthorized user") | Your user ID is not in `TELEGRAM_ALLOWED_USERS` — use the numeric ID from the log, not your username |
+| "Chat not found" on cron delivery | `TELEGRAM_HOME_CHANNEL` is set to a username — replace with numeric chat ID |
+| Tool/skill not showing up after adding a token | Restart Hermes: `hermes gateway restart` |
+| Response is generic / ignores your repo | Be more explicit — name the exact repo and date range in the prompt |
+| "Access blocked" on Google OAuth screen | Your email is not in the OAuth app's test users list — Google Cloud Console → OAuth consent screen → Test users → Add your email |
+| `HttpError 403 — Gmail API has not been used in project` | The Gmail API is not enabled — Google Cloud Console → APIs & Services → Library → search "Gmail API" → Enable |
+| `setup.py --check` returns NOT AUTHENTICATED | Re-run `setup.py --client-secret` to get a fresh auth URL, complete the browser flow again, then `--auth-code` |
+| `gmail_draft.py` command not found / import error | The script lives at `~/.hermes/scripts/gmail_draft.py` — check the path; if missing, recreate from the appendix |
+| Gmail or Google auth fails generally | Re-run the `setup.py` flow from step 1d; confirm the Gmail API is enabled and your email is a test user |
 
 ---
 
@@ -156,17 +462,63 @@ Real, independently sourced seed/pre-seed investors, verified via official fund 
 | **Village Global (Velocity)** | Up to $1M | Pre-seed, seed | Explicitly geography-agnostic, "anywhere in the world" | Medium-high |
 | **Y Combinator** | $500K standard ($125K + $375K SAFE) | Pre-seed (3-month program) | ⚠️ Requires re-incorporating in US/Canada/Cayman/Singapore — not a direct-to-India-entity option | High |
 
-**How to use this table live:** ask the founder for their stage + sector + geography, scan the matching section(s) above, and feed 3-5 relevant rows into Step 4 (scoring) and Step 5 (drafting) in place of live search results.
-
-**Full research trail:** five parallel research threads (India micro-VC, India seed generalist, India sector-specific, India angel networks, global/US funds) were run and cross-verified against official fund sites and dated press coverage on 2026-07-16. Entries with weaker sourcing (single aggregator, no official confirmation) were deliberately dropped rather than included — see source-of-truth doc §5.8 for the full drop list if a specific fund is expected here and missing.
+**How to use this table live:** ask the founder for their stage + sector + geography, scan the matching section(s) above, and feed 3-5 relevant rows into Step 5 (scoring) and Step 6 (drafting) in place of live search results.
 
 ---
 
-## General Troubleshooting (both agents)
+## Appendix — `gmail_draft.py` source
 
-| Problem | Fix |
-|---|---|
-| Hermes doesn't respond at all | Check `hermes gateway` is still running in a terminal — it must stay open |
-| Tool/skill not showing up after adding a token | Restart Hermes, or run `/reload-mcp` inside chat |
-| Response is generic / ignores your specific repo or round | Be more explicit in the prompt — name the exact repo, exact round terms, don't rely on Hermes inferring context from earlier messages |
-| Gmail or GitHub auth fails | Double check token scope and that it's in `~/.hermes/.env` with no trailing spaces or quotes issues |
+If `~/.hermes/scripts/gmail_draft.py` is missing or needs to be recreated:
+
+```python
+#!/usr/bin/env python3
+"""
+Create a Gmail draft via the Google Workspace token stored by Hermes.
+Usage:
+  python3 gmail_draft.py --to EMAIL --subject SUBJECT --body BODY
+"""
+import argparse
+import base64
+import json
+import sys
+from email.mime.text import MIMEText
+from pathlib import Path
+
+# Reuse Hermes's google_api helpers for auth
+_SCRIPTS = Path.home() / ".hermes/hermes-agent/skills/productivity/google-workspace/scripts"
+sys.path.insert(0, str(_SCRIPTS))
+
+from google_api import build_service
+
+def create_draft(to, subject, body):
+    service = build_service("gmail", "v1")
+    message = MIMEText(body, "plain")
+    message["To"] = to
+    message["Subject"] = subject
+    raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    draft = service.users().drafts().create(
+        userId="me",
+        body={"message": {"raw": raw}}
+    ).execute()
+    return draft
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Create a Gmail draft")
+    parser.add_argument("--to", required=True)
+    parser.add_argument("--subject", required=True)
+    parser.add_argument("--body", required=True)
+    args = parser.parse_args()
+
+    draft = create_draft(args.to, args.subject, args.body)
+    print(json.dumps({
+        "status": "draft_created",
+        "draft_id": draft["id"],
+        "message_id": draft["message"]["id"]
+    }, indent=2))
+```
+
+After creating the file, make it executable:
+
+```bash
+chmod +x ~/.hermes/scripts/gmail_draft.py
+```
