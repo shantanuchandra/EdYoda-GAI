@@ -222,7 +222,7 @@ hermes cron run <job-id>
 
 ### Step 5 — Enable on-demand repo lookups via Telegram
 
-Add standing instructions to Hermes's persistent system prompt so it knows how to handle repo requests interactively. Edit `~/.hermes/SOUL.md` and append:
+Add standing instructions to Hermes's persistent system prompt so it knows how to handle repo requests interactively. Edit `~/.hermes/SOUL.md` and append the following two blocks — one for Agent 1 (repo digest) and one for Agent 2 (investor outreach):
 
 ```
 ## GitHub Repo Digest — standing instructions
@@ -250,6 +250,131 @@ Now in Telegram you can message your bot:
 
 > **Design decision made:** Telegram's native inline buttons cap at 4 choices. With 6 repos, buttons don't work cleanly. Number-reply navigation was chosen instead — it scales to any number of repos and is easier to explain to a room of founders.
 
+Also append the following block to `~/.hermes/SOUL.md` for the Pragya → Varta pipeline. This gives Hermes standing instructions for both the short regional command format and the long-form round description:
+
+```
+## Pragya → Varta: Investor Qualification + Outreach pipeline
+
+AGENTS: Pragya (प्रज्ञा, intelligence) handles search + scoring.
+        Varta (वार्ता, communication) handles drafting + Gmail save.
+This is a SEQUENTIAL pipeline. Complete each stage before the next.
+
+─────────────────────────────────────────────
+TRIGGER RECOGNITION
+─────────────────────────────────────────────
+
+SHORT COMMAND FORMAT (primary trigger):
+Pattern: "get my <APP> app a <STAGE> investor from <REGION> region with checks around <CHECK>"
+Example: "get my CardCompass app a pre-seed investor from Dubai region with checks around $500K"
+
+When you receive this pattern, extract:
+  APP     = the app/company name (e.g. CardCompass)
+  STAGE   = the round stage (pre-seed / seed / Series A / Series B)
+  REGION  = the geography (e.g. Dubai, India, Singapore, Global, Southeast Asia)
+  CHECK   = the target check size (e.g. $500K, ₹4Cr, $1M–$2M)
+
+Then proceed immediately to STEP 2 — do not ask for more information.
+
+LONG-FORM FORMAT (fallback):
+If the message describes a round without matching the short pattern, extract the same
+four values (APP, STAGE, REGION, CHECK) from the description, confirm them in one line,
+and proceed to STEP 2.
+
+If any of STAGE, REGION, or CHECK is missing, ask for only the missing items before
+proceeding. Ask for all missing items in ONE message, not separately.
+
+─────────────────────────────────────────────
+STEP 1 — Confirm extracted parameters (optional, skip if all four are clear)
+─────────────────────────────────────────────
+Reply: "Running Pragya for [APP] — [STAGE] round, [REGION], checks ~[CHECK]. Starting search..."
+Then immediately begin STEP 2.
+
+─────────────────────────────────────────────
+STEP 2 (PRAGYA) — Two-pass investor search
+─────────────────────────────────────────────
+Run BOTH searches. Do not proceed to scoring until both are complete.
+
+Search 1 — broad:
+"Search for active [STAGE] investors in [REGION] who invest in startups in the same
+space as [APP]. List 5-8 currently active funds or investors. For each: name, direct
+source link (fund website or dated press article — not Crunchbase/Tracxn alone), typical
+check size, stage focus, geography. Exclude any result without a direct source link."
+
+Search 2 — recency-anchored (run immediately after Search 1):
+"Now search for funds that made investments in the [APP] sector/space in the last 12
+months, OR announced a new fund targeting [REGION] in the last 18 months. Add any new
+names not already on the list. Same format."
+
+Combine results, deduplicate by fund name. Proceed to STEP 3.
+
+─────────────────────────────────────────────
+STEP 3 (PRAGYA) — Per-criterion scoring
+─────────────────────────────────────────────
+For EACH investor on the combined list, score these four criteria independently:
+
+  Stage fit   → HIGH / MED / LOW / UNKNOWN — does their typical stage match [STAGE]?
+  Sector fit  → HIGH / MED / LOW / UNKNOWN — portfolio evidence in [APP]'s space?
+  Geography   → HIGH / MED / LOW / UNKNOWN — invests in [REGION]-based companies, no flip?
+  Check size  → HIGH / MED / LOW / UNKNOWN — target check [CHECK] within their range?
+
+Overall fit: 3 = all HIGH, no UNKNOWN dealbreakers | 2 = mixed | 1 = any LOW
+
+Rules:
+  - Cite specific source evidence per criterion. If evidence is missing, mark UNKNOWN.
+  - Do NOT guess or infer. UNKNOWN is better than a wrong LOW or HIGH.
+  - Do NOT pass any investor with an overall score of 1 to Varta.
+  - Do NOT pass any investor with LOW on Stage or Geography to Varta (these are dealbreakers).
+
+─────────────────────────────────────────────
+STEP 4 (VARTA) — Draft personalized outreach
+─────────────────────────────────────────────
+Draft ONLY for investors with overall score 3, or 2 with no LOW on Stage/Geography.
+
+For each qualifying investor, draft an email meeting ALL of these requirements:
+  - Under 150 words
+  - First sentence: ONE specific sourced fact about this investor — a portfolio company name,
+    a recent investment they made, or an exact quote from their thesis. NOT a generic claim
+    like "you invest in [sector]." If no specific fact is sourced, do not draft.
+  - Second sentence: "[APP] is [one-line description]. We are raising a [STAGE] round,
+    targeting [CHECK] checks."
+  - Final sentence: A single ask — "Would you have 20 minutes this week for a call?"
+  - No: "I hope this finds you well," "I'm reaching out because," superlatives, buzzwords.
+
+─────────────────────────────────────────────
+STEP 5 (VARTA) — Save as Gmail draft
+─────────────────────────────────────────────
+For each draft, run:
+  python3 ~/.hermes/scripts/gmail_draft_standalone.py \
+    --to [founder's own email as placeholder — never an investor's email unless confirmed] \
+    --subject "Introduction: [APP] — [STAGE] round, [CHECK]" \
+    --body "[draft text]"
+
+After each draft is saved, note the draft_id from the JSON response.
+
+─────────────────────────────────────────────
+FINAL REPLY (send to Telegram after all drafts saved)
+─────────────────────────────────────────────
+Reply in this format:
+"Pragya → Varta complete.
+
+Found [N] investors. [M] qualified for outreach (score 2+ on all key criteria).
+
+[For each draft saved:]
+• [Fund name] — Score: [overall]/3 (Stage: [H/M/L], Sector: [H/M/L], Geography: [H/M/L], Check: [H/M/L])
+  Draft saved. Verify before sending: [one specific thing to verify, e.g. 'Confirm fund is still active — last confirmed press: Nov 2025']
+
+Check your Gmail Drafts folder. Edit the subject line to add your name before sending."
+
+─────────────────────────────────────────────
+ABSOLUTE RULES — NEVER VIOLATE
+─────────────────────────────────────────────
+NEVER send email. NEVER call users.messages.send or users.drafts.send.
+Only drafts().create() is permitted. Drafts go to the FOUNDER'S OWN email as recipient
+placeholder unless they explicitly provide an investor's contact email.
+NEVER invent investor names, fund sizes, or portfolio companies.
+NEVER draft for an investor with a sourced LOW on Stage or Geography.
+```
+
 ---
 
 ### Done-state checklist
@@ -264,9 +389,15 @@ Now in Telegram you can message your bot:
 
 ---
 
-## Part 2 — Investor Qualification + Outreach Agent
+## Part 2 — Pragya + Varta: Investor Qualification + Outreach Agents
 
-**What you're building:** an agent that takes your round description, searches for matching investors, scores them, and drafts personalized outreach directly into your Gmail drafts — never sent automatically. You read, validate, and send it yourself.
+**Agent names:**
+- **Pragya** (प्रज्ञा — *intelligence, insight*): finds and scores matching investors
+- **Varta** (वार्ता — *communication, discourse*): drafts and saves the personalized outreach email
+
+These are two stages of the same pipeline. Together: **Pragya → Varta**.
+
+**What you're building:** a two-stage agent pipeline triggered from Telegram. You describe your app, round stage, region, and check size in a single Telegram message. Pragya runs a live two-pass web search, scores each investor per criterion, and hands the top matches to Varta. Varta drafts a personalized outreach email anchored to specific investor evidence and saves it to your Gmail Drafts — never sent automatically. You read, validate, and send it yourself.
 
 ---
 
@@ -317,13 +448,15 @@ This generates an auth URL. Copy it, open it in a browser, sign in with your Goo
 python3 setup.py --auth-code <paste-code-here>
 ```
 
-Verify the token was saved correctly:
+Verify the token was saved correctly **and check which scope was granted**:
 
 ```bash
 python3 setup.py --check
 ```
 
 You should see `AUTHENTICATED` and a list of granted scopes. If you see `NOT AUTHENTICATED`, re-run steps 1d from the top.
+
+> **Critical — check the scope shown:** You need `https://www.googleapis.com/auth/gmail.modify` in the scope list, **not** `https://www.googleapis.com/auth/gmail.compose`. Here's why this matters: `gmail.compose` is commonly used for draft creation but it actually grants "Manage drafts **and send emails**" — it includes send capability. `gmail.modify` is the correct minimum scope: it covers `drafts.create` but has no send path, giving you a structural guarantee that this agent cannot auto-send. If `setup.py` granted `gmail.compose`, re-run the OAuth flow after updating the scope in `setup.py`'s configuration, or use the standalone script in the appendix which requests `gmail.modify` directly.
 
 ---
 
@@ -354,35 +487,85 @@ Check your Gmail **Drafts** folder — the message should be there.
 
 ---
 
-### Step 3 — Describe your round
+### Step 3 — Trigger Pragya via Telegram (regional command format)
 
-Message your bot on Telegram:
+Pragya understands a natural-language command format that encodes your app name, round stage, region, and check size in a single Telegram message. This is the **primary trigger** — one message starts the full Pragya → Varta pipeline.
 
-> "I'm raising a [stage] round in [sector], based in [geography], looking for [check size] checks. Here's anything else that matters for this specific round: [your notes]."
+**Command format:**
+```
+get my <app-name> app a <stage> investor from <region> region with checks around <check-size>
+```
+
+**Examples:**
+```
+get my CardCompass app a pre-seed investor from Dubai region with checks around $500K
+get my Buildwise app a seed investor from India region with checks around $1M–$2M
+get my Shoploop app a Series A investor from Singapore region with checks around $3M
+```
+
+**What Hermes does when it receives this command** (wired via SOUL.md — see Step 5):
+1. Extracts: app name = `CardCompass`, stage = `pre-seed`, region = `Dubai`, check size = `$500K`
+2. Runs Pragya's two-pass search — first broad, then recency-anchored for `Dubai`-active `pre-seed` funds
+3. Scores each result per criterion (Stage / Sector / Geography / Check size)
+4. Passes top matches (score 3, or 2 with no LOW on Stage/Geography) to Varta
+5. Varta drafts an outreach email that mentions `CardCompass` specifically, saves to Gmail Drafts
+6. Replies on Telegram: "Done — N draft(s) saved to your Gmail Drafts. Top match: [fund name], score 3/3. Verify: [one specific thing to check before sending]."
+
+**If you want to describe your round in a longer form** (when detail matters), send this to Telegram instead:
+> "I'm raising a [stage] round for [app-name] in [sector], based in [geography], looking for [check size] checks. Here's anything else that matters: [your notes]."
+
+Both formats trigger the same Pragya → Varta pipeline.
 
 ---
 
 ### Step 4 — Live web-search for matching investors
 
-> "Search for active [stage] investors in [sector] who invest in [geography]-based startups, with check sizes around [your target]. Give me a list of 5-8 real, currently active funds or investors with their typical check size, stage focus, and a source link for each."
+Send two searches in sequence — a broad one, then a recency-anchored one. The second catches recent fund announcements and portfolio updates the broad query often misses:
 
-Watch for results that are generic, outdated, or cite no real source. If this happens — **switch immediately to the fallback list in the appendix below.** Live search coverage varies by sector and geography; the fallback exists for exactly this.
+**Search 1 — broad match:**
+> "Search for active [stage] investors in [sector] who invest in [geography]-based startups, with check sizes around [your target]. Give me a list of 5-8 real, currently active funds or investors. For each: investor or fund name, a direct source link (fund website or dated press article, not a listicle), typical check size, stage focus, and geography. Do not include any investor without a direct source link."
+
+**Search 2 — recency filter (run immediately after):**
+> "Now search again with a focus on recent activity: funds that made investments in [sector] in the last 12 months, or announced a new fund in the last 18 months. Add any new names not already in your previous list. Same format — name, source link, check size, stage, geography."
+
+Watch for results that are generic, cite no real source, or only link to aggregator sites (Crunchbase, Tracxn) rather than the fund's own site or a dated press article. **If this happens — switch immediately to the fallback list in the appendix below.** Live search coverage varies by sector and geography; the fallback exists for exactly this.
+
+> **Why two searches:** A single broad query frequently returns the same 5-6 widely-covered funds regardless of sector specificity. The recency-anchored follow-up surfaces funds that have signaled active investment intent recently — which is what a founder actually wants to know before sending outreach. The two-pass approach consistently surfaces 2-3 names the first query misses.
 
 ---
 
 ### Step 5 — Score the matches
 
-> "For each investor/fund you just found, score how well they fit my round on a scale of 1-3 (low/medium/high fit) based on stage, sector, geography, and check size match. Explain the score in one sentence."
+Score each criterion separately — this prevents a strong stage fit from masking a geography mismatch:
+
+> "For each investor/fund on your list, evaluate fit across these four criteria using my round facts above. Score each criterion independently as HIGH / MED / LOW, then give an overall fit rating (1 = weak, 2 = moderate, 3 = strong):
+>
+> 1. **Stage fit** — does their typical investment stage match mine?
+> 2. **Sector fit** — do they actively invest in my sector, with portfolio evidence?
+> 3. **Geography** — do they invest in [geography]-based companies, or require a flip?
+> 4. **Check size** — does my target check size fall within their range?
+>
+> For each, cite the specific source evidence (not inference). If you don't have sourced evidence for a criterion, mark it UNKNOWN rather than guessing."
+
+> **Why per-criterion scoring:** A single 1-3 overall score lets a strong match on one dimension mask a dealbreaker on another (e.g., right stage, wrong geography). Scoring each criterion separately surfaces the specific reason a match is weak — which is also the thing to address in the outreach email.
 
 ---
 
 ### Step 6 — Draft personalized outreach
 
-For your top 2-3 matches:
+For your top 2-3 matches (score 3 overall, or 2 with no LOW on stage/geography):
 
-> "For [investor/fund name], draft a short, personalized outreach email. Reference what specifically about their thesis or portfolio makes them a fit for my round. Keep it under 150 words. Create it as a Gmail draft using the draft creation tool — do not send it."
+> "For [investor/fund name], draft a short outreach email. Requirements:
+> - Under 150 words
+> - Open with one specific, sourced reason they fit my round — cite their portfolio, thesis statement, or a recent investment, not a generic statement about their sector focus
+> - State my round facts in one sentence (stage, sector, check size)
+> - One clear ask — a 20-minute call, not a pitch deck attachment
+> - No superlatives, no 'I'm reaching out because...', no 'I hope this finds you well'
+> Create it as a Gmail draft using the draft creation tool. Do not send it. After creating the draft, tell me what specific detail I should verify before sending."
 
 Hermes will call `gmail_draft.py` via its tool layer. Check your **Gmail Drafts** folder for the result.
+
+> **Why source-anchored opening:** Generic openings ("I admire your firm's focus on SaaS") are filtered immediately by investors who receive dozens of outreach emails per week. Anchoring the opening to a specific portfolio company, recent investment, or exact thesis quote forces the research step and signals the founder did their homework — the single highest-leverage change in cold outreach quality.
 
 ---
 
@@ -392,10 +575,56 @@ Hermes will call `gmail_draft.py` via its tool layer. Check your **Gmail Drafts*
 - [ ] Gmail API enabled in Google Cloud Console
 - [ ] Your email added as a test user on the OAuth consent screen
 - [ ] `setup.py --check` returns `AUTHENTICATED`
+- [ ] **Scope confirmed:** `gmail.modify` (not `gmail.compose`) in the granted scope list
 - [ ] `gmail_draft.py` test returned `draft_created` and the draft appeared in Gmail
+- [ ] Two-pass search completed (broad + recency-anchored)
 - [ ] Got either live search results or switched cleanly to the fallback list
-- [ ] At least one scored investor match
-- [ ] At least one personalized draft sitting in Gmail Drafts, unsent
+- [ ] At least one investor scored per-criterion (stage / sector / geography / check size)
+- [ ] At least one personalized draft sitting in Gmail Drafts, unsent, with a source-anchored opening
+
+---
+
+## Hermes Dashboard — Local Monitor + Manual Trigger
+
+**File:** `session/hermes_dashboard.py`  
+**Run:** `python3 session/hermes_dashboard.py`  
+**Opens at:** `http://localhost:7890`
+
+The dashboard is a zero-dependency Python 3 web UI that gives you a visual control panel for both agents. No npm, no pip, no external libraries — stdlib only.
+
+### What it does
+
+**Drishti card (left, indigo)**
+- Shows last run timestamp and IDLE / Running / OK / Error badge
+- Editable Repo Owner field — pre-populated from `~/.hermes/drishti_config.json` on load
+- Shows scheduled next run (Monday 9:00 AM)
+- "Run Now" button → calls `hermes cron run "Weekly Repo Digest — All Repos"` → output streams into the collapsible terminal pane below
+
+**Pragya + Varta card (right, cyan)**
+- Four parameter fields: App Name, Round Stage (select), Region, Check Size
+- Live-updating "Generated command" preview box — updates as you type. Shows the exact string that will be sent to Hermes:
+  ```
+  get my <app> app a <stage> investor from <region> region with checks around <checkSize>
+  ```
+- "Trigger Pragya → Varta" button → sends the command to `hermes chat` → output appears in the terminal pane
+
+### Startup checklist
+
+1. Run: `python3 session/hermes_dashboard.py`
+2. Expected terminal output:
+   ```
+   ✓ Python 3.x found
+   ✓ Hermes found (hermes version x.x.x)
+   Starting Hermes Dashboard on http://localhost:7890
+   Open this URL in your browser to monitor and trigger your agents.
+   Press Ctrl+C to stop.
+   ```
+3. Open `http://localhost:7890` in Chrome or Safari
+4. If Hermes is not installed yet, the script warns but still starts — the dashboard UI loads and becomes functional once Hermes is set up via `session/00_Pre_Read.md`
+
+### Config persistence
+
+Parameter values (repo owner, app name, stage, region, check size) are saved to `~/.hermes/drishti_config.json` and `~/.hermes/pragya_config.json` on every trigger. They reload automatically next time you open the dashboard — no re-entering parameters between sessions.
 
 ---
 
@@ -415,6 +644,10 @@ Hermes will call `gmail_draft.py` via its tool layer. Check your **Gmail Drafts*
 | `setup.py --check` returns NOT AUTHENTICATED | Re-run `setup.py --client-secret` to get a fresh auth URL, complete the browser flow again, then `--auth-code` |
 | `gmail_draft.py` command not found / import error | The script lives at `~/.hermes/scripts/gmail_draft.py` — check the path; if missing, recreate from the appendix |
 | Gmail or Google auth fails generally | Re-run the `setup.py` flow from step 1d; confirm the Gmail API is enabled and your email is a test user |
+| `setup.py --check` shows `gmail.compose` instead of `gmail.modify` | `gmail.compose` grants send capability — wrong scope for a never-auto-send pipeline. Use the `gmail_draft_standalone.py` in the appendix, which handles its own OAuth and explicitly requests `gmail.modify` |
+| Draft created but want to verify it can't auto-send | `drafts().create()` posts to `/v1/users/{userId}/drafts` — a categorically separate endpoint from `users.messages.send`. A draft requires an explicit separate API call to send; there is no code path in `gmail_draft.py` that triggers that call |
+| Dashboard shows blank page at `localhost:7890` | Check that `python3 session/hermes_dashboard.py` is still running in your terminal — the server exits if the terminal window closes |
+| Dashboard: "Trigger Pragya → Varta" does nothing | Fill in all four parameter fields before triggering — app name, stage, region, check size. The terminal pane auto-opens below the card when a run starts |
 
 ---
 
@@ -466,7 +699,107 @@ Real, independently sourced seed/pre-seed investors, verified via official fund 
 
 ---
 
-## Appendix — `gmail_draft.py` source
+## Appendix — `gmail_draft_standalone.py` (recommended)
+
+Use this instead of the Hermes-bundled `gmail_draft.py` when you want explicit control over the OAuth scope. This version handles its own auth flow and requests **only `gmail.modify`** — no send capability, structural draft-only guarantee.
+
+**First-time setup:**
+
+```bash
+pip3 install google-auth google-auth-oauthlib google-api-python-client
+```
+
+Create `~/.hermes/scripts/gmail_draft_standalone.py`:
+
+```python
+#!/usr/bin/env python3
+"""
+Standalone Gmail draft creator — handles its own OAuth, requests gmail.modify only.
+First run: opens browser for consent. Subsequent runs: uses stored token.
+Usage:
+  python3 gmail_draft_standalone.py --to EMAIL --subject SUBJECT --body BODY
+"""
+import argparse
+import base64
+import json
+import os
+from email.mime.text import MIMEText
+from pathlib import Path
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+# gmail.modify: covers drafts.create, does NOT include send capability.
+# Do NOT use gmail.compose — it grants "Manage drafts and send emails".
+SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
+
+TOKEN_PATH = Path.home() / ".hermes" / "gmail_modify_token.json"
+CLIENT_SECRET = Path.home() / ".hermes" / "google_client_secret.json"
+
+
+def get_service():
+    creds = None
+    if TOKEN_PATH.exists():
+        creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET), SCOPES)
+            creds = flow.run_local_server(port=0)
+        TOKEN_PATH.write_text(creds.to_json())
+    return build("gmail", "v1", credentials=creds)
+
+
+def create_draft(to, subject, body):
+    service = get_service()
+    message = MIMEText(body, "plain")
+    message["To"] = to
+    message["Subject"] = subject
+    # RFC 2822 MIME → base64url — exact pattern verified against Google's API contract
+    raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    draft = service.users().drafts().create(
+        userId="me",
+        body={"message": {"raw": raw}}
+    ).execute()
+    return draft
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Create a Gmail draft (gmail.modify scope only)")
+    parser.add_argument("--to", required=True)
+    parser.add_argument("--subject", required=True)
+    parser.add_argument("--body", required=True)
+    args = parser.parse_args()
+
+    draft = create_draft(args.to, args.subject, args.body)
+    print(json.dumps({
+        "status": "draft_created",
+        "draft_id": draft["id"],
+        "message_id": draft["message"]["id"],
+        "scope": "gmail.modify (no send capability)"
+    }, indent=2))
+```
+
+Make it executable and test:
+
+```bash
+chmod +x ~/.hermes/scripts/gmail_draft_standalone.py
+python3 ~/.hermes/scripts/gmail_draft_standalone.py \
+  --to your.email@gmail.com \
+  --subject "Hermes scope test" \
+  --body "Scope: gmail.modify. This draft cannot be auto-sent. Do not send."
+```
+
+The first run opens a browser for consent — the consent screen will list only "View and manage your mail" (gmail.modify), not "Send email on your behalf" (gmail.compose). Check Gmail Drafts for the result.
+
+**Wire it into Hermes's tool layer:** in `~/.hermes/SOUL.md`, update the Gmail tool reference to point to `gmail_draft_standalone.py` instead of `gmail_draft.py`.
+
+---
+
+## Appendix — `gmail_draft.py` source (Hermes-integrated version)
 
 If `~/.hermes/scripts/gmail_draft.py` is missing or needs to be recreated:
 

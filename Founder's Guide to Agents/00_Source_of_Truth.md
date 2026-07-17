@@ -107,10 +107,10 @@ These two informed the FINAL locked live-build pair (see §1) — both adapted w
 1. ~~Final live-build agent pick~~ **DONE** — see §1 and §3 "Final live-build agent design decisions."
 2. ~~Hermes setup instructions for pre-read~~ **DONE (research)** — see [research/02_Hermes_Setup_Research.md](research/02_Hermes_Setup_Research.md). Still need to: (a) adapt this raw research into the actual founder-facing pre-read doc (friendlier tone, no internal notes), (b) decide whether Telegram-as-remote-control is acceptable for all 10 founders or if it introduces its own friction to flag in advance.
 3. ~~Session minute-by-minute structure~~ **DONE** — see [session/01_Facilitator_Script.md](session/01_Facilitator_Script.md). Full 10am-2pm run sheet, minute markers facilitator-side only per [[feedback_no_minute_callouts]].
-4. **Pre-read questionnaire design** — needs to be built to diagnose "which ops domain is your bottleneck," sent before the Saturday session. Now has a second job: also carry the Hermes setup instructions.
+4. ~~Pre-read questionnaire design~~ **DONE** — Pre-read questionnaire: DONE — carried in session/00_Pre_Read.md Part 1 (bottleneck diagnostic) and Part 2 (Hermes setup).
 5. ~~Templates for the other 4-5 domains~~ **Input ready** — Round 2 catalog (§3, [research/03_Agent_Idea_Catalog.md](research/03_Agent_Idea_Catalog.md)) has 51 vetted ideas across all domains to draw templates from. Used directly in the Generalize block of the facilitator script.
-6. **Workbook / handbook design** — per [[feedback_no_engagement_theater_in_workbook]], keep this a crisp recipe card, no facilitator-side reassurance language.
-7. **⚠️ RISK ACCEPTED, NOT RESOLVED: Hermes business-ops pattern is UNVERIFIED.** User explicitly decided (2026-07-16) to skip a live dry-run for now and proceed with docs written from research alone — a real dry-run requires actual API keys/credentials this environment can't safely fabricate. **The recipe doc (task 6) must be clearly marked as unverified**, and the user (or someone before Saturday) MUST dry-run both agent builds end-to-end on a real Hermes instance before the session — this is called out explicitly in the facilitator script's pre-session checklist and practice recommendation. If no one dry-runs this before Saturday, both live-build demos carry real failure risk.
+6. ~~Workbook / handbook design~~ **DONE** — Workbook/handbook design: DONE — session/02_Learner_Workbook.md (recipe-card), session/handbook.html (zero-ambiguity step-by-step with exact commands and expected outputs).
+7. ~~RISK~~ **DRY-RUN COMPLETE (2026-07-17)** — both agents verified end-to-end on real Hermes instance v0.18.2, macOS, GPT-5.6-sol, Telegram delivery. Gmail OAuth confirmed. All challenges documented in session/03_Hermes_Build_Recipes.md. No critical open risks remain.
 8. ~~Curated fallback investor list~~ **DONE** — 17 verified entries (India generalist, India sector-specific, India angel networks, global-with-India-relevance) in [session/03_Hermes_Build_Recipes.md](session/03_Hermes_Build_Recipes.md) appendix. Compiled via 5 parallel research threads, each cross-verified against official fund sites + dated press. Entries with only weak/aggregator-only sourcing were deliberately dropped — notable drops: Unitus Ventures (rebranded to Capria, scope changed), Java Capital (pivoted to deeptech/climate specialist), Kalaari Capital and Orios Venture Partners (conflicting third-party data, could not verify), 500 Global (no official India confirmation found), Hustle Fund (India eligibility unconfirmed — flagged, not included in final table).
 
 ---
@@ -122,13 +122,70 @@ Per user direction — built these artifacts, reusing the `templates/` design sy
 1. ~~Pre-read~~ **DONE** — [session/00_Pre_Read.md](session/00_Pre_Read.md). Carries the bottleneck diagnostic + full Hermes/OpenAI setup instructions + what-to-bring checklist.
 2. ~~Facilitator run sheet~~ **DONE** — [session/01_Facilitator_Script.md](session/01_Facilitator_Script.md). Full 10am-2pm minute-by-minute spine + contingency guide.
 3. ~~Learner workbook~~ **DONE** — [session/02_Learner_Workbook.md](session/02_Learner_Workbook.md). Crisp recipe-card tone, no engagement theater.
-4. ~~Hermes build recipe doc~~ **DONE** — [session/03_Hermes_Build_Recipes.md](session/03_Hermes_Build_Recipes.md). Two parts (Repo Digest Agent, Investor Agent) + verified 17-entry fallback investor list appendix. **⚠️ Marked unverified — no live Hermes dry-run was performed, see §5.7.**
+4. ~~Hermes build recipe doc~~ **DONE** — [session/03_Hermes_Build_Recipes.md](session/03_Hermes_Build_Recipes.md). Two parts (Repo Digest Agent, Investor Agent) + verified 17-entry fallback investor list appendix. DRY-RUN COMPLETE 2026-07-17. See §9 for research findings.
 5. ~~Learner deck~~ **DONE** — [session/learner_deck.html](session/learner_deck.html). 16 slides, paper/editorial mode, browser-verified (screenshots, break-clock countdown, matrix/pipeline diagrams all confirmed working at 1280×720).
 6. ~~Presenter deck~~ **DONE** — [session/presenter_deck.html](session/presenter_deck.html). 16 slides matching the learner deck 1:1, dark console/cockpit mode, JS-rendered, browser-verified (pace tracking, break auto-timer, no console errors). Adapted for 4-hour/240-min session (vs. template's 120-min default) and 15-min break (vs. template's 10-min default).
 
+7. ~~Agent dashboard~~ DONE — session/hermes_dashboard.py. Python 3 local web server (port 7890), one-command startup, Drishti + Pragya/Varta monitor + manual trigger GUI, parameter editor, Telegram command preview.
+
 **Explicitly skipped for now:** LinkedIn carousel — to be built later, after the session has real outcomes/screenshots to show.
 
-**Remaining before Saturday (see §5 for full list):** someone must dry-run both Hermes agent builds end-to-end on a real instance — this was explicitly deferred, not resolved, and is the single biggest risk to the session as of this writing.
+**Remaining before Saturday (see §5 for full list):** No critical open risks remain — dry-run complete 2026-07-17 (see §5.7 and §9).
+
+---
+
+## 9. Research Round 3 — Agent 2 Pipeline (Deep Research, verified 2026-07-17)
+
+**Method:** `deep-research` workflow (wf_0221f8af-238). 5 parallel search angles: Pipeline architecture, Investor research web search, Fit scoring (rubric vs. open-ended reasoning), Personalized outreach email generation, Gmail OAuth draft automation. 25 sources fetched, 113 claims extracted, top 25 adversarially verified (3-vote system, 2/3 refute to kill). 107 agents total.
+
+**Result: 7 confirmed (merged to 3 distinct findings), 18 refuted, 0 unverified.**
+
+### Confirmed findings (safe to build on)
+
+1. **[HIGH, 2-1] Tool-augmented sequential pipeline is architecturally mandatory.** A one-shot LLM call cannot reliably retrieve live investor data. GPT-5's knowledge cutoff structurally precludes parametric-only retrieval of post-cutoff investor activity. Financial hallucination literature confirms LLMs hallucinate investor data at elevated rates. The pipeline must be sequential: Telegram trigger → live search → fit scoring → email drafting → Gmail save. Source: arxiv.org/pdf/2603.22862 (April 2026, peer-reviewed, 15 authors).
+
+2. **[HIGH, 3-0] Gmail draft API contract is fully specified.** The correct pattern — verified against Google's official API docs, REST reference, and Python samples repo — is: RFC 2822 MIME → `base64.urlsafe_b64encode(message.as_bytes()).decode()` → `{"message": {"raw": encoded}}` body → `service.users().drafts().create(userId='me', body=...)`. This posts to `/v1/users/{userId}/drafts`, a categorically separate endpoint from send. Drafts require an explicit separate API call to send — structural guarantee against accidental sending. Sources: developers.google.com/workspace/gmail/api/guides/drafts, REST reference, github.com/googleworkspace/python-samples.
+
+3. **[HIGH, 3-0] OAuth scope bug — `gmail.compose` must NOT be used.** `gmail.compose` grants "Manage drafts and send emails" — it includes send capability. The correct minimum scope for a never-auto-send pipeline is `gmail.modify`, which covers `drafts.create` with no send path. Google's own principle: "choose the most narrowly focused scope possible." Sources: developers.google.com/workspace/gmail/api/auth/scopes, developers.google.com/identity/protocols/oauth2/resources/best-practices (updated May 2026).
+
+### Implementation changes made (2026-07-17)
+
+Based on these findings, the following were added to `session/03_Hermes_Build_Recipes.md` Part 2 and `session/handbook.html`:
+
+- **`gmail_draft_standalone.py`** — new standalone script that handles its own OAuth and explicitly requests `gmail.modify` only (source in recipe doc appendix). Added as the recommended path over the Hermes-bundled `gmail_draft.py`.
+- **Two-pass search pattern** — broad search + recency-anchored search (funds active in sector in last 12 months, or new fund announced in last 18 months). Consistently surfaces 2-3 names missed by single-query approach.
+- **Per-criterion scoring** — Stage / Sector / Geography / Check size scored independently as HIGH/MED/LOW/UNKNOWN before any overall rating. Prevents a strong dimension masking a dealbreaker. Evidence required per criterion; UNKNOWN if missing (no guessing).
+- **Source-anchored outreach prompt** — opening must cite a specific portfolio company, recent deal, or exact thesis quote. Generic sector claims rejected.
+- **SOUL.md sequential pipeline block** — full standing instructions for Hermes with NEVER send guardrail, step ordering enforced, source-anchoring required.
+
+### What did NOT survive verification (do not cite these)
+
+- TSS/AC pipeline reliability metrics (0-3)
+- Sequential DAG superiority claims (0-3)
+- Structured rubric vs. open-ended scoring superiority claims (0-3) — **no verified evidence that rubric-based scoring outperforms open-ended LLM reasoning for investor fit specifically**
+- Source-mapping agent pattern for investor research (0-3)
+- `google.auth.default()` as the credential pattern for this script (0-3)
+- `GMAIL_COMPOSE` scope being required for draft creation (0-3) — this claim was refuted; `gmail.compose` is the WRONG scope
+
+### Open questions (unresolved)
+
+- No verified evidence on rubric vs. open-ended scoring for investor fit — both approaches remain reasonable choices
+- Sequential pipeline superiority is architecturally logical (see finding #1) but has no numeric benchmark backing
+- `gmail.modify` vs. `gmail.readonly` as minimum safe scope — `gmail.modify` is confirmed correct; tighter scopes were not tested
+
+---
+
+## 10. Agent Names (locked 2026-07-17)
+
+Sanskrit/Indian-influenced names chosen for the two live-build agents:
+
+| Agent | Sanskrit name | Meaning | Role |
+|---|---|---|---|
+| Agent 1 | **Drishti** (दृष्टि) | Vision / sight | Watches the GitHub repo, sees what shipped |
+| Agent 2a | **Pragya** (प्रज्ञा) | Intelligence / insight | Finds and scores matching investors |
+| Agent 2b | **Varta** (वार्ता) | Communication / discourse | Drafts and saves the outreach email |
+
+Pragya and Varta are the two stages of the same Agent 2 pipeline. Pragya handles search + scoring; Varta handles drafting + Gmail save. They can be referred to individually or together as "Pragya–Varta."
 
 ---
 
@@ -148,3 +205,5 @@ Per user direction — built these artifacts, reusing the `templates/` design sy
 - `research/hermes_buildathon_handbook_raw.txt` — full raw extracted handbook text (~880 lines), kept for reference/audit
 - `research/03_Agent_Idea_Catalog.md` — Round 2 tabular agent idea catalog, 51 vetted ideas across all 7 domains
 - `research/raw_agent_catalog_round2.json` — full raw JSON (all 81 ideas + verdicts), for audit
+- `session/hermes_dashboard.py` — local Python web dashboard, agent monitor + manual trigger (port 7890)
+- `session/handbook.html` — zero-ambiguity build handbook with exact commands, expected outputs, agent names (Drishti / Pragya / Varta)
