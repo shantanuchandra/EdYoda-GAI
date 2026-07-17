@@ -207,7 +207,7 @@
   }
   .matrix .cell h3 { font-size: 1.1rem; color: var(--terra); margin-bottom: 0.3em; }
   .matrix .cell p { font-size: 0.92rem; margin: 0; }
-  .matrix .cell.build { background: var(--terra-soft); }
+  .matrix .cell.build { background: var(--terra-soft); border-left: 3px solid var(--terra); border-top: 3px solid var(--terra); }
   .matrix .cell.build h3 { color: var(--terra); }
 
   /* Numbered test list */
@@ -312,40 +312,7 @@
     transition: width var(--dur) var(--ease);
   }
 
-  .preclass-timer {
-    margin-top: var(--s-4); padding-top: var(--s-3);
-    border-top: 1px solid var(--rule);
-    display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
-  }
-  .preclass-timer .pt-clock {
-    font-family: 'Fraunces', serif; font-weight: 300;
-    font-size: clamp(3.4rem, 7vw, 5.4rem); line-height: 0.9;
-    color: var(--terra); font-variant-numeric: tabular-nums oldstyle-nums;
-    letter-spacing: -0.03em; font-variation-settings: 'opsz' 144, 'SOFT' 40;
-    min-width: 4.5ch;
-  }
-  .preclass-timer .pt-clock.warn { color: var(--warn); }
-  .preclass-timer .pt-clock.danger { color: var(--danger); }
-  .preclass-timer .pt-label {
-    font-family: 'Geist Mono', monospace; font-size: 0.74rem;
-    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
-    display: block; margin-bottom: 0.3em;
-  }
-  .preclass-timer .pt-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-  .preclass-timer button {
-    font-family: 'Geist Mono', monospace; font-size: 0.82rem;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    background: var(--paper-cream); border: 1px solid var(--rule);
-    color: var(--ink-soft); padding: 0.5em 0.9em; border-radius: 4px;
-    cursor: pointer; transition: all 200ms var(--ease);
-  }
-  .preclass-timer button:hover { border-color: var(--terra); color: var(--terra); background: var(--terra-soft); }
-  .preclass-timer button.pt-primary { background: var(--terra); border-color: var(--terra); color: var(--paper); }
-  .preclass-timer button.pt-primary:hover { background: #9e3a17; color: #fff; }
-  .preclass-timer .pt-adjust { font-size: 1rem; min-width: 2.4em; padding: 0.4em 0; text-align: center; }
-  .preclass-timer .pt-hint { font-size: 0.92rem; color: var(--ink-mute); font-style: italic; }
-
-  .break-slide { align-items: center; justify-content: center; text-align: center; }
+.break-slide { align-items: center; justify-content: center; text-align: center; }
   .break-slide .slide-body { align-items: center; justify-content: center; text-align: center; }
   .break-clock {
     font-family: 'Fraunces', serif;
@@ -395,7 +362,7 @@
       overflow: hidden; padding: 0.4in 0.6in 0.5in !important;
     }
     .slide:last-child { page-break-after: auto; break-after: auto; }
-    .nav, .progress-thread, .preclass-timer { display: none !important; }
+    .nav, .progress-thread { display: none !important; }
     body::before { background-image: none !important; opacity: 0 !important; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
   }
@@ -417,22 +384,10 @@
         <p class="cover-byline">
           Not your product. The ops around it — the repetitive stuff that isn't your core work but won't leave you alone.
         </p>
-        <div class="preclass-timer" id="preclassTimer">
-          <div>
-            <span class="pt-label">We begin in</span>
-            <div class="pt-clock" id="preclassClock">05:00</div>
-          </div>
-          <div class="pt-controls">
-            <button class="pt-adjust" onclick="preclassAdjust(-60)" title="minus 1 minute">−</button>
-            <button class="pt-primary" id="preclassStartBtn" onclick="preclassToggle()">Start</button>
-            <button class="pt-adjust" onclick="preclassAdjust(60)" title="plus 1 minute">+</button>
-            <button onclick="preclassReset()">Reset</button>
-          </div>
-          <span class="pt-hint">Set it, hit Start before you go live. ± adjusts by a minute.</span>
-        </div>
+        <p class="cover-byline" style="margin-top: var(--s-3); font-size: 1rem; font-style: normal; color: var(--ink-mute);">Open your recipe doc. You build today — not watch.</p>
         <div class="cover-foot">
           <span>GrowthX · Hands-On Build Session</span>
-          <span>Reading time: 240 min</span>
+          <span>GrowthX · In-Person · 4 Hours</span>
         </div>
       </div>
     </div>
@@ -447,6 +402,7 @@
     </div>
     <div class="slide-body">
       <span class="eyebrow">Before we start</span>
+      <p style="font-family:'Geist Mono',monospace; font-size:0.82rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--terra); margin-bottom:var(--s-2);">30 seconds · say it aloud</p>
       <h1>Your one-line pitch. And the one ops task <em class="terra" style="font-style:italic;">eating your week</em>.</h1>
       <p class="lede mt-3">Not your product roadmap — the annoying, repetitive thing that isn't your product but won't leave you alone.</p>
       <div class="rule mt-4"></div>
@@ -471,8 +427,8 @@
         <div class="axis-label">Occasional</div>
         <div class="cell"><h3>Buy a Tool</h3><p>Off-the-shelf software solves this. Don't build.</p></div>
         <div class="cell"><h3>Hire / Consult</h3><p>Rare and high-stakes — get a human expert.</p></div>
-        <div class="axis-label">Daily / High-Frequency</div>
-        <div class="cell build"><h3>Build an Agent</h3><p>This is today's territory. Repetitive and mechanical.</p></div>
+        <div class="axis-label">Daily</div>
+        <div class="cell build"><h3>Build an Agent ↗</h3><p>This is today's territory. Repetitive and mechanical.</p></div>
         <div class="cell"><h3>Augment Yourself</h3><p>Use AI to move faster — don't automate your own judgment away.</p></div>
       </div>
     </div>
@@ -488,6 +444,10 @@
     <div class="slide-body">
       <span class="eyebrow">The real test</span>
       <h1>A prompt with a costume on is <em class="terra" style="font-style:italic;">not</em> an agent.</h1>
+      <div class="slide-question" style="margin-bottom: var(--s-3);">
+        <span class="q-label">Question</span>
+        <p>Which of the three tests does your current AI workflow fail?</p>
+      </div>
       <div class="test-list">
         <div class="test-item">
           <div class="test-num">1</div>
@@ -517,13 +477,13 @@
       <h1>By 2pm, two agents. <em class="terra" style="font-style:italic;">Actually running.</em></h1>
       <p class="lede mt-3">Not a demo. Not a template you'll never open again. Something you leave running Monday morning.</p>
       <div class="pipeline">
-        <div class="stage"><span class="label">Build A</span>Repo Digest</div>
+        <div class="stage"><span class="label">Build A · 45 min</span>Repo Digest</div>
         <div class="arrow">→</div>
-        <div class="stage"><span class="label">Break</span>15 min</div>
+        <div class="stage"><span class="label">Break · 15 min</span>Coffee &amp; Stretch</div>
         <div class="arrow">→</div>
-        <div class="stage"><span class="label">Build B</span>Investor Outreach</div>
+        <div class="stage"><span class="label">Build B · 40 min</span>Investor Outreach</div>
         <div class="arrow">→</div>
-        <div class="stage"><span class="label">Generalize</span>Your Own Domain</div>
+        <div class="stage"><span class="label">Generalize · 20 min</span>Your Domain</div>
       </div>
     </div>
     <div class="folio">5<sup>/16</sup></div>
@@ -546,7 +506,7 @@
         <div class="arrow">→</div>
         <div class="stage"><span class="label">Reasoning</span>Plain-language summary</div>
         <div class="arrow">→</div>
-        <div class="stage"><span class="label">Action</span>Posts the digest</div>
+        <div class="stage"><span class="label">Action</span>Sends to Telegram</div>
       </div>
     </div>
     <div class="folio">6<sup>/16</sup></div>
@@ -564,7 +524,8 @@
         <div class="ex-meta">Build Step · 45 minutes</div>
         <h1>Point it at your repo. Write the digest prompt.</h1>
         <p class="lede mt-3">Follow Part 1 of your Hermes Build Recipe. Flag your facilitator the second something breaks.</p>
-        <div class="prompt mt-4">"You just read the commits on &lt;repo&gt;. Now write a 3-5 sentence summary of what shipped this week, in plain English. No git jargon — explain it like you're telling a co-founder who doesn't read code what's new."</div>
+        <p style="font-family:'Geist Mono',monospace; font-size:0.78rem; color:var(--ink-mute); letter-spacing:0.08em; margin-bottom:0.5em; margin-top:var(--s-4);">Replace &lt;repo&gt; with your actual GitHub <strong>username/repo-name</strong></p>
+        <div class="prompt">"You just read the commits on &lt;repo&gt;. Now write a 3-5 sentence summary of what shipped this week, in plain English. No git jargon — explain it like you're telling a co-founder who doesn't read code what's new."</div>
       </div>
     </div>
     <div class="folio">7<sup>/16</sup></div>
@@ -577,6 +538,7 @@
       <span class="pub-title">Founder's Guide to Agents</span>
     </div>
     <div class="slide-body">
+      <p style="font-family:'Geist Mono',monospace; font-size:0.74rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--terra); margin-bottom:var(--s-3);">Could a non-technical co-founder understand what changed?</p>
       <p class="display"><span style="float:left; font-family:'Fraunces',serif; font-size:5.2em; line-height:0.82; font-weight:400; color:var(--terra); padding:0.05em 0.12em 0 0; font-variation-settings:'opsz' 144, 'WONK' 1;">T</span>hat agent read something live, took action no static prompt could take, and <span class="marked">will do this again next week without you touching it.</span></p>
     </div>
     <div class="folio">8<sup>/16</sup></div>
@@ -592,7 +554,6 @@
       <div class="break-label">— Break —</div>
       <div class="break-clock" id="breakClock">15:00</div>
       <p class="lede center mt-5" style="font-size: 1.6rem;">Stand up. Coffee. Stretch.</p>
-      <p class="byline mt-4" style="color: var(--terra); letter-spacing: 0.18em;">Next up: the one with real stakes — your actual fundraise.</p>
     </div>
     <div class="folio">9<sup>/16</sup></div>
   </div>
@@ -616,6 +577,7 @@
         <div class="arrow">→</div>
         <div class="stage"><span class="label">Action</span>Gmail draft — not sent</div>
       </div>
+      <p style="margin-top:var(--s-3); font-family:'Geist Mono',monospace; font-size:0.82rem; color:var(--ink-mute); letter-spacing:0.06em; border-left: 2px solid var(--rule); padding-left:var(--s-2);">This agent creates drafts only. Nothing reaches an investor's inbox without you reviewing and sending it manually.</p>
     </div>
     <div class="folio">10<sup>/16</sup></div>
   </div>
@@ -660,9 +622,9 @@
       <span class="pub-title">Founder's Guide to Agents</span>
     </div>
     <div class="slide-body">
-      <span class="eyebrow warn">Expected, not a crisis</span>
-      <h1>Live search doesn't cover every sector evenly.</h1>
-      <p class="lede mt-3">If your results are generic, outdated, or don't cite a real source — switch to the curated fallback investor list in your recipe doc's appendix. That's exactly why it's there.</p>
+      <span class="eyebrow">Reference</span>
+      <h1>Your recipe doc has a curated investor list in the appendix.</h1>
+      <p class="lede mt-3">17 verified funds across India generalist, sector-specific, angel networks, and global programs. If live search returns generic or outdated results, switch to this list for Steps 4–5 (scoring and drafting). Same prompts, just a different input.</p>
     </div>
     <div class="folio">13<sup>/16</sup></div>
   </div>
@@ -691,47 +653,16 @@
         <div class="ex-meta">Sketch · 20 minutes</div>
         <h1>Same pattern. Your bottleneck.</h1>
         <p class="lede mt-3">You named it this morning. Now sketch it: trigger, live data, reasoning, action. Browse the 51-idea catalog for a starting shape.</p>
-        <div class="prompt mt-4">TRIGGER → LIVE DATA → LLM REASONING → ACTION
-(the exact shape of both agents you built today)</div>
+        <div style="margin-top:var(--s-4); background:var(--ink-blue-soft); border:1px solid rgba(30,58,95,0.2); border-left:3px solid var(--ink-blue); padding:var(--s-3); font-family:'Geist Mono',monospace; font-size:0.9rem; color:var(--ink-blue); letter-spacing:0.04em; position:relative;">
+  <span style="position:absolute; top:-0.6em; left:var(--s-3); background:var(--paper); padding:0 0.6em; font-size:0.62rem; letter-spacing:0.2em; color:var(--ink-blue); font-weight:500;">THE PATTERN — sketch this, don't paste it into Hermes</span>
+  TRIGGER → LIVE DATA → LLM REASONING → ACTION
+</div>
       </div>
     </div>
     <div class="folio">15<sup>/16</sup></div>
   </div>
 
-  <!-- 16 — SKETCH YOUR NEXT AGENT -->
-  <div class="slide exercise-slide">
-    <div class="running-head">
-      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">Sketch</span></div>
-      <span class="pub-title">Founder's Guide to Agents</span>
-    </div>
-    <div class="slide-body">
-      <div class="ex-letter">D</div>
-      <div>
-        <div class="ex-meta">Sketch · 20 minutes</div>
-        <h1>Same pattern. Your bottleneck.</h1>
-        <p class="lede mt-3">Choose the smallest safe version you could run for one week. Keep a human review where the stakes are high.</p>
-        <div class="prompt mt-4">TRIGGER → LIVE DATA → LLM REASONING → ACTION → HUMAN CHECK</div>
-      </div>
-    </div>
-    <div class="folio">16<sup>/18</sup></div>
-  </div>
-
-  <!-- 17 — PEER SHARE-OUTS -->
-  <div class="slide">
-    <div class="running-head">
-      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">Share</span></div>
-      <span class="pub-title">Founder's Guide to Agents</span>
-    </div>
-    <div class="slide-body">
-      <span class="eyebrow cool">Peer share-out</span>
-      <h1>Share the trigger and the one action your agent takes.</h1>
-      <p class="lede mt-3">Keep it short: what starts the agent, what it reads, and the outcome a human can review.</p>
-      <div class="prompt mt-4">“When [trigger] happens, my agent reads [live data], decides [reasoning], then [action]. A human checks [approval gate].”</div>
-    </div>
-    <div class="folio">17<sup>/18</sup></div>
-  </div>
-
-  <!-- 18 — CLOSE -->
+  <!-- 16 — CLOSE -->
   <div class="slide">
     <div class="running-head">
       <div class="left"><span>Close</span><span class="dot">·</span><span class="topic">— End —</span></div>
@@ -743,6 +674,10 @@
       <p class="lede mt-3">One thing to do this week: run your Repo Digest agent for real, on a real schedule, and actually read what it tells you. That's the whole test of whether today was worth your Saturday.</p>
       <div class="rule-double mt-4"></div>
       <p class="mt-3">Thank you for building with us today.</p>
+      <div class="rule mt-4"></div>
+      <p style="font-family:'Geist Mono',monospace; font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-mute); margin-top:var(--s-2);">
+        Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu" style="color:var(--terra); text-decoration:none; letter-spacing:0.08em;">linkedin.com/in/chandrashantanu</a>
+      </p>
     </div>
     <div class="folio">16<sup>/16</sup></div>
   </div>
@@ -780,6 +715,8 @@
     const body = slide.querySelector('.slide-body');
     const question = slideQuestions[index];
     if (!body || !question) return;
+    if (index === 3) return; // question is inlined on this slide
+    if (index === 7) return; // question is inlined on this slide
     const card = document.createElement('aside');
     card.className = 'slide-question';
     card.setAttribute('aria-label', 'Question to answer');
@@ -849,47 +786,6 @@
     if (el) el.classList.remove('warn', 'danger');
   }
 
-  let preclassTotal = 5 * 60, preclassRemaining = 5 * 60, preclassInterval = null, preclassRunning = false;
-  function preclassRender() {
-    const el = document.getElementById('preclassClock');
-    if (!el) return;
-    const m = Math.floor(preclassRemaining / 60), s = preclassRemaining % 60;
-    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    el.classList.toggle('warn', preclassRemaining <= 60 && preclassRemaining > 15);
-    el.classList.toggle('danger', preclassRemaining <= 15);
-  }
-  function preclassToggle() {
-    const btn = document.getElementById('preclassStartBtn');
-    if (preclassRunning) {
-      clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
-      if (btn) btn.textContent = 'Resume';
-      return;
-    }
-    preclassRunning = true;
-    if (btn) btn.textContent = 'Pause';
-    preclassInterval = setInterval(() => {
-      preclassRemaining--;
-      if (preclassRemaining <= 0) {
-        preclassRemaining = 0; preclassRender();
-        clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
-        if (btn) btn.textContent = 'Start';
-        return;
-      }
-      preclassRender();
-    }, 1000);
-  }
-  function preclassAdjust(delta) {
-    preclassTotal = Math.max(60, Math.min(60 * 60, preclassTotal + delta));
-    if (!preclassRunning) { preclassRemaining = preclassTotal; preclassRender(); }
-    else { preclassRemaining = Math.max(0, preclassRemaining + delta); preclassRender(); }
-  }
-  function preclassReset() {
-    clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
-    preclassRemaining = preclassTotal;
-    const btn = document.getElementById('preclassStartBtn'); if (btn) btn.textContent = 'Start';
-    preclassRender();
-  }
-  preclassRender();
 
   const PRINT_KEY = 'founders_guide_agents_print_request';
   let lastPrintStamp = '';

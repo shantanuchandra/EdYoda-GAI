@@ -371,7 +371,7 @@
       <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
       <div class="quick-key"><kbd>←</kbd> previous</div>
       <div class="quick-key"><kbd>S</kbd> start / pause class</div>
-      <div class="quick-key"><kbd>5</kbd> <kbd>10</kbd> <kbd>15</kbd> <kbd>20</kbd> <kbd>45</kbd> start timer</div>
+      <div class="quick-key"><kbd>5m</kbd> <kbd>10m</kbd> <kbd>15m</kbd> <kbd>20m</kbd> <kbd>45m</kbd> timer buttons (sidebar)</div>
       <div class="quick-key"><kbd>B</kbd> jump to break</div>
       <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
       <div class="quick-key"><kbd>End</kbd> last slide</div>
@@ -390,21 +390,9 @@
 <script>
 const slides = [
   {
-    num: 1, when: "09:55 – 10:00", duration: "5 min", tag: "title",
-    title: "Build two working agents before lunch",
-    ask: "What would make today worth four hours of your time?",
-    say: "Welcome. Get comfortable, open the learner deck, and have your repository URL ready. We start at 10:00 sharp.",
-    doSteps: [
-      "Confirm the learner deck is open on the shared screen.",
-      "Ask founders to have their repository URL or the fallback demo repo ready.",
-      "Start the class clock when the round-robin begins."
-    ],
-    bridge: "At 10:00, go straight into the round-robin opener."
-  },
-  {
-    num: 1, sync: "opener", when: "10:00 – 10:10", duration: "10 min", tag: "title",
+    num: 1, when: "10:00 – 10:10", duration: "10 min", tag: "title",
     title: "Round-Robin Opener",
-    ask: "What is the one repetitive operational task you would happily never do again?",
+    ask: "Who's got the most painful ops task in the room right now — let's find out.",
     say: "Go around the room — 30 seconds each. Your one-line pitch, and the one ops task that's eating your week right now. Not your product roadmap — the annoying, repetitive thing that isn't your product but won't leave you alone.",
     doSteps: [
       "Go around all 10 founders. Keep it moving.",
@@ -423,7 +411,7 @@ const slides = [
       "Draw the 2×2 live on whiteboard or point to the slide: Task Frequency (occasional ↔ daily) vs Judgment Required (low ↔ high).",
       "Walk each quadrant: high-freq/low-judgment = build an agent. High-freq/high-judgment = augment, don't automate. Low-freq/high-judgment = hire/consult. Low-freq/low-judgment = buy a tool."
     ],
-    sayAfter: "One honest caveat: tasks migrate. Something that needs your judgment the first 20 times you do it can become mechanical by the 21st. Revisit this quadrant as you get faster.",
+    deeper: "Honest caveat for if someone asks: tasks migrate. Something that needs your judgment the first 20 times can become mechanical by the 21st. Revisit this quadrant as your ops rhythm matures.",
     note: "Analogy to memorize: 'Think of it like hiring your first employee. You wouldn't hire someone for a one-time decision — you'd hire them for the thing you do every single day that doesn't need you anymore.'",
     bridge: "Now the harder question — how do you tell a real agent from a fancy prompt?"
   },
@@ -471,8 +459,8 @@ const slides = [
     say: "Follow Part 1 of your recipe doc. I'll walk the room — flag me the second something breaks, don't sit stuck for more than 2 minutes.",
     prompt: "1. Point Hermes at your GitHub repo (auth + repo URL)\n2. Configure the trigger: on-demand for today's demo\n3. Write the prompt that turns raw commit data into a plain-language digest\n4. Run it — confirm the digest lands somewhere you can see it\n5. Thin commit activity? Use the shared fallback demo repo",
     doSteps: [
-      "Start the 45-min timer (key: 45 not available — use two 20m blocks or the custom sidebar controls).",
-      "Walk the room. Watch for: GitHub auth/token setup stalls (most common failure), repos with no recent commits (route to fallback immediately), digests that are too git-jargon-heavy (coach toward 'explain to a non-technical co-founder')."
+      "Start the 45-min timer — click the '45m' button in the exercise timer panel on the right.",
+      "Walk the room. Fix in this order: (1) GitHub auth stall — check token scope and that GITHUB_TOKEN is in ~/.hermes/.env. (2) No recent commits — route to facilitator's shared fallback demo repo immediately. (3) Output too jargon-heavy — prompt: 'Rewrite this as if explaining to someone outside the company for the first time.'"
     ],
     sayAfter: "However far you got, that's fine. Let's see two or three of these live.",
     watch: "Ask 2-3 founders to read their agent's ACTUAL output aloud — not a description of what it should do.",
@@ -507,7 +495,8 @@ const slides = [
     num: 9, sync: "investor-intro", when: "11:50 – 11:55", duration: "5 min", tag: "demo",
     title: "Build Block B — Setup: Investor Agent",
     ask: "Where is the human approval gate, and what must never happen automatically?",
-    say: "This one has real stakes — it's touching your actual fundraise. Here's the shape: you tell it your round — stage, sector, geography, check size. It goes and searches for investors who actually fit that shape. It scores them. And for the good matches, it writes you a personalized outreach email — not sent, just sitting in your Gmail drafts, waiting for you to read it, fix anything that's off, and hit send yourself.",
+    say: "This one has real stakes — it's touching your actual fundraise. You tell it your round: stage, sector, geography, check size. It searches for investors who fit. Scores them. Writes a personalized outreach for each good match.",
+    sayAfter: "One rule that never changes: it does not send. The outreach lands in Gmail drafts. You read it, fix what's off, and hit send yourself. You are always the last human check before anything reaches an investor's inbox.",
     doSteps: [
       "Open the Hermes Build Recipe doc, Part 2, on screen.",
       "State explicitly: 'This agent does not send email on your behalf. You are always the last human check before anything reaches an investor's inbox.'"
@@ -524,6 +513,7 @@ const slides = [
       "Start the 15-min timer.",
       "Walk the room. Coach pre-fundraise founders unsure of their round shape: fill in your best guess or next planned round — this is a rehearsal."
     ],
+    note: "Mention the curated fallback list now — before they run search. Founders who know their sector is underrepresented online (deep tech, niche B2B) can plan to use it from the start rather than discovering it when search returns junk.",
     bridge: "Now the real build — search, score, draft."
   },
   {
@@ -534,22 +524,11 @@ const slides = [
     prompt: "1. Configure Hermes's web-search tool with your round-description as the query seed\n2. Add scoring logic: does stage/sector/geography/check-size actually match?\n3. For matches, draft personalized outreach referencing what specifically would sway this investor\n4. Wire output to create a Gmail draft (not send)\n5. Thin/wrong live search results? Switch to the curated fallback investor list immediately",
     doSteps: [
       "Start the 40-min timer.",
-      "Walk the room. Watch for: live search returning generic/wrong-stage investors (expected — route to fallback list, frame as 'this is exactly why we built a backup'), Gmail draft-creation auth issues (2nd most common failure point), generic (non-personalized) outreach drafts (coach toward 'what specifically would this investor need to see to say yes')."
+      "Walk the room. Fix in this order: (1) Live search returns generic/wrong results — switch to curated fallback list; frame it as: 'this is exactly why we built a backup.' (2) Gmail draft auth fails — check gateway setup; most common second failure. (3) Draft outreach is generic — coach: 'What specifically about this investor's thesis makes them a fit? Reference that.'"
     ],
     sayAfter: "Let's see what landed in a few Gmail drafts folders.",
     watch: "Ask 2-3 founders to read their agent's ACTUAL drafted outreach aloud — do not send it, just read it.",
     bridge: "Debrief, then the block everyone's own domain gets applied."
-  },
-  {
-    num: 13, when: "12:50 – 12:52", duration: "2 min", tag: "demo",
-    title: "If Search Comes Up Thin",
-    ask: "If search is weak, what is your safe fallback instead of guessing?",
-    say: "Generic, outdated, or unsourced results are a normal constraint — not a reason to invent a recommendation. Switch to the curated fallback investor list in the recipe appendix.",
-    doSteps: [
-      "Show the fallback list and point out the source links.",
-      "Remind the room: a source-backed short list is better than a confident-looking guess."
-    ],
-    bridge: "With that guardrail clear, move into the debrief."
   },
   {
     num: 12, sync: "investor-debrief", when: "12:50 – 1:05", duration: "15 min", tag: "demo",
@@ -605,9 +584,9 @@ const slides = [
     say: "You came in this morning with an idea of what an agent is. You're leaving with two of them actually running, and a sketch of a third. That's not a framework you'll forget by Monday — that's muscle memory.",
     doSteps: [
       "State the one-thing-this-week ask: 'Run your Repo Digest agent for real, on a real schedule, and actually read what it tells you. That's the whole test of whether any of this was worth your Saturday.'",
-      "Thank the room. No bridge to a 'next session' — this is standalone, not a cohort course with a sequel."
+      "Thank the room. No bridge to a 'next session' — this is standalone, not a cohort course with a sequel.",
+      "Post-session (within 24 hrs): send the workbook, the full Agent Idea Catalog, and a thank-you note with a space to share what they build next."
     ],
-    note: "Post-session: within 24 hrs, send the workbook, the full Agent Idea Catalog, and a thank-you note with a place to share what they build next.",
     watch: "Close clean. Do not fabricate a 'session 2' — there isn't one unless explicitly planned."
   }
 ];
@@ -641,7 +620,7 @@ function renderSlide(s) {
   const bar = el('div', { cls: 'timing-bar' });
   bar.appendChild(el('span', { cls: 'time-pill', text: s.when }));
   bar.appendChild(el('span', { cls: 'duration', text: s.duration }));
-  bar.appendChild(el('span', { cls: 'block-title', text: `Slide ${String(s.num).padStart(2, '0')} of ${slides.length}` }));
+  bar.appendChild(el('span', { cls: 'block-title', text: s.duration || '' }));
   slidePane.appendChild(bar);
 
   slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
