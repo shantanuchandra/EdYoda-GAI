@@ -1250,6 +1250,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <div class="header-sep"></div>
   <span class="header-subtitle">Founder&#8217;s Guide to Agents</span>
   <div class="header-right">
+    <a class="header-pill" href="/morning-report" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;background:rgba(94,234,212,0.12);color:#5eead4;border:1px solid rgba(94,234,212,0.25);">&#x1F4CB; Morning Report</a>
     <span class="header-pill">2026-07-19</span>
     <span class="header-pill">Local Control Panel</span>
   </div>
@@ -2440,6 +2441,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         elif path == "/api/log":
             self.send_json(read_log())
+
+        elif path == "/morning-report":
+            report_path = pathlib.Path(__file__).parent / "morning_report.html"
+            if report_path.exists():
+                self.send_html(report_path.read_text(encoding="utf-8"))
+            else:
+                self.send_html("<p style='font-family:monospace;padding:32px'>morning_report.html not found in session/</p>", 404)
 
         else:
             self.send_json({"error": "Not found"}, 404)

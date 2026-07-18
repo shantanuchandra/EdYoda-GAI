@@ -1,0 +1,454 @@
+<title>Morning Report · 2026-07-19 · Founder's Guide to Agents</title>
+<style>
+  :root {
+    --bg:      #050c1a;
+    --surface: #0d1625;
+    --border:  rgba(94,234,212,0.12);
+    --border2: rgba(255,255,255,0.07);
+    --text:    #e8eef8;
+    --soft:    #8b9ab0;
+    --dim:     #4a5a72;
+    --teal:    #5eead4;
+    --teal-s:  rgba(94,234,212,0.10);
+    --amber:   #fbbf24;
+    --amber-s: rgba(251,191,36,0.10);
+    --red:     #f87171;
+    --red-s:   rgba(248,113,113,0.10);
+    --green:   #4ade80;
+    --green-s: rgba(74,222,128,0.10);
+    --purple:  #a78bfa;
+    --purple-s:rgba(167,139,250,0.10);
+  }
+  @media(prefers-color-scheme:light){:root{
+    --bg:#f0f4fb;--surface:#fff;
+    --border:rgba(94,234,212,0.22);--border2:rgba(0,0,0,0.08);
+    --text:#0f1623;--soft:#4a5a72;--dim:#8b9ab0;
+    --teal:#0d9488;--teal-s:rgba(13,148,136,0.08);
+    --amber:#b45309;--amber-s:rgba(180,83,9,0.08);
+    --red:#dc2626;--red-s:rgba(220,38,38,0.08);
+    --green:#16a34a;--green-s:rgba(22,163,74,0.08);
+    --purple:#7c3aed;--purple-s:rgba(124,58,237,0.08);
+  }}
+  :root[data-theme="light"]{
+    --bg:#f0f4fb;--surface:#fff;
+    --border:rgba(94,234,212,0.22);--border2:rgba(0,0,0,0.08);
+    --text:#0f1623;--soft:#4a5a72;--dim:#8b9ab0;
+    --teal:#0d9488;--teal-s:rgba(13,148,136,0.08);
+    --amber:#b45309;--amber-s:rgba(180,83,9,0.08);
+    --red:#dc2626;--red-s:rgba(220,38,38,0.08);
+    --green:#16a34a;--green-s:rgba(22,163,74,0.08);
+    --purple:#7c3aed;--purple-s:rgba(124,58,237,0.08);
+  }
+  :root[data-theme="dark"]{
+    --bg:#050c1a;--surface:#0d1625;
+    --border:rgba(94,234,212,0.12);--border2:rgba(255,255,255,0.07);
+    --text:#e8eef8;--soft:#8b9ab0;--dim:#4a5a72;
+    --teal:#5eead4;--teal-s:rgba(94,234,212,0.10);
+    --amber:#fbbf24;--amber-s:rgba(251,191,36,0.10);
+    --red:#f87171;--red-s:rgba(248,113,113,0.10);
+    --green:#4ade80;--green-s:rgba(74,222,128,0.10);
+    --purple:#a78bfa;--purple-s:rgba(167,139,250,0.10);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  body{max-width:840px;margin:0 auto;padding:32px 24px 80px}
+
+  /* ── Header ── */
+  .header{border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:36px}
+  .header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .badge{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;background:var(--teal-s);color:var(--teal);border:1px solid var(--border);padding:4px 10px;border-radius:4px}
+  .report-title{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;font-weight:700;color:var(--teal);letter-spacing:-0.01em;margin:10px 0 4px;line-height:1.2}
+  .report-sub{font-size:13px;color:var(--soft)}
+  .report-sub strong{color:var(--text)}
+
+  /* ── Stat bar ── */
+  .stat-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-bottom:36px}
+  .stat{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:14px 16px}
+  .stat-num{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:28px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+  .stat-num.teal{color:var(--teal)}
+  .stat-num.amber{color:var(--amber)}
+  .stat-num.green{color:var(--green)}
+  .stat-num.purple{color:var(--purple)}
+  .stat-num.red{color:var(--red)}
+  .stat-label{font-size:11px;color:var(--soft);margin-top:4px;font-family:'JetBrains Mono',ui-monospace,monospace;letter-spacing:0.06em;text-transform:uppercase}
+
+  /* ── Section ── */
+  .section{margin-bottom:32px}
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .section-label{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--soft)}
+  .section-line{flex:1;height:1px;background:var(--border2)}
+  .status-pill{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px}
+  .pill-done{background:var(--green-s);color:var(--green);border:1px solid rgba(74,222,128,0.25)}
+  .pill-warn{background:var(--amber-s);color:var(--amber);border:1px solid rgba(251,191,36,0.25)}
+  .pill-info{background:var(--teal-s);color:var(--teal);border:1px solid rgba(94,234,212,0.25)}
+
+  /* ── Card ── */
+  .card{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:20px 22px;margin-bottom:12px}
+  .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .card-title{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;font-weight:600;color:var(--text)}
+  .card-meta{font-size:12px;color:var(--soft);margin-top:2px}
+  .card p{font-size:13.5px;color:var(--soft);line-height:1.65;margin-bottom:10px}
+  .card p:last-child{margin-bottom:0}
+  .card p strong{color:var(--text)}
+
+  /* ── VC table ── */
+  .vc-table{width:100%;border-collapse:collapse;font-size:12.5px;overflow-x:auto;display:block}
+  .vc-table th{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);padding:6px 10px 8px;border-bottom:1px solid var(--border2);text-align:left;white-space:nowrap}
+  .vc-table td{padding:8px 10px;border-bottom:1px solid var(--border2);color:var(--soft);vertical-align:middle}
+  .vc-table tr:last-child td{border-bottom:none}
+  .vc-table .name{color:var(--text);font-weight:500}
+  .chip{display:inline-block;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:0.06em}
+  .ch{background:var(--green-s);color:var(--green)}
+  .cm{background:var(--amber-s);color:var(--amber)}
+  .cl{background:var(--red-s);color:var(--red)}
+  .cu{background:var(--border2);color:var(--dim)}
+  .score-3{background:var(--green-s);color:var(--green);font-weight:700;padding:3px 8px;border-radius:4px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px}
+  .score-2{background:var(--teal-s);color:var(--teal);font-weight:700;padding:3px 8px;border-radius:4px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px}
+  .route-email{color:var(--teal);font-size:11px}
+  .route-form{color:var(--amber);font-size:11px}
+  .route-na{color:var(--dim);font-size:11px}
+
+  /* ── Draft block ── */
+  .draft-block{background:rgba(0,0,0,0.18);border:1px solid var(--border2);border-left:3px solid var(--teal);border-radius:6px;padding:14px 16px;margin-top:12px}
+  :root[data-theme="light"] .draft-block{background:rgba(0,0,0,0.04)}
+  .draft-meta{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:var(--teal);margin-bottom:8px;opacity:0.85}
+  .draft-id{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:var(--amber);margin-bottom:6px}
+  .draft-body{font-size:12.5px;color:var(--soft);line-height:1.7;white-space:pre-wrap;font-family:'JetBrains Mono',ui-monospace,monospace}
+
+  /* ── Alert / notice ── */
+  .alert{border-radius:8px;padding:14px 16px;margin-bottom:12px;font-size:13px;line-height:1.6}
+  .alert-star{background:var(--green-s);border:1px solid rgba(74,222,128,0.22)}
+  .alert-star strong{color:var(--green)}
+  .alert-warn{background:var(--amber-s);border:1px solid rgba(251,191,36,0.22)}
+  .alert-warn strong{color:var(--amber)}
+
+  /* ── Change log ── */
+  .change-list{list-style:none;padding:0}
+  .change-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border2);font-size:13px;color:var(--soft)}
+  .change-list li:last-child{border-bottom:none}
+  .change-list .icon{color:var(--teal);font-size:13px;flex-shrink:0;margin-top:1px}
+  .change-list .lbl{color:var(--text);font-weight:500;margin-right:4px}
+
+  /* ── Checklist ── */
+  .checklist{list-style:none;padding:0;margin-top:8px}
+  .checklist li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2);font-size:13px;align-items:baseline}
+  .checklist li:last-child{border-bottom:none}
+  .check-icon{color:var(--amber);flex-shrink:0;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;margin-top:2px}
+  .checklist code{font-size:11.5px;background:var(--border2);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',ui-monospace,monospace}
+
+  /* ── Footer ── */
+  .footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border2);font-size:12px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .footer a{color:var(--teal);text-decoration:none}
+
+  @media(prefers-reduced-motion:no-preference){
+    .card{transition:border-color 180ms}
+    .card:hover{border-color:var(--border)}
+  }
+</style>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="badge">Morning Report</div>
+      <div class="report-title">Overnight Loop Complete</div>
+      <div class="report-sub"><strong>2026-07-19, 07:00 IST</strong> &nbsp;·&nbsp; Founder's Guide to Agents session today at 10:00am</div>
+    </div>
+    <div class="badge" style="align-self:flex-start;margin-top:4px">All systems green</div>
+  </div>
+</div>
+
+<!-- Stat bar -->
+<div class="stat-bar">
+  <div class="stat"><div class="stat-num teal">17</div><div class="stat-label">Slides (both decks)</div></div>
+  <div class="stat"><div class="stat-num amber">14</div><div class="stat-label">VCs Evaluated</div></div>
+  <div class="stat"><div class="stat-num green">4</div><div class="stat-label">Gmail Drafts</div></div>
+  <div class="stat"><div class="stat-num purple">5</div><div class="stat-label">SVG Diagrams</div></div>
+  <div class="stat"><div class="stat-num red">0</div><div class="stat-label">Emails Sent</div></div>
+</div>
+
+<!-- Section 1: VakilDiary VC run -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-label">VakilDiary Dubai VC Run</span>
+    <div class="section-line"></div>
+    <span class="status-pill pill-done">COMPLETE</span>
+  </div>
+
+  <div class="alert alert-star">
+    <strong>Standout finds:</strong> Oryx Fund (Salica Investments) and Village Global both score 3/3 — the highest possible. Village Global <em>led</em> Qanooni's $2M UAE legaltech pre-seed in June 2025, making them the single most relevant fund for VakilDiary. Oryx Fund co-invested in the same round. No public contact form for Oryx — manual outreach required via salicainvestments.com.
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Pipeline stats · 24 agents · 284 seconds</div>
+        <div class="card-meta">2026-07-18 03:14 IST · VakilDiary · pre-seed · US$500K–750K · Dubai / UAE</div>
+      </div>
+      <span class="status-pill pill-info">VERIFIED</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="vc-table">
+        <thead>
+          <tr>
+            <th>Fund</th><th>Stg</th><th>Sec</th><th>Geo</th><th>Chk</th><th>Score</th><th>Route</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">TA Ventures</td>
+            <td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-email">✉ Email · Draft saved</td>
+          </tr>
+          <tr>
+            <td class="name">Nuwa Capital</td>
+            <td><span class="chip cm">M</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-email">✉ Email · Draft saved</td>
+          </tr>
+          <tr>
+            <td class="name">Wamda Capital</td>
+            <td><span class="chip cm">M</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-email">✉ Email · Draft saved</td>
+          </tr>
+          <tr>
+            <td class="name">VentureSouq</td>
+            <td><span class="chip cm">M</span></td><td><span class="chip cm">M</span></td><td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-email">✉ Email · Draft saved</td>
+          </tr>
+          <tr>
+            <td class="name">Village Global ★★</td>
+            <td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td>
+            <td><span class="score-3">3/3</span></td>
+            <td class="route-form">📋 Form (Velocity)</td>
+          </tr>
+          <tr>
+            <td class="name">Oryx Fund ★★</td>
+            <td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td>
+            <td><span class="score-3">3/3</span></td>
+            <td class="route-na">? No public contact</td>
+          </tr>
+          <tr>
+            <td class="name">BECO Capital</td>
+            <td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-form">📋 Form</td>
+          </tr>
+          <tr>
+            <td class="name">Shorooq Partners</td>
+            <td><span class="chip cm">M</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip cl">L</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-form">📋 Form</td>
+          </tr>
+          <tr>
+            <td class="name">DIFC Innovation Hub</td>
+            <td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip ch">H</span></td><td><span class="chip cu">U</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-form">📋 Accelerator</td>
+          </tr>
+          <tr>
+            <td class="name">Hub71 Access</td>
+            <td><span class="chip ch">H</span></td><td><span class="chip cm">M</span></td><td><span class="chip cm">M</span></td><td><span class="chip cl">L</span></td>
+            <td><span class="score-2">2/3</span></td>
+            <td class="route-form">📋 Programme</td>
+          </tr>
+          <tr style="opacity:0.45">
+            <td class="name"><s>MEVP</s></td>
+            <td><span class="chip cl">L</span></td><td><span class="chip cm">M</span></td><td><span class="chip ch">H</span></td><td><span class="chip cl">L</span></td>
+            <td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px">1/3</td>
+            <td style="color:var(--red);font-size:11px">✕ Disqualified</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Gmail Drafts — 4 saved, 0 sent</div>
+        <div class="card-meta">shantanu.msp@gmail.com · Drafts folder · subject line needs your name before sending</div>
+      </div>
+    </div>
+
+    <div class="draft-block">
+      <div class="draft-meta">TA Ventures · info@taventures.vc</div>
+      <div class="draft-id">Draft ID: r1081684019003708418</div>
+      <div class="draft-body">Opening: "Your co-investment with Oryx Fund and Village Global in Qanooni's $2M UAE legaltech pre-seed (June 2025) caught our attention."
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We offer AI document drafting, client matter management, DIFC/ADGM compliance tracking, court deadline management, and bilingual Arabic/English support. Early design partners in Dubai.
+
+Would you have 20 minutes this week for a call?</div>
+    </div>
+
+    <div class="draft-block" style="border-left-color:var(--amber)">
+      <div class="draft-meta" style="color:var(--amber)">Nuwa Capital · hello@nuwacapital.io</div>
+      <div class="draft-id">Draft ID: r6602756412192891445</div>
+      <div class="draft-body">Opening: "Your portfolio company Nafes — AI procurement SaaS for the MENA region — caught my attention as a close parallel to what we are building in legal."
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We offer AI document drafting, DIFC/ADGM compliance tracking, court deadline management, and bilingual Arabic/English support. Early design partners in Dubai.
+
+Would you have 20 minutes this week for a call?</div>
+    </div>
+
+    <div class="draft-block" style="border-left-color:var(--purple)">
+      <div class="draft-meta" style="color:var(--purple)">Wamda Capital · connect@wamda.com</div>
+      <div class="draft-id">Draft ID: r2554042097995219939</div>
+      <div class="draft-body">Opening: "Your participation in Tarjama's $15M Series A (May 2025) signals conviction in Arabic-language AI infrastructure across the region."
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+We handle AI document drafting, DIFC/ADGM compliance tracking, court deadline management, and bilingual Arabic/English workflows. Early design partners in Dubai.
+
+Would you have 20 minutes this week for a call?</div>
+    </div>
+
+    <div class="draft-block" style="border-left-color:var(--green)">
+      <div class="draft-meta" style="color:var(--green)">VentureSouq · info@venturesouq.com</div>
+      <div class="draft-id">Draft ID: r-6043997022286703510</div>
+      <div class="draft-body">Opening: "VentureSouq's FinTech Fund II — backed by Mubadala, PIF's Jada, and SVC, which closed September 2025 — shows your continued conviction in MENA-native financial and professional infrastructure."
+
+VakilDiary is an AI-powered legal practice management platform for UAE law firms. We are raising a pre-seed round, targeting US$500K–750K checks.
+
+Building for DIFC/ADGM compliance, court deadline management, bilingual Arabic/English workflows. Early design partners in Dubai.
+
+Would you have 20 minutes this week for a call?</div>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>Before sending any draft:</strong> Open the draft in Gmail. Edit the subject line — add your name (e.g. "— Shantanu, VakilDiary"). Verify the opening fact is still current. Hit send yourself. The agent never sends automatically. The dashboard at localhost:7890 shows full scoring breakdowns and draft text on demand via the "View Draft" drawer.
+  </div>
+</div>
+
+<!-- Section 2: Session artifacts -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-label">Session Artifacts — Ready for Today</span>
+    <div class="section-line"></div>
+    <span class="status-pill pill-done">17 / 17 SLIDES</span>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Learner Deck — SVG motion graphics added</div>
+        <div class="card-meta">session/learner_deck.html · 17 slides · paper / editorial aesthetic</div>
+      </div>
+      <span class="status-pill pill-done">DONE</span>
+    </div>
+    <ul class="change-list">
+      <li><span class="icon">▸</span><div><span class="lbl">6 @keyframes defined:</span> fadeUp, fadeIn, drawLine, popIn, inkPulse, flowDot — plus .anim-cell / .anim-node / .anim-line utility classes</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">3 animated SVG pipelines:</span> Slide 5 (roadmap, 4 nodes, dashed Break node), Slide 6 (Agent 1 terra-toned, sub-labels), Slide 10 (Agent 2 amber, "never auto-sent" / "you review · you send" emphasis, heavier border)</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">3 inline icon SVGs:</span> Slide 4 test-list headings — sun/radiate, chevrons-up, clock — inline with each test criterion</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">Staggered animations:</span> 4 matrix cells on Slide 3 (anim-cell, fadeUp), exercise letters A/B/C on Slides 7/12/15 (popIn)</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">prefers-reduced-motion:</span> all animations disabled when OS accessibility setting is on</div></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Presenter Deck — SVG diagrams on key teaching slides</div>
+        <div class="card-meta">session/presenter_deck.html · 17 slides · dark cockpit aesthetic</div>
+      </div>
+      <span class="status-pill pill-done">DONE</span>
+    </div>
+    <ul class="change-list">
+      <li><span class="icon">▸</span><div><span class="lbl">Slide 3 — 2×2 Mental Model:</span> Animated SVG quadrant with 4 zones (Hire, Augment, Buy a Tool, BUILD AN AGENT), axes, labels. The "Build an Agent" quadrant is teal-highlighted with "← this is today's session" annotation.</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">Slide 4 — 3-Part Test:</span> 3-node pipeline (Live Data → Real Action → Trigger), each node color-coded (teal/amber/purple). Caption: "MISSING ANY ONE → it's a prompt with a costume on."</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">Slide 5 — Roadmap:</span> 4-node pipeline (Build A → BREAK → Build B → Generalize). Break node in dashed green. Footer: "YOU LEAVE WITH TWO RUNNING AGENTS · NOT NOTES."</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">Slide 7 — Build A pipeline:</span> Trigger/Live Data/Reasoning/Action in teal, sub-labels showing "cron · on-demand", "7-day window", "plain English", "Telegram".</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">Slide 11 — Build B pipeline:</span> Amber-toned, ACTION node has thicker border, "never auto-sent" in red, "you review · you send" below, "← HUMAN GATE" annotation.</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">All SVG content hardcoded</span> — no user/external data flows into innerHTML. prefers-reduced-motion respected.</div></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Handbook — Step 05 added to 07 / Monitor</div>
+        <div class="card-meta">session/handbook.html · covers VakilDiary run + pre-send checklist + form links</div>
+      </div>
+      <span class="status-pill pill-done">DONE</span>
+    </div>
+    <p>Step 05 documents the full VakilDiary test run — all 4 Gmail Draft IDs, standout VC findings, Village Global Velocity form link, the Oryx Fund manual-outreach note, and the pre-send checklist (edit subject line → verify opening fact → you send). Learners can reference the handbook during the Build B debrief to see a real output from the pipeline they just built.</p>
+  </div>
+</div>
+
+<!-- Section 3: Wasabi Travels (prior run) -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-label">Wasabi Travels — Prior Run (still in Dashboard)</span>
+    <div class="section-line"></div>
+    <span class="status-pill pill-info">REVIEW PENDING</span>
+  </div>
+
+  <div class="card">
+    <p><strong>Both Wasabi Travels drafts remain in Gmail Drafts</strong> (shantanu.msp@gmail.com) from the 2026-07-18 02:33 IST run — they have not been sent. Edit subject lines to add your name before sending.</p>
+    <ul class="change-list">
+      <li><span class="icon">▸</span><div><span class="lbl">Titan Capital</span> · Draft ID <code style="font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--border2);padding:1px 5px;border-radius:3px">r-1843979562797016151</code> · startups@titancapital.vc · Score 3/3</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">India Quotient</span> · Draft ID <code style="font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--border2);padding:1px 5px;border-radius:3px">r-2951018845219637762</code> · anand@indiaquotient.in · Score 2/3</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">First Cheque</span> · Form-only · <a href="https://bit.ly/ApplytoFC" target="_blank" rel="noopener" style="color:var(--teal)">bit.ly/ApplytoFC</a> · Use submission packet at ~/Wasabi_Travels_Fundraising/PRIORITY_1_SUBMISSION_PACKET.md</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">Indian Angel Network</span> · Form-only · <a href="https://iangroup.vc/submit-plan/" target="_blank" rel="noopener" style="color:var(--teal)">iangroup.vc/submit-plan/</a></div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Section 4: Today's session checklist -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-label">Today's Session — Pre-Flight (10:00am)</span>
+    <div class="section-line"></div>
+    <span class="status-pill pill-warn">ACTION NEEDED</span>
+  </div>
+
+  <div class="card">
+    <ul class="checklist">
+      <li><span class="check-icon">→</span><div>Start Hermes: <code>hermes start</code> — confirm it replies to a test message in Telegram before 9:55am</div></li>
+      <li><span class="check-icon">→</span><div>Open learner deck on projector: <code>session/learner_deck.html</code> · Slide 1 · click the countdown start button</div></li>
+      <li><span class="check-icon">→</span><div>Open presenter deck in separate window: <code>session/presenter_deck.html</code> · localStorage sync activates on first navigation</div></li>
+      <li><span class="check-icon">→</span><div>Start dashboard: <code>python3 session/hermes_dashboard.py</code> → <a href="http://localhost:7890" style="color:var(--teal)">localhost:7890</a> — confirm both VC panels visible</div></li>
+      <li><span class="check-icon">→</span><div>Open handbook for reference: <code>session/handbook.html</code> — or the hosted version linked in your notes</div></li>
+      <li><span class="check-icon">→</span><div>GitHub token in <code>~/.hermes/.env</code> as <code>GITHUB_TOKEN</code> — confirm with a quick repo lookup in Hermes</div></li>
+      <li><span class="check-icon">→</span><div>Gmail OAuth token confirmed at <code>~/.hermes/google_token.json</code> — test with <code>python3 ~/.hermes/scripts/gmail_draft_standalone.py --help</code></div></li>
+      <li><span class="check-icon">→</span><div>Fallback investor list ready in <code>03_Hermes_Build_Recipes.md</code> Appendix — for founders whose live VC search returns weak results</div></li>
+      <li><span class="check-icon">→</span><div>Shared fallback demo repo URL ready to paste for founders with low-commit repos during Build A</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Section 5: Git status -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-label">Git Commit</span>
+    <div class="section-line"></div>
+    <span class="status-pill pill-done">COMMITTED</span>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">540d2a6 — feat: VakilDiary Dubai VC test run, SVG motion graphics on both decks, handbook updated</div>
+        <div class="card-meta">branch: founders-guide-to-agents · 4 files changed · +1,346 insertions · −48 deletions</div>
+      </div>
+    </div>
+    <ul class="change-list">
+      <li><span class="icon">▸</span><div><span class="lbl">session/hermes_dashboard.py</span> — VakilDiary VC evaluation section (14 rows, 4 drawers, 9 form links), VakilDiary JS data with Draft IDs</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">session/learner_deck.html</span> — 6 @keyframes, 3 animated SVG pipelines, 3 icon SVGs, staggered matrix/exercise animations</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">session/presenter_deck.html</span> — 5 SVG diagrams (2×2, 3-test, roadmap, Build A, Build B), CSS animation classes</div></li>
+      <li><span class="icon">▸</span><div><span class="lbl">session/handbook.html</span> — Step 05 added to Monitor section with full VakilDiary test run documentation</div></li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu">linkedin.com/in/chandrashantanu</a></span>
+  <span>Founder's Guide to Agents · GrowthX · 2026-07-19</span>
+</div>
