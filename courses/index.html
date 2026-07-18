@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdYoda · Courses</title>
+  <meta name="description" content="Browse all EdYoda AI programs — session decks, handbooks, and learner materials organized by course and session." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #08090d;
+      --surface:   #10121a;
+      --elevated:  #161b26;
+      --border:    #1f2535;
+      --border-hi: #2d3650;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --faint:     #3a4260;
+
+      --genai-a: #7c3aed;
+      --genai-b: #4f46e5;
+      --aipm-a:  #0d9488;
+      --aipm-b:  #0284c7;
+      --found-a: #ea580c;
+      --found-b: #be185d;
+
+      --r: 12px;
+      --r-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── TOP NAV ─────────────────────────────────────────────────── */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 9, 13, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 2rem;
+      height: 56px;
+    }
+    .topnav-logo {
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .topnav-logo span { color: var(--genai-a); }
+    .topnav-divider { width: 1px; height: 20px; background: var(--border); }
+    .topnav-title { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+    .topnav-spacer { flex: 1; }
+    .topnav-home {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: all .15s;
+    }
+    .topnav-home:hover { color: var(--text); border-color: var(--border-hi); }
+
+    /* ─── HERO ────────────────────────────────────────────────────── */
+    .hero {
+      padding: 4rem 2rem 3rem;
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--faint);
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    h1 .grad-genai { background: linear-gradient(90deg, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-sub { font-size: 1.05rem; color: var(--muted); line-height: 1.6; max-width: 560px; }
+
+    /* ─── STATS ROW ───────────────────────────────────────────────── */
+    .stats-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .stat { display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat-num { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
+    .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* ─── LUMIÈRE BANNER ──────────────────────────────────────────── */
+    .lumiere-banner {
+      max-width: 960px;
+      margin: 0 auto 2.5rem;
+      padding: 0 2rem;
+    }
+    .lumiere-inner {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--r);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      background: linear-gradient(135deg, rgba(124,58,237,.12) 0%, rgba(79,70,229,.08) 100%);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .lumiere-inner::before {
+      content: '🥐';
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 5rem;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .lumiere-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a78bfa;
+      margin-bottom: 0.35rem;
+    }
+    .lumiere-inner h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .lumiere-inner p { font-size: 0.85rem; color: var(--muted); }
+    .lumiere-btns { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.2rem;
+      background: linear-gradient(135deg, var(--genai-a), var(--genai-b));
+      color: #fff; border-radius: var(--r-sm);
+      font-size: 0.82rem; font-weight: 600; text-decoration: none;
+      transition: opacity .15s, transform .15s;
+    }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.2rem;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border-hi); border-radius: var(--r-sm);
+      font-size: 0.82rem; font-weight: 500; text-decoration: none;
+      transition: all .15s;
+    }
+    .btn-ghost:hover { background: var(--elevated); border-color: var(--faint); }
+
+    /* ─── COURSE TABS ─────────────────────────────────────────────── */
+    .courses-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+      flex: 1;
+    }
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.1rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color .15s;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--text); }
+    .tab-btn.active.genai  { border-bottom-color: var(--genai-a); }
+    .tab-btn.active.aipm   { border-bottom-color: var(--aipm-a); }
+    .tab-btn.active.found  { border-bottom-color: var(--found-a); }
+    .tab-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-genai { background: linear-gradient(135deg, var(--genai-a), var(--genai-b)); }
+    .dot-aipm  { background: linear-gradient(135deg, var(--aipm-a), var(--aipm-b)); }
+    .dot-found { background: linear-gradient(135deg, var(--found-a), var(--found-b)); }
+
+    /* ─── COURSE PANEL ────────────────────────────────────────────── */
+    .course-panel { display: none; }
+    .course-panel.active { display: block; }
+
+    .course-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .course-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .ci-genai { background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(79,70,229,.25)); border: 1px solid rgba(124,58,237,.3); }
+    .ci-aipm  { background: linear-gradient(135deg, rgba(13,148,136,.25), rgba(2,132,199,.25)); border: 1px solid rgba(13,148,136,.3); }
+    .ci-found { background: linear-gradient(135deg, rgba(234,88,12,.25), rgba(190,24,93,.25)); border: 1px solid rgba(234,88,12,.3); }
+    .course-info-text h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .course-info-text p  { font-size: 0.88rem; color: var(--muted); line-height: 1.55; max-width: 540px; }
+    .course-badges { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .badge {
+      padding: 0.2rem 0.65rem; border-radius: 100px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+    }
+    .badge-genai { background: rgba(124,58,237,.15); color: #a78bfa; border: 1px solid rgba(124,58,237,.2); }
+    .badge-aipm  { background: rgba(13,148,136,.15);  color: #2dd4bf; border: 1px solid rgba(13,148,136,.2); }
+    .badge-found { background: rgba(234,88,12,.15);   color: #fb923c; border: 1px solid rgba(234,88,12,.2); }
+
+    /* ─── SESSION ACCORDION ───────────────────────────────────────── */
+    .sessions { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .session-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .session-card:hover { border-color: var(--border-hi); }
+    .session-card.open  { border-color: var(--border-hi); }
+
+    .session-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s;
+    }
+    .session-header:hover { background: var(--elevated); }
+
+    .session-num {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .sn-genai { background: rgba(124,58,237,.2); color: #a78bfa; }
+    .sn-aipm  { background: rgba(13,148,136,.2);  color: #2dd4bf; }
+    .sn-found { background: rgba(234,88,12,.2);   color: #fb923c; }
+
+    .session-info { flex: 1; min-width: 0; }
+    .session-name {
+      font-size: 0.92rem; font-weight: 600; line-height: 1.3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-sub {
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem;
+    }
+
+    .session-count {
+      font-size: 0.72rem; color: var(--muted);
+      background: var(--elevated); border: 1px solid var(--border);
+      padding: 0.2rem 0.6rem; border-radius: 100px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .session-chevron {
+      width: 20px; height: 20px; flex-shrink: 0; color: var(--faint);
+      transition: transform .22s cubic-bezier(.4,0,.2,1), color .15s;
+    }
+    .session-card.open .session-chevron { transform: rotate(90deg); color: var(--muted); }
+
+    /* ─── SESSION BODY ────────────────────────────────────────────── */
+    .session-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s cubic-bezier(.4,0,.2,1);
+    }
+    .session-card.open .session-body { max-height: 600px; }
+
+    .session-body-inner {
+      padding: 0 1.25rem 1.25rem 1.25rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .file-tree { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .tree-line {
+      width: 32px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: flex-end;
+      color: var(--faint); font-size: 0.75rem;
+      padding-right: 4px;
+    }
+    .file-chip {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.85rem;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 0.8rem; font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .file-chip:hover {
+      border-color: var(--border-hi);
+      background: #1e2436;
+      transform: translateX(2px);
+    }
+    .file-chip-icon { font-size: 0.85rem; opacity: .7; }
+    .file-chip-label { }
+    .file-chip-arr { color: var(--faint); font-size: 0.7rem; margin-left: auto; opacity: 0; transition: opacity .15s; }
+    .file-chip:hover .file-chip-arr { opacity: 1; }
+
+    /* Type-specific accent left border */
+    .chip-learner  { border-left: 3px solid rgba(124,58,237,.5); }
+    .chip-present  { border-left: 3px solid rgba(2,132,199,.5);  }
+    .chip-workbook { border-left: 3px solid rgba(234,88,12,.5);  }
+    .chip-handbook { border-left: 3px solid rgba(234,88,12,.5);  }
+    .chip-other    { border-left: 3px solid rgba(100,116,139,.5); }
+
+    /* ─── EXPAND ALL ──────────────────────────────────────────────── */
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .session-count-label { font-size: 0.8rem; color: var(--muted); }
+    .expand-all-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      color: var(--muted); font-size: 0.78rem; font-weight: 500;
+      padding: 0.35rem 0.85rem; cursor: pointer; font-family: inherit;
+      transition: all .15s;
+    }
+    .expand-all-btn:hover { border-color: var(--border-hi); color: var(--text); background: var(--elevated); }
+
+    /* ─── FOOTER ──────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer p { font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── TOP NAV ───────────────────────────────────────────────────────── -->
+<nav class="topnav">
+  <a href="/" class="topnav-logo">Ed<span>Yoda</span></a>
+  <div class="topnav-divider"></div>
+  <span class="topnav-title">Course Directory</span>
+  <div class="topnav-spacer"></div>
+  <a href="/" class="topnav-home">← Home</a>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <p class="hero-eyebrow">EdYoda · AI Programs</p>
+  <h1>All <span class="grad-genai">Courses</span> &amp;<br>Session Materials</h1>
+  <p class="hero-sub">Every deck, handbook, and learner resource — organized by program and session. Click any session to expand its materials.</p>
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-num" style="background:linear-gradient(90deg,#a78bfa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">3</span>
+      <span class="stat-label">Programs</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" style="background:linear-gradient(90deg,#2dd4bf,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">17</span>
+      <span class="stat-label">Sessions</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" style="background:linear-gradient(90deg,#fb923c,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">50+</span>
+      <span class="stat-label">Materials</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── LUMIÈRE BANNER ─────────────────────────────────────────────────── -->
+<div class="lumiere-banner">
+  <div class="lumiere-inner">
+    <div>
+      <p class="lumiere-tag">Live Demo · GenAI S5 – S7</p>
+      <h3>🥐 Lumière Bakery Agent</h3>
+      <p>Interactive AI ordering agent built in the course — live on the web.</p>
+    </div>
+    <div class="lumiere-btns">
+      <a class="btn-primary" href="/lumiere-app/">Open Bakery ↗</a>
+      <a class="btn-ghost" href="/lumiere-app/guide.html">Build Guide</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── COURSES ────────────────────────────────────────────────────────── -->
+<div class="courses-section">
+
+  <!-- Tab Bar -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn genai active" role="tab" onclick="switchTab('genai', this)">
+      <span class="tab-dot dot-genai"></span>
+      GenAI for Non-Coders
+    </button>
+    <button class="tab-btn aipm" role="tab" onclick="switchTab('aipm', this)">
+      <span class="tab-dot dot-aipm"></span>
+      AI PM Program
+    </button>
+    <button class="tab-btn found" role="tab" onclick="switchTab('found', this)">
+      <span class="tab-dot dot-found"></span>
+      Founder's Guide to Agents
+    </button>
+  </div>
+
+  <!-- ══ PANEL: GenAI for Non-Coders ══ -->
+  <div id="panel-genai" class="course-panel active">
+
+    <div class="course-meta">
+      <div class="course-icon ci-genai">🤖</div>
+      <div class="course-info-text">
+        <h2>GenAI &amp; AI Agents for Non-Coders</h2>
+        <p>7 sessions + an Evals elective. Goes from foundational LLM concepts through RAG, agent architecture, and deploying a live AI product with n8n automations.</p>
+        <div class="course-badges">
+          <span class="badge badge-genai">8 Sessions</span>
+          <span class="badge badge-genai">Beginner → Advanced</span>
+          <span class="badge badge-genai">Hands-on</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <span class="session-count-label">8 sessions · click to expand</span>
+      <button class="expand-all-btn" onclick="expandAll('panel-genai')">Expand all</button>
+    </div>
+
+    <div class="sessions">
+
+      <!-- S01 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S01</div>
+          <div class="session-info">
+            <div class="session-name">Generative AI Foundations</div>
+            <div class="session-sub">How LLMs work, tokens, prompting basics</div>
+          </div>
+          <span class="session-count">3 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/linkedin_carousel.html" target="_blank"><span class="file-chip-icon">📢</span><span class="file-chip-label">LinkedIn Carousel</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- S02 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S02</div>
+          <div class="session-info">
+            <div class="session-name">From Chatbot to Agent</div>
+            <div class="session-sub">Tool use, memory, planning loops</div>
+          </div>
+          <span class="session-count">4 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-workbook" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/02_Learner_Workbook.html" target="_blank"><span class="file-chip-icon">📝</span><span class="file-chip-label">Learner Workbook</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/linkedin_carousel.html" target="_blank"><span class="file-chip-icon">📢</span><span class="file-chip-label">LinkedIn Carousel</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- S03 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S03</div>
+          <div class="session-info">
+            <div class="session-name">Prompt &amp; Context Engineering</div>
+            <div class="session-sub">Chain-of-thought, few-shot, system prompts, context windows</div>
+          </div>
+          <span class="session-count">4 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-workbook" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/CoT_ToT_Exercise_Live_ChatGPT.html" target="_blank"><span class="file-chip-icon">🧠</span><span class="file-chip-label">CoT / ToT Live Exercise</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/linkedin_carousel.html" target="_blank"><span class="file-chip-icon">📢</span><span class="file-chip-label">LinkedIn Carousel</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- S04 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S04</div>
+          <div class="session-info">
+            <div class="session-name">RAG — Giving Agents Your Data</div>
+            <div class="session-sub">Vector stores, retrieval pipelines, knowledge bases</div>
+          </div>
+          <span class="session-count">3 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-workbook" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/Session4_Learner_Workbook_print.html" target="_blank"><span class="file-chip-icon">📝</span><span class="file-chip-label">Learner Workbook</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- S05 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S05</div>
+          <div class="session-info">
+            <div class="session-name">Agent Architecture</div>
+            <div class="session-sub">ReAct, multi-tool agents, Lumière Bakery build</div>
+          </div>
+          <span class="session-count">3 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-workbook" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/learner_workbook.html" target="_blank"><span class="file-chip-icon">📝</span><span class="file-chip-label">Learner Workbook</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- S06 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S06</div>
+          <div class="session-info">
+            <div class="session-name">Workflow Automation with n8n</div>
+            <div class="session-sub">Visual pipelines, webhook triggers, no-code automation</div>
+          </div>
+          <span class="session-count">3 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/linkedin_carousel.html" target="_blank"><span class="file-chip-icon">📢</span><span class="file-chip-label">LinkedIn Carousel</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- S07 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai">S07</div>
+          <div class="session-info">
+            <div class="session-name">n8n Part 2 — Deploy &amp; Automate</div>
+            <div class="session-sub">GitHub → Vercel, email automations, production workflows</div>
+          </div>
+          <span class="session-count">4 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-handbook" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/03_Learner_Handbook.html" target="_blank"><span class="file-chip-icon">📋</span><span class="file-chip-label">Learner Handbook</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/linkedin_carousel.html" target="_blank"><span class="file-chip-icon">📢</span><span class="file-chip-label">LinkedIn Carousel</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- Evals Elective -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-genai" style="font-size:.65rem">EVL</div>
+          <div class="session-info">
+            <div class="session-name">AI Evals <span style="color:var(--muted);font-weight:400;font-size:.8rem">· Elective</span></div>
+            <div class="session-sub">Evaluation frameworks, benchmarks, RLHF</div>
+          </div>
+          <span class="session-count">3 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-present" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/linkedin_carousel.html" target="_blank"><span class="file-chip-icon">📢</span><span class="file-chip-label">LinkedIn Carousel</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+    </div><!-- /sessions -->
+  </div><!-- /panel-genai -->
+
+
+  <!-- ══ PANEL: AI PM Program ══ -->
+  <div id="panel-aipm" class="course-panel">
+
+    <div class="course-meta">
+      <div class="course-icon ci-aipm">📊</div>
+      <div class="course-info-text">
+        <h2>Production AI PM Program</h2>
+        <p>8 weeks of applied AI product management — from strategy and moats to evals, ML collaboration, and shipping production-grade AI products.</p>
+        <div class="course-badges">
+          <span class="badge badge-aipm">8 Weeks</span>
+          <span class="badge badge-aipm">Senior PMs</span>
+          <span class="badge badge-aipm">Case-driven</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <span class="session-count-label">8 weeks + resources · click to expand</span>
+      <button class="expand-all-btn" onclick="expandAll('panel-aipm')">Expand all</button>
+    </div>
+
+    <div class="sessions">
+
+      <!-- Resources -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm" style="font-size:.65rem">RES</div>
+          <div class="session-info">
+            <div class="session-name">Program Resources</div>
+            <div class="session-sub">Index and markdown viewer for all program materials</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/index.html" target="_blank"><span class="file-chip-icon">🏠</span><span class="file-chip-label">Program Index</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/AI-PM/Production%20AI%20PM%20Program/md-viewer.html" target="_blank"><span class="file-chip-icon">📄</span><span class="file-chip-label">Markdown Viewer</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <!-- W01–W08 -->
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W01</div>
+          <div class="session-info">
+            <div class="session-name">AI Product Judgment for Senior PMs</div>
+            <div class="session-sub">When to build with AI, risk vs. upside, product instincts</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2001%20-%20AI%20Product%20Judgment%20for%20Senior%20PMs/W01_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2001%20-%20AI%20Product%20Judgment%20for%20Senior%20PMs/W01_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W02</div>
+          <div class="session-info">
+            <div class="session-name">AI Strategy, Moats &amp; Business Case</div>
+            <div class="session-sub">Defensibility, competitive dynamics, ROI framing</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2002%20-%20AI%20Strategy%20Moats%20and%20Business%20Case/W02_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2002%20-%20AI%20Strategy%20Moats%20and%20Business%20Case/W02_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W03</div>
+          <div class="session-info">
+            <div class="session-name">GenAI System Design for PMs</div>
+            <div class="session-sub">LLM stacks, latency, RAG architecture, prompt pipelines</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2003%20-%20GenAI%20System%20Design%20for%20PMs/W03_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2003%20-%20GenAI%20System%20Design%20for%20PMs/W03_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W04</div>
+          <div class="session-info">
+            <div class="session-name">Agentic Product Design</div>
+            <div class="session-sub">Multi-step agents, human-in-the-loop, UX for AI actions</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2004%20-%20Agentic%20Product%20Design/W04_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2004%20-%20Agentic%20Product%20Design/W04_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W05</div>
+          <div class="session-info">
+            <div class="session-name">Evals as the New PRD</div>
+            <div class="session-sub">Writing eval suites, LLM-as-judge, acceptance criteria</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2005%20-%20Evals%20as%20the%20New%20PRD/W05_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2005%20-%20Evals%20as%20the%20New%20PRD/W05_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W06</div>
+          <div class="session-info">
+            <div class="session-name">Working with AI / ML Engineering Teams</div>
+            <div class="session-sub">Collaboration models, sprint dynamics, PM–engineer interface</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2006%20-%20Working%20with%20AI%20ML%20Engineering%20Teams/W06_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2006%20-%20Working%20with%20AI%20ML%20Engineering%20Teams/W06_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W07</div>
+          <div class="session-info">
+            <div class="session-name">Production Readiness — Cost, Latency &amp; Launch</div>
+            <div class="session-sub">Guardrails, monitoring, cost modeling, go-live checklist</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2007%20-%20Production%20Readiness%20Cost%20Latency%20Safety%20and%20Launch/W07_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2007%20-%20Production%20Readiness%20Cost%20Latency%20Safety%20and%20Launch/W07_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-aipm">W08</div>
+          <div class="session-info">
+            <div class="session-name">Executive Narrative, Portfolio &amp; AI PM Interview</div>
+            <div class="session-sub">Storytelling, portfolio framing, interview prep</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Learner_Deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Presenter_Deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+    </div><!-- /sessions -->
+  </div><!-- /panel-aipm -->
+
+
+  <!-- ══ PANEL: Founder's Guide to Agents ══ -->
+  <div id="panel-found" class="course-panel">
+
+    <div class="course-meta">
+      <div class="course-icon ci-found">🚀</div>
+      <div class="course-info-text">
+        <h2>Founder's Guide to Agents</h2>
+        <p>An intensive workshop for founders and senior operators. Build and ship a real AI agent — Hermes — from scratch in a single session, with full ops runbooks and a live Telegram integration.</p>
+        <div class="course-badges">
+          <span class="badge badge-found">Workshop</span>
+          <span class="badge badge-found">Founders &amp; Operators</span>
+          <span class="badge badge-found">Ship on Day 1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <span class="session-count-label">6 materials · click to expand</span>
+      <button class="expand-all-btn" onclick="expandAll('panel-found')">Expand all</button>
+    </div>
+
+    <div class="sessions">
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-found" style="font-size:.6rem">PRE</div>
+          <div class="session-info">
+            <div class="session-name">Pre-Read &amp; Preparation</div>
+            <div class="session-sub">Context setting and prerequisite concepts before the workshop</div>
+          </div>
+          <span class="session-count">1 material</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-learner" href="/Founder's%20Guide%20to%20Agents/session/00_Pre_Read.html" target="_blank"><span class="file-chip-icon">📚</span><span class="file-chip-label">Pre-Read</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-found" style="font-size:.6rem">DAY</div>
+          <div class="session-info">
+            <div class="session-name">Workshop — Decks &amp; Live Sessions</div>
+            <div class="session-sub">Learner and presenter materials for the main workshop day</div>
+          </div>
+          <span class="session-count">2 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-learner" href="/Founder's%20Guide%20to%20Agents/session/learner_deck.html" target="_blank"><span class="file-chip-icon">📖</span><span class="file-chip-label">Learner Deck</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-present" href="/Founder's%20Guide%20to%20Agents/session/presenter_deck.html" target="_blank"><span class="file-chip-icon">🎙️</span><span class="file-chip-label">Presenter Deck</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+      <div class="session-card" onclick="toggleSession(this)">
+        <div class="session-header">
+          <div class="session-num sn-found" style="font-size:.6rem">OPS</div>
+          <div class="session-info">
+            <div class="session-name">Ops &amp; Reference Materials</div>
+            <div class="session-sub">Handbook, runbook, and the Hermes morning report dashboard</div>
+          </div>
+          <span class="session-count">3 materials</span>
+          <svg class="session-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"/></svg>
+        </div>
+        <div class="session-body"><div class="session-body-inner"><div class="file-tree">
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-handbook" href="/Founder's%20Guide%20to%20Agents/session/handbook.html" target="_blank"><span class="file-chip-icon">📋</span><span class="file-chip-label">Handbook</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">├─</span><a class="file-chip chip-workbook" href="/Founder's%20Guide%20to%20Agents/session/runbook.html" target="_blank"><span class="file-chip-icon">🔧</span><span class="file-chip-label">Runbook</span><span class="file-chip-arr">↗</span></a></div>
+          <div class="file-row"><span class="tree-line">└─</span><a class="file-chip chip-other" href="/Founder's%20Guide%20to%20Agents/session/morning_report.html" target="_blank"><span class="file-chip-icon">☀️</span><span class="file-chip-label">Morning Report</span><span class="file-chip-arr">↗</span></a></div>
+        </div></div></div>
+      </div>
+
+    </div><!-- /sessions -->
+  </div><!-- /panel-found -->
+
+</div><!-- /courses-section -->
+
+<footer>
+  <p>EdYoda · AI Programs · <a href="/">Course Hub</a></p>
+  <p>All materials open in a new tab ↗</p>
+</footer>
+
+<script>
+  // ── Tab switching ──────────────────────────────────────────────────
+  function switchTab(id, btn) {
+    document.querySelectorAll('.course-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── Session accordion ──────────────────────────────────────────────
+  function toggleSession(card) {
+    // Prevent toggling when clicking links inside
+    card.classList.toggle('open');
+  }
+
+  // Stop link clicks from bubbling to the card toggle
+  document.querySelectorAll('.file-chip').forEach(a => {
+    a.addEventListener('click', e => e.stopPropagation());
+  });
+
+  // ── Expand / collapse all ──────────────────────────────────────────
+  function expandAll(panelId) {
+    const panel = document.getElementById(panelId);
+    const cards = panel.querySelectorAll('.session-card');
+    const btn   = panel.querySelector('.expand-all-btn');
+    const allOpen = [...cards].every(c => c.classList.contains('open'));
+    cards.forEach(c => c.classList.toggle('open', !allOpen));
+    btn.textContent = allOpen ? 'Expand all' : 'Collapse all';
+  }
+</script>
+
+</body>
+</html>
