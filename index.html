@@ -3,324 +3,927 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EdYoda · Course Hub</title>
-  <meta name="description" content="All course materials for EdYoda's Generative AI programs — session decks, handbooks, and learner resources." />
+  <title>EdYoda · AI Programs</title>
+  <meta name="description" content="EdYoda AI programs — GenAI for Non-Coders, Production AI PM, and Founder's Guide to Agents. Hands-on, live, real." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0d0f14;
-      --surface: #161920;
-      --card: #1d2230;
-      --border: #2a2f3d;
-      --accent: #6c63ff;
-      --accent2: #00d4aa;
-      --accent3: #ff6b6b;
-      --text: #e8eaf0;
-      --muted: #7a8099;
-      --radius: 14px;
+      --bg: #05060a;
+      --text: #e8edf5;
+      --muted: #5a6480;
+      --border: #151c2c;
+      --border-hi: #1f2d45;
+      --surface: #0d1220;
     }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    header {
-      background: linear-gradient(135deg, #1a1040 0%, #0d2040 50%, #0d1a30 100%);
-      border-bottom: 1px solid var(--border);
-      padding: 3rem 2rem 2.5rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    /* ─── NOISE TEXTURE ─────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.028;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
     }
-    header::before {
+
+    /* ─── AMBIENT ORBS ──────────────────────────────────────────── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      animation: float 12s ease-in-out infinite;
+    }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,60,255,.18), transparent 70%); top: -200px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,180,160,.14), transparent 70%); top: 20%; right: -150px; animation-delay: -4s; }
+    .orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(220,60,60,.10), transparent 70%); bottom: 10%; left: 20%; animation-delay: -8s; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(30px, -40px) scale(1.05); }
+      66%       { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* ─── NAV ───────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 2.5rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5, 6, 10, 0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .nav-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo em { font-style: normal; color: #7c6fff; }
+    .nav-right { display: flex; align-items: center; gap: 1.25rem; }
+    .nav-link {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color .15s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      background: rgba(124,111,255,.15);
+      border: 1px solid rgba(124,111,255,.3);
+      border-radius: 7px;
+      color: #a99fff;
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .nav-cta:hover { background: rgba(124,111,255,.25); color: #fff; }
+
+    /* ─── HERO ──────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 2rem 4rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(124,111,255,.1);
+      border: 1px solid rgba(124,111,255,.25);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9d8fff;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; background: #7c6fff; border-radius: 50%; animation: pulse-dot 2s ease infinite; }
+    @keyframes pulse-dot { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(124,111,255,.4); } 50% { opacity:.8; box-shadow: 0 0 0 5px rgba(124,111,255,0); } }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.1s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .hero h1 .line-1 { display: block; color: var(--text); }
+    .hero h1 .line-2 {
+      display: block;
+      background: linear-gradient(135deg, #7c6fff 0%, #38bdf8 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 520px;
+      margin: 0 auto 3rem;
+      animation: fadeUp 0.8s 0.2s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.3s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .btn-hero-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.8rem 1.8rem;
+      background: linear-gradient(135deg, #7c6fff, #5b8dee);
+      color: #fff;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .2s;
+      box-shadow: 0 0 0 0 rgba(124,111,255,0);
+    }
+    .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,111,255,.35); }
+    .btn-hero-ghost {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.8rem 1.8rem;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border-hi);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-hero-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.15); background: rgba(255,255,255,.04); }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeUp 1s 0.8s both;
+    }
+    .scroll-hint span { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .scroll-mouse {
+      width: 20px; height: 32px;
+      border: 1.5px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      position: relative;
+    }
+    .scroll-mouse::after {
       content: '';
       position: absolute;
+      left: 50%; top: 6px;
+      width: 3px; height: 6px;
+      background: rgba(255,255,255,.25);
+      border-radius: 2px;
+      transform: translateX(-50%);
+      animation: scroll-bob 2s ease infinite;
+    }
+    @keyframes scroll-bob { 0%,100% { opacity:1; transform: translateX(-50%) translateY(0); } 50% { opacity:0; transform: translateX(-50%) translateY(8px); } }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── SECTION ───────────────────────────────────────────────── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 2rem;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+    .section-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .section-eyebrow::after {
+      content: '';
+      height: 1px;
+      flex: 1;
+      background: var(--border);
+    }
+    .eyebrow-text {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+    .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 480px; margin-bottom: 3.5rem; }
+
+    /* ─── FLIP CARDS ────────────────────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    @media (max-width: 900px) { .cards-grid { grid-template-columns: 1fr; } }
+    @media (min-width: 600px) and (max-width: 900px) { .cards-grid { grid-template-columns: 1fr 1fr; } }
+
+    .flip-wrap {
+      perspective: 1200px;
+      height: 420px;
+      cursor: pointer;
+    }
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flip-wrap:hover .flip-inner { transform: rotateY(180deg); }
+
+    .flip-front, .flip-back {
+      position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108,99,255,.18) 0%, transparent 70%);
+      border-radius: 20px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+    }
+
+    /* FRONT */
+    .flip-front {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color .2s;
+    }
+    .flip-wrap:hover .flip-front { border-color: var(--border-hi); }
+
+    .card-glow {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity .3s;
       pointer-events: none;
     }
-    .logo { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
-    h1 {
-      font-size: clamp(1.8rem, 4vw, 3rem);
+    .flip-wrap:hover .card-glow { opacity: 1; }
+
+    .card-icon-wrap {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .card-eyebrow {
+      font-size: 0.68rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #fff 0%, #b8bfff 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
       margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
     }
-    .tagline { color: var(--muted); font-size: 1rem; }
+    .card-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+    }
+    .card-stat { display: flex; flex-direction: column; gap: 0.15rem; }
+    .card-stat-num { font-size: 1.1rem; font-weight: 700; }
+    .card-stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+    .card-hover-hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      opacity: 0.6;
+    }
+    .flip-icon {
+      width: 18px; height: 18px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.55rem;
+    }
 
-    main { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    /* BACK */
+    .flip-back {
+      transform: rotateY(180deg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .back-header { margin-bottom: 1.25rem; }
+    .back-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+    .back-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .back-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      flex: 1;
+      margin-bottom: 1.5rem;
+    }
+    .back-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.83rem;
+      line-height: 1.45;
+    }
+    .back-list li::before {
+      content: '→';
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      opacity: .5;
+    }
+    .back-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 9px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .15s;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .back-sessions {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
 
-    .section { margin-bottom: 3.5rem; }
-    .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
-    .section-pill {
-      display: inline-block; padding: 0.3rem 0.85rem; border-radius: 100px;
-      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-    }
-    .pill-purple { background: rgba(108,99,255,.18); color: #a89bff; border: 1px solid rgba(108,99,255,.3); }
-    .pill-teal   { background: rgba(0,212,170,.15);  color: #00d4aa; border: 1px solid rgba(0,212,170,.25); }
-    .pill-red    { background: rgba(255,107,107,.15); color: #ff8a8a; border: 1px solid rgba(255,107,107,.25); }
-    .section-title { font-size: 1.25rem; font-weight: 600; }
+    /* ── CARD 1: GenAI (Purple) ── */
+    .card-genai .card-glow { background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(99,60,255,.12), transparent 70%); }
+    .card-genai .card-icon-wrap { background: rgba(99,60,255,.15); border: 1px solid rgba(99,60,255,.25); }
+    .card-genai .card-eyebrow { color: #9d78ff; }
+    .card-genai .card-stat-num { color: #9d78ff; }
+    .card-genai .flip-back { background: linear-gradient(145deg, #0f0b22 0%, #0d1220 100%); border: 1px solid rgba(99,60,255,.25); }
+    .card-genai .back-tag { color: #9d78ff; }
+    .card-genai .cta-btn { background: linear-gradient(135deg, #7c3aed, #4f46e5); }
+    .card-genai .cta-btn:hover { box-shadow: 0 6px 24px rgba(124,58,237,.35); transform: translateY(-1px); }
 
-    .session { margin-bottom: 1rem; }
-    .session-label {
-      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; padding-left: 0.25rem;
+    /* ── CARD 2: AI-PM (Teal) ── */
+    .card-aipm .card-glow { background: radial-gradient(ellipse 80% 60% at 80% 20%, rgba(0,180,155,.10), transparent 70%); }
+    .card-aipm .card-icon-wrap { background: rgba(0,180,155,.12); border: 1px solid rgba(0,180,155,.22); }
+    .card-aipm .card-eyebrow { color: #2dd4bf; }
+    .card-aipm .card-stat-num { color: #2dd4bf; }
+    .card-aipm .flip-back { background: linear-gradient(145deg, #080f18 0%, #091420 100%); border: 1px solid rgba(13,148,136,.25); }
+    .card-aipm .back-tag { color: #2dd4bf; }
+    .card-aipm .cta-btn { background: linear-gradient(135deg, #0d9488, #0284c7); }
+    .card-aipm .cta-btn:hover { box-shadow: 0 6px 24px rgba(13,148,136,.35); transform: translateY(-1px); }
+
+    /* ── CARD 3: Founders (Orange-Pink) ── */
+    .card-found .card-glow { background: radial-gradient(ellipse 80% 60% at 80% 80%, rgba(220,60,40,.10), transparent 70%); }
+    .card-found .card-icon-wrap { background: rgba(220,60,40,.12); border: 1px solid rgba(220,60,40,.22); }
+    .card-found .card-eyebrow { color: #fb923c; }
+    .card-found .card-stat-num { color: #fb923c; }
+    .card-found .flip-back { background: linear-gradient(145deg, #120a06 0%, #160e0a 100%); border: 1px solid rgba(234,88,12,.25); }
+    .card-found .back-tag { color: #fb923c; }
+    .card-found .cta-btn { background: linear-gradient(135deg, #ea580c, #be185d); }
+    .card-found .cta-btn:hover { box-shadow: 0 6px 24px rgba(234,88,12,.35); transform: translateY(-1px); }
+
+    /* ─── LUMIÈRE FEATURE ───────────────────────────────────────── */
+    .lumiere-section {
+      position: relative;
+      z-index: 1;
+      padding: 0 2rem 6rem;
+      max-width: 1160px;
+      margin: 0 auto;
     }
-    .links-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .link-chip {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.5rem 1rem; background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: var(--text);
-      text-decoration: none; transition: all .18s ease;
-    }
-    .link-chip:hover {
-      background: #252b3d; border-color: var(--accent); color: #fff;
-      transform: translateY(-1px); box-shadow: 0 4px 16px rgba(108,99,255,.2);
-    }
-    .link-chip .icon { font-size: 0.9rem; opacity: .75; }
 
     .lumiere-card {
-      background: linear-gradient(135deg, #1d1640 0%, #1a2640 100%);
-      border: 1px solid rgba(108,99,255,.35); border-radius: var(--radius);
-      padding: 1.5rem 1.75rem; display: flex; align-items: center;
-      justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid rgba(124,111,255,.2);
+      background: linear-gradient(135deg, rgba(15,12,35,.95) 0%, rgba(8,14,30,.95) 100%);
+      padding: 3.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 3rem;
     }
-    .lumiere-card p { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
-    .lumiere-btn {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.65rem 1.4rem; background: var(--accent); color: #fff;
-      border-radius: 8px; font-weight: 600; font-size: 0.9rem;
-      text-decoration: none; transition: background .18s, box-shadow .18s; white-space: nowrap;
-    }
-    .lumiere-btn:hover { background: #5750e8; box-shadow: 0 4px 20px rgba(108,99,255,.4); }
-    .lumiere-btn.ghost { background: var(--card); border: 1px solid var(--border); }
-    .lumiere-btn.ghost:hover { background: #252b3d; box-shadow: none; }
+    @media (max-width: 700px) { .lumiere-card { grid-template-columns: 1fr; padding: 2rem; } }
 
-    hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0 1.25rem; }
-    footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding-bottom: 2rem; }
+    .lumiere-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 100% 50%, rgba(124,111,255,.07), transparent 70%),
+        radial-gradient(ellipse 40% 60% at 0% 50%, rgba(0,180,160,.05), transparent 70%);
+      pointer-events: none;
+    }
+    .lumiere-emoji {
+      position: absolute;
+      right: 3rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: 9rem;
+      opacity: 0.06;
+      pointer-events: none;
+      user-select: none;
+    }
+    @media (max-width: 700px) { .lumiere-emoji { display: none; } }
+
+    .lumiere-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #9d78ff;
+      margin-bottom: 1rem;
+    }
+    .lumiere-tag .live-dot {
+      width: 6px; height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease infinite;
+    }
+    .lumiere-card h2 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .lumiere-card p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 2rem;
+    }
+    .lumiere-pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .lumiere-pill {
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.5);
+    }
+    .lumiere-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-lumiere {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .18s;
+    }
+    .btn-lumiere.primary { background: linear-gradient(135deg, #7c6fff, #5b8dee); color: #fff; }
+    .btn-lumiere.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(124,111,255,.3); }
+    .btn-lumiere.ghost { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.6); }
+    .btn-lumiere.ghost:hover { background: rgba(255,255,255,.09); color: var(--text); }
+
+    /* Lumiere side stats */
+    .lumiere-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+    .ls { text-align: center; }
+    .ls-num { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; background: linear-gradient(135deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .ls-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-top: 0.15rem; }
+
+    /* ─── STATS STRIP ───────────────────────────────────────────── */
+    .stats-strip {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.015);
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+    }
+    .ss { text-align: center; }
+    .ss-num {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #e8edf5, #8a95b0);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .ss-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ─── FOOTER ────────────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 1rem;
+    }
+    footer p { font-size: 0.8rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; transition: color .15s; }
+    footer a:hover { color: var(--text); }
+
+    /* ─── ENTER ANIMATION ───────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .7s cubic-bezier(0.4,0,0.2,1), transform .7s cubic-bezier(0.4,0,0.2,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-d1 { transition-delay: .05s; }
+    .reveal-d2 { transition-delay: .12s; }
+    .reveal-d3 { transition-delay: .19s; }
   </style>
 </head>
 <body>
 
-<header>
-  <p class="logo">EdYoda · AI Programs</p>
-  <h1>Course Hub</h1>
-  <p class="tagline">All session decks, handbooks &amp; learner resources in one place</p>
-</header>
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-<main>
+<!-- ── NAV ──────────────────────────────────────────────────────────────── -->
+<nav>
+  <a href="/" class="nav-logo">Ed<em>Yoda</em></a>
+  <div class="nav-right">
+    <a href="#programs" class="nav-link">Programs</a>
+    <a href="/lumiere-app/" class="nav-link">Live Demo</a>
+    <a href="/courses" class="nav-cta">Browse All →</a>
+  </div>
+</nav>
 
-  <!-- ── Lumière Bakery Live Demo ── -->
-  <div class="section">
-    <div class="lumiere-card">
-      <div>
-        <strong style="font-size:1.05rem">🥐 Lumière Bakery — Live Demo</strong>
-        <p>Interactive AI bakery agent + learner build guide · GenAI for Non-Coders S5–S7</p>
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Live AI Programs · India's Top 1%
+  </div>
+  <h1>
+    <span class="line-1">Learn AI by</span>
+    <span class="line-2">Building Real Things</span>
+  </h1>
+  <p class="hero-sub">Not slides. Not theory. Real AI products you ship to the internet — in sessions, not semesters.</p>
+  <div class="hero-actions">
+    <a href="#programs" class="btn-hero-primary">Explore Programs ↓</a>
+    <a href="/lumiere-app/" class="btn-hero-ghost">See Live Demo ↗</a>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-mouse"></div>
+    <span>Scroll</span>
+  </div>
+</div>
+
+<!-- ── STATS STRIP ───────────────────────────────────────────────────────── -->
+<div class="stats-strip">
+  <div class="ss"><div class="ss-num">3</div><div class="ss-label">Programs</div></div>
+  <div class="ss"><div class="ss-num">17</div><div class="ss-label">Sessions</div></div>
+  <div class="ss"><div class="ss-num">50+</div><div class="ss-label">Materials</div></div>
+  <div class="ss"><div class="ss-num">1</div><div class="ss-label">Live AI App</div></div>
+</div>
+
+<!-- ── PROGRAMS ──────────────────────────────────────────────────────────── -->
+<section id="programs">
+  <div class="section-eyebrow">
+    <span class="eyebrow-text">Programs</span>
+  </div>
+  <h2 class="section-title">Three ways to master AI</h2>
+  <p class="section-sub">Hover a card to see what's inside. Click to dive in.</p>
+
+  <div class="cards-grid">
+
+    <!-- ─ GenAI for Non-Coders ─ -->
+    <div class="flip-wrap reveal reveal-d1" onclick="window.location.href='/courses'">
+      <div class="flip-inner">
+
+        <div class="flip-front card-genai">
+          <div class="card-glow"></div>
+          <div>
+            <div class="card-icon-wrap">🤖</div>
+            <div class="card-eyebrow">Course 1 · Beginner → Advanced</div>
+            <div class="card-name">GenAI &amp; AI Agents<br>for Non-Coders</div>
+            <div class="card-desc">From how LLMs work to building a live AI ordering agent with n8n automations and RAG. No coding background required.</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-stat">
+              <span class="card-stat-num">8</span>
+              <span class="card-stat-label">Sessions</span>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat-num">22+</span>
+              <span class="card-stat-label">Materials</span>
+            </div>
+            <div class="card-hover-hint">
+              <div class="flip-icon">↺</div> Hover to explore
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-back card-genai">
+          <div>
+            <div class="back-header">
+              <span class="back-tag">What you'll learn</span>
+              <div class="back-title">GenAI &amp; AI Agents<br>for Non-Coders</div>
+            </div>
+            <ul class="back-list">
+              <li>How LLMs work — tokens, context, temperature</li>
+              <li>Prompt &amp; context engineering that actually sticks</li>
+              <li>RAG — give agents your own knowledge base</li>
+              <li>Agent architecture: tools, memory, planning loops</li>
+              <li>Build &amp; deploy Lumière Bakery — a real AI agent</li>
+              <li>n8n workflows, webhooks, email automations</li>
+              <li>AI Evals elective — test what you've built</li>
+            </ul>
+          </div>
+          <div class="back-cta">
+            <span class="back-sessions">7 sessions + Evals elective</span>
+            <a class="cta-btn" href="/courses" onclick="event.stopPropagation()">View sessions →</a>
+          </div>
+        </div>
+
       </div>
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <a class="lumiere-btn" href="/lumiere-app/">Bakery Site ↗</a>
-        <a class="lumiere-btn ghost" href="/lumiere-app/guide.html">Build Guide</a>
+    </div>
+
+    <!-- ─ AI PM Program ─ -->
+    <div class="flip-wrap reveal reveal-d2" onclick="window.location.href='/courses'">
+      <div class="flip-inner">
+
+        <div class="flip-front card-aipm">
+          <div class="card-glow"></div>
+          <div>
+            <div class="card-icon-wrap">📊</div>
+            <div class="card-eyebrow">Course 2 · Senior PMs</div>
+            <div class="card-name">Production AI PM<br>Program</div>
+            <div class="card-desc">For PMs managing AI products in production. Strategy, system design, evals, ML collaboration, and shipping at scale.</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-stat">
+              <span class="card-stat-num">8</span>
+              <span class="card-stat-label">Weeks</span>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat-num">16+</span>
+              <span class="card-stat-label">Materials</span>
+            </div>
+            <div class="card-hover-hint">
+              <div class="flip-icon">↺</div> Hover to explore
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-back card-aipm">
+          <div>
+            <div class="back-header">
+              <span class="back-tag">What you'll master</span>
+              <div class="back-title">Production AI PM<br>Program</div>
+            </div>
+            <ul class="back-list">
+              <li>AI product judgment — when to build, when to buy</li>
+              <li>Strategy &amp; moats in an AI-native landscape</li>
+              <li>GenAI system design concepts for non-engineers</li>
+              <li>Agentic product design &amp; human-in-the-loop UX</li>
+              <li>Evals as the new PRD — write measurable acceptance criteria</li>
+              <li>Working with ML engineering teams</li>
+              <li>Production readiness, cost, latency &amp; launch</li>
+            </ul>
+          </div>
+          <div class="back-cta">
+            <span class="back-sessions">8 weeks · W01 – W08</span>
+            <a class="cta-btn" href="/courses" onclick="event.stopPropagation()">View weeks →</a>
+          </div>
+        </div>
+
       </div>
+    </div>
+
+    <!-- ─ Founder's Guide ─ -->
+    <div class="flip-wrap reveal reveal-d3" onclick="window.location.href='/courses'">
+      <div class="flip-inner">
+
+        <div class="flip-front card-found">
+          <div class="card-glow"></div>
+          <div>
+            <div class="card-icon-wrap">🚀</div>
+            <div class="card-eyebrow">Workshop · Founders &amp; Operators</div>
+            <div class="card-name">Founder's Guide<br>to Agents</div>
+            <div class="card-desc">One intensive day. You go from zero to a live Telegram AI agent — Hermes — deployed, monitored, and running for real.</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-stat">
+              <span class="card-stat-num">1</span>
+              <span class="card-stat-label">Day</span>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat-num">6</span>
+              <span class="card-stat-label">Materials</span>
+            </div>
+            <div class="card-hover-hint">
+              <div class="flip-icon">↺</div> Hover to explore
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-back card-found">
+          <div>
+            <div class="back-header">
+              <span class="back-tag">What you'll ship</span>
+              <div class="back-title">Founder's Guide<br>to Agents</div>
+            </div>
+            <ul class="back-list">
+              <li>Hermes — a real Telegram AI agent, live by end of day</li>
+              <li>Pre-read: agent concepts, architecture principles</li>
+              <li>Full presenter + learner deck for the workshop</li>
+              <li>Operational runbook: maintain &amp; iterate post-launch</li>
+              <li>Morning Report — daily intelligence dashboard</li>
+              <li>Handbook for ongoing reference and team onboarding</li>
+            </ul>
+          </div>
+          <div class="back-cta">
+            <span class="back-sessions">Workshop · 1 intensive day</span>
+            <a class="cta-btn" href="/courses" onclick="event.stopPropagation()">View materials →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── LUMIÈRE FEATURE ──────────────────────────────────────────────────── -->
+<div class="lumiere-section reveal">
+  <div class="lumiere-card">
+    <div class="lumiere-bg"></div>
+    <div class="lumiere-emoji">🥐</div>
+
+    <div style="position:relative;z-index:1;">
+      <div class="lumiere-tag">
+        <span class="live-dot"></span>
+        Live on the internet
+      </div>
+      <h2>Lumière Bakery<br>— the AI Agent you build</h2>
+      <p>A real, working AI bakery ordering agent. Built from scratch in the GenAI for Non-Coders program. Takes orders, checks food regulations, captures leads — all live on Vercel + n8n.</p>
+      <div class="lumiere-pills">
+        <span class="lumiere-pill">n8n Webhook</span>
+        <span class="lumiere-pill">Gemini AI</span>
+        <span class="lumiere-pill">RAG Knowledge Base</span>
+        <span class="lumiere-pill">Serverless API</span>
+        <span class="lumiere-pill">Lead Capture</span>
+      </div>
+      <div class="lumiere-btns">
+        <a href="/lumiere-app/" class="btn-lumiere primary">Open Bakery ↗</a>
+        <a href="/lumiere-app/guide.html" class="btn-lumiere ghost">Build Guide</a>
+      </div>
+    </div>
+
+    <div class="lumiere-stats">
+      <div class="ls"><div class="ls-num">5</div><div class="ls-label">AI Tools</div></div>
+      <div class="ls"><div class="ls-num">2</div><div class="ls-label">Agents</div></div>
+      <div class="ls"><div class="ls-num">∞</div><div class="ls-label">Real orders</div></div>
     </div>
   </div>
+</div>
 
-  <!-- ── GenAI for Non-Coders ── -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-pill pill-purple">Course 1</span>
-      <span class="section-title">GenAI &amp; AI Agents for Non-Coders</span>
-    </div>
-    <hr class="divider" />
-
-    <div class="session">
-      <p class="session-label">Session 01 · Generative AI Foundations</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Session 02 · From Chatbot to Agent</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/02_Learner_Workbook.html"><span class="icon">📝</span> Learner Workbook</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Session 03 · Prompt &amp; Context Engineering</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/CoT_ToT_Exercise_Live_ChatGPT.html"><span class="icon">🧠</span> CoT / ToT Exercise</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Session 04 · RAG — Giving Agents Your Data</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/Session4_Learner_Workbook_print.html"><span class="icon">📝</span> Learner Workbook</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Session 05 · Agent Architecture</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/learner_workbook.html"><span class="icon">📝</span> Learner Workbook</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Session 06 · Workflow Automation with n8n</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Session 07 · n8n Part 2 — Deploy &amp; Automate</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/03_Learner_Handbook.html"><span class="icon">📋</span> Learner Handbook</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Elective · AI Evals</p>
-      <div class="links-row">
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── AI-PM ── -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-pill pill-teal">Course 2</span>
-      <span class="section-title">Production AI PM Program</span>
-    </div>
-    <hr class="divider" />
-
-    <div class="session">
-      <p class="session-label">Program Resources</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/index.html"><span class="icon">🏠</span> Program Index</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/md-viewer.html"><span class="icon">📄</span> Markdown Viewer</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 01 · AI Product Judgment for Senior PMs</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2001%20-%20AI%20Product%20Judgment%20for%20Senior%20PMs/W01_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2001%20-%20AI%20Product%20Judgment%20for%20Senior%20PMs/W01_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 02 · AI Strategy, Moats &amp; Business Case</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2002%20-%20AI%20Strategy%20Moats%20and%20Business%20Case/W02_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2002%20-%20AI%20Strategy%20Moats%20and%20Business%20Case/W02_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 03 · GenAI System Design for PMs</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2003%20-%20GenAI%20System%20Design%20for%20PMs/W03_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2003%20-%20GenAI%20System%20Design%20for%20PMs/W03_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 04 · Agentic Product Design</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2004%20-%20Agentic%20Product%20Design/W04_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2004%20-%20Agentic%20Product%20Design/W04_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 05 · Evals as the New PRD</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2005%20-%20Evals%20as%20the%20New%20PRD/W05_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2005%20-%20Evals%20as%20the%20New%20PRD/W05_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 06 · Working with AI / ML Engineering Teams</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2006%20-%20Working%20with%20AI%20ML%20Engineering%20Teams/W06_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2006%20-%20Working%20with%20AI%20ML%20Engineering%20Teams/W06_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 07 · Production Readiness, Cost, Latency &amp; Launch</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2007%20-%20Production%20Readiness%20Cost%20Latency%20Safety%20and%20Launch/W07_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2007%20-%20Production%20Readiness%20Cost%20Latency%20Safety%20and%20Launch/W07_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-
-    <div class="session">
-      <p class="session-label">Week 08 · Executive Narrative, Portfolio &amp; AI PM Interview</p>
-      <div class="links-row">
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Founder's Guide to Agents ── -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-pill pill-red">Workshop</span>
-      <span class="section-title">Founder's Guide to Agents</span>
-    </div>
-    <hr class="divider" />
-
-    <div class="session">
-      <div class="links-row">
-        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
-        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
-        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/handbook.html"><span class="icon">📋</span> Handbook</a>
-        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/runbook.html"><span class="icon">🔧</span> Runbook</a>
-        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/00_Pre_Read.html"><span class="icon">📚</span> Pre-Read</a>
-        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/morning_report.html"><span class="icon">☀️</span> Morning Report</a>
-      </div>
-    </div>
-  </div>
-
-</main>
-
+<!-- ── FOOTER ────────────────────────────────────────────────────────────── -->
 <footer>
-  <p>EdYoda · AI Programs · Course Hub &nbsp;·&nbsp; <a href="/courses" style="color:var(--accent)">Browse all courses →</a></p>
+  <p>© EdYoda · AI Programs</p>
+  <p><a href="/courses">Browse all courses →</a></p>
 </footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+</script>
 
 </body>
 </html>
