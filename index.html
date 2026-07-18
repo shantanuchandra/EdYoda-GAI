@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdYoda · Course Hub</title>
+  <meta name="description" content="All course materials for EdYoda's Generative AI programs — session decks, handbooks, and learner resources." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161920;
+      --card: #1d2230;
+      --border: #2a2f3d;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --text: #e8eaf0;
+      --muted: #7a8099;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1040 0%, #0d2040 50%, #0d1a30 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108,99,255,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .logo { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #b8bfff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .tagline { color: var(--muted); font-size: 1rem; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+    .section { margin-bottom: 3.5rem; }
+    .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .section-pill {
+      display: inline-block; padding: 0.3rem 0.85rem; border-radius: 100px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .pill-purple { background: rgba(108,99,255,.18); color: #a89bff; border: 1px solid rgba(108,99,255,.3); }
+    .pill-teal   { background: rgba(0,212,170,.15);  color: #00d4aa; border: 1px solid rgba(0,212,170,.25); }
+    .pill-red    { background: rgba(255,107,107,.15); color: #ff8a8a; border: 1px solid rgba(255,107,107,.25); }
+    .section-title { font-size: 1.25rem; font-weight: 600; }
+
+    .session { margin-bottom: 1rem; }
+    .session-label {
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; padding-left: 0.25rem;
+    }
+    .links-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .link-chip {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: var(--text);
+      text-decoration: none; transition: all .18s ease;
+    }
+    .link-chip:hover {
+      background: #252b3d; border-color: var(--accent); color: #fff;
+      transform: translateY(-1px); box-shadow: 0 4px 16px rgba(108,99,255,.2);
+    }
+    .link-chip .icon { font-size: 0.9rem; opacity: .75; }
+
+    .lumiere-card {
+      background: linear-gradient(135deg, #1d1640 0%, #1a2640 100%);
+      border: 1px solid rgba(108,99,255,.35); border-radius: var(--radius);
+      padding: 1.5rem 1.75rem; display: flex; align-items: center;
+      justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .lumiere-card p { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+    .lumiere-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.65rem 1.4rem; background: var(--accent); color: #fff;
+      border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+      text-decoration: none; transition: background .18s, box-shadow .18s; white-space: nowrap;
+    }
+    .lumiere-btn:hover { background: #5750e8; box-shadow: 0 4px 20px rgba(108,99,255,.4); }
+    .lumiere-btn.ghost { background: var(--card); border: 1px solid var(--border); }
+    .lumiere-btn.ghost:hover { background: #252b3d; box-shadow: none; }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0 1.25rem; }
+    footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding-bottom: 2rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <p class="logo">EdYoda · AI Programs</p>
+  <h1>Course Hub</h1>
+  <p class="tagline">All session decks, handbooks &amp; learner resources in one place</p>
+</header>
+
+<main>
+
+  <!-- ── Lumière Bakery Live Demo ── -->
+  <div class="section">
+    <div class="lumiere-card">
+      <div>
+        <strong style="font-size:1.05rem">🥐 Lumière Bakery — Live Demo</strong>
+        <p>Interactive AI bakery agent + learner build guide · GenAI for Non-Coders S5–S7</p>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <a class="lumiere-btn" href="/lumiere-app/">Bakery Site ↗</a>
+        <a class="lumiere-btn ghost" href="/lumiere-app/guide.html">Build Guide</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GenAI for Non-Coders ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-pill pill-purple">Course 1</span>
+      <span class="section-title">GenAI &amp; AI Agents for Non-Coders</span>
+    </div>
+    <hr class="divider" />
+
+    <div class="session">
+      <p class="session-label">Session 01 · Generative AI Foundations</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Session 02 · From Chatbot to Agent</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/02_Learner_Workbook.html"><span class="icon">📝</span> Learner Workbook</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2002%20-%20From%20Chatbot%20to%20Agent/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Session 03 · Prompt &amp; Context Engineering</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/CoT_ToT_Exercise_Live_ChatGPT.html"><span class="icon">🧠</span> CoT / ToT Exercise</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2003%20-%20Prompt%20Engineering%20Context%20Engineering%20for%20Agents/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Session 04 · RAG — Giving Agents Your Data</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2004%20-%20RAG%20Giving%20Agents%20a%20Brain%20of%20Your%20Own%20Data/Session4_Learner_Workbook_print.html"><span class="icon">📝</span> Learner Workbook</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Session 05 · Agent Architecture</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2005%20-%20Agent%20Architecture/learner_workbook.html"><span class="icon">📝</span> Learner Workbook</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Session 06 · Workflow Automation with n8n</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2006%20-%20Workflow%20Automation%20with%20n8n/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Session 07 · n8n Part 2 — Deploy &amp; Automate</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/03_Learner_Handbook.html"><span class="icon">📋</span> Learner Handbook</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/Session%2007%20-%20Workflow%20Automation%20with%20n8n%20-%20Part%202/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Elective · AI Evals</p>
+      <div class="links-row">
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/linkedin_carousel.html"><span class="icon">📢</span> LinkedIn Carousel</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI-PM ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-pill pill-teal">Course 2</span>
+      <span class="section-title">Production AI PM Program</span>
+    </div>
+    <hr class="divider" />
+
+    <div class="session">
+      <p class="session-label">Program Resources</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/index.html"><span class="icon">🏠</span> Program Index</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/md-viewer.html"><span class="icon">📄</span> Markdown Viewer</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 01 · AI Product Judgment for Senior PMs</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2001%20-%20AI%20Product%20Judgment%20for%20Senior%20PMs/W01_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2001%20-%20AI%20Product%20Judgment%20for%20Senior%20PMs/W01_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 02 · AI Strategy, Moats &amp; Business Case</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2002%20-%20AI%20Strategy%20Moats%20and%20Business%20Case/W02_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2002%20-%20AI%20Strategy%20Moats%20and%20Business%20Case/W02_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 03 · GenAI System Design for PMs</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2003%20-%20GenAI%20System%20Design%20for%20PMs/W03_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2003%20-%20GenAI%20System%20Design%20for%20PMs/W03_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 04 · Agentic Product Design</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2004%20-%20Agentic%20Product%20Design/W04_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2004%20-%20Agentic%20Product%20Design/W04_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 05 · Evals as the New PRD</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2005%20-%20Evals%20as%20the%20New%20PRD/W05_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2005%20-%20Evals%20as%20the%20New%20PRD/W05_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 06 · Working with AI / ML Engineering Teams</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2006%20-%20Working%20with%20AI%20ML%20Engineering%20Teams/W06_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2006%20-%20Working%20with%20AI%20ML%20Engineering%20Teams/W06_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 07 · Production Readiness, Cost, Latency &amp; Launch</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2007%20-%20Production%20Readiness%20Cost%20Latency%20Safety%20and%20Launch/W07_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2007%20-%20Production%20Readiness%20Cost%20Latency%20Safety%20and%20Launch/W07_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+
+    <div class="session">
+      <p class="session-label">Week 08 · Executive Narrative, Portfolio &amp; AI PM Interview</p>
+      <div class="links-row">
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Learner_Deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Presenter_Deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Founder's Guide to Agents ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-pill pill-red">Workshop</span>
+      <span class="section-title">Founder's Guide to Agents</span>
+    </div>
+    <hr class="divider" />
+
+    <div class="session">
+      <div class="links-row">
+        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/learner_deck.html"><span class="icon">📖</span> Learner Deck</a>
+        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/presenter_deck.html"><span class="icon">🎙️</span> Presenter Deck</a>
+        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/handbook.html"><span class="icon">📋</span> Handbook</a>
+        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/runbook.html"><span class="icon">🔧</span> Runbook</a>
+        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/00_Pre_Read.html"><span class="icon">📚</span> Pre-Read</a>
+        <a class="link-chip" href="/Founder's%20Guide%20to%20Agents/session/morning_report.html"><span class="icon">☀️</span> Morning Report</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>EdYoda · AI Programs · Course Hub</p>
+</footer>
+
+</body>
+</html>
