@@ -13,9 +13,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "check:links": "tsx scripts/check-links.ts",
+    "audit": "mkdir -p .lighthouse && lighthouse ${PORTFOLIO_AUDIT_URL:-http://127.0.0.1:3000} --only-categories=performance,accessibility,seo,best-practices --output=json --output-path=.lighthouse/home.json --chrome-flags='--headless --no-sandbox'",
+    "audit:check": "tsx scripts/check-lighthouse.ts .lighthouse/home.json",
     "render:resume": "tsx scripts/render-resume-pdf.ts",
     "validate:content": "tsx scripts/validate-content.ts",
-    "validate:public": "tsx scripts/check-public-copy.ts"
+    "validate:public": "tsx scripts/check-public-copy.ts",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm test:e2e"
   },
   "dependencies": {
     "@vercel/config": "0.6.1",

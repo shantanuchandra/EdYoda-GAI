@@ -16,6 +16,6 @@ export default defineConfig({
   webServer: {
     command: `pnpm build && pnpm start --port ${port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI && port === 3000,
+    reuseExistingServer: false,
   },
 });
