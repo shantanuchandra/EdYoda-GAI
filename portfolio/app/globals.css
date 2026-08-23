@@ -107,6 +107,19 @@ button {
   max-width: var(--reading-measure);
 }
 
+.career-rail { min-width: 0; }
+.career-rail__controls { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
+.career-rail__control { min-width: 44px; min-height: 44px; border: 1px solid var(--color-ink); border-radius: 999px; background: transparent; color: var(--color-ink); font-size: 1.1rem; cursor: pointer; transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) ease; }
+.career-rail__control:hover { transform: translateY(-2px); background: var(--color-surface); }
+.career-rail__list { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 30%); gap: 16px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x proximity; margin: 0; padding: 2px 0 18px; list-style: none; scrollbar-width: thin; }
+.career-rail__item { display: flex; min-height: 210px; flex-direction: column; gap: 7px; scroll-snap-align: start; border-top: 2px solid var(--color-ink); border-bottom: 1px solid var(--color-line); padding: 18px 18px 20px 0; }
+.career-rail__period { margin: 0; color: var(--color-teal); font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.career-rail__item strong { font-family: var(--font-newsreader), Georgia, serif; font-size: 1.65rem; font-weight: 600; letter-spacing: -.02em; }
+.career-rail__item span { color: var(--color-teal-dark); font-size: .88rem; font-weight: 700; }
+.career-rail__item p:last-child { margin: auto 0 0; color: var(--color-muted-ink); font-size: .85rem; line-height: 1.55; }
+@media (max-width: 700px) { .career-rail__list { grid-auto-columns: minmax(255px, 82vw); } }
+@media (prefers-reduced-motion: reduce) { .career-rail__control { transition: none; } .career-rail__list { scroll-behavior: auto; } }
+
 .hero-heading {
   font-family: var(--font-newsreader), Georgia, serif;
   font-size: clamp(48px, 7vw, 84px);
