@@ -12,13 +12,22 @@ type RevealProps = {
 export function Reveal({ children, className }: RevealProps) {
   const reduceMotion = useReducedMotion();
 
+  if (reduceMotion) {
+    return (
+      <div className={className} data-reveal style={{ opacity: 1, transform: "none" }}>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
+      data-reveal
+      initial={false}
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       viewport={{ once: true }}
-      whileInView={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: [0.98, 1], y: [12, 0] }}
     >
       {children}
     </motion.div>

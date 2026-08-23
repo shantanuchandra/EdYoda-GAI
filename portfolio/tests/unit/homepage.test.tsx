@@ -152,9 +152,9 @@ it("keeps cards semantic and gives every title and visible action its own link",
   }
 });
 
-it("uses the restrained Reveal boundary exactly twice", async () => {
+it("uses exactly two progressive Reveal boundaries", async () => {
   await renderHomepage();
-  expect(document.querySelectorAll('div[style*="translateY(12px)"]')).toHaveLength(2);
+  expect(document.querySelectorAll("[data-reveal]")).toHaveLength(2);
 });
 
 it("explains the operating model, career path and contact routes without placeholder imagery", async () => {
