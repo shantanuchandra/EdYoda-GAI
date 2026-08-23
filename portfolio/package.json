@@ -6,14 +6,15 @@
   "engines": { "node": ">=22 <25" },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm validate:content && pnpm validate:public && next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "validate:content": "tsx scripts/validate-content.ts"
+    "validate:content": "tsx scripts/validate-content.ts",
+    "validate:public": "tsx scripts/check-public-copy.ts"
   },
   "dependencies": {
     "@vercel/config": "0.6.1",
