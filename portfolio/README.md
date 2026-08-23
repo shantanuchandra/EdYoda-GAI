@@ -27,7 +27,7 @@ pnpm verify
 Every release follows this sequence:
 
 ```text
-pnpm verify → preview deployment → human review → separate production approval
+pnpm verify → vercel deploy --target=preview → human review → separate production approval
 ```
 
-Create a review deployment with `vercel deploy`. Do not add `--prod`, promote the preview, assign a domain, or otherwise change production without separate explicit approval after review.
+Create a review deployment with `vercel deploy --target=preview`; the explicit target avoids environment ambiguity. Do not add `--prod`, promote the preview, assign a domain, or otherwise change production without separate explicit approval after review.
