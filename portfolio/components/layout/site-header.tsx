@@ -10,17 +10,18 @@ export function SiteHeader() {
     <header className="site-header">
       <Container className="site-header__inner">
         <Link aria-label={siteConfig.name} className="site-wordmark" href="/">
-          <span aria-hidden="true" className="site-wordmark__monogram">
-            SC
-          </span>
           <span>{siteConfig.name}</span>
         </Link>
 
         <nav aria-label="Primary" className="desktop-navigation">
           {siteConfig.navigation.map(([label, href]) => (
-            <NavLink className={label === "Contact" ? "nav-link--contact" : ""} href={href} key={href} label={label} />
+            <NavLink href={href} key={href} label={label} />
           ))}
         </nav>
+
+        <Link className="site-header__contact" href="/contact">
+          Get in touch <span aria-hidden="true">→</span>
+        </Link>
 
         <MobileNavigation />
       </Container>

@@ -2,15 +2,21 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { expect, it } from "vitest";
 import { SignalProfileCard } from "@/components/home/signal-profile-card";
 
-it("renders the local portrait, identity, operating thesis and truthful current role", () => {
+it("renders the local portrait, identity, latest role and truthful skill chips", () => {
   render(<SignalProfileCard />);
 
   expect(screen.getByRole("img", { name: "Shantanu Chandra" })).toHaveAttribute("src", expect.stringContaining("shantanu-chandra-linkedin"));
   expect(screen.getByText("AI Transformation Leader")).toBeInTheDocument();
   expect(screen.getByText("AI Product Lead at Lenskart")).toBeInTheDocument();
-  const thesis = screen.getByRole("list", { name: "Operating thesis" });
-  expect(within(thesis).getAllByRole("listitem").map((item) => item.querySelector("strong")?.textContent)).toEqual(["Signal", "System", "Scale"]);
-  expect(screen.getByRole("link", { name: /Read resume/ })).toHaveAttribute("href", "/resume");
+  expect(screen.getByText("November 2025 — Present")).toBeInTheDocument();
+  const skills = screen.getByRole("list", { name: "Key skills" });
+  expect(within(skills).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+    "AI Product Strategy",
+    "Operating Models",
+    "Responsible AI",
+    "Product Adoption",
+  ]);
+  expect(screen.queryByRole("link")).not.toBeInTheDocument();
 });
 
 it("keeps a stable monogram fallback when the portrait fails", async () => {

@@ -104,6 +104,7 @@ it("exposes the brand and complete primary navigation", () => {
   }
 
   expect(primaryNavigation.getByRole("link", { name: "Case Studies" })).toHaveAttribute("aria-current", "page");
+  expect(header.getByRole("link", { name: "Get in touch" })).toHaveAttribute("href", "/contact");
   for (const name of ["Work", "Products", "Insights", "About"]) {
     expect(primaryNavigation.queryByRole("link", { name })).not.toBeInTheDocument();
   }

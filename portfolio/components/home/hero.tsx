@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize imports used by JSX. */
-import { ActionLink } from "@/components/ui/action-link";
 import { ButtonLink } from "@/components/ui/button-link";
 import { SignalProfileCard } from "@/components/home/signal-profile-card";
 import { Container } from "@/components/ui/container";
@@ -10,25 +9,20 @@ export function Hero() {
     <section aria-labelledby="home-hero-title" className={styles.hero}>
       <Container className={styles.heroGrid}>
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>AI Transformation Leader</p>
           <h1 className={styles.heroTitle} id="home-hero-title">
-            I make enterprise AI <em>useful — and used.</em>
+            Shantanu Chandra
           </h1>
           <p className={styles.heroLead}>
-            I lead AI product strategy, operating-model redesign and governed delivery across retail, lending, AdTech, SaaS and enterprise software.
+            AI Transformation Leader turning complex opportunities into useful, governed products across industries.
           </p>
           <div className={styles.heroActions}>
-            <ButtonLink href="/case-studies">Explore case studies</ButtonLink>
-            <ButtonLink href="/contact" variant="secondary">Contact me</ButtonLink>
-            <ActionLink href="/shantanu-chandra-resume.pdf" prefetch={false}>Download resume</ActionLink>
+            <ButtonLink href="/resume">View Resume</ButtonLink>
+            <ButtonLink href="/case-studies" variant="secondary">Explore Case Studies</ButtonLink>
           </div>
-          <ul className={styles.heroFacts} aria-label="Leadership context">
-            <li>Current: AI Product Lead at Lenskart</li>
-            <li>Retail · Lending · AdTech · SaaS · Enterprise</li>
-          </ul>
         </div>
 
         <SignalProfileCard />
+        <span aria-hidden="true" className={styles.scrollCue}>⌄</span>
       </Container>
     </section>
   );

@@ -2,9 +2,7 @@
 
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize JSX/DOM scope analysis. */
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState, type PointerEvent } from "react";
-import { RoleTypewriter } from "@/components/home/role-typewriter";
 
 type SignalProfileCardProps = {
   portraitSrc?: string;
@@ -41,16 +39,13 @@ export function SignalProfileCard({ portraitSrc = "/images/shantanu-chandra-link
 
   return (
     <aside
-      aria-label="AI transformation operating system"
+      aria-label="Professional profile"
       className="signal-profile-card"
       onPointerLeave={resetTilt}
       onPointerMove={handlePointerMove}
       style={{ transform }}
     >
-      <div className="signal-profile-card__topline">
-        <span>Transformation console</span>
-        <span aria-hidden="true">Live</span>
-      </div>
+      <p className="signal-profile-card__role">AI Transformation Leader</p>
       <div className="signal-profile-card__identity">
         {imageFailed ? (
           <span aria-label="Shantanu Chandra" className="signal-profile-card__monogram" role="img">SC</span>
@@ -66,19 +61,21 @@ export function SignalProfileCard({ portraitSrc = "/images/shantanu-chandra-link
         )}
         <div>
           <p className="signal-profile-card__name">Shantanu Chandra</p>
-          <RoleTypewriter contexts={["retail AI", "lending systems", "AdTech operations", "SaaS products"]} staticText="AI Transformation Leader" />
+          <p className="signal-profile-card__descriptor">Enterprise AI · Product · Transformation</p>
         </div>
       </div>
-      <p className="signal-profile-card__current">AI Product Lead at Lenskart</p>
-      <ol className="signal-profile-card__sequence" aria-label="Operating thesis">
-        <li><strong>Signal</strong><span>Choose the valuable problem.</span></li>
-        <li><strong>System</strong><span>Design the work and controls.</span></li>
-        <li><strong>Scale</strong><span>Earn adoption and measure change.</span></li>
-      </ol>
-      <div className="signal-profile-card__actions">
-        <Link href="/resume">Read resume <span aria-hidden="true">→</span></Link>
-        <Link href="/about">More context <span aria-hidden="true">→</span></Link>
+      <div className="signal-profile-card__current">
+        <p>Latest role</p>
+        <strong>AI Product Lead at Lenskart</strong>
+        <span>November 2025 — Present</span>
+        <span>Selecting, launching and governing AI products for retail journeys and operations.</span>
       </div>
+      <ul className="signal-profile-card__skills" aria-label="Key skills">
+        <li>AI Product Strategy</li>
+        <li>Operating Models</li>
+        <li>Responsible AI</li>
+        <li>Product Adoption</li>
+      </ul>
     </aside>
   );
 }

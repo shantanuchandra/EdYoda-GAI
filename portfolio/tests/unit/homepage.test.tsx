@@ -21,21 +21,22 @@ async function renderHomepage() {
   render(await HomePage());
 }
 
-it("presents the proof-first hero and impact record", async () => {
+it("presents the identity-first reference-parity hero and impact record", async () => {
   await renderHomepage();
 
-  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-    "I make enterprise AI useful — and used.",
-  );
-  expect(screen.getByText(/AI product strategy, operating-model redesign and governed delivery/i)).toBeInTheDocument();
+  const heading = screen.getByRole("heading", { level: 1 });
+  expect(heading).toHaveTextContent("Shantanu Chandra");
+  const hero = heading.closest("section");
+  expect(hero).not.toBeNull();
+  expect(within(hero as HTMLElement).getAllByText(/AI Transformation Leader/i)).not.toHaveLength(0);
 
   for (const [name, href] of [
-    ["Explore case studies", "/case-studies"],
-    ["Contact me", "/contact"],
-    ["Download resume", "/shantanu-chandra-resume.pdf"],
+    ["View Resume", "/resume"],
+    ["Explore Case Studies", "/case-studies"],
   ]) {
-    expect(screen.getByRole("link", { name })).toHaveAttribute("href", href);
+    expect(within(hero as HTMLElement).getByRole("link", { name })).toHaveAttribute("href", href);
   }
+  expect(within(hero as HTMLElement).getAllByRole("link")).toHaveLength(2);
 
   for (const [value, label] of [
     ["200 stores", "Hindi and English voice-guided eye test at Lenskart"],
