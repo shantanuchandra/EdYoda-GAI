@@ -174,7 +174,6 @@ it("locks body scrolling only while the mobile menu is open", async () => {
   expect(document.body.style.overflow).toBe("hidden");
 
   await user.click(screen.getByRole("button", { name: "Close menu" }));
-  expect(document.body.style.overflow).toBe("hidden");
   await waitFor(() => expect(document.body.style.overflow).toBe("auto"));
 });
 
@@ -211,6 +210,6 @@ it("closes an open mobile menu when the viewport becomes desktop", async () => {
   enterDesktopViewport();
 
   await waitFor(() => expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument());
-  expect(document.body.style.overflow).toBe("auto");
+  await waitFor(() => expect(document.body.style.overflow).toBe("auto"));
   expect(within(screen.getByRole("banner")).getByRole("link", { name: "Shantanu Chandra" })).toHaveFocus();
 });

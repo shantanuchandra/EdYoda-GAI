@@ -1225,87 +1225,141 @@
 .careerMotionButton:disabled { cursor: default; opacity: .45; }
 .careerMotionButton svg { width: 15px; height: 15px; fill: currentColor; }
 
-.contactSection { padding: 0 0 clamp(72px, 6vw, 80px); }
+.contactSection {
+  display: grid;
+  min-height: 462px;
+  place-items: center;
+  border-top: 1px solid var(--home-line);
+  background: #fff;
+  padding: 64px 0;
+}
 
 .contactPanel {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 56px;
+  display: flex;
+  min-height: 334px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
   overflow: hidden;
-  border-radius: 28px;
-  background: var(--home-ink);
-  color: #fff;
-  padding: clamp(34px, 4vw, 52px);
+  color: var(--home-ink);
+  text-align: center;
 }
 
 .contactPanel::before {
   position: absolute;
-  top: -150px;
-  right: 4%;
-  width: 360px;
-  height: 360px;
-  border: 1px solid rgb(201 243 107 / 22%);
+  top: 50%;
+  left: 50%;
+  width: 520px;
+  height: 520px;
+  border: 1px solid rgb(15 107 93 / 7%);
   border-radius: 50%;
-  box-shadow: 0 0 0 50px rgb(201 243 107 / 4%), 0 0 0 100px rgb(201 243 107 / 2%);
+  box-shadow: 0 0 0 72px rgb(183 228 213 / 5%), 0 0 0 144px rgb(183 228 213 / 3%);
   content: "";
+  transform: translate(-50%, -50%);
 }
 
-.contactPanel .eyebrow { color: var(--home-signal); }
-.contactPanel .eyebrow::before { background: var(--home-signal); }
+.contactSignal {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--home-green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .68rem;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.contactSignal::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--home-green-bright);
+  box-shadow: 0 0 0 5px rgb(83 180 154 / 10%);
+  content: "";
+}
 
 .contactTitle {
   position: relative;
   z-index: 1;
-  max-width: 13ch;
-  margin: 20px 0 0;
+  max-width: 16ch;
+  margin: 18px 0 0;
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: clamp(2.5rem, 4.4vw, 4rem);
+  font-size: clamp(2.75rem, 4.2vw, 3.75rem);
   font-weight: 700;
   letter-spacing: -0.06em;
-  line-height: 1;
+  line-height: 1.04;
 }
 
 .contactText {
   position: relative;
   z-index: 1;
-  max-width: 58ch;
-  margin: 22px 0 0;
-  color: #afbeb8;
+  max-width: 62ch;
+  margin: 20px 0 0;
+  color: var(--home-muted);
   font-size: 0.95rem;
+  line-height: 1.65;
 }
 
-.contactActions {
+.contactAction {
   position: relative;
   z-index: 1;
-  display: grid;
-  gap: 10px;
-}
-
-.contactActions a {
   display: inline-flex;
-  min-width: 170px;
+  min-width: 178px;
   min-height: 48px;
   align-items: center;
-  justify-content: space-between;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 999px;
-  padding: 0 18px;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 28px;
+  border-radius: 6px;
+  background: var(--home-ink);
+  box-shadow: 0 10px 24px rgb(11 23 20 / 13%);
+  padding: 0 20px;
   color: #fff;
   font-size: 0.76rem;
   font-weight: 750;
   text-decoration: none;
-  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms var(--ease-out);
+  transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms var(--ease-out);
 }
 
-.contactActions a::after { color: var(--home-signal); content: "↗"; }
+.contactAction span { color: var(--home-signal); transition: transform 180ms var(--ease-out); }
 
-.contactActions a:hover {
-  border-color: var(--home-signal);
-  background: rgb(201 243 107 / 9%);
-  transform: translateX(4px);
+.contactAction:hover,
+.contactAction:focus-visible {
+  background: var(--home-green-dark);
+  box-shadow: 0 14px 30px rgb(15 107 93 / 20%);
+  transform: translateY(-3px);
 }
+
+.contactAction:hover span,
+.contactAction:focus-visible span { transform: translateX(4px); }
+
+.contactDirect {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  color: #7a8983;
+  font-size: .65rem;
+}
+
+.contactDirect a {
+  min-height: 28px;
+  color: var(--home-green-dark);
+  font-weight: 700;
+  line-height: 28px;
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.contactDirect a:hover,
+.contactDirect a:focus-visible { text-decoration: underline; }
 
 @media (max-width: 980px) {
   .heroGrid { grid-template-columns: 1fr; align-items: start; }
@@ -1325,9 +1379,6 @@
   .systemStage { min-height: 0; border-right: 0; border-bottom: 1px solid var(--home-line); }
   .systemStage:last-child { border-bottom: 0; }
   .stageTitle { margin-top: 28px; }
-  .contactPanel { grid-template-columns: 1fr; align-items: start; }
-  .contactActions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .contactActions a { min-width: 0; }
 }
 
 @media (min-width: 701px) and (max-width: 1100px) {
@@ -1385,8 +1436,10 @@
   .specializationIntro { height: 84px; }
   .specializationGrid { grid-template-columns: 1fr; gap: 24px; }
   .specializationCard { height: 297px; }
-  .contactPanel { border-radius: 22px; }
-  .contactActions { grid-template-columns: 1fr; }
+  .contactSection { min-height: 462px; padding: 52px 0; }
+  .contactPanel { min-height: 358px; }
+  .contactTitle { max-width: 9ch; font-size: 2.75rem; }
+  .contactText { max-width: 33ch; font-size: .9rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

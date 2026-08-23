@@ -6,17 +6,18 @@ import styles from "@/components/home/home-portfolio.module.css";
 
 export function ContactCallout() {
   return (
-    <section aria-label="Start a conversation" className={styles.contactSection}>
+    <section aria-label="Start a conversation" className={styles.contactSection} data-home-closing>
       <Container className={styles.contactPanel}>
-        <div>
-          <p className={styles.eyebrow}>Start a conversation</p>
-          <h2 className={styles.contactTitle}>Make the next AI decision count.</h2>
-          <p className={styles.contactText}>I am interested in useful products, difficult operating problems and teams that care about adoption.</p>
-        </div>
-        <div className={styles.contactActions}>
+        <span aria-hidden="true" className={styles.contactSignal}>Signal</span>
+        <h2 className={styles.contactTitle}>Make the next AI decision count.</h2>
+        <p className={styles.contactText}>Useful products begin with a clear problem, a responsible system and a team committed to adoption.</p>
+        <Link aria-label="Contact" className={styles.contactAction} href="/contact">
+          Start a conversation <span aria-hidden="true">→</span>
+        </Link>
+        <div className={styles.contactDirect}>
           <a href={`mailto:${siteConfig.email}`}>Email</a>
+          <span aria-hidden="true">·</span>
           <a href={siteConfig.linkedin}>LinkedIn</a>
-          <Link href="/contact">Contact</Link>
         </div>
       </Container>
     </section>

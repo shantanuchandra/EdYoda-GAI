@@ -7,33 +7,38 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <Container className="site-footer__grid">
-        <div>
+        <div className="site-footer__identity">
           <Link className="site-footer__brand" href="/">
-            {siteConfig.name}
+            Shantanu
           </Link>
-          <p>{siteConfig.descriptor}</p>
+          <p>AI transformation leadership across product, operating model and adoption.</p>
         </div>
 
         <nav aria-label="Footer" className="site-footer__navigation">
+          <h2>Quick links</h2>
           {siteConfig.navigation.map(([label, href]) => (
             <Link href={href} key={href}>
-              {label}
+              <span aria-hidden="true">{href === "/" ? "⌂" : "□"}</span>{label}
             </Link>
           ))}
           {siteConfig.footerNavigation.map(([label, href]) => (
             <Link href={href} key={href}>
-              {label}
+              <span aria-hidden="true">□</span>{label}
             </Link>
           ))}
         </nav>
 
         <div className="site-footer__utility">
-          <a href={`mailto:${siteConfig.email}`}>Email</a>
-          <a href={siteConfig.linkedin}>LinkedIn</a>
-          <Link href={siteConfig.resumePath} prefetch={false}>Download resume</Link>
+          <h2>Connect</h2>
+          <a href={siteConfig.linkedin}><span aria-hidden="true">in</span>LinkedIn</a>
+          <a aria-label="Email Shantanu Chandra" href={`mailto:${siteConfig.email}`}><span aria-hidden="true">✉</span>{siteConfig.email}</a>
+          <Link href={siteConfig.resumePath} prefetch={false}><span aria-hidden="true">↓</span>Download resume</Link>
         </div>
 
-        <p className="site-footer__note">Building useful AI products through signal, system and scale.</p>
+        <div className="site-footer__baseline">
+          <p>© 2026 Shantanu Chandra. All rights reserved.</p>
+          <p>Building useful AI products through Signal, System and Scale.</p>
+        </div>
       </Container>
     </footer>
   );
