@@ -1007,7 +1007,7 @@ button {
 
 @page {
   size: A4;
-  margin: 13mm 14mm;
+  margin: 12mm;
 }
 
 @media print {

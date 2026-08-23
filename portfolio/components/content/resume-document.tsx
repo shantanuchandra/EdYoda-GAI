@@ -151,7 +151,7 @@ export function ResumeDocument() {
 
       <footer className="resume-document__footer">
         <p>The HTML resume remains available if the PDF cannot be downloaded.</p>
-        <Link href={siteConfig.resumePath}>Download PDF resume</Link>
+        <Link href={siteConfig.resumePath} prefetch={false}>Download PDF resume</Link>
       </footer>
     </article>
   );

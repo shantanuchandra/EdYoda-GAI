@@ -18,7 +18,7 @@ export default function ResumePage() {
       <Container>
         <nav aria-label="Resume actions" className="resume-actions">
           <Link href="/contact">Contact Shantanu</Link>
-          <Link href={siteConfig.resumePath}>Download PDF resume</Link>
+          <Link href={siteConfig.resumePath} prefetch={false}>Download PDF resume</Link>
         </nav>
         <ResumeDocument />
       </Container>
