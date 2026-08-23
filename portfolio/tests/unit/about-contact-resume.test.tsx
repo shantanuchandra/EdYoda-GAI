@@ -60,6 +60,8 @@ it("offers direct contact and both resume paths without a form or JavaScript dep
     "href",
     "/shantanu-chandra-resume.pdf",
   );
+  expect(screen.getByText("The HTML version stays usable if the current PDF download is unavailable.")).toBeInTheDocument();
+  expect(screen.queryByText(/future downloadable PDF/i)).not.toBeInTheDocument();
   expect(container.querySelector("form")).toBeNull();
   expect(container.querySelector("script")).toBeNull();
 });

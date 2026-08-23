@@ -25,7 +25,7 @@ export default async function ProductsIndexPage() {
         />
         {items.length > 0 ? (
           <div className="mt-12 grid gap-5 lg:grid-cols-2">
-            {items.map((item) => <ProductCard item={item} key={item.metadata.slug} />)}
+            {items.map((item) => <ProductCard headingLevel={2} item={item} key={item.metadata.slug} />)}
           </div>
         ) : (
           <EmptyState

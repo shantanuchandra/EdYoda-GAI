@@ -5,6 +5,7 @@ import { cleanup, render } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getContentBySlug } from "@/lib/content/loader";
+import type { ContentItem } from "@/lib/content/schema";
 import {
   buildArticleJsonLd,
   buildCreativeWorkJsonLd,
@@ -132,7 +133,7 @@ it("falls back to CreativeWork when the visible learning audience is absent", as
   const incomplete = {
     ...complete,
     metadata: { ...complete.metadata, audience: undefined },
-  };
+  } as unknown as ContentItem;
   expect(buildLearningJsonLd(incomplete)).toMatchObject({
     "@type": "CreativeWork",
     name: complete.metadata.title,

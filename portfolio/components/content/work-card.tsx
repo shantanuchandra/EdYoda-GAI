@@ -3,17 +3,21 @@ import Link from "next/link";
 import type { ContentItem } from "@/lib/content/schema";
 
 type WorkCardProps = {
+  headingLevel: 2 | 3;
   item: ContentItem;
 };
+
+const headingClassName = "mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]";
 
 function publicCompanyName(company?: string): string {
   return company === "Builder" ? "Builder.ai" : (company ?? "Employer work");
 }
 
-export function WorkCard({ item }: WorkCardProps) {
+export function WorkCard({ headingLevel, item }: WorkCardProps) {
   const { metadata } = item;
   const outcome = metadata.outcomes[0];
   const href = `/work/${metadata.slug}`;
+  const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
 
   return (
     <article className="group flex h-full min-h-[360px] flex-col rounded-card border border-line bg-surface p-[clamp(24px,4vw,36px)] transition-[border-color,box-shadow,translate] duration-200 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-teal hover:shadow-[0_18px_48px_rgb(16_37_34_/_9%)] focus-within:-translate-y-1 focus-within:border-teal focus-within:shadow-[0_18px_48px_rgb(16_37_34_/_9%)]">
@@ -24,9 +28,11 @@ export function WorkCard({ item }: WorkCardProps) {
         </div>
         <span aria-hidden="true">↗</span>
       </div>
-      <h3 className="mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]">
-        <Link className="no-underline" href={href}>{metadata.title}</Link>
-      </h3>
+      {headingLevel === 2 ? (
+        <h2 className={headingClassName}>{titleLink}</h2>
+      ) : (
+        <h3 className={headingClassName}>{titleLink}</h3>
+      )}
       <p className="mt-[18px] mb-7 text-[0.94rem] text-muted-ink">{metadata.description}</p>
       {metadata.methods.length > 0 ? (
         <ul aria-label="Methods and capabilities" className="mt-0 mb-0 flex list-none flex-wrap gap-2 p-0">
@@ -43,7 +49,7 @@ export function WorkCard({ item }: WorkCardProps) {
           {outcome.qualifier ? <small className="text-xs text-muted-ink italic">{outcome.qualifier}</small> : null}
         </div>
       ) : null}
-      <Link className="mt-5 text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
+      <Link className="mt-5 inline-flex min-h-11 items-center text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
         Read case study <span aria-hidden="true">→</span>
       </Link>
     </article>

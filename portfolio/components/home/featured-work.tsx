@@ -19,7 +19,7 @@ export function FeaturedWork({ items }: FeaturedWorkProps) {
           />
           <ActionLink href="/work">View all work</ActionLink>
         </div>
-        <WorkGrid items={items} />
+        <WorkGrid headingLevel={3} items={items} />
       </Container>
     </section>
   );

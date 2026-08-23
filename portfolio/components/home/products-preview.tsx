@@ -20,7 +20,7 @@ export function ProductsPreview({ items }: ProductsPreviewProps) {
           <ActionLink href="/products">See all products</ActionLink>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-2">
-          {items.map((item) => <ProductCard item={item} key={item.metadata.slug} />)}
+          {items.map((item) => <ProductCard headingLevel={3} item={item} key={item.metadata.slug} />)}
         </div>
       </Container>
     </section>

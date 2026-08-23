@@ -2,7 +2,7 @@
 
 This directory is the complete deployment boundary for Shantanu Chandra's public portfolio.
 
-## Vercel project settings
+## Intended Vercel dashboard values
 
 - Project name: `shantanu-chandra-portfolio`
 - Root Directory: `portfolio`
@@ -10,6 +10,8 @@ This directory is the complete deployment boundary for Shantanu Chandra's public
 - Build command: `pnpm build`
 - Node.js version: 24.x
 - Compute: Fluid Compute defaults; no function-level runtime overrides
+
+The current CLI-linked preview reports Root Directory `.` and Framework `Other`. Its deployment metadata and versioned `vercel.ts` still apply the `portfolio` application boundary and Next.js build for that preview. Set the remote Root Directory to `portfolio` and Framework preset to Next.js before adding Git integration or requesting production approval.
 
 The repository root and its unrelated source material are not part of the public deployment. Public content is explicitly allowlisted through `content/manifest.ts`; files that are not in that manifest are excluded from generated routes, metadata, and the sitemap.
 

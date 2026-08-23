@@ -1,5 +1,5 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not recognize TypeScript syntax in E2E tests. */
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const learningPaths = [
   {
@@ -25,6 +25,13 @@ const learningPaths = [
   },
 ] as const;
 
+async function expectNoExcludedLearningClaims(page: Page) {
+  const visibleCopy = await page.locator("main").innerText();
+  expect(visibleCopy).not.toMatch(/\b(?:checkout|payment|pay now|buy now|purchase access)\b/i);
+  expect(visibleCopy).not.toMatch(/\b(?:log[ -]?in|sign[ -]?in|create (?:an? )?account|learner account)\b/i);
+  expect(visibleCopy).not.toMatch(/\b(?:certificate|certification|certified)\b/i);
+}
+
 test("lists exactly three complete Learning Lab paths without commerce or account controls", async ({ page }) => {
   const response = await page.goto("/learning");
 
@@ -41,6 +48,7 @@ test("lists exactly three complete Learning Lab paths without commerce or accoun
 
   await expect(page.getByRole("button", { name: /buy|enrol|sign in|create account|get certified/i })).toHaveCount(0);
   await expect(page.locator('[href*="checkout"], [href*="login"], [href*="signup"]')).toHaveCount(0);
+  await expectNoExcludedLearningClaims(page);
 });
 
 for (const path of learningPaths) {
@@ -54,6 +62,7 @@ for (const path of learningPaths) {
     const modules = page.getByRole("heading", { level: 2, name: "Launch modules" }).locator("+ ul > li");
     await expect(modules).toHaveText(path.modules);
     await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
+    await expectNoExcludedLearningClaims(page);
   });
 }
 

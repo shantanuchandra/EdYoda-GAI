@@ -44,7 +44,7 @@ export default function ContactPage() {
               <Link href="/resume">View HTML resume</Link>
               <Link href={siteConfig.resumePath} prefetch={false}>Download PDF resume</Link>
             </div>
-            <p>The HTML version stays usable if the future downloadable PDF is unavailable.</p>
+            <p>The HTML version stays usable if the current PDF download is unavailable.</p>
           </article>
         </div>
       </Container>

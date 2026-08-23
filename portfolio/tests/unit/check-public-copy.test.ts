@@ -1,5 +1,5 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not apply TypeScript or Node.js global scope analysis. */
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -31,15 +31,19 @@ function createTextPdf(text: string): Uint8Array {
 
 it("detects forbidden PDF text without relying on the pdftotext executable", async () => {
   const root = await mkdtemp(join(tmpdir(), "public-copy-test-"));
-  await mkdir(join(root, "public"));
-  await writeFile(join(root, "public", "forbidden.pdf"), createTextPdf("EdYoda"));
-
   const originalPath = process.env.PATH;
-  process.env.PATH = "/definitely-no-system-tools";
   try {
-    const checkAtRoot = checkPublicCopy as unknown as (scanRoot: string) => ReturnType<typeof checkPublicCopy>;
-    await expect(checkAtRoot(root)).rejects.toThrow(/forbidden\.pdf[\s\S]*edyoda/i);
+    await mkdir(join(root, "public"));
+    await writeFile(join(root, "public", "forbidden.pdf"), createTextPdf("EdYoda"));
+    process.env.PATH = "/definitely-no-system-tools";
+
+    await expect(checkPublicCopy(root)).rejects.toThrow(/forbidden\.pdf[\s\S]*edyoda/i);
   } finally {
-    process.env.PATH = originalPath;
+    if (originalPath === undefined) {
+      delete process.env.PATH;
+    } else {
+      process.env.PATH = originalPath;
+    }
+    await rm(root, { force: true, recursive: true });
   }
 });

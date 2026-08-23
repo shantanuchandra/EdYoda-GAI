@@ -3,14 +3,15 @@ import type { ContentItem } from "@/lib/content/schema";
 import { WorkCard } from "@/components/content/work-card";
 
 type WorkGridProps = {
+  headingLevel: 2 | 3;
   items: ContentItem[];
 };
 
-export function WorkGrid({ items }: WorkGridProps) {
+export function WorkGrid({ headingLevel, items }: WorkGridProps) {
   return (
     <div className="mt-12 grid gap-4 md:grid-cols-2">
       {items.map((item) => (
-        <WorkCard item={item} key={item.metadata.slug} />
+        <WorkCard headingLevel={headingLevel} item={item} key={item.metadata.slug} />
       ))}
     </div>
   );

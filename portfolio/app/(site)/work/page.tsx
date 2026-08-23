@@ -23,7 +23,7 @@ export default async function WorkIndexPage() {
           title="Transformation work, with the operating context intact."
           description="Four public case studies about the product decisions, workflows, controls and adoption work behind measurable change."
         />
-        {items.length > 0 ? <WorkGrid items={items} /> : (
+        {items.length > 0 ? <WorkGrid headingLevel={2} items={items} /> : (
           <EmptyState
             title="Work stories are being prepared."
             description="There are no public employer case studies available right now. The portfolio homepage is a useful place to start."

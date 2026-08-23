@@ -46,7 +46,7 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           <section aria-labelledby="case-study-outcomes">
             <h2 id="case-study-outcomes" className="m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">Outcomes</h2>
-            <div className="mt-5"><OutcomeList outcomes={metadata.outcomes} /></div>
+            <div className="mt-5"><OutcomeList ariaLabel="Case-study outcomes" outcomes={metadata.outcomes} /></div>
           </section>
           <section aria-labelledby="case-study-methods" className="mt-10 border-t border-line pt-8">
             <h2 id="case-study-methods" className="m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">Methods used</h2>

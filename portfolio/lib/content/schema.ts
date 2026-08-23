@@ -15,41 +15,95 @@ const seoSchema = z.object({
   description: z.string().min(70).max(160),
 });
 
-export const contentFrontmatterSchema = z
-  .object({
-    slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    title: z.string().min(4),
-    description: z.string().min(40).max(200),
-    category: z.enum(["employer-work", "independent-product", "learning", "insight"]),
-    company: z.string().min(1).optional(),
-    industry: z.array(z.string().min(1)).default([]),
-    role: z.string().min(1).optional(),
-    period: z.string().min(1).optional(),
-    status: z.enum(["active", "in-development", "archived", "case-study-only"]).optional(),
-    audience: z.string().min(1).optional(),
-    outcomes: z.array(outcomeSchema).default([]),
-    methods: z.array(z.string().min(1)).default([]),
-    featured: z.boolean().default(false),
-    publishedAt: z.iso.date().optional(),
-    updatedAt: z.iso.date().optional(),
-    externalUrl: z
-      .url()
-      .refine((url) => new URL(url).protocol === "https:", "externalUrl must use HTTPS")
-      .optional(),
-    public: z.boolean(),
-    confidentialityNotes: z.string().min(1),
-    seo: seoSchema,
-  })
-  .superRefine((value, ctx) => {
-    const expected = {
-      work: "employer-work",
-      products: "independent-product",
-      learning: "learning",
-      insights: "insight",
-    } as const;
+const statusSchema = z.enum(["active", "in-development", "archived", "case-study-only"]);
+const industrySchema = z.array(z.string().min(1));
+const outcomesSchema = z.array(outcomeSchema);
+const methodsSchema = z.array(z.string().min(1));
+const externalUrlSchema = z
+  .url()
+  .refine((url) => new URL(url).protocol === "https:", "externalUrl must use HTTPS")
+  .optional();
 
-    if (value.company && value.category !== expected.work) {
-      ctx.addIssue({ code: "custom", path: ["company"], message: "company is reserved for employer work" });
+const commonFields = {
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  title: z.string().min(4),
+  description: z.string().min(40).max(200),
+  featured: z.boolean().default(false),
+  externalUrl: externalUrlSchema,
+  public: z.boolean(),
+  confidentialityNotes: z.string().min(1),
+  seo: seoSchema,
+};
+
+const employerWorkSchema = z.object({
+  ...commonFields,
+  category: z.literal("employer-work"),
+  company: z.string().min(1),
+  industry: industrySchema.min(1),
+  role: z.string().min(1),
+  period: z.string().min(1),
+  status: z.never().optional(),
+  audience: z.never().optional(),
+  outcomes: outcomesSchema.min(1),
+  methods: methodsSchema.min(1),
+  publishedAt: z.iso.date().optional(),
+  updatedAt: z.iso.date().optional(),
+});
+
+const independentProductSchema = z.object({
+  ...commonFields,
+  category: z.literal("independent-product"),
+  company: z.never().optional(),
+  industry: industrySchema,
+  role: z.never().optional(),
+  period: z.never().optional(),
+  status: statusSchema,
+  audience: z.never().optional(),
+  outcomes: outcomesSchema.min(1),
+  methods: methodsSchema.min(1),
+  publishedAt: z.iso.date().optional(),
+  updatedAt: z.iso.date().optional(),
+});
+
+const learningSchema = z.object({
+  ...commonFields,
+  category: z.literal("learning"),
+  company: z.never().optional(),
+  industry: industrySchema,
+  role: z.never().optional(),
+  period: z.never().optional(),
+  status: statusSchema.optional(),
+  audience: z.string().min(1),
+  outcomes: outcomesSchema.min(1),
+  methods: methodsSchema.length(4),
+  publishedAt: z.iso.date().optional(),
+  updatedAt: z.iso.date().optional(),
+});
+
+const insightSchema = z.object({
+  ...commonFields,
+  category: z.literal("insight"),
+  company: z.never().optional(),
+  industry: industrySchema,
+  role: z.never().optional(),
+  period: z.never().optional(),
+  status: z.never().optional(),
+  audience: z.never().optional(),
+  outcomes: outcomesSchema,
+  methods: methodsSchema,
+  publishedAt: z.iso.date(),
+  updatedAt: z.iso.date(),
+});
+
+export const contentFrontmatterSchema = z
+  .discriminatedUnion("category", [employerWorkSchema, independentProductSchema, learningSchema, insightSchema])
+  .superRefine((value, ctx) => {
+    if (value.category === "independent-product" && value.status === "active" && !value.externalUrl) {
+      ctx.addIssue({ code: "custom", path: ["externalUrl"], message: "active products require an externalUrl" });
+    }
+
+    if (value.category === "independent-product" && value.status === "case-study-only" && value.externalUrl) {
+      ctx.addIssue({ code: "custom", path: ["externalUrl"], message: "case-study-only products cannot have an externalUrl" });
     }
   });
 

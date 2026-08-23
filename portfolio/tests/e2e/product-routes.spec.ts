@@ -13,13 +13,17 @@ test("lists the two verified independent products without a placeholder third ca
   await expect(page.getByRole("heading", { level: 1, name: "Applied AI Builds" })).toBeVisible();
   await expect(page.getByText("Only experiments with a public problem statement, operating status, and evidence appear here.")).toBeVisible();
   await expect(page.getByRole("article")).toHaveCount(2);
+  await expect(page.getByRole("article").getByRole("heading", { level: 2 })).toHaveCount(2);
 
   for (const product of products) {
     const card = page.getByRole("article").filter({ has: page.getByRole("heading", { name: product.title }) });
     await expect(card.getByText("Independent product", { exact: true })).toBeVisible();
     await expect(card.getByText(product.status)).toBeVisible();
     await expect(card.getByText(product.outcome)).toBeVisible();
-    await expect(card.getByRole("link", { name: "View product" })).toHaveAttribute("href", `/products/${product.slug}`);
+    const action = card.getByRole("link", { name: "View product" });
+    await expect(action).toHaveAttribute("href", `/products/${product.slug}`);
+    await expect(action).toContainText("→");
+    expect((await action.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   }
 });
 

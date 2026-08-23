@@ -56,6 +56,12 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
   const featuredWork = screen.getByRole("region", { name: "Selected employer work" });
   const workCards = within(featuredWork).getAllByRole("article");
   expect(workCards).toHaveLength(4);
+  expect(within(featuredWork).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
+    "AI-assisted retail journeys at Lenskart",
+    "Responsible AI operations for digital lending",
+    "Scaling ad-tech operations with automation",
+    "Conversational AI for customer-success scale",
+  ]);
   expect(workCards.map((card) => card.querySelector("p")?.textContent)).toEqual([
     "Lenskart",
     "IIFL",
@@ -88,6 +94,10 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
   }
 
   const independentProducts = screen.getByRole("region", { name: "Independent products" });
+  expect(within(independentProducts).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
+    "Wasabi Travels",
+    "Card Compass",
+  ]);
   expect(within(independentProducts).getAllByRole("article").map((card) => card.textContent)).toEqual([
     expect.stringContaining("Wasabi Travels"),
     expect.stringContaining("Card Compass"),
@@ -147,7 +157,13 @@ it("keeps cards semantic and gives every title and visible action its own link",
       const article = articles[index];
       expect(article.closest("a")).toBeNull();
       expect(within(article).getByRole("heading", { name: title }).querySelector("a")).toHaveAttribute("href", href);
-      expect(within(article).getByRole("link", { name: action })).toHaveAttribute("href", href);
+      const actionLink = within(article).getByRole("link", { name: action });
+      expect(actionLink).toHaveAttribute("href", href);
+      expect(actionLink).toHaveClass("inline-flex", "min-h-11", "items-center");
+      if (action === "View product") {
+        expect(actionLink).toHaveTextContent("→");
+        expect(actionLink).not.toHaveTextContent("↗");
+      }
     });
   }
 });

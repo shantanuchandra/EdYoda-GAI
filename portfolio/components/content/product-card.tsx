@@ -4,13 +4,17 @@ import type { ContentItem } from "@/lib/content/schema";
 import { StatusLabel } from "@/components/ui/status-label";
 
 type ProductCardProps = {
+  headingLevel: 2 | 3;
   item: ContentItem;
 };
 
-export function ProductCard({ item }: ProductCardProps) {
+const headingClassName = "mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]";
+
+export function ProductCard({ headingLevel, item }: ProductCardProps) {
   const { metadata } = item;
   const outcome = metadata.outcomes[0];
   const href = `/products/${metadata.slug}`;
+  const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
 
   return (
     <article className="group flex h-full min-h-[390px] flex-col rounded-card border border-line bg-surface p-[clamp(24px,4vw,34px)] transition-[border-color,box-shadow,translate] duration-200 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-teal hover:shadow-[0_18px_48px_rgb(16_37_34_/_9%)] focus-within:-translate-y-1 focus-within:border-teal focus-within:shadow-[0_18px_48px_rgb(16_37_34_/_9%)]">
@@ -18,9 +22,11 @@ export function ProductCard({ item }: ProductCardProps) {
         <p className="m-0 text-xs font-extrabold tracking-[0.1em] text-teal uppercase">Independent product</p>
         <StatusLabel status={metadata.status} />
       </div>
-      <h3 className="mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]">
-        <Link className="no-underline" href={href}>{metadata.title}</Link>
-      </h3>
+      {headingLevel === 2 ? (
+        <h2 className={headingClassName}>{titleLink}</h2>
+      ) : (
+        <h3 className={headingClassName}>{titleLink}</h3>
+      )}
       <p className="mt-[18px] mb-6 text-[0.9rem] text-muted-ink">{metadata.description}</p>
       {outcome ? (
         <p className="mt-auto mb-6 grid gap-[3px] border-t border-line pt-5">
@@ -28,8 +34,8 @@ export function ProductCard({ item }: ProductCardProps) {
           <span className="text-xs text-muted-ink">{outcome.label}</span>
         </p>
       ) : null}
-      <Link className="mt-auto text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
-        View product <span aria-hidden="true">↗</span>
+      <Link className="mt-auto inline-flex min-h-11 items-center text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
+        View product <span aria-hidden="true">→</span>
       </Link>
     </article>
   );

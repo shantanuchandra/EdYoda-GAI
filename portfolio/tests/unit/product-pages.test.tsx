@@ -14,6 +14,10 @@ it("lists the two public independent products with their honest status, verified
 
   const cards = screen.getAllByRole("article");
   expect(cards).toHaveLength(2);
+  expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual([
+    "Wasabi Travels",
+    "Card Compass",
+  ]);
 
   const expectedProducts = [
     { title: "Wasabi Travels", outcome: "2,000+ places", href: "/products/wasabi-travels", status: "Active" },
@@ -27,7 +31,11 @@ it("lists the two public independent products with their honest status, verified
     expect(within(card).getByText(status)).toBeInTheDocument();
     expect(within(card).getByText(outcome)).toBeInTheDocument();
     expect(within(card).getByRole("link", { name: title })).toHaveAttribute("href", href);
-    expect(within(card).getByRole("link", { name: "View product" })).toHaveAttribute("href", href);
+    const action = within(card).getByRole("link", { name: "View product" });
+    expect(action).toHaveAttribute("href", href);
+    expect(action).toHaveClass("inline-flex", "min-h-11", "items-center");
+    expect(action).toHaveTextContent("→");
+    expect(action).not.toHaveTextContent("↗");
   });
 });
 
@@ -41,6 +49,7 @@ it("renders Wasabi as the only active live destination and keeps Card Compass ca
   expect(wasabiLink).toHaveAttribute("target", "_blank");
   expect(wasabiLink).toHaveAttribute("rel", "noreferrer");
   expect(screen.getByText("2,000+ places")).toBeInTheDocument();
+  expect(screen.getByRole("list", { name: "Product evidence" })).toBeInTheDocument();
   expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(1);
 
   rerender(await ProductDetailPage({ params: Promise.resolve({ slug: "card-compass" }) }));

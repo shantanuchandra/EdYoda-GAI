@@ -16,6 +16,12 @@ it("lists the four public employer stories with approved context, methods, role 
 
   const cards = screen.getAllByRole("article");
   expect(cards).toHaveLength(4);
+  expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual([
+    "AI-assisted retail journeys at Lenskart",
+    "Responsible AI operations for digital lending",
+    "Scaling ad-tech operations with automation",
+    "Conversational AI for customer-success scale",
+  ]);
 
   const expectedCards = [
     {
@@ -45,7 +51,7 @@ it("lists the four public employer stories with approved context, methods, role 
     expect(within(card).getByText(outcome)).toBeInTheDocument();
     expect(within(card).getByText(context)).toBeInTheDocument();
     methods.forEach((method) => expect(within(card).getByText(method)).toBeInTheDocument());
-    expect(within(card).getByRole("link", { name: "Read case study" })).toBeInTheDocument();
+    expect(within(card).getByRole("link", { name: "Read case study" })).toHaveClass("inline-flex", "min-h-11", "items-center");
   });
 });
 
@@ -59,6 +65,7 @@ it("keeps the table of contents before the narrative in DOM order while retainin
   expect(toc.compareDocumentPosition(narrative as Node) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
   expect(tocRail).toHaveClass("lg:sticky");
   expect(tocRail).not.toHaveClass("order-first");
+  expect(screen.getByRole("list", { name: "Case-study outcomes" })).toBeInTheDocument();
 });
 
 it("generates only approved static work routes and reports branded metadata", async () => {

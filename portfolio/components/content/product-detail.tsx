@@ -42,7 +42,7 @@ export function ProductDetail({ children, item }: ProductDetailProps) {
       <div className="container mt-10 max-w-[900px] lg:mt-14">
         <section aria-labelledby="product-outcomes">
           <h2 id="product-outcomes" className="m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">Verified evidence</h2>
-          <div className="mt-5"><OutcomeList outcomes={metadata.outcomes} /></div>
+          <div className="mt-5"><OutcomeList ariaLabel="Product evidence" outcomes={metadata.outcomes} /></div>
         </section>
         <section aria-labelledby="product-methods" className="mt-10 border-t border-line pt-8">
           <h2 id="product-methods" className="m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">What I am building</h2>
