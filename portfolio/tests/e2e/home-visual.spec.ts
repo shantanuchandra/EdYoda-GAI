@@ -149,7 +149,7 @@ test("mobile hero stacks the reference composition without horizontal overflow",
   expect(geometry.heroHeight).toBeLessThanOrEqual(1030);
   expect(geometry.leadTop).toBeGreaterThanOrEqual(245);
   expect(geometry.leadTop).toBeLessThanOrEqual(262);
-  expect(geometry.menuDiscBackground).toBe("rgb(238, 238, 238)");
+  expect(geometry.menuDiscBackground).toBe("rgb(231, 239, 235)");
   expect(geometry.menuDiscRadius).toBe("50%");
   expect(geometry.menuDiscWidth).toBe(40);
   expect(geometry.profileLeft).toBeGreaterThanOrEqual(24);

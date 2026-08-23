@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --color-canvas: #f4f1ea;
-  --color-surface: #fcfbf7;
-  --color-ink: #151a18;
-  --color-muted-ink: #5b6561;
-  --color-teal: #0e5a55;
-  --color-teal-dark: #083f3b;
-  --color-sand: #d9c6a2;
+  --color-canvas: #fbfcfb;
+  --color-surface: #f7faf8;
+  --color-ink: #0b1714;
+  --color-muted-ink: #53635d;
+  --color-teal: #0f6b5d;
+  --color-teal-dark: #0b574b;
+  --color-sand: #d5e2dc;
   --color-copper: #9a5134;
-  --color-line: #cdd2cc;
-  --color-dark-section: #102522;
-  --color-on-dark: #f7f3ea;
-  --color-on-dark-muted: #c8d3ce;
+  --color-line: #d5e2dc;
+  --color-dark-section: #0b261f;
+  --color-on-dark: #f7fbf9;
+  --color-on-dark-muted: #b7d2c8;
   --space-base: 4px;
   --radius-button: 10px;
   --radius-card: 12px;
@@ -38,18 +38,18 @@
 }
 
 @theme inline {
-  --color-canvas: #f4f1ea;
-  --color-surface: #fcfbf7;
-  --color-ink: #151a18;
-  --color-muted-ink: #5b6561;
-  --color-teal: #0e5a55;
-  --color-teal-dark: #083f3b;
-  --color-sand: #d9c6a2;
+  --color-canvas: #fbfcfb;
+  --color-surface: #f7faf8;
+  --color-ink: #0b1714;
+  --color-muted-ink: #53635d;
+  --color-teal: #0f6b5d;
+  --color-teal-dark: #0b574b;
+  --color-sand: #d5e2dc;
   --color-copper: #9a5134;
-  --color-line: #cdd2cc;
-  --color-dark-section: #102522;
-  --color-on-dark: #f7f3ea;
-  --color-on-dark-muted: #c8d3ce;
+  --color-line: #d5e2dc;
+  --color-dark-section: #0b261f;
+  --color-on-dark: #f7fbf9;
+  --color-on-dark-muted: #b7d2c8;
   --font-sans: var(--font-manrope);
   --font-display: var(--font-newsreader);
   --radius-button: 10px;
@@ -75,7 +75,7 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background: #fff;
+  background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-manrope), system-ui, sans-serif;
   font-size: var(--body-size);
@@ -85,15 +85,15 @@ body {
 
 /* Reference-parity visual system: clean white canvas, centered navigation,
    compact section rhythm, and a balanced two-column first impression. */
-.site-header { background: #fff; border-bottom-color: #e7e7e7; }
+.site-header { background: var(--color-canvas); border-bottom-color: var(--color-line); }
 .site-header__inner { max-width: 1248px; }
 .site-wordmark { font-size: 1rem; }
-.site-wordmark__monogram { background: #111; color: #fff; font-family: var(--font-manrope), system-ui, sans-serif; }
+.site-wordmark__monogram { background: var(--color-dark-section); color: var(--color-on-dark); font-family: var(--font-manrope), system-ui, sans-serif; }
 .desktop-navigation { gap: 2px; }
-.nav-link { color: #555; }
-.nav-link:hover, .nav-link[aria-current="page"] { color: #111; }
-.nav-link--contact { border-color: #111; color: #111; }
-.nav-link--contact:hover, .nav-link--contact[aria-current="page"] { background: #111; color: #fff; }
+.nav-link { color: var(--color-muted-ink); }
+.nav-link:hover, .nav-link[aria-current="page"] { color: var(--color-teal); }
+.nav-link--contact { border-color: var(--color-teal); color: var(--color-teal-dark); }
+.nav-link--contact:hover, .nav-link--contact[aria-current="page"] { background: var(--color-teal-dark); color: var(--color-on-dark); }
 @media (min-width: 900px) {
   .site-header__inner { position: relative; }
   .desktop-navigation { position: absolute; left: 50%; transform: translateX(-50%); }
@@ -205,7 +205,7 @@ button {
   z-index: 40;
   height: var(--header-height);
   border-bottom: 0;
-  background: #fff;
+  background: var(--color-canvas);
   transition:
     background-color 300ms ease,
     border-color 300ms ease,
@@ -214,9 +214,9 @@ button {
 }
 
 .site-header[data-compact="true"] {
-  border-bottom: 1px solid rgb(0 0 0 / 8%);
-  background: rgb(255 255 255 / 78%);
-  box-shadow: 0 6px 18px rgb(0 0 0 / 5%);
+  border-bottom: 1px solid rgb(15 107 93 / 13%);
+  background: rgb(251 252 251 / 86%);
+  box-shadow: 0 6px 18px rgb(11 38 31 / 7%);
   backdrop-filter: blur(14px);
 }
 
@@ -304,7 +304,7 @@ button {
 
 .nav-link:hover,
 .nav-link[aria-current="page"] {
-  color: var(--color-teal-dark);
+  color: var(--color-teal);
   text-decoration-color: currentColor;
 }
 
@@ -329,9 +329,9 @@ button {
   align-items: center;
   gap: 8px;
   border-radius: 3px;
-  background: #111;
+  background: var(--color-dark-section);
   padding: 0 18px;
-  color: #fff;
+  color: var(--color-on-dark);
   font-size: 0.76rem;
   font-weight: 750;
   text-decoration: none;
@@ -386,7 +386,7 @@ button {
   position: absolute;
   inset: 2px;
   border-radius: 50%;
-  background: #eee;
+  background: #e7efeb;
   content: "";
 }
 
@@ -415,7 +415,7 @@ button {
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  background: rgb(21 26 24 / 44%);
+  background: rgb(11 38 31 / 46%);
   padding: 12px;
 }
 
