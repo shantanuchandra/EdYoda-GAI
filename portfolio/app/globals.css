@@ -1105,6 +1105,10 @@ button {
   .resume-section--experience .resume-role:nth-of-type(even) {
     margin-left: min(calc(100% - 480px), calc(50% + 2px));
   }
+
+  .resume-education-card:nth-of-type(even) {
+    margin-left: min(calc(100% - 464px), calc(50% + 2px));
+  }
 }
 
 .resume-section--experience .resume-role::after {
@@ -1125,6 +1129,97 @@ button {
   border-color: rgb(15 107 93 / 38%);
   box-shadow: 0 14px 32px rgb(11 23 20 / 12%);
   transform: translateY(-4px);
+}
+
+.resume-section--education {
+  width: min(calc(100% - 32px), 992px);
+  margin: 112px auto 0;
+}
+
+.resume-section.resume-section--education > h2 {
+  width: 100%;
+  margin: 0 0 40px;
+  border: 0;
+  padding: 0;
+  color: var(--color-ink);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 36px;
+  text-align: center;
+  text-transform: none;
+}
+
+.resume-education-card {
+  position: relative;
+  display: flex;
+  width: 464px;
+  min-height: 124px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 80px max(0px, calc(50% - 482px));
+  overflow: hidden;
+  border: 1px solid rgb(224 224 224 / 50%);
+  border-radius: 12px;
+  background: rgb(250 250 250 / 75%);
+  padding: 24px;
+  box-shadow: 0 2px 6px rgb(11 23 20 / 10%);
+  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1), transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.resume-education-card::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgb(15 107 93 / 5%), transparent 65%);
+  content: "";
+  pointer-events: none;
+}
+
+.resume-education-card > * { position: relative; z-index: 1; }
+.resume-education-card h3,
+.resume-education-card p { margin: 0; }
+
+.resume-education-card h3 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.resume-education-card p {
+  margin-top: 5px;
+  color: var(--color-muted-ink);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.resume-education-card span {
+  flex: 0 0 auto;
+  border: 1px solid rgb(11 23 20 / 18%);
+  border-radius: 6px;
+  background: rgb(11 23 20 / 6%);
+  padding: 3px 8px;
+  color: var(--color-muted-ink);
+  font-size: 0.75rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.resume-education-card:nth-of-type(even) { margin-bottom: 0; }
+
+.resume-education-card:hover,
+.resume-education-card:focus-within {
+  border-color: rgb(15 107 93 / 38%);
+  box-shadow: 0 14px 32px rgb(11 23 20 / 12%);
+  transform: translateY(-4px);
+}
+
+.resume-section--methods {
+  width: min(calc(100% - 32px), 992px);
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .resume-role__wash {
@@ -1361,6 +1456,18 @@ button {
   .resume-section.resume-section--experience > h2 {
     width: calc(100% - 32px);
   }
+
+  .resume-section--education {
+    width: calc(100% - 32px);
+    margin-top: 72px;
+  }
+
+  .resume-education-card {
+    width: 100%;
+    min-height: 0;
+    margin-bottom: 24px;
+    margin-left: 0;
+  }
 }
 
 .case-study-artwork {
@@ -1591,6 +1698,28 @@ button {
     margin-top: 5mm;
     padding-top: 4mm;
   }
+
+  .resume-section--education {
+    width: 100%;
+    margin-top: 5mm;
+  }
+
+  .resume-section.resume-section--education > h2 {
+    margin-bottom: 3mm;
+    font-size: 16pt;
+  }
+
+  .resume-education-card,
+  .resume-education-card:nth-of-type(even) {
+    width: 100%;
+    min-height: 0;
+    margin: 0 0 2mm;
+    border-radius: 2mm;
+    padding: 3mm 4mm;
+  }
+
+  .resume-education-card h3 { font-size: 9.5pt; }
+  .resume-education-card p { font-size: 8pt; }
 
   .resume-profile .resume-document__summary {
     margin-top: 3mm;

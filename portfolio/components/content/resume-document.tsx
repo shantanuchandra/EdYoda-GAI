@@ -110,6 +110,24 @@ export function ResumeDocument() {
 
       </section>
 
+      <section aria-label="Education" className="resume-section resume-section--education" data-resume-education="true">
+        <h2>Education</h2>
+        <article className="resume-education-card">
+          <div>
+            <h3>MBA, Marketing</h3>
+            <p>William &amp; Mary, Raymond A. Mason School of Business</p>
+          </div>
+          <span>2017–2019</span>
+        </article>
+        <article className="resume-education-card">
+          <div>
+            <h3>Bachelor of Engineering, Computer Science</h3>
+            <p>Manipal Institute of Technology</p>
+          </div>
+          <span>2013</span>
+        </article>
+      </section>
+
       <section aria-label="Profile" className="resume-profile">
         <h2>Profile</h2>
         <p className="resume-document__descriptor">{siteConfig.descriptor}</p>
@@ -122,24 +140,7 @@ export function ResumeDocument() {
         </p>
       </section>
 
-      <div className="resume-document__columns">
-        <section aria-label="Education" className="resume-section">
-          <h2>Education and practical instruction</h2>
-          <div className="resume-credential">
-            <h3>MBA, Marketing</h3>
-            <p>William &amp; Mary, Raymond A. Mason School of Business · 2017–2019</p>
-          </div>
-          <div className="resume-credential">
-            <h3>Bachelor of Engineering, Computer Science</h3>
-            <p>Manipal Institute of Technology · 2013</p>
-          </div>
-          <div className="resume-credential">
-            <h3>Practical instruction</h3>
-            <p>Generative AI and no-code agents · Jun 2025–Present</p>
-          </div>
-        </section>
-
-        <section aria-label="Methods and tools" className="resume-section">
+      <section aria-label="Methods and tools" className="resume-section resume-section--methods">
           <h2>Methods and tools</h2>
           <dl className="resume-methods">
             <div>
@@ -155,8 +156,7 @@ export function ResumeDocument() {
               <dd>Jira, Figma, Miro</dd>
             </div>
           </dl>
-        </section>
-      </div>
+      </section>
 
       <footer className="resume-document__footer">
         <p>The HTML resume remains available if the PDF cannot be downloaded.</p>

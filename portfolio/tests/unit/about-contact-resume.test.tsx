@@ -96,6 +96,12 @@ it("renders a print-ready public resume with individually named, verified experi
   expect(within(career).getByText("Toshiba Softwares")).toBeInTheDocument();
 
   const education = screen.getByRole("region", { name: "Education" });
+  expect(education).toHaveAttribute("data-resume-education", "true");
+  expect(within(education).getByRole("heading", { level: 2, name: "Education" })).toBeInTheDocument();
+  expect(within(education).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
+    "MBA, Marketing",
+    "Bachelor of Engineering, Computer Science",
+  ]);
   expect(within(education).getByText("MBA, Marketing")).toBeInTheDocument();
   expect(within(education).getByText(/William & Mary/i)).toBeInTheDocument();
   expect(within(education).getByText("Bachelor of Engineering, Computer Science")).toBeInTheDocument();

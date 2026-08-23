@@ -82,3 +82,23 @@ test("desktop experience follows the reference alternating timeline rhythm", asy
   expect(positions[1].top - (positions[0].top + positions[0].height)).toBeGreaterThanOrEqual(72);
   expect(positions[2].top - (positions[1].top + positions[1].height)).toBeGreaterThanOrEqual(72);
 });
+
+test("education starts left and alternates like the reference timeline", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/resume", { waitUntil: "domcontentloaded" });
+
+  const positions = await page.locator("[data-resume-education] .resume-education-card").evaluateAll((cards) =>
+    cards.map((card) => {
+      const { left, top, width } = card.getBoundingClientRect();
+      return { left, top, width };
+    }),
+  );
+
+  expect(positions).toHaveLength(2);
+  expect(positions[0].left).toBeGreaterThanOrEqual(152);
+  expect(positions[0].left).toBeLessThanOrEqual(164);
+  expect(positions[1].left).toBeGreaterThanOrEqual(636);
+  expect(positions[1].left).toBeLessThanOrEqual(648);
+  expect(positions[1].top - positions[0].top).toBeGreaterThanOrEqual(196);
+  positions.forEach((position) => expect(position.width).toBeGreaterThanOrEqual(460));
+});
