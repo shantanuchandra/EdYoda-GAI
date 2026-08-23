@@ -17,7 +17,7 @@ export function FeaturedWork({ items }: FeaturedWorkProps) {
             eyebrow="Selected work"
             title="Evidence before theatre."
           />
-          <ActionLink href="/work">View all work</ActionLink>
+          <ActionLink href="/case-studies#employer-transformations">View employer case studies</ActionLink>
         </div>
         <WorkGrid headingLevel={3} items={items} />
       </Container>

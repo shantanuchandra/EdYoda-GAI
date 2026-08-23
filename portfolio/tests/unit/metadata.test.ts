@@ -69,13 +69,12 @@ it("publishes every static route and exactly the ten allowlisted public content 
 
   expect(urls).toEqual([
     "http://localhost:3000/",
-    "http://localhost:3000/work",
-    "http://localhost:3000/products",
+    "http://localhost:3000/resume",
+    "http://localhost:3000/case-studies",
     "http://localhost:3000/learning",
     "http://localhost:3000/insights",
     "http://localhost:3000/about",
     "http://localhost:3000/contact",
-    "http://localhost:3000/resume",
     "http://localhost:3000/work/lenskart-ai-retail",
     "http://localhost:3000/work/iifl-digital-lending",
     "http://localhost:3000/work/agl-adtech-operations",

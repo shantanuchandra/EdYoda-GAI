@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentIndexHeader } from "@/components/content/content-index-header";
 import { Container } from "@/components/ui/container";
+import { CopyEmail } from "@/components/contact/copy-email";
 import { siteConfig } from "@/lib/site-config";
 import { buildContentMetadata } from "@/lib/metadata";
 
@@ -26,7 +27,7 @@ export default function ContactPage() {
           <article className="contact-option">
             <p className="contact-option__label">Email</p>
             <h2>Write to me directly</h2>
-            <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+            <CopyEmail email={siteConfig.email} />
             <p>Plain email link—copy it, open it in your preferred mail app, or use it from any device.</p>
           </article>
 

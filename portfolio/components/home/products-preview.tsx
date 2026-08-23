@@ -17,7 +17,7 @@ export function ProductsPreview({ items }: ProductsPreviewProps) {
             eyebrow="Independent products"
             title="Building keeps judgment honest."
           />
-          <ActionLink href="/products">See all products</ActionLink>
+          <ActionLink href="/case-studies#independent-products">See independent case studies</ActionLink>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           {items.map((item) => <ProductCard headingLevel={3} item={item} key={item.metadata.slug} />)}
