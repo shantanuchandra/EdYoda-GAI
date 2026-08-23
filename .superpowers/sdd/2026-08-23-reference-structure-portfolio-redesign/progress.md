@@ -1,0 +1,57 @@
+# SDD ledger — plan: docs/superpowers/plans/2026-08-23-reference-structure-portfolio-redesign.md
+
+Baseline: `4744df2`; clean linked worktree `codex/shantanu-portfolio`.
+Baseline verification: `PLAYWRIGHT_PORT=3222 pnpm verify` exit 0 — lint, typecheck, 109/109 unit, content 10/10, public scan 73 text + 1 PDF, build 24 outputs, E2E 117/117 across Chromium/Firefox/WebKit.
+
+## Preflight consistency scan
+
+### Task self-consistency
+
+| Task | Production/files against tests and commands | Finding |
+|---|---|---|
+| 1 | Package pins, `cn`, Button/Badge/Collapsible, CSS tokens against primitive tests, install policy, typecheck, lint | Consistent. Exact registry pins were resolved before planning. |
+| 2 | Five navigation entries, Case Studies shell, two 308 redirects, sitemap and link behavior against shell/migration/navigation/build tests | Consistent. Canonical route inventory falls from 18 to 17 by replacing two indexes with one. |
+| 3 | Central career data and two MDX corrections against content, Work, Resume, About, and public-copy tests | Consistent. Source conflict is narrowed rather than guessed. |
+| 4 | Six normalized records and SSR filter presentation against unit/browser tests | Consistent. Filter state never owns content reachability. |
+| 5 | Local portrait, profile tilt, role text, and Hero integration against unit/no-JS/reduced/touch/browser contracts | Consistent. Signed LinkedIn URL cannot be committed. |
+| 6 | One semantic career list with native scrolling and bounded enhancement against unit/browser contracts | Consistent. No clone-based infinite rail. |
+| 7 | Home reading order and secondary-route reachability against Home/Reveal/browser contracts | Consistent. Learning uses existing loader/components. |
+| 8 | Reading progress, Collapsible TOC/support, and category-local related links against unit/browser/detail tests | Consistent. Outcomes remain outside collapsed regions. |
+| 9 | Clipboard enhancement plus independent mailto against unit/browser conversion tests | Consistent. Clipboard failure cannot claim success. |
+| 10 | Revised metadata/JSON-LD/sitemap and Vercel-only SDK rendering against unit/browser/build output | Consistent. SDK presence is not treated as platform enablement proof. |
+| 11 | Learning source-derived lock and semantic Resume PDF generation against unit/browser/artifact inspection | Consistent. PDF operation marker is single-use at first generation. |
+| 12 | Canonical inventory, progressive enhancement, all-browser, link, audit, responsive and cleanup gates | Consistent. Workers remain sequential and budgets unchanged. |
+| 13 | Two audit tables, exact Preview deploy, internal-browser live verification, and source/deployment SHA parity | Consistent. No production/domain/protection mutation. |
+
+### Shared files and interfaces
+
+| Producer task | Consumer task | Shared surface | Finding |
+|---|---|---|---|
+| 1 | 4, 5, 8, 9 | Button/Badge/Collapsible/`cn` primitives | Compatible: later tasks consume variants and semantics established in Task 1. |
+| 1 | 4, 5, 6, 7 | `globals.css` tokens | Compatible: later tasks add component styles without changing approved palette/motion bounds. |
+| 2 | 4, 10 | `/case-studies` page | Compatible: Task 2 creates the truthful server shell; Task 4 fills it; Task 10 adds metadata. |
+| 2 | 10, 12 | sitemap and route inventory | Compatible: Task 2 establishes 17 canonical routes; Tasks 10/12 validate metadata and browser coverage. |
+| 2 | 13 | redirects and Primary/footer navigation | Compatible: the parity audit and live verification consume the exact five-tab/secondary-route split. |
+| 3 | 4 | Work/Product loader inputs | Compatible: normalized Case Studies consumes corrected allowlisted records. |
+| 3 | 6, 11 | `CareerRole`, timeline, semantic Resume | Compatible: Task 6 consumes centralized roles; Task 11 renders and exports the same facts. |
+| 3 | 7 | narrowed IIFL/Home impact evidence | Compatible: Task 7 must use only the corrected destination-state claim. |
+| 4 | 7 | `CaseStudySummary` | Compatible: Home selected evidence reuses the normalized server model. |
+| 4 | 10, 12, 13 | Case Studies route and filters | Compatible: metadata, accessibility, and live audit validate rather than redefine the route. |
+| 5 | 7, 10, 12, 13 | Home portrait/profile component | Compatible: Home composition, Person JSON-LD, browser gates, and live checks consume the same local asset. |
+| 5 | 7 | Home page/Hero tests | Compatible: Task 7 extends the approved Hero rather than restoring the old thesis aside. |
+| 6 | 7, 12, 13 | Career rail | Compatible: Task 7 places it; later tasks exercise all input modes live. |
+| 7 | 10, 12, 13 | Home composition | Compatible: later work changes metadata and verifies behavior without reordering content. |
+| 8 | 10, 12, 13 | Long detail routes | Compatible: canonical URLs/structured data remain unchanged and later gates cover them. |
+| 9 | 11, 12, 13 | Contact and conversion test surface | Compatible: PDF/Resume links and mailto fallback remain intact while copy feedback is additive. |
+| 10 | 12, 13 | metadata, sitemap, telemetry | Compatible: local raw-output assertions precede protected-live observation. |
+| 11 | 12, 13 | Learning lock and regenerated PDF | Compatible: all-browser and live checks treat both as immutable release artifacts. |
+| 12 | 13 | release gates/evidence | Compatible: only a clean locally verified commit may be deployed. |
+
+Preflight result: no task contradiction or rubric conflict found. No ruling required before Task 1.
+
+Task 1: fix round 1/5 (2 evidence findings addressed; no tracked fix required; commit `28ac68c`). pnpm 11.0.5 reports an absent `ignoredBuilds` field as “no node_modules”, while `.modules.yaml` shows `pendingBuilds: []`, only the two approved `allowBuilds` entries, and `pnpm approve-builds --all` reports no packages awaiting approval. Original RED output was appended verbatim to the implementer report. The implementation review found no code-quality issues; controller accepted the verification evidence after the user selected inline execution.
+Task 1: complete (commits `4744df2..28ac68c`, review clean after controller verification).
+Task 2: complete (commit `4667741`, focused 16/16, typecheck, lint, build, and diff-check green).
+Task 3: complete (commit `11a5ec3`, focused 47/47, content/public validators, typecheck, lint, build, and diff-check green; IIFL baseline narrowed to 20 minutes and Builder chronology split).
+Task 4: complete (commit `78727a4`, focused 2/2, content/public validators, typecheck, lint, build, and diff-check green; six SSR cards, accessible filters, and truthful destinations).
+Task 5: complete (uncommitted controller work; focused profile/home tests 7/7, typecheck, lint, content/public validators, and production build green; local LinkedIn portrait, accessible Signal/System/Scale card, reduced-motion-safe context rotation, tilt microinteraction, and `/case-studies` Hero CTA).
