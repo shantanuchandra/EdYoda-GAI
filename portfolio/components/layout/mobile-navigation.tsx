@@ -6,6 +6,7 @@ import { siteConfig } from "@/lib/site-config";
 import { NavLink } from "@/components/layout/nav-link";
 
 const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const desktopMediaQuery = "(min-width: 900px)";
 
 export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +29,20 @@ export function MobileNavigation() {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const desktopViewport = window.matchMedia(desktopMediaQuery);
+    const handleBreakpointChange = (event: MediaQueryListEvent) => {
+      if (!event.matches || !isOpen) return;
+
+      setIsOpen(false);
+      const visibleDesktopTarget = document.querySelector<HTMLElement>(".site-wordmark");
+      (visibleDesktopTarget ?? triggerRef.current)?.focus();
+    };
+
+    desktopViewport.addEventListener("change", handleBreakpointChange);
+    return () => desktopViewport.removeEventListener("change", handleBreakpointChange);
   }, [isOpen]);
 
   const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
