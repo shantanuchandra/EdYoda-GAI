@@ -6,7 +6,7 @@ import ProductDetailPage, {
 } from "@/app/(site)/products/[slug]/page";
 import ProductsIndexPage from "@/app/(site)/products/page";
 
-it("lists only the two public independent products with active status, verified evidence, and internal detail links", async () => {
+it("lists the two public independent products with their honest status, verified evidence, and internal detail links", async () => {
   render(await ProductsIndexPage());
 
   expect(screen.getByRole("heading", { level: 1, name: "Applied AI Builds" })).toBeInTheDocument();
@@ -16,23 +16,23 @@ it("lists only the two public independent products with active status, verified 
   expect(cards).toHaveLength(2);
 
   const expectedProducts = [
-    { title: "Wasabi Travels", outcome: "2,000+ places", href: "/products/wasabi-travels" },
-    { title: "Card Compass", outcome: "121", href: "/products/card-compass" },
+    { title: "Wasabi Travels", outcome: "2,000+ places", href: "/products/wasabi-travels", status: "Active" },
+    { title: "Card Compass", outcome: "121", href: "/products/card-compass", status: "Case study only" },
   ];
 
-  expectedProducts.forEach(({ title, outcome, href }, index) => {
+  expectedProducts.forEach(({ title, outcome, href, status }, index) => {
     const card = cards[index];
     expect(card.closest("a")).toBeNull();
     expect(within(card).getByText("Independent product")).toBeInTheDocument();
-    expect(within(card).getByText("Active")).toBeInTheDocument();
+    expect(within(card).getByText(status)).toBeInTheDocument();
     expect(within(card).getByText(outcome)).toBeInTheDocument();
     expect(within(card).getByRole("link", { name: title })).toHaveAttribute("href", href);
     expect(within(card).getByRole("link", { name: "View product" })).toHaveAttribute("href", href);
   });
 });
 
-it("renders static product pages with guarded factual external destinations", async () => {
-  const { rerender } = render(
+it("renders Wasabi as the only active live destination and keeps Card Compass case-study-only", async () => {
+  const { container, rerender } = render(
     await ProductDetailPage({ params: Promise.resolve({ slug: "wasabi-travels" }) }),
   );
 
@@ -41,12 +41,13 @@ it("renders static product pages with guarded factual external destinations", as
   expect(wasabiLink).toHaveAttribute("target", "_blank");
   expect(wasabiLink).toHaveAttribute("rel", "noreferrer");
   expect(screen.getByText("2,000+ places")).toBeInTheDocument();
+  expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(1);
 
   rerender(await ProductDetailPage({ params: Promise.resolve({ slug: "card-compass" }) }));
-  const cardCompassLink = screen.getByRole("link", { name: "Visit Card Compass (opens in a new tab)" });
-  expect(cardCompassLink).toHaveAttribute("href", "https://cardcompass.in/");
-  expect(cardCompassLink).toHaveAttribute("target", "_blank");
-  expect(cardCompassLink).toHaveAttribute("rel", "noreferrer");
+  expect(screen.getByText("Case study only")).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: /Visit Card Compass/i })).not.toBeInTheDocument();
+  expect(container.querySelector('[href="https://cardcompass.in/"]')).toBeNull();
+  expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(0);
   expect(screen.getByText("121")).toBeInTheDocument();
 });
 
