@@ -26,10 +26,11 @@ const caseStudies = [
 
 const narrativeHeadings = ["Context", "Opportunity", "My role", "Approach", "Governance", "Adoption", "Outcomes", "Lessons"];
 
-test("uses h2 card titles and 44px explicit case-study actions on the work index", async ({ page }) => {
-  await page.goto("/work");
+test("uses accessible card titles and 44px explicit case-study actions on the unified index", async ({ page }) => {
+  await page.goto("/case-studies");
+  await page.getByRole("button", { name: /Employer transformations 4/ }).click();
 
-  await expect(page.getByRole("article").getByRole("heading", { level: 2 })).toHaveCount(4);
+  await expect(page.getByRole("article").getByRole("heading", { level: 3 })).toHaveCount(4);
   const actions = page.getByRole("link", { name: "Read case study" });
   await expect(actions).toHaveCount(4);
   for (let index = 0; index < 4; index += 1) {
