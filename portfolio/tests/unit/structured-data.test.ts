@@ -194,3 +194,151 @@ it("server-renders a CreativeWork fallback when a visible module no longer match
   expect(html).toContain('"@type":"CreativeWork"');
   expect(html).not.toContain('"@type":"Course"');
 });
+
+it("server-renders CreativeWork when an exact-looking module section exists only inside a backtick fence", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const fencedOnly = {
+    ...complete,
+    body: [
+      "```md",
+      "## Launch modules",
+      "- Opportunity framing",
+      "- Prompt-to-workflow design",
+      "- Grounding and verification",
+      "- Human-review checkpoints",
+      "```",
+    ].join("\n"),
+  };
+  const html = renderToStaticMarkup(createElement(JsonLd, { data: buildLearningJsonLd(fencedOnly) }));
+  expect(html).toContain('"@type":"CreativeWork"');
+  expect(html).not.toContain('"@type":"Course"');
+});
+
+it("falls back to CreativeWork when an exact-looking module section exists only inside a tilde fence", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const fencedOnly = {
+    ...complete,
+    body: [
+      "~~~md",
+      "## Launch modules",
+      "- Opportunity framing",
+      "- Prompt-to-workflow design",
+      "- Grounding and verification",
+      "- Human-review checkpoints",
+      "~~~",
+    ].join("\n"),
+  };
+  expect(buildLearningJsonLd(fencedOnly)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("does not close a longer backtick fence when it encounters shorter fence text", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const longerFence = {
+    ...complete,
+    body: [
+      "````md",
+      "```",
+      "## Launch modules",
+      "- Opportunity framing",
+      "- Prompt-to-workflow design",
+      "- Grounding and verification",
+      "- Human-review checkpoints",
+      "```",
+      "````",
+    ].join("\n"),
+  };
+  expect(buildLearningJsonLd(longerFence)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("falls back to CreativeWork when an exact-looking module section is indented code", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const indentedCodeOnly = {
+    ...complete,
+    body: [
+      "    ## Launch modules",
+      "    - Opportunity framing",
+      "    - Prompt-to-workflow design",
+      "    - Grounding and verification",
+      "    - Human-review checkpoints",
+    ].join("\n"),
+  };
+  expect(buildLearningJsonLd(indentedCodeOnly)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("does not treat four matching bullets outside the exact Launch modules section as course modules", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const bulletsOutsideSection = {
+    ...complete,
+    body: [
+      "## Suggested topics",
+      "- Opportunity framing",
+      "- Prompt-to-workflow design",
+      "- Grounding and verification",
+      "- Human-review checkpoints",
+    ].join("\n"),
+  };
+  expect(buildLearningJsonLd(bulletsOutsideSection)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("does not count nested bullets as the four top-level Launch modules", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const nestedOnly = {
+    ...complete,
+    body: [
+      "## Launch modules",
+      "  - Opportunity framing",
+      "  - Prompt-to-workflow design",
+      "  - Grounding and verification",
+      "  - Human-review checkpoints",
+    ].join("\n"),
+  };
+  expect(buildLearningJsonLd(nestedOnly)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("uses a valid real module section that follows a fenced fake section", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const validAfterCode = {
+    ...complete,
+    body: [
+      "```md",
+      "## Launch modules",
+      "- Fake one",
+      "- Fake two",
+      "- Fake three",
+      "- Fake four",
+      "```",
+      "",
+      "## Launch modules",
+      "- Opportunity framing",
+      "- Prompt-to-workflow design",
+      "- Grounding and verification",
+      "- Human-review checkpoints",
+      "",
+      "## How I teach it",
+      "Visible teaching notes.",
+    ].join("\n"),
+  };
+  expect(buildLearningJsonLd(validAfterCode)).toMatchObject({
+    "@type": "Course",
+    hasPart: [
+      { name: "Opportunity framing" },
+      { name: "Prompt-to-workflow design" },
+      { name: "Grounding and verification" },
+      { name: "Human-review checkpoints" },
+    ],
+  });
+});

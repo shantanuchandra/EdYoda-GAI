@@ -26,16 +26,40 @@ function personReference(): JsonLd {
 
 function getVisibleLearningModules(body: string): string[] {
   const lines = body.split(/\r?\n/);
-  const sectionStart = lines.findIndex((line) => /^##\s+Launch modules\s*$/.test(line.trim()));
+  const visibleLines: string[] = [];
+  let fence: { marker: "`" | "~"; length: number } | null = null;
+
+  for (const line of lines) {
+    if (fence) {
+      const closingFence = line.match(/^ {0,3}(`{3,}|~{3,})[ \t]*$/);
+      if (closingFence && closingFence[1][0] === fence.marker && closingFence[1].length >= fence.length) {
+        fence = null;
+      }
+      continue;
+    }
+
+    const openingFence = line.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (openingFence) {
+      fence = {
+        marker: openingFence[1][0] as "`" | "~",
+        length: openingFence[1].length,
+      };
+      continue;
+    }
+
+    if (/^(?: {4}|\t)/.test(line)) continue;
+    visibleLines.push(line);
+  }
+
+  const sectionStart = visibleLines.findIndex((line) => /^##[ \t]+Launch modules[ \t]*$/.test(line));
 
   if (sectionStart < 0) return [];
 
   const modules: string[] = [];
-  for (const line of lines.slice(sectionStart + 1)) {
-    const visibleLine = line.trim();
-    if (/^#{1,6}\s+/.test(visibleLine)) break;
+  for (const line of visibleLines.slice(sectionStart + 1)) {
+    if (/^ {0,3}#{1,6}(?:[ \t]+|$)/.test(line)) break;
 
-    const listItem = visibleLine.match(/^[-*+]\s+(.+)$/);
+    const listItem = line.match(/^[-*+][ \t]+(.+)$/);
     if (listItem) modules.push(listItem[1].trim());
   }
 
