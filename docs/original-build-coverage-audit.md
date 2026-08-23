@@ -2,8 +2,8 @@
 
 **Audit date:** 23 August 2026  
 **Reference build:** <https://portfolio-website-lac-alpha-44.vercel.app/>  
-**Shantanu preview:** protected Preview deployment is refreshed only after the final verified commit; local verification below uses `http://localhost:3244`.
-**Compared source commit:** `0ed56f3` (current redesign worktree before final release gates)
+**Shantanu preview:** <https://shantanu-chandra-portfolio-fgq4dd965-shantanuchandras-projects.vercel.app>
+**Compared source commit:** `2477f08a187acb978cd68623ee5417530fd0c0ce`
 
 ## Executive conclusion
 
@@ -144,3 +144,13 @@ The current preview is protected by Vercel SSO. Unauthenticated requests receive
 
 “Demo” means a connected, navigable learning detail route. The site does not
 invent course commerce, accounts, certificates, or payment flows.
+
+### Protected Preview confirmation
+
+| Live check | Result |
+|---|---|
+| Vercel deployment | READY, target `preview`, `dpl_FnUcXvHYyKtGyPrtq8JSWVsodD2z` |
+| Build source | Current HEAD `2477f08a187acb978cd68623ee5417530fd0c0ce`; remote content/public validators and Next build passed |
+| Protected live Home | Authenticated `vercel curl` confirms the five-tab markers, Learning Lab, AI Transformation Leader descriptor, and local portrait asset reference |
+| Live sitemap/robots | Sitemap contains 17 public URLs; robots points to the current protected Preview host after the Preview-host RCA fix |
+| Production safety | No `--prod`, promote, alias, domain, or protection mutation was run; Preview protection remains enabled |
