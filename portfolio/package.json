@@ -25,7 +25,10 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@babel/core": "8.0.1",
+    "@babel/eslint-parser": "8.0.1",
     "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
     "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "7.0.1",
