@@ -10,8 +10,9 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { getPublicContent } from "@/lib/content/loader";
 import { buildContentMetadata } from "@/lib/metadata";
 import { buildPersonJsonLd } from "@/lib/structured-data";
+import styles from "@/components/home/home-portfolio.module.css";
 
-const description = "Shantanu Chandra turns complex AI opportunities into adopted, measurable and responsibly governed products across five industries.";
+const description = "Shantanu Chandra leads AI product strategy, operating-model redesign and governed delivery across retail, lending, AdTech, SaaS and enterprise software.";
 
 export const metadata: Metadata = buildContentMetadata({
   title: "Shantanu Chandra | AI Transformation Leader",
@@ -25,12 +26,14 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero />
-      <ImpactStrip />
-      <FeaturedWork items={work} />
-      <Capabilities />
-      <CareerSnapshot />
-      <ContactCallout />
+      <div className={styles.home}>
+        <Hero />
+        <ImpactStrip />
+        <FeaturedWork items={work} />
+        <Capabilities />
+        <CareerSnapshot />
+        <ContactCallout />
+      </div>
       <JsonLd data={buildPersonJsonLd({
         path: "/",
         pageName: "Shantanu Chandra — AI Transformation Leader",

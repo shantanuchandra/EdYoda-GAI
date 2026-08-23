@@ -25,9 +25,9 @@ it("presents the proof-first hero and impact record", async () => {
   await renderHomepage();
 
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-    "I turn complex AI opportunities into adopted, measurable and responsibly governed products.",
+    "I make enterprise AI useful — and used.",
   );
-  expect(screen.getByText("Across retail, lending, AdTech, SaaS and enterprise software.")).toBeInTheDocument();
+  expect(screen.getByText(/AI product strategy, operating-model redesign and governed delivery/i)).toBeInTheDocument();
 
   for (const [name, href] of [
     ["Explore case studies", "/case-studies"],
@@ -50,7 +50,7 @@ it("presents the proof-first hero and impact record", async () => {
   }
 });
 
-it("preserves the approved work and capability inventory without turning Home into a catalogue", async () => {
+it("organizes the approved work and capabilities around Signal, System and Scale", async () => {
   await renderHomepage();
 
   const featuredWork = screen.getByRole("region", { name: "Selected employer work" });
@@ -69,9 +69,14 @@ it("preserves the approved work and capability inventory without turning Home in
     "Builder.ai",
   ]);
 
-  const capabilitiesHeading = screen.getByRole("heading", { name: "The work around the model is the product." });
+  const capabilitiesHeading = screen.getByRole("heading", { name: "Transformation is an operating system." });
   const capabilitiesSection = capabilitiesHeading.closest("section");
   expect(capabilitiesSection).not.toBeNull();
+  expect(within(capabilitiesSection as HTMLElement).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
+    "Signal",
+    "System",
+    "Scale",
+  ]);
   expect(within(capabilitiesSection as HTMLElement).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
     "AI product strategy and portfolio prioritization",
     "workflow and operating-model redesign",
@@ -116,7 +121,7 @@ it("keeps cards semantic and gives every title and visible action its own link",
   }
 });
 
-it("uses exactly two progressive Reveal boundaries", async () => {
+it("uses one progressive Reveal boundary", async () => {
   await renderHomepage();
   expect(document.querySelectorAll("[data-reveal]")).toHaveLength(1);
 });

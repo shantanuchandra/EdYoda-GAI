@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not apply JSX/TypeScript scope analysis. */
-import { ImpactMetric } from "@/components/content/impact-metric";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
+import styles from "@/components/home/home-portfolio.module.css";
 
 export const impactMetrics = [
   { value: "200 stores", label: "Hindi and English voice-guided eye test at Lenskart" },
@@ -12,12 +12,20 @@ export const impactMetrics = [
 
 export function ImpactStrip() {
   return (
-    <section aria-label="Impact highlights" className="border-y border-line bg-surface">
+    <section aria-label="Impact highlights" className={styles.proofBand}>
       <Container>
         <Reveal>
-          <ul className="m-0 grid p-0 [list-style:none] md:grid-cols-2 lg:grid-cols-4">
-            {impactMetrics.map((metric) => <ImpactMetric {...metric} key={metric.value} />)}
-          </ul>
+          <div className={styles.proofInner}>
+            <p className={styles.proofLabel}>Selected evidence</p>
+            <ul className={styles.proofList}>
+              {impactMetrics.map((metric) => (
+                <li className={styles.proofItem} key={metric.value}>
+                  <strong className={styles.proofValue}>{metric.value}</strong>
+                  <span className={styles.proofText}>{metric.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </Reveal>
       </Container>
     </section>

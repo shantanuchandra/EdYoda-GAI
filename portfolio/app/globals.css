@@ -99,42 +99,13 @@ body {
   .desktop-navigation { position: absolute; left: 50%; transform: translateX(-50%); }
 }
 
-section[aria-labelledby="home-hero-title"] > .container {
-  grid-template-columns: minmax(0, 1fr);
-}
 .hero-heading { max-width: 15ch; font-family: var(--font-manrope), system-ui, sans-serif; font-size: clamp(3.5rem, 6.2vw, 6rem); font-weight: 700; letter-spacing: -.065em; line-height: .98; }
-section[aria-labelledby="home-hero-title"] { padding-top: 40px !important; padding-bottom: 56px !important; }
-@media (min-width: 900px) {
-  section[aria-labelledby="home-hero-title"] > .container { grid-template-columns: minmax(0, 1.35fr) minmax(360px, .8fr); align-items: center; gap: clamp(48px, 7vw, 96px); }
-}
-section[aria-labelledby="home-hero-title"] .text-muted-ink { font-size: clamp(1.15rem, 2vw, 1.65rem); line-height: 1.35; }
-.signal-profile-card { min-height: 440px; border: 0; border-radius: 28px; background: #f4f1ea; color: #111; box-shadow: 0 18px 48px rgb(17 17 17 / 9%); padding: clamp(28px, 3vw, 42px); }
-.signal-profile-card__topline { color: #555; }
-.signal-profile-card__identity { margin-top: 40px; }
-.signal-profile-card__portrait, .signal-profile-card__monogram { width: 112px; height: 112px; flex-basis: 112px; border-color: rgb(17 17 17 / 15%); }
-.signal-profile-card__name { font-family: var(--font-manrope), system-ui, sans-serif; font-size: clamp(1.35rem, 2.5vw, 1.8rem); font-weight: 700; }
-.signal-profile-card__role { color: #555; }
-.signal-profile-card__current { color: #111; }
-.signal-profile-card__sequence li { border-top-color: rgb(17 17 17 / 16%); }
-.signal-profile-card__sequence strong { font-family: var(--font-manrope), system-ui, sans-serif; font-size: 1rem; }
-.signal-profile-card__sequence span { color: #555; }
-.signal-profile-card__actions a { color: #111; }
 .section-heading__title { font-family: var(--font-manrope), system-ui, sans-serif; font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 700; letter-spacing: -.055em; line-height: 1.06; }
 .section-heading__description { max-width: 56ch; color: #666; }
 .case-study-card { border-color: #e3e3e3; border-radius: 20px; background: #fff; }
 .case-study-card h3, .product-card h3, .learning-path-card h3 { font-family: var(--font-manrope), system-ui, sans-serif; font-weight: 700; letter-spacing: -.04em; }
 .impact-strip, .career-rail__item { border-color: #e3e3e3; }
-section[aria-label="Selected employer work"] .case-study-card { min-height: 330px; }
-section[aria-label="Selected employer work"] .work-grid { margin-top: 32px; }
-section[aria-label="Selected employer work"] .work-card { min-height: 320px; padding: 24px; }
-section[aria-label="Selected employer work"] .work-card h3 { margin-top: 18px; font-size: clamp(1.35rem, 2.2vw, 1.8rem); }
-section[aria-label="Selected employer work"] .work-card > p { margin-top: 12px; margin-bottom: 16px; font-size: .86rem; line-height: 1.45; }
-section[aria-label="Selected employer work"] .work-card .mt-5 { margin-top: 12px; }
-section[aria-label="Career snapshot"] > .container { gap: 32px; }
 .career-rail__item { min-height: 170px; }
-@media (min-width: 900px) {
-  section[aria-label="Career snapshot"] > .container { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); align-items: start; gap: 64px; }
-}
 
 a {
   color: inherit;
@@ -1076,112 +1047,6 @@ button {
   color: var(--muted-ink);
 }
 
-.signal-profile-card {
-  align-self: end;
-  border: 1px solid var(--ink);
-  border-radius: 22px;
-  background: var(--color-dark-section);
-  color: var(--color-on-dark);
-  padding: clamp(20px, 3vw, 30px);
-  transform-style: preserve-3d;
-  transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
-  will-change: transform;
-}
-
-.signal-profile-card:hover,
-.signal-profile-card:focus-within {
-  box-shadow: 0 22px 58px rgb(16 37 34 / 20%);
-}
-
-.signal-profile-card__topline,
-.signal-profile-card__current,
-.signal-profile-card__role,
-.signal-profile-card__actions {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.signal-profile-card__topline {
-  display: flex;
-  justify-content: space-between;
-  color: rgb(255 255 255 / 70%);
-  font-weight: 800;
-}
-
-.signal-profile-card__identity {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 34px;
-}
-
-.signal-profile-card__portrait,
-.signal-profile-card__monogram {
-  width: 76px;
-  height: 76px;
-  flex: 0 0 76px;
-  border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.signal-profile-card__monogram {
-  display: grid;
-  place-items: center;
-  background: var(--color-sand);
-  color: var(--color-teal-dark);
-  font-family: var(--font-newsreader), Georgia, serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.signal-profile-card__name {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1;
-  letter-spacing: -0.035em;
-}
-
-.signal-profile-card__role { margin: 8px 0 0; color: rgb(255 255 255 / 72%); }
-.signal-profile-card__context { display: block; color: var(--sand); }
-.signal-profile-card__current { margin: 24px 0 0; color: var(--sand); font-weight: 800; }
-
-.signal-profile-card__sequence {
-  display: grid;
-  gap: 0;
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.signal-profile-card__sequence li {
-  display: grid;
-  grid-template-columns: 78px 1fr;
-  gap: 12px;
-  align-items: baseline;
-  border-top: 1px solid rgb(255 255 255 / 22%);
-  padding: 10px 0;
-}
-
-.signal-profile-card__sequence strong { font-family: var(--font-display); font-size: 1.25rem; }
-.signal-profile-card__sequence span { color: rgb(255 255 255 / 68%); font-size: 0.8rem; }
-
-.signal-profile-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 18px;
-  font-weight: 800;
-}
-
-.signal-profile-card__actions a { min-height: 44px; display: inline-flex; align-items: center; gap: 5px; color: #fff; text-decoration: underline; text-underline-offset: 4px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .signal-profile-card { transition: none; transform: none !important; }
-}
-
 .resume-document__footer p {
   margin: 0;
   color: var(--color-muted-ink);
@@ -1361,32 +1226,6 @@ button {
     font-weight: 700;
     letter-spacing: -0.065em;
     line-height: 0.98;
-  }
-
-  section[aria-labelledby="home-hero-title"] > .container,
-  section[aria-labelledby="home-hero-title"] > .container > * {
-    min-width: 0;
-  }
-
-  .signal-profile-card {
-    min-height: 440px;
-    border-color: transparent;
-    border-radius: 28px;
-    background: var(--color-dark-section);
-    color: var(--color-on-dark);
-    box-shadow: 0 18px 48px rgb(17 17 17 / 12%);
-  }
-
-  .signal-profile-card__portrait,
-  .signal-profile-card__monogram {
-    width: 112px;
-    height: 112px;
-    flex-basis: 112px;
-  }
-
-  .signal-profile-card__name,
-  .signal-profile-card__sequence strong {
-    font-family: var(--font-manrope), system-ui, sans-serif !important;
   }
 
   @media (max-width: 480px) {

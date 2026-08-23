@@ -3,24 +3,29 @@ import { ActionLink } from "@/components/ui/action-link";
 import { ButtonLink } from "@/components/ui/button-link";
 import { SignalProfileCard } from "@/components/home/signal-profile-card";
 import { Container } from "@/components/ui/container";
+import styles from "@/components/home/home-portfolio.module.css";
 
 export function Hero() {
   return (
-    <section aria-labelledby="home-hero-title" className="pt-[clamp(56px,9vw,120px)] pb-[clamp(48px,7vw,88px)]">
-      <Container className="grid gap-12 min-[900px]:grid-cols-[minmax(0,2.25fr)_minmax(250px,0.75fr)] min-[900px]:items-end min-[900px]:gap-[clamp(48px,7vw,96px)]">
-        <div className="max-w-[920px]">
-          <p className="m-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">AI Transformation Leader</p>
-          <h1 className="hero-heading mt-[18px] mb-0" id="home-hero-title">
-            I turn complex AI opportunities into adopted, measurable and responsibly governed products.
+    <section aria-labelledby="home-hero-title" className={styles.hero}>
+      <Container className={styles.heroGrid}>
+        <div className={styles.heroCopy}>
+          <p className={styles.eyebrow}>AI Transformation Leader</p>
+          <h1 className={styles.heroTitle} id="home-hero-title">
+            I make enterprise AI <em>useful — and used.</em>
           </h1>
-          <p className="mt-7 mb-0 max-w-[54ch] text-[clamp(1.05rem,2vw,1.25rem)] text-muted-ink">
-            Across retail, lending, AdTech, SaaS and enterprise software.
+          <p className={styles.heroLead}>
+            I lead AI product strategy, operating-model redesign and governed delivery across retail, lending, AdTech, SaaS and enterprise software.
           </p>
-          <div className="mt-9 flex flex-wrap items-center gap-x-4 gap-y-3">
+          <div className={styles.heroActions}>
             <ButtonLink href="/case-studies">Explore case studies</ButtonLink>
             <ButtonLink href="/contact" variant="secondary">Contact me</ButtonLink>
             <ActionLink href="/shantanu-chandra-resume.pdf" prefetch={false}>Download resume</ActionLink>
           </div>
+          <ul className={styles.heroFacts} aria-label="Leadership context">
+            <li>Current: AI Product Lead at Lenskart</li>
+            <li>Retail · Lending · AdTech · SaaS · Enterprise</li>
+          </ul>
         </div>
 
         <SignalProfileCard />

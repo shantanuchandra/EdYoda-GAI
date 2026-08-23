@@ -62,7 +62,7 @@ it("builds a self-canonical page contract with absolute Open Graph and Twitter i
 
 it("gives the homepage its own canonical, description and social contract", () => {
   expect(homeMetadata).toMatchObject({
-    description: "Shantanu Chandra turns complex AI opportunities into adopted, measurable and responsibly governed products across five industries.",
+    description: "Shantanu Chandra leads AI product strategy, operating-model redesign and governed delivery across retail, lending, AdTech, SaaS and enterprise software.",
     alternates: { canonical: "http://localhost:3000/" },
     openGraph: {
       type: "website",

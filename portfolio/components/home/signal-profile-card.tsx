@@ -41,15 +41,15 @@ export function SignalProfileCard({ portraitSrc = "/images/shantanu-chandra-link
 
   return (
     <aside
-      aria-label="Signal profile"
+      aria-label="AI transformation operating system"
       className="signal-profile-card"
       onPointerLeave={resetTilt}
       onPointerMove={handlePointerMove}
       style={{ transform }}
     >
       <div className="signal-profile-card__topline">
-        <span>Signal / System / Scale</span>
-        <span aria-hidden="true">SC</span>
+        <span>Transformation console</span>
+        <span aria-hidden="true">Live</span>
       </div>
       <div className="signal-profile-card__identity">
         {imageFailed ? (
