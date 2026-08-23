@@ -23,6 +23,10 @@
   --reading-measure: 68ch;
   --section-space: clamp(56px, 9vw, 128px);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 150ms;
+  --motion-standard: 200ms;
+  --motion-settle: 320ms;
 }
 
 @theme inline {
@@ -131,6 +135,17 @@ button {
 
 .skip-link:focus {
   translate: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .site-header {
