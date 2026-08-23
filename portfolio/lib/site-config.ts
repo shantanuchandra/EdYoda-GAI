@@ -6,12 +6,15 @@ export const siteConfig = {
   linkedin: "https://www.linkedin.com/in/chandrashantanu/",
   resumePath: "/shantanu-chandra-resume.pdf",
   navigation: [
-    ["Work", "/work"],
-    ["Products", "/products"],
+    ["Home", "/"],
+    ["Resume", "/resume"],
+    ["Case Studies", "/case-studies"],
     ["Learning", "/learning"],
-    ["Insights", "/insights"],
-    ["About", "/about"],
     ["Contact", "/contact"],
+  ] as const,
+  footerNavigation: [
+    ["About", "/about"],
+    ["Insights", "/insights"],
   ] as const,
 };
 

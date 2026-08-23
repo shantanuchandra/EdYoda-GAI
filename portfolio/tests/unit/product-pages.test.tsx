@@ -4,40 +4,6 @@ import ProductDetailPage, {
   generateMetadata,
   generateStaticParams,
 } from "@/app/(site)/products/[slug]/page";
-import ProductsIndexPage from "@/app/(site)/products/page";
-
-it("lists the two public independent products with their honest status, verified evidence, and internal detail links", async () => {
-  render(await ProductsIndexPage());
-
-  expect(screen.getByRole("heading", { level: 1, name: "Applied AI Builds" })).toBeInTheDocument();
-  expect(screen.getByText("Only experiments with a public problem statement, operating status, and evidence appear here.")).toBeInTheDocument();
-
-  const cards = screen.getAllByRole("article");
-  expect(cards).toHaveLength(2);
-  expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual([
-    "Wasabi Travels",
-    "Card Compass",
-  ]);
-
-  const expectedProducts = [
-    { title: "Wasabi Travels", outcome: "2,000+ places", href: "/products/wasabi-travels", status: "Active" },
-    { title: "Card Compass", outcome: "121", href: "/products/card-compass", status: "Case study only" },
-  ];
-
-  expectedProducts.forEach(({ title, outcome, href, status }, index) => {
-    const card = cards[index];
-    expect(card.closest("a")).toBeNull();
-    expect(within(card).getByText("Independent product")).toBeInTheDocument();
-    expect(within(card).getByText(status)).toBeInTheDocument();
-    expect(within(card).getByText(outcome)).toBeInTheDocument();
-    expect(within(card).getByRole("link", { name: title })).toHaveAttribute("href", href);
-    const action = within(card).getByRole("link", { name: "View product" });
-    expect(action).toHaveAttribute("href", href);
-    expect(action).toHaveClass("inline-flex", "min-h-11", "items-center");
-    expect(action).toHaveTextContent("→");
-    expect(action).not.toHaveTextContent("↗");
-  });
-});
 
 it("renders Wasabi as the only active live destination and keeps Card Compass case-study-only", async () => {
   const { container, rerender } = render(

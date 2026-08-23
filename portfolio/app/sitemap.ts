@@ -4,7 +4,7 @@ import { getPublicContent } from "@/lib/content/loader";
 import type { ContentKind } from "@/lib/content/schema";
 import { getSiteUrl } from "@/lib/site-config";
 
-const staticPaths = ["/", "/work", "/products", "/learning", "/insights", "/about", "/contact", "/resume"];
+const staticPaths = ["/", "/resume", "/case-studies", "/learning", "/insights", "/about", "/contact"];
 const contentKinds: ContentKind[] = ["work", "products", "learning", "insights"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

@@ -56,7 +56,7 @@ afterEach(() => {
 });
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/work",
+  usePathname: () => "/case-studies",
 }));
 
 it("provides semantic landmarks and a keyboard skip link", () => {
@@ -94,17 +94,19 @@ it("exposes the brand and complete primary navigation", () => {
   expect(header.getByRole("link", { name: "Shantanu Chandra" })).toHaveAttribute("href", "/");
 
   for (const [name, href] of [
-    ["Work", "/work"],
-    ["Products", "/products"],
+    ["Home", "/"],
+    ["Resume", "/resume"],
+    ["Case Studies", "/case-studies"],
     ["Learning", "/learning"],
-    ["Insights", "/insights"],
-    ["About", "/about"],
     ["Contact", "/contact"],
   ]) {
     expect(primaryNavigation.getByRole("link", { name })).toHaveAttribute("href", href);
   }
 
-  expect(primaryNavigation.getByRole("link", { name: "Work" })).toHaveAttribute("aria-current", "page");
+  expect(primaryNavigation.getByRole("link", { name: "Case Studies" })).toHaveAttribute("aria-current", "page");
+  for (const name of ["Work", "Products", "Insights", "About"]) {
+    expect(primaryNavigation.queryByRole("link", { name })).not.toBeInTheDocument();
+  }
 });
 
 it("opens and closes the mobile navigation accessibly and restores trigger focus", async () => {

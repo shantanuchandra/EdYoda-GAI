@@ -167,13 +167,38 @@ async function inventoryRenderedLinks(baseUrl: URL, routes: string[]): Promise<L
   return inventory;
 }
 
+async function fetchFollowingRedirects(destination: string): Promise<Response> {
+  let current = new URL(destination);
+  const visited = new Set<string>();
+
+  for (let hop = 0; hop < 5; hop += 1) {
+    if (visited.has(current.toString())) {
+      throw new Error(`Redirect loop detected at ${current}`);
+    }
+    visited.add(current.toString());
+
+    const response = await fetchWithinTimeout(current, { redirect: "manual" });
+    if (response.status < 300 || response.status >= 400) return response;
+
+    const location = response.headers.get("location");
+    if (!location) throw new Error(`HTTP ${response.status} redirect from ${current} has no Location`);
+    const next = new URL(location, current);
+    if (next.origin !== current.origin) {
+      throw new Error(`Redirect from ${current} leaves the internal origin: ${next}`);
+    }
+    current = next;
+  }
+
+  throw new Error(`Too many redirects while resolving ${destination}`);
+}
+
 async function checkInternalDestinations(inventory: LinkInventory): Promise<void> {
   const failures: string[] = [];
 
   for (const [destination, sourceRoutes] of inventory.internal) {
     let response: Response;
     try {
-      response = await fetchWithinTimeout(destination, { redirect: "manual" });
+      response = await fetchFollowingRedirects(destination);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       failures.push(
@@ -184,21 +209,6 @@ async function checkInternalDestinations(inventory: LinkInventory): Promise<void
     if (response.status < 200 || response.status >= 400) {
       failures.push(`${[...sourceRoutes].join(", ")} -> ${destination} returned HTTP ${response.status}`);
       continue;
-    }
-
-    if (response.status >= 300) {
-      const location = response.headers.get("location");
-      if (!location) {
-        failures.push(`${[...sourceRoutes].join(", ")} -> ${destination} returned HTTP ${response.status} without Location`);
-        continue;
-      }
-
-      const redirectDestination = new URL(location, destination);
-      if (redirectDestination.origin !== new URL(destination).origin) {
-        failures.push(
-          `${[...sourceRoutes].join(", ")} -> ${destination} redirected outside the internal origin to ${redirectDestination}`,
-        );
-      }
     }
 
     if (new URL(destination).pathname.endsWith(".pdf")) {
@@ -214,6 +224,21 @@ async function checkInternalDestinations(inventory: LinkInventory): Promise<void
 
   if (failures.length > 0) {
     throw new Error(`Internal-link checks failed:\n${failures.join("\n")}`);
+  }
+}
+
+async function checkLegacyRedirects(baseUrl: URL): Promise<void> {
+  const expected = new Map([
+    ["/work", "/case-studies#employer-transformations"],
+    ["/products", "/case-studies#independent-products"],
+  ]);
+
+  for (const [sourcePath, expectedLocation] of expected) {
+    const response = await fetchWithinTimeout(new URL(sourcePath, baseUrl), { redirect: "manual" });
+    const actualLocation = response.headers.get("location");
+    if (response.status !== 308 || actualLocation !== expectedLocation) {
+      throw new Error(`${sourcePath} must return HTTP 308 Location ${expectedLocation}; received ${response.status} ${actualLocation ?? "(missing)"}`);
+    }
   }
 }
 
@@ -243,6 +268,7 @@ async function main(): Promise<void> {
   const routes = await loadSitemapRoutes(baseUrl);
   const inventory = await inventoryRenderedLinks(baseUrl, routes);
 
+  await checkLegacyRedirects(baseUrl);
   await checkInternalDestinations(inventory);
   await checkWasabiDestination(inventory.wasabiSources);
 

@@ -31,7 +31,7 @@ test("all public routes are server-rendered and keyboard reachable", async ({ pa
 
 test("primary navigation reaches a public destination", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Work" }).click();
-  await expect(page).toHaveURL(/\/work$/);
+  await page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Case Studies" }).click();
+  await expect(page).toHaveURL(/\/case-studies$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
 });

@@ -20,6 +20,11 @@ export function SiteFooter() {
               {label}
             </Link>
           ))}
+          {siteConfig.footerNavigation.map(([label, href]) => (
+            <Link href={href} key={href}>
+              {label}
+            </Link>
+          ))}
         </nav>
 
         <div className="site-footer__utility">
