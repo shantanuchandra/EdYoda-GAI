@@ -23,7 +23,7 @@ export function LearningIndex({ items }: { items: ContentItem[] }) {
         />
         {items.length > 0 ? (
           <div className="mt-12 grid gap-5 min-[900px]:grid-cols-3">
-            {items.map((item) => <LearningPathCard item={item} key={item.metadata.slug} />)}
+            {items.map((item) => <LearningPathCard headingLevel={2} item={item} key={item.metadata.slug} />)}
           </div>
         ) : (
           <EmptyState

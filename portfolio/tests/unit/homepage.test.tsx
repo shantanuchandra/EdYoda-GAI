@@ -99,6 +99,14 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
     expect.stringContaining("AI product transformation"),
     expect.stringContaining("Practical agents for founders"),
   ]);
+  expect(within(learningLab).getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual([
+    "Make the work legible.",
+  ]);
+  expect(within(learningLab).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
+    "Applied AI for non-technical professionals",
+    "AI product transformation",
+    "Practical agents for founders",
+  ]);
 });
 
 it("keeps cards semantic and gives every title and visible action its own link", async () => {

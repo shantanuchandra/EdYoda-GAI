@@ -3,21 +3,27 @@ import Link from "next/link";
 import type { ContentItem } from "@/lib/content/schema";
 
 type LearningPathCardProps = {
+  headingLevel: 2 | 3;
   item: ContentItem;
 };
 
-export function LearningPathCard({ item }: LearningPathCardProps) {
+const headingClassName = "mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]";
+
+export function LearningPathCard({ headingLevel, item }: LearningPathCardProps) {
   const { metadata } = item;
   const href = `/learning/${metadata.slug}`;
   const outcome = metadata.outcomes[0];
+  const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
 
   return (
     <article className="group flex h-full min-h-[480px] flex-col rounded-card border border-line bg-surface p-[clamp(24px,4vw,34px)] transition-[border-color,box-shadow,translate] duration-200 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-teal hover:shadow-[0_18px_48px_rgb(16_37_34_/_9%)] focus-within:-translate-y-1 focus-within:border-teal focus-within:shadow-[0_18px_48px_rgb(16_37_34_/_9%)]">
       <p className="m-0 text-[0.68rem] font-extrabold tracking-[0.1em] text-teal uppercase">Audience</p>
       <p className="mt-2 mb-0 text-sm font-bold text-teal-dark">{metadata.audience}</p>
-      <h3 className="mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]">
-        <Link className="no-underline" href={href}>{metadata.title}</Link>
-      </h3>
+      {headingLevel === 2 ? (
+        <h2 className={headingClassName}>{titleLink}</h2>
+      ) : (
+        <h3 className={headingClassName}>{titleLink}</h3>
+      )}
       {outcome ? (
         <div className="mt-6 border-l-2 border-sand pl-4">
           <p className="m-0 text-[0.68rem] font-extrabold tracking-[0.1em] text-teal uppercase">Outcome</p>
@@ -30,7 +36,7 @@ export function LearningPathCard({ item }: LearningPathCardProps) {
           <li className="border-l-2 border-sand pl-2 text-xs leading-5 text-muted-ink" key={method}>{method}</li>
         ))}
       </ul>
-      <Link className="mt-auto text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
+      <Link className="mt-auto inline-flex min-h-11 items-center text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
         Explore path <span aria-hidden="true">→</span>
       </Link>
     </article>

@@ -20,7 +20,7 @@ export function LearningPreview({ items }: LearningPreviewProps) {
           <ActionLink href="/learning">Visit Learning Lab</ActionLink>
         </div>
         <div className="mt-12 grid gap-4 min-[900px]:grid-cols-3">
-          {items.map((item) => <LearningPathCard item={item} key={item.metadata.slug} />)}
+          {items.map((item) => <LearningPathCard headingLevel={3} item={item} key={item.metadata.slug} />)}
         </div>
       </Container>
     </section>

@@ -50,6 +50,9 @@ it("lists exactly three Learning Lab paths with their exact audience, outcome an
   expect(screen.getByRole("heading", { level: 1, name: "Shantanu Chandra Learning Lab" })).toBeInTheDocument();
   const cards = screen.getAllByRole("article");
   expect(cards).toHaveLength(3);
+  expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(
+    learningPaths.map(({ title }) => title),
+  );
 
   learningPaths.forEach((path, index) => {
     const card = cards[index];
@@ -59,7 +62,9 @@ it("lists exactly three Learning Lab paths with their exact audience, outcome an
     const modules = within(card).getByRole("list", { name: `${path.title} launch modules` });
     expect(within(modules).getAllByRole("listitem").map((item) => item.textContent)).toEqual(path.modules);
     expect(within(card).getByRole("link", { name: path.title })).toHaveAttribute("href", `/learning/${path.slug}`);
-    expect(within(card).getByRole("link", { name: "Explore path" })).toHaveAttribute("href", `/learning/${path.slug}`);
+    const action = within(card).getByRole("link", { name: "Explore path" });
+    expect(action).toHaveAttribute("href", `/learning/${path.slug}`);
+    expect(action).toHaveClass("inline-flex", "min-h-11", "items-center");
   });
 });
 
