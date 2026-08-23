@@ -54,17 +54,32 @@ test("does not prefetch PDF resume links on any sitemap route", async ({ page, r
 });
 
 test("fetches the PDF when a visitor activates a resume link", async ({ page }) => {
+  type PdfResponse = { body: Buffer; contentType: string; status: number };
+  let resolvePdfResponse: (response: PdfResponse) => void = () => undefined;
+  const pdfResponse = new Promise<PdfResponse>((resolve) => {
+    resolvePdfResponse = resolve;
+  });
+
+  await page.route(pdfPath, async (route) => {
+    const response = await route.fetch();
+    const body = await response.body();
+
+    resolvePdfResponse({
+      body,
+      contentType: response.headers()["content-type"] ?? "",
+      status: response.status(),
+    });
+    await route.fulfill({ response, body });
+  });
+
   await page.goto("/");
 
-  const responsePromise = page.waitForResponse(
-    (response) => new URL(response.url()).pathname === pdfPath,
-  );
-  await page.getByRole("link", { name: "Download resume", exact: true }).first().click();
-  const response = await responsePromise;
+  await page.getByRole("link", { name: "Download resume", exact: true }).first().click({ noWaitAfter: true });
+  const response = await pdfResponse;
 
-  expect(response.status()).toBe(200);
-  expect(response.headers()["content-type"]).toContain("application/pdf");
-  expect((await response.body()).subarray(0, 4).toString("ascii")).toBe("%PDF");
+  expect(response.status).toBe(200);
+  expect(response.contentType).toContain("application/pdf");
+  expect(response.body.subarray(0, 4).toString("ascii")).toBe("%PDF");
 });
 
 test("settles the print source without prefetching the generated asset", async ({ page }) => {
