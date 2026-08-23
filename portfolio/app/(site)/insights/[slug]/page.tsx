@@ -1,0 +1,29 @@
+/* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize imports used by JSX or TypeScript. */
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { ArticleLayout } from "@/components/content/article-layout";
+import { compileContent, getContentBySlug, getPublicSlugs } from "@/lib/content/loader";
+
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateStaticParams() {
+  return (await getPublicSlugs("insights")).map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const item = await getContentBySlug("insights", slug);
+
+  if (!item) return {};
+
+  return { title: item.metadata.seo.title, description: item.metadata.seo.description };
+}
+
+export default async function InsightDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const item = await getContentBySlug("insights", slug);
+
+  if (!item) notFound();
+
+  return <ArticleLayout item={item}>{await compileContent(item)}</ArticleLayout>;
+}
