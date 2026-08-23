@@ -140,9 +140,11 @@ it("explains the operating model, career path and contact routes without placeho
   await renderHomepage();
 
   const career = screen.getByRole("region", { name: "Career snapshot" });
+  const timeline = within(career).getByRole("list", { name: "Career timeline" });
   for (const employer of ["Lenskart", "IIFL", "AGL", "Builder.ai", "Earlier career"]) {
-    expect(within(career).getByText(employer)).toBeInTheDocument();
+    expect(within(timeline).getAllByText(employer).length).toBeGreaterThan(0);
   }
+  expect(within(timeline).getByText("Before 2019")).toBeInTheDocument();
 
   const contact = screen.getByRole("region", { name: "Start a conversation" });
   expect(within(contact).getByRole("link", { name: "Email" })).toHaveAttribute(

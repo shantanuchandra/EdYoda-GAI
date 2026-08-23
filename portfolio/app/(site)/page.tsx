@@ -28,10 +28,10 @@ export default async function HomePage() {
     <>
       <div className={styles.home}>
         <Hero />
+        <CareerSnapshot />
         <ImpactStrip />
         <FeaturedWork items={work} />
         <Capabilities />
-        <CareerSnapshot />
         <ContactCallout />
       </div>
       <JsonLd data={buildPersonJsonLd({
