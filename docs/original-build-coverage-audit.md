@@ -2,8 +2,8 @@
 
 **Audit date:** 23 August 2026  
 **Reference build:** <https://portfolio-website-lac-alpha-44.vercel.app/>  
-**Shantanu preview:** <https://shantanu-chandra-portfolio-pf1g8r02m-shantanuchandras-projects.vercel.app>
-**Compared source commit:** `e4efd1b` (final visual/mobile RCA fix)
+**Shantanu preview:** <https://shantanu-chandra-portfolio-lv42lnwiu-shantanuchandras-projects.vercel.app>
+**Compared source commit:** `6aa5db7` (transformation-leadership Home rebuild)
 
 ## Executive conclusion
 
@@ -29,8 +29,8 @@ It is **not a literal feature-for-feature clone**, and should not be described a
 | Reference `/contact` | Message form, email, LinkedIn, copy-email interaction, response-time statement | HTTP 200 |
 | Reference technical endpoints | `/sitemap.xml` and `/robots.txt` | Both HTTP 404 |
 | Current route source | `portfolio/app/sitemap.ts` and `portfolio/content/manifest.ts` | 18 public HTML routes from eight indexes/static pages and ten allowlisted detail records |
-| Current exact-HEAD release gate | `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, targeted Chromium responsive/reduced-motion suite | 117 unit tests, validators/build, and 8/8 focused browser checks passed; prior cross-browser release gate remains recorded below |
-| Current protected Vercel preview | Authenticated smoke test of affected routes/assets | Preview/READY; source commit matches `64a4932`; SSO protection retained |
+| Current exact-HEAD release gate | `PLAYWRIGHT_PORT=3282 pnpm verify` | 117 unit tests, validators/build, and 123/123 browser checks across Chromium, Firefox, and WebKit passed |
+| Current protected Vercel preview | Authenticated HTML and internal-browser visual inspection | `dpl_GgsdoBwPVgwwgyxKqAXFMVuDaoYL`; target Preview/READY; deployed from clean `6aa5db7`; SSO protection retained |
 
 The current preview is protected by Vercel SSO. Unauthenticated requests receive a 302 and `noindex`; current-site assertions below use the exact source tree, full release gate, and authenticated preview checks.
 
@@ -131,7 +131,7 @@ The current preview is protected by Vercel SSO. Unauthenticated requests receive
 | Case Studies | **Confirmed** | `/case-studies` contains six server-rendered records: four employer transformations and two independent products. `/work` and `/products` remain permanent redirects to the grouped view. |
 | Learning index and details | **Confirmed** | `/learning` plus all three approved slugs return 200 with one H1 and connected index cards. Existing Learning copy remains source-preserved. |
 | Connected product demos | **Confirmed with guardrails** | Wasabi Travels is the sole active external destination; Card Compass is deliberately case-study-only with no outbound URL. Employer/product detail pages retain their canonical internal routes. |
-| Responsive behavior | **Confirmed locally** | Home at 390px reports `scrollWidth === innerWidth`; portrait is present; all five primary tab labels are present. Full release gates remain required before Preview refresh. |
+| Responsive behavior | **Confirmed locally and live** | All 17 public routes are overflow-free at 320/390/768/1024/1440 in Chromium, Firefox, and WebKit. The protected live Home was inspected in the internal browser. |
 | Micro-interactions | **Confirmed** | Signal profile tilt (pointer fine only), reduced-motion-safe role context rotation, career rail controls, reading progress, copy-email feedback, hover/focus transitions, and existing progressive reveals. All preserve server HTML fallbacks. |
 
 ### Course route matrix
@@ -149,9 +149,9 @@ invent course commerce, accounts, certificates, or payment flows.
 
 | Live check | Result |
 |---|---|
-| Vercel deployment | READY, target `preview`, `dpl_4MVoxvqw4djP1S6Utq43dJMtPVz8` |
-| Build source | Current HEAD `e4efd1b`; remote content/public validators and Next build passed |
-| Protected live Home | Authenticated `vercel curl` confirms the five-tab markers, Learning Lab, AI Transformation Leader descriptor, and local portrait asset reference |
+| Vercel deployment | READY, target `preview`, `dpl_GgsdoBwPVgwwgyxKqAXFMVuDaoYL` |
+| Build source | Clean source commit `6aa5db7`; remote content/public validators and Next build passed |
+| Protected live Home | Authenticated `vercel curl` and internal-browser inspection confirm the new thesis, transformation console, evidence band, Signal/System/Scale section, portrait, and five-tab shell |
 | Live sitemap/robots | Sitemap contains 17 public URLs; robots points to the current protected Preview host after the Preview-host RCA fix |
 | Production safety | No `--prod`, promote, alias, domain, or protection mutation was run; Preview protection remains enabled |
 
@@ -165,3 +165,7 @@ invent course commerce, accounts, certificates, or payment flows.
 | Home motion contract became stale after streamlining | Reveal test still expected two regions after the second animated section was intentionally removed | Reduced-motion and normal-motion contracts now assert the one remaining progressive boundary |
 | Final home still looked editorial in the live browser | Earlier compatibility overrides were declared before the component defaults, so later `.hero-heading` and `.signal-profile-card` rules silently restored serif typography and legacy card sizing | Added a final screen-only home contract after the component layer: Manrope/system hero typography, stable dark profile card, centered white header, and no changes to dedicated editorial routes |
 | 320px body overflow remained after the desktop grid fix | The long hero sentence exceeded the mobile grid track's min-content width even though the outer container was 288px | Mobile hero type now scales to 42.4px at 320px and the hero grid tracks are `minmax(0, 1fr)`; 320/390/768/1024/1440 responsive checks are green |
+| Second-iteration Home still felt oversized and generic | The reference's 96px hero scale was copied onto substantially longer positioning copy, producing a four-line billboard beside a constrained card | Replaced the copy with a concise leadership thesis, capped the desktop display at 88px, and introduced the subject-specific Transformation console |
+| The rebuilt Home still exceeded 5,100px | Work used a two-row catalogue, section spacing was inherited from long-form pages, and career/capability blocks repeated generous editorial spacing | Four cases now scan in one desktop row, executive evidence is a compact band, and the page has a tested 4,200px desktop density budget; measured output is 4,126px at 1440 |
+| Earlier redesign fixes kept fighting each other | Legacy Home selectors and an `!important` hero rule remained in `globals.css`, overriding the new component module after each iteration | Removed obsolete Home-specific global overrides and moved the complete Home visual system into `home-portfolio.module.css` |
+| Cold Firefox visits to an unpublished Work slug could show a blank 404 | The unconstrained dynamic route returned a client-bootstrap `__next_error__` document and relied on hydration to reveal the branded 404 | `dynamicParams = false` constrains Work to its four generated public slugs; five repeated Firefox checks and the final 123-test cross-browser gate pass |
