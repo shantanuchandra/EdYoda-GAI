@@ -24,6 +24,24 @@ function personReference(): JsonLd {
   };
 }
 
+function getVisibleLearningModules(body: string): string[] {
+  const lines = body.split(/\r?\n/);
+  const sectionStart = lines.findIndex((line) => /^##\s+Launch modules\s*$/.test(line.trim()));
+
+  if (sectionStart < 0) return [];
+
+  const modules: string[] = [];
+  for (const line of lines.slice(sectionStart + 1)) {
+    const visibleLine = line.trim();
+    if (/^#{1,6}\s+/.test(visibleLine)) break;
+
+    const listItem = visibleLine.match(/^[-*+]\s+(.+)$/);
+    if (listItem) modules.push(listItem[1].trim());
+  }
+
+  return modules;
+}
+
 export function buildPersonJsonLd({
   path,
   pageName,
@@ -86,7 +104,11 @@ export function buildArticleJsonLd(item: ContentItem): JsonLd {
 
 export function buildLearningJsonLd(item: ContentItem): JsonLd {
   const { audience, outcomes, methods } = item.metadata;
-  const isCompleteCourse = Boolean(audience && outcomes[0]?.label && methods.length === 4);
+  const visibleModules = getVisibleLearningModules(item.body);
+  const modulesMatch = visibleModules.length === 4
+    && methods.length === 4
+    && visibleModules.every((module, index) => module === methods[index]);
+  const isCompleteCourse = Boolean(audience && outcomes[0]?.label && modulesMatch);
 
   if (!isCompleteCourse) {
     return buildCreativeWorkJsonLd(item, "learning");
@@ -101,6 +123,6 @@ export function buildLearningJsonLd(item: ContentItem): JsonLd {
     provider: personReference(),
     audience: { "@type": "Audience", audienceType: audience },
     teaches: outcomes[0].label,
-    hasPart: methods.map((name) => ({ "@type": "CreativeWork", name })),
+    hasPart: visibleModules.map((name) => ({ "@type": "CreativeWork", name })),
   };
 }

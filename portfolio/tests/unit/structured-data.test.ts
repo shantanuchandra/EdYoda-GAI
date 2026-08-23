@@ -1,5 +1,6 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not apply TypeScript scope analysis. */
 import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -124,17 +125,72 @@ it("describes all three complete Learning Lab paths as non-commercial Courses", 
   }
 });
 
-it("does not describe an incomplete learning resource as a Course", async () => {
+it("falls back to CreativeWork when the visible learning audience is absent", async () => {
   const complete = await getContentBySlug("learning", "applied-ai-non-technical");
   if (!complete) throw new Error("Expected allowlisted learning path");
 
   const incomplete = {
     ...complete,
-    metadata: { ...complete.metadata, audience: undefined, methods: complete.metadata.methods.slice(0, 2) },
+    metadata: { ...complete.metadata, audience: undefined },
   };
   expect(buildLearningJsonLd(incomplete)).toMatchObject({
     "@type": "CreativeWork",
     name: complete.metadata.title,
     url: "http://localhost:3000/learning/applied-ai-non-technical",
   });
+});
+
+it("falls back to CreativeWork when the visible learning outcome is absent", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const incomplete = {
+    ...complete,
+    metadata: { ...complete.metadata, outcomes: [] },
+  };
+  expect(buildLearningJsonLd(incomplete)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("falls back to CreativeWork when the visible Launch modules list does not contain exactly four items", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const missingVisibleModule = {
+    ...complete,
+    body: complete.body.replace("- Human-review checkpoints\n", ""),
+  };
+  expect(missingVisibleModule.metadata.methods).toHaveLength(4);
+  expect(buildLearningJsonLd(missingVisibleModule)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("falls back to CreativeWork when the visible Launch modules heading is missing", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const renamedVisibleSection = {
+    ...complete,
+    body: complete.body.replace("## Launch modules", "## Topics"),
+  };
+  expect(renamedVisibleSection.metadata.methods).toHaveLength(4);
+  expect(buildLearningJsonLd(renamedVisibleSection)).toMatchObject({ "@type": "CreativeWork" });
+});
+
+it("server-renders a CreativeWork fallback when a visible module no longer matches the four metadata methods", async () => {
+  const complete = await getContentBySlug("learning", "applied-ai-non-technical");
+  if (!complete) throw new Error("Expected allowlisted learning path");
+
+  const changedVisibleModule = {
+    ...complete,
+    body: complete.body.replace("- Opportunity framing", "- Opportunity selection"),
+  };
+  expect(changedVisibleModule.metadata.methods).toEqual([
+    "Opportunity framing",
+    "Prompt-to-workflow design",
+    "Grounding and verification",
+    "Human-review checkpoints",
+  ]);
+
+  const html = renderToStaticMarkup(createElement(JsonLd, { data: buildLearningJsonLd(changedVisibleModule) }));
+  expect(html).toContain('"@type":"CreativeWork"');
+  expect(html).not.toContain('"@type":"Course"');
 });
