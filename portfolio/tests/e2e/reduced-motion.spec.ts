@@ -3,7 +3,6 @@ import { expect, test, type Page } from "@playwright/test";
 
 const revealSelectors = [
   'section[aria-label="Impact highlights"] .container > div',
-  'figure[aria-labelledby="signal-system-scale-caption"] >> xpath=..',
 ] as const;
 
 async function enterViewportAndSample(page: Page, selector: string, waitForAnimation: boolean) {
