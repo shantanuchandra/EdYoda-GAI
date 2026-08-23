@@ -25,12 +25,13 @@ export function WorkCard({ item }: WorkCardProps) {
         <Link className="no-underline" href={href}>{metadata.title}</Link>
       </h3>
       <p className="mt-[18px] mb-7 text-[0.94rem] text-muted-ink">{metadata.description}</p>
+      {metadata.role ? <p className="mt-auto mb-0 text-xs font-bold tracking-[0.04em] text-teal-dark">{metadata.role}</p> : null}
       {outcome ? (
-        <p className="mt-auto mb-0 grid gap-[5px] border-t border-line pt-5">
+        <div className="mt-5 grid gap-[5px] border-t border-line pt-5">
           <strong className="font-display text-[1.65rem] leading-[1.1] text-copper">{outcome.value}</strong>
           <span className="text-xs text-muted-ink">{outcome.label}</span>
           {outcome.qualifier ? <small className="text-xs text-muted-ink italic">{outcome.qualifier}</small> : null}
-        </p>
+        </div>
       ) : null}
       <Link className="mt-5 text-xs font-bold text-teal-dark underline underline-offset-4" href={href}>
         Read case study <span aria-hidden="true">→</span>

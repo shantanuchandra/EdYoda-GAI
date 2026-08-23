@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize TypeScript type-only imports. */
 import type { Heading } from "@/lib/content/schema";
 
-function slugifyHeading(label: string): string {
+export function slugifyHeading(label: string): string {
   return label
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")

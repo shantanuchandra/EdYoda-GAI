@@ -12,6 +12,7 @@ import {
   type PublicContent,
 } from "@/lib/content/schema";
 import { extractHeadings } from "@/lib/content/slugify-heading";
+import { mdxComponents } from "@/components/mdx/mdx-components";
 
 const categoryByKind: Record<ContentKind, PublicContent["category"]> = {
   work: "employer-work",
@@ -113,7 +114,11 @@ export async function compileContent(item: ContentItem): Promise<React.ReactNode
 
   assertSafeMdx(item.body);
   const { compileMDX } = await import("next-mdx-remote/rsc");
-  const { content } = await compileMDX({ source: item.body, options: { parseFrontmatter: false } });
+  const { content } = await compileMDX({
+    source: item.body,
+    options: { parseFrontmatter: false },
+    components: mdxComponents,
+  });
   return content;
 }
 
