@@ -178,7 +178,7 @@ it("explains the operating model, career path and contact routes without placeho
   );
   expect(within(contact).getByRole("link", { name: "LinkedIn" })).toHaveAttribute(
     "href",
-    "https://www.linkedin.com/in/chandrashantanu",
+    "https://www.linkedin.com/in/chandrashantanu/",
   );
   expect(within(contact).getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
 

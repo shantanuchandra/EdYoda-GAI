@@ -3,7 +3,7 @@ export const siteConfig = {
   name: "Shantanu Chandra",
   descriptor: "AI Transformation Leader",
   email: "shantanu.msp@gmail.com",
-  linkedin: "https://www.linkedin.com/in/chandrashantanu",
+  linkedin: "https://www.linkedin.com/in/chandrashantanu/",
   resumePath: "/shantanu-chandra-resume.pdf",
   navigation: [
     ["Work", "/work"],
