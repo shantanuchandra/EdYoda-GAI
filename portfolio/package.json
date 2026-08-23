@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "validate:content": "tsx scripts/validate-content.ts"
   },
   "dependencies": {
     "@vercel/config": "0.6.1",
