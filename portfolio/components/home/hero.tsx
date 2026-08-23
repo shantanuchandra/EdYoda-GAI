@@ -18,7 +18,7 @@ export function Hero() {
           <div className="mt-9 flex flex-wrap items-center gap-x-4 gap-y-3">
             <ButtonLink href="/work">Explore selected work</ButtonLink>
             <ButtonLink href="/contact" variant="secondary">Contact me</ButtonLink>
-            <ActionLink href="/shantanu-chandra-resume.pdf">Download resume</ActionLink>
+            <ActionLink href="/shantanu-chandra-resume.pdf" prefetch={false}>Download resume</ActionLink>
           </div>
         </div>
 

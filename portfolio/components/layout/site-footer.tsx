@@ -25,7 +25,7 @@ export function SiteFooter() {
         <div className="site-footer__utility">
           <a href={`mailto:${siteConfig.email}`}>Email</a>
           <a href={siteConfig.linkedin}>LinkedIn</a>
-          <Link href={siteConfig.resumePath}>Download resume</Link>
+          <Link href={siteConfig.resumePath} prefetch={false}>Download resume</Link>
         </div>
 
         <p className="site-footer__note">Building useful AI products through signal, system and scale.</p>

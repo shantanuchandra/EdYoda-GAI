@@ -42,7 +42,7 @@ export default function ContactPage() {
             <h2>Choose the format that works</h2>
             <div className="contact-option__actions">
               <Link href="/resume">View HTML resume</Link>
-              <Link href={siteConfig.resumePath}>Download PDF resume</Link>
+              <Link href={siteConfig.resumePath} prefetch={false}>Download PDF resume</Link>
             </div>
             <p>The HTML version stays usable if the future downloadable PDF is unavailable.</p>
           </article>
