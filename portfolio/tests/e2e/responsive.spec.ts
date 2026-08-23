@@ -40,7 +40,7 @@ for (const viewport of viewports) {
         await mobileTrigger.click();
         const dialog = page.getByRole("dialog", { name: "Site navigation" });
         await expect(dialog).toBeVisible();
-        await expect(dialog.getByRole("link")).toHaveCount(6);
+        await expect(dialog.getByRole("link")).toHaveCount(5);
         await expect(dialog).toBeInViewport();
         await dialog.getByRole("button", { name: "Close menu" }).click();
         await expect(mobileTrigger).toBeFocused();

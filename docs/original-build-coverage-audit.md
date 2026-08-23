@@ -2,8 +2,8 @@
 
 **Audit date:** 23 August 2026  
 **Reference build:** <https://portfolio-website-lac-alpha-44.vercel.app/>  
-**Shantanu preview:** <https://shantanu-chandra-portfolio-2k9tyowd1-shantanuchandras-projects.vercel.app>  
-**Compared source commit:** `64a4932de3b22b187dde063ec00c31b07bf8c0db`
+**Shantanu preview:** protected Preview deployment is refreshed only after the final verified commit; local verification below uses `http://localhost:3244`.
+**Compared source commit:** `0ed56f3` (current redesign worktree before final release gates)
 
 ## Executive conclusion
 
@@ -121,3 +121,26 @@ The current preview is protected by Vercel SSO. Unauthenticated requests receive
 | Is any omitted capability worth considering before production? | **Only optionally** — analytics/Speed Insights and, if genuinely needed, a real contact-form integration. |
 | Does the current site materially exceed the reference? | **Yes** — 18 public routes, dedicated evidence pages, products, Learning Lab, Insights, About, structured data, sitemap/robots/OG, branded errors, and audited accessibility. |
 
+## Current redesign verification addendum
+
+| Check | Result | Evidence |
+|---|---|---|
+| Primary tabs | **Confirmed** | Home, Resume, Case Studies, Learning, Contact appear in that order in the browser at 390px and desktop widths. About/Insights remain secondary routes. |
+| LinkedIn profile image | **Confirmed** | Local portrait is bundled at `portfolio/public/images/shantanu-chandra-linkedin.jpg`; Home renders it with alt text and a monogram fallback. No signed LinkedIn URL is committed. |
+| Career evidence | **Confirmed** | Builder promotion path is split into the two approved roles; IIFL public claim is narrowed to 20 minutes; the career rail is driven from `lib/resume-data.ts`. |
+| Case Studies | **Confirmed** | `/case-studies` contains six server-rendered records: four employer transformations and two independent products. `/work` and `/products` remain permanent redirects to the grouped view. |
+| Learning index and details | **Confirmed** | `/learning` plus all three approved slugs return 200 with one H1 and connected index cards. Existing Learning copy remains source-preserved. |
+| Connected product demos | **Confirmed with guardrails** | Wasabi Travels is the sole active external destination; Card Compass is deliberately case-study-only with no outbound URL. Employer/product detail pages retain their canonical internal routes. |
+| Responsive behavior | **Confirmed locally** | Home at 390px reports `scrollWidth === innerWidth`; portrait is present; all five primary tab labels are present. Full release gates remain required before Preview refresh. |
+| Micro-interactions | **Confirmed** | Signal profile tilt (pointer fine only), reduced-motion-safe role context rotation, career rail controls, reading progress, copy-email feedback, hover/focus transitions, and existing progressive reveals. All preserve server HTML fallbacks. |
+
+### Course route matrix
+
+| Learning path | Index link | Detail route | HTTP | Individual page | Connected demo |
+|---|---|---|---:|---|---|
+| Applied AI for non-technical professionals | `/learning` | `/learning/applied-ai-non-technical` | 200 | Yes | Learning content/modules; no commercial checkout claim |
+| AI product transformation | `/learning` | `/learning/ai-product-transformation` | 200 | Yes | Learning content/modules; no account/certification claim |
+| Practical agents for founders | `/learning` | `/learning/practical-agents-founders` | 200 | Yes | Learning content/modules; no commercial checkout claim |
+
+“Demo” means a connected, navigable learning detail route. The site does not
+invent course commerce, accounts, certificates, or payment flows.
