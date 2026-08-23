@@ -51,7 +51,11 @@ export function assertSafeMdx(body: string): void {
     throw new Error("Executable MDX is not allowed");
   }
 
-  if (/(?:\b(?:href|src)\s*=\s*(?:["']\s*)?|\]\(\s*)javascript\s*:/i.test(body)) {
+  if (/\b(?:href|src)\s*=\s*\{/i.test(body)) {
+    throw new Error("MDX URL expressions are not allowed");
+  }
+
+  if (/(?:\b(?:href|src)\s*=\s*(?:["']\s*)?|\]\(\s*(?:<\s*)?)javascript\s*:/i.test(body)) {
     throw new Error("JavaScript URLs are not allowed in MDX");
   }
 }
@@ -103,6 +107,10 @@ export async function getPublicSlugs(kind: ContentKind): Promise<string[]> {
 }
 
 export async function compileContent(item: ContentItem): Promise<React.ReactNode> {
+  if (item.metadata.public !== true) {
+    throw new Error("Only public content can be compiled");
+  }
+
   assertSafeMdx(item.body);
   const { compileMDX } = await import("next-mdx-remote/rsc");
   const { content } = await compileMDX({ source: item.body, options: { parseFrontmatter: false } });

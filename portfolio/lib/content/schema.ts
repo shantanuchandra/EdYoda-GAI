@@ -32,7 +32,10 @@ export const contentFrontmatterSchema = z
     featured: z.boolean().default(false),
     publishedAt: z.iso.date().optional(),
     updatedAt: z.iso.date().optional(),
-    externalUrl: z.url().optional(),
+    externalUrl: z
+      .url()
+      .refine((url) => new URL(url).protocol === "https:", "externalUrl must use HTTPS")
+      .optional(),
     public: z.boolean(),
     confidentialityNotes: z.string().min(1),
     seo: seoSchema,

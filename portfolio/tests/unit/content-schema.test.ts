@@ -16,4 +16,16 @@ describe("contentFrontmatterSchema", () => {
   it("rejects unsupported content categories", () => {
     expect(contentFrontmatterSchema.safeParse({ ...validWorkFrontmatter, category: "course-marketplace" }).success).toBe(false);
   });
+
+  it("rejects JavaScript external URLs", () => {
+    expect(contentFrontmatterSchema.safeParse({ ...validWorkFrontmatter, externalUrl: "javascript:alert(1)" }).success).toBe(false);
+  });
+
+  it("rejects data external URLs", () => {
+    expect(contentFrontmatterSchema.safeParse({ ...validWorkFrontmatter, externalUrl: "data:text/html,test" }).success).toBe(false);
+  });
+
+  it("accepts HTTPS external URLs", () => {
+    expect(contentFrontmatterSchema.safeParse({ ...validWorkFrontmatter, externalUrl: "https://example.com/work" }).success).toBe(true);
+  });
 });
