@@ -18,7 +18,7 @@
   --radius-card: 12px;
   --focus-outline-width: 3px;
   --focus-outline-offset: 2px;
-  --header-height: 64px;
+  --header-height: 80px;
   --body-size: 17px;
   --reading-measure: 68ch;
   --section-space: clamp(56px, 9vw, 128px);
@@ -209,6 +209,7 @@ button {
 }
 
 .site-header__inner {
+  width: min(calc(100% - 32px), 1248px);
   display: flex;
   height: 100%;
   align-items: center;
@@ -222,11 +223,11 @@ button {
   align-items: center;
   gap: 10px;
   color: var(--color-ink);
-  font-family: var(--font-newsreader), Georgia, serif;
-  font-size: 1.45rem;
-  font-style: italic;
-  font-weight: 600;
-  letter-spacing: -0.045em;
+  font-family: var(--font-signature), cursive;
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
   text-decoration: none;
 }
 
@@ -1244,6 +1245,10 @@ button {
   .site-header {
     background: #fff;
     border-bottom-color: #e7e7e7;
+  }
+
+  .site-header__inner {
+    width: min(calc(100% - 32px), 1248px);
   }
 
   .hero-heading {

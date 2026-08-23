@@ -10,7 +10,7 @@ export function SiteHeader() {
     <header className="site-header">
       <Container className="site-header__inner">
         <Link aria-label={siteConfig.name} className="site-wordmark" href="/">
-          <span>{siteConfig.name}</span>
+          <span aria-hidden="true">Shantanu</span>
         </Link>
 
         <nav aria-label="Primary" className="desktop-navigation">
