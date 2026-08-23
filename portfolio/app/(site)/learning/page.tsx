@@ -6,11 +6,13 @@ import { LearningPathCard } from "@/components/content/learning-path-card";
 import { Container } from "@/components/ui/container";
 import { getPublicContent } from "@/lib/content/loader";
 import type { ContentItem } from "@/lib/content/schema";
+import { buildContentMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildContentMetadata({
   title: "Shantanu Chandra Learning Lab",
   description: "Shantanu Chandra Learning Lab offers three practical learning paths for operators, product leaders, founders, and emerging AI builders.",
-};
+  path: "/learning",
+});
 
 export function LearningIndex({ items }: { items: ContentItem[] }) {
   return (

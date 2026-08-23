@@ -82,7 +82,7 @@ it("renders each Learning Lab detail as a public overview with the exact audienc
     const modules = launchModulesHeading.nextElementSibling;
     expect(modules?.tagName).toBe("UL");
     expect(within(modules as HTMLElement).getAllByRole("listitem").map((item) => item.textContent)).toEqual(path.modules);
-    expect(document.querySelector('script[type="application/ld+json"]')).toBeNull();
+    expect(document.querySelector('script[type="application/ld+json"]')).not.toBeNull();
 
     view.unmount();
   }
@@ -123,6 +123,7 @@ it("renders the Signal to System to Scale insight as a dated article with TOC, r
 
   const article = screen.getByRole("article");
   expect(within(article).getByRole("heading", { level: 1, name: "From AI demo to adopted system: Signal → System → Scale" })).toBeInTheDocument();
+  expect(within(article).getByText("By Shantanu Chandra", { exact: true })).toBeInTheDocument();
   expect(within(article).getByText("23 August 2026")).toHaveAttribute("datetime", "2026-08-23");
 
   const headings = ["Signal", "System", "Scale", "Why product design includes adoption and governance", "Closing checklist"];

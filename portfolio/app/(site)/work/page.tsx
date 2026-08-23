@@ -4,6 +4,13 @@ import { EmptyState } from "@/components/content/empty-state";
 import { WorkGrid } from "@/components/content/work-grid";
 import { Container } from "@/components/ui/container";
 import { getPublicContent } from "@/lib/content/loader";
+import { buildContentMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = buildContentMetadata({
+  title: "Selected employer work",
+  description: "Evidence-led AI transformation case studies from Shantanu Chandra, with operating context, responsible controls and measurable outcomes intact.",
+  path: "/work",
+});
 
 export default async function WorkIndexPage() {
   const items = await getPublicContent("work");
@@ -26,3 +33,4 @@ export default async function WorkIndexPage() {
     </section>
   );
 }
+import type { Metadata } from "next";

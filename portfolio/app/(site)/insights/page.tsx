@@ -6,11 +6,13 @@ import { InsightCard } from "@/components/content/insight-card";
 import { Container } from "@/components/ui/container";
 import { getPublicContent } from "@/lib/content/loader";
 import type { ContentItem } from "@/lib/content/schema";
+import { buildContentMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildContentMetadata({
   title: "Insights",
   description: "Practical AI product viewpoints from Shantanu Chandra on finding valuable signals, designing responsible systems, and scaling adoption.",
-};
+  path: "/insights",
+});
 
 export function InsightsIndex({ items }: { items: ContentItem[] }) {
   return (

@@ -53,7 +53,7 @@ for (const path of learningPaths) {
     await expect(page.getByText(path.outcome, { exact: true })).toBeVisible();
     const modules = page.getByRole("heading", { level: 2, name: "Launch modules" }).locator("+ ul > li");
     await expect(modules).toHaveText(path.modules);
-    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
+    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
   });
 }
 

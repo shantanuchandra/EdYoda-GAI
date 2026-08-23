@@ -2,7 +2,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LearningPathDetail } from "@/components/content/learning-path-detail";
+import { JsonLd } from "@/components/seo/json-ld";
 import { compileContent, getContentBySlug, getPublicSlugs } from "@/lib/content/loader";
+import { buildContentMetadata } from "@/lib/metadata";
+import { buildLearningJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -16,7 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!item) return {};
 
-  return { title: item.metadata.seo.title, description: item.metadata.seo.description };
+  return buildContentMetadata({
+    title: item.metadata.seo.title,
+    description: item.metadata.seo.description,
+    path: `/learning/${item.metadata.slug}`,
+  });
 }
 
 export default async function LearningDetailPage({ params }: Props) {
@@ -25,5 +32,10 @@ export default async function LearningDetailPage({ params }: Props) {
 
   if (!item) notFound();
 
-  return <LearningPathDetail item={item}>{await compileContent(item)}</LearningPathDetail>;
+  return (
+    <>
+      <LearningPathDetail item={item}>{await compileContent(item)}</LearningPathDetail>
+      <JsonLd data={buildLearningJsonLd(item)} />
+    </>
+  );
 }

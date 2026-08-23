@@ -20,6 +20,7 @@ export function ArticleLayout({ children, item }: ArticleLayoutProps) {
           <Breadcrumbs items={[{ label: "Insights", href: "/insights" }, { label: metadata.title }]} />
           <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">
             <span>Insight</span>
+            <span>By Shantanu Chandra</span>
             {metadata.publishedAt ? <time dateTime={metadata.publishedAt}>{formatPublicationDate(metadata.publishedAt)}</time> : null}
           </div>
           <h1 className="mt-3 mb-0 max-w-[1100px] font-display text-[clamp(3rem,7vw,6rem)] font-medium tracking-[-0.04em] leading-[0.96]">

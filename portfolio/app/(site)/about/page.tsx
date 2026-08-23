@@ -1,8 +1,20 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize imports used by JSX. */
+import type { Metadata } from "next";
 import { CareerTimeline } from "@/components/content/career-timeline";
 import { ContentIndexHeader } from "@/components/content/content-index-header";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button-link";
+import { JsonLd } from "@/components/seo/json-ld";
+import { buildContentMetadata } from "@/lib/metadata";
+import { buildPersonJsonLd } from "@/lib/structured-data";
+
+const description = "A first-person career story spanning product, software, operations and five years building and launching AI products.";
+
+export const metadata: Metadata = buildContentMetadata({
+  title: "About",
+  description,
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (
@@ -66,6 +78,7 @@ export default function AboutPage() {
           </div>
         </Container>
       </section>
+      <JsonLd data={buildPersonJsonLd({ path: "/about", pageName: "About Shantanu Chandra", description })} />
     </>
   );
 }

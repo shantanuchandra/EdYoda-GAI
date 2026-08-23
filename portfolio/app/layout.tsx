@@ -10,8 +10,6 @@ export const metadata: Metadata = {
     default: `${siteConfig.name} | ${siteConfig.descriptor}`,
     template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Shantanu Chandra turns complex AI opportunities into adopted, measurable and responsibly governed products.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

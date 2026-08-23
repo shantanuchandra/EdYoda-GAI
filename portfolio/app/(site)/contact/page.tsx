@@ -1,8 +1,16 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize imports used by JSX. */
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentIndexHeader } from "@/components/content/content-index-header";
 import { Container } from "@/components/ui/container";
 import { siteConfig } from "@/lib/site-config";
+import { buildContentMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = buildContentMetadata({
+  title: "Contact",
+  description: "Contact Shantanu Chandra directly by email or LinkedIn about AI product leadership, transformation work, products and practical learning.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

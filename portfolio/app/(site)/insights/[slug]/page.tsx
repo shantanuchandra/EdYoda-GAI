@@ -2,7 +2,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleLayout } from "@/components/content/article-layout";
+import { JsonLd } from "@/components/seo/json-ld";
 import { compileContent, getContentBySlug, getPublicSlugs } from "@/lib/content/loader";
+import { buildContentMetadata } from "@/lib/metadata";
+import { buildArticleJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -16,7 +19,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!item) return {};
 
-  return { title: item.metadata.seo.title, description: item.metadata.seo.description };
+  return buildContentMetadata({
+    title: item.metadata.seo.title,
+    description: item.metadata.seo.description,
+    path: `/insights/${item.metadata.slug}`,
+    type: "article",
+    publishedAt: item.metadata.publishedAt,
+  });
 }
 
 export default async function InsightDetailPage({ params }: Props) {
@@ -25,5 +34,10 @@ export default async function InsightDetailPage({ params }: Props) {
 
   if (!item) notFound();
 
-  return <ArticleLayout item={item}>{await compileContent(item)}</ArticleLayout>;
+  return (
+    <>
+      <ArticleLayout item={item}>{await compileContent(item)}</ArticleLayout>
+      <JsonLd data={buildArticleJsonLd(item)} />
+    </>
+  );
 }

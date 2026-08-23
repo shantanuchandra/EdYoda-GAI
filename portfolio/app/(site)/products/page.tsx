@@ -4,6 +4,13 @@ import { EmptyState } from "@/components/content/empty-state";
 import { ProductCard } from "@/components/content/product-card";
 import { Container } from "@/components/ui/container";
 import { getPublicContent } from "@/lib/content/loader";
+import { buildContentMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = buildContentMetadata({
+  title: "Independent products",
+  description: "Explore Shantanu Chandra’s independent product stories, including a Japan itinerary planner and transparent card recommendation case study.",
+  path: "/products",
+});
 
 export default async function ProductsIndexPage() {
   const items = await getPublicContent("products");
@@ -30,3 +37,4 @@ export default async function ProductsIndexPage() {
     </section>
   );
 }
+import type { Metadata } from "next";
