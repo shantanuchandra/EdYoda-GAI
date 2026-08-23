@@ -19,7 +19,7 @@ export function CareerRail({ roles }: CareerRailProps) {
         <button className="career-rail__control" type="button" onClick={() => move(-1)} aria-label="Scroll career timeline left">←</button>
         <button className="career-rail__control" type="button" onClick={() => move(1)} aria-label="Scroll career timeline right">→</button>
       </div>
-      <ol ref={railRef} aria-label="Career timeline" className="career-rail__list">
+      <ol ref={railRef} aria-label="Career timeline" className="career-rail__list" tabIndex={0}>
         {roles.map((role) => (
           <li className="career-rail__item" key={`${role.company}-${role.start}`}>
             <p className="career-rail__period">{role.periodLabel}</p>

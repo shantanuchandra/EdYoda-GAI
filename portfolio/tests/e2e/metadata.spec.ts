@@ -3,8 +3,7 @@ import { expect, test } from "@playwright/test";
 
 const routes = [
   ["/", "Shantanu Chandra | AI Transformation Leader"],
-  ["/work", "Selected employer work | Shantanu Chandra"],
-  ["/products", "Independent products | Shantanu Chandra"],
+  ["/case-studies", "Case Studies | Shantanu Chandra"],
   ["/learning", "Shantanu Chandra Learning Lab | Shantanu Chandra"],
   ["/insights", "Insights | Shantanu Chandra"],
   ["/about", "About | Shantanu Chandra"],
@@ -74,7 +73,7 @@ test("publishes public-only sitemap and permissive robots declarations", async (
   const sitemapResponse = await request.get("/sitemap.xml");
   const sitemapXml = await sitemapResponse.text();
   expect(sitemapResponse.status()).toBe(200);
-  expect(sitemapXml.match(/<loc>/g)).toHaveLength(18);
+  expect(sitemapXml.match(/<loc>/g)).toHaveLength(17);
   expect(sitemapXml).toContain("<loc>http://localhost:3000/work/lenskart-ai-retail</loc>");
   expect(sitemapXml).toContain("<loc>http://localhost:3000/insights/signal-system-scale</loc>");
   expect(sitemapXml).not.toMatch(/not-public|private|unknown/);

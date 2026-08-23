@@ -10,10 +10,9 @@ test("lists the two verified independent products without a placeholder third ca
   const response = await page.goto("/products");
 
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1, name: "Applied AI Builds" })).toBeVisible();
-  await expect(page.getByText("Only experiments with a public problem statement, operating status, and evidence appear here.")).toBeVisible();
-  await expect(page.getByRole("article")).toHaveCount(2);
-  await expect(page.getByRole("article").getByRole("heading", { level: 2 })).toHaveCount(2);
+  await expect(page.getByRole("heading", { level: 1, name: "Evidence from transformation work and independent builds." })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Independent products" })).toBeVisible();
+  await expect(page.getByRole("article")).toHaveCount(6);
 
   for (const product of products) {
     const card = page.getByRole("article").filter({ has: page.getByRole("heading", { name: product.title }) });

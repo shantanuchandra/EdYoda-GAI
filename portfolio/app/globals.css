@@ -112,6 +112,7 @@ button {
 .career-rail__control { min-width: 44px; min-height: 44px; border: 1px solid var(--color-ink); border-radius: 999px; background: transparent; color: var(--color-ink); font-size: 1.1rem; cursor: pointer; transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) ease; }
 .career-rail__control:hover { transform: translateY(-2px); background: var(--color-surface); }
 .career-rail__list { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 30%); gap: 16px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x proximity; margin: 0; padding: 2px 0 18px; list-style: none; scrollbar-width: thin; }
+.career-rail__list:focus-visible { outline: 3px solid var(--color-teal); outline-offset: 4px; }
 .career-rail__item { display: flex; min-height: 210px; flex-direction: column; gap: 7px; scroll-snap-align: start; border-top: 2px solid var(--color-ink); border-bottom: 1px solid var(--color-line); padding: 18px 18px 20px 0; }
 .career-rail__period { margin: 0; color: var(--color-teal); font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .career-rail__item strong { font-family: var(--font-newsreader), Georgia, serif; font-size: 1.65rem; font-weight: 600; letter-spacing: -.02em; }
@@ -1018,8 +1019,8 @@ button {
   align-self: end;
   border: 1px solid var(--ink);
   border-radius: 22px;
-  background: var(--dark-teal);
-  color: #fff;
+  background: var(--color-dark-section);
+  color: var(--color-on-dark);
   padding: clamp(20px, 3vw, 30px);
   transform-style: preserve-3d;
   transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
@@ -1067,9 +1068,9 @@ button {
 .signal-profile-card__monogram {
   display: grid;
   place-items: center;
-  background: var(--sand);
-  color: var(--dark-teal);
-  font-family: var(--font-display);
+  background: var(--color-sand);
+  color: var(--color-teal-dark);
+  font-family: var(--font-newsreader), Georgia, serif;
   font-size: 1.5rem;
   font-weight: 700;
 }
