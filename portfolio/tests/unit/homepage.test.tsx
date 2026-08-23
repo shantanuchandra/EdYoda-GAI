@@ -1,6 +1,21 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not apply DOM/TypeScript scope analysis. */
 import { render, screen, within } from "@testing-library/react";
+import { vi } from "vitest";
 import HomePage from "@/app/(site)/page";
+
+class IntersectionObserverStub implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = "0px";
+  readonly scrollMargin = "0px";
+  readonly thresholds = [0];
+
+  disconnect() {}
+  observe() {}
+  takeRecords(): IntersectionObserverEntry[] { return []; }
+  unobserve() {}
+}
+
+vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
 
 async function renderHomepage() {
   render(await HomePage());
@@ -39,11 +54,19 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
   await renderHomepage();
 
   const featuredWork = screen.getByRole("region", { name: "Selected employer work" });
-  for (const company of ["Lenskart", "IIFL", "AGL", "Builder.ai"]) {
-    expect(within(featuredWork).getByText(company)).toBeInTheDocument();
-  }
+  const workCards = within(featuredWork).getAllByRole("article");
+  expect(workCards).toHaveLength(4);
+  expect(workCards.map((card) => card.querySelector("p")?.textContent)).toEqual([
+    "Lenskart",
+    "IIFL",
+    "AGL",
+    "Builder.ai",
+  ]);
 
-  for (const capability of [
+  const capabilitiesHeading = screen.getByRole("heading", { name: "The work around the model is the product." });
+  const capabilitiesSection = capabilitiesHeading.closest("section");
+  expect(capabilitiesSection).not.toBeNull();
+  expect(within(capabilitiesSection as HTMLElement).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
     "AI product strategy and portfolio prioritization",
     "workflow and operating-model redesign",
     "product discovery and adoption",
@@ -51,9 +74,7 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
     "human review and responsible deployment",
     "cross-functional product and engineering leadership",
     "measurement, iteration and scale",
-  ]) {
-    expect(screen.getByText(capability)).toBeInTheDocument();
-  }
+  ]);
 
   for (const [industry, href] of [
     ["Retail", "/work/lenskart-ai-retail"],
@@ -80,7 +101,55 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
   ]);
 });
 
-it("explains the operating model, career path and contact routes without placeholder or hover-only content", async () => {
+it("keeps cards semantic and gives every title and visible action its own link", async () => {
+  await renderHomepage();
+
+  const cardGroups = [
+    {
+      region: "Selected employer work",
+      cards: [
+        ["AI-assisted retail journeys at Lenskart", "Read case study", "/work/lenskart-ai-retail"],
+        ["Responsible AI operations for digital lending", "Read case study", "/work/iifl-digital-lending"],
+        ["Scaling ad-tech operations with automation", "Read case study", "/work/agl-adtech-operations"],
+        ["Conversational AI for customer-success scale", "Read case study", "/work/builder-conversational-ai"],
+      ],
+    },
+    {
+      region: "Independent products",
+      cards: [
+        ["Wasabi Travels", "View product", "https://wasabitravels.com/"],
+        ["Card Compass", "View product", "https://cardcompass.in/"],
+      ],
+    },
+    {
+      region: "Learning Lab paths",
+      cards: [
+        ["Applied AI for non-technical professionals", "Explore path", "/learning/applied-ai-non-technical"],
+        ["AI product transformation", "Explore path", "/learning/ai-product-transformation"],
+        ["Practical agents for founders", "Explore path", "/learning/practical-agents-founders"],
+      ],
+    },
+  ] as const;
+
+  for (const group of cardGroups) {
+    const articles = within(screen.getByRole("region", { name: group.region })).getAllByRole("article");
+    expect(articles).toHaveLength(group.cards.length);
+
+    group.cards.forEach(([title, action, href], index) => {
+      const article = articles[index];
+      expect(article.closest("a")).toBeNull();
+      expect(within(article).getByRole("heading", { name: title }).querySelector("a")).toHaveAttribute("href", href);
+      expect(within(article).getByRole("link", { name: action })).toHaveAttribute("href", href);
+    });
+  }
+});
+
+it("uses the restrained Reveal boundary exactly twice", async () => {
+  await renderHomepage();
+  expect(document.querySelectorAll('div[style*="translateY(12px)"]')).toHaveLength(2);
+});
+
+it("explains the operating model, career path and contact routes without placeholder imagery", async () => {
   await renderHomepage();
 
   expect(
@@ -106,5 +175,4 @@ it("explains the operating model, career path and contact routes without placeho
   expect(within(contact).getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
 
   expect(screen.queryByRole("img", { name: /placeholder|stand-in|portrait/i })).not.toBeInTheDocument();
-  expect(document.querySelector("[aria-expanded], details")).toBeNull();
 });
