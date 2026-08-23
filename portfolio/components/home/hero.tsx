@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize imports used by JSX. */
 import { ActionLink } from "@/components/ui/action-link";
 import { ButtonLink } from "@/components/ui/button-link";
+import { SignalProfileCard } from "@/components/home/signal-profile-card";
 import { Container } from "@/components/ui/container";
 
 export function Hero() {
@@ -16,31 +17,13 @@ export function Hero() {
             Across retail, lending, AdTech, SaaS and enterprise software.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-x-4 gap-y-3">
-            <ButtonLink href="/work">Explore selected work</ButtonLink>
+            <ButtonLink href="/case-studies">Explore case studies</ButtonLink>
             <ButtonLink href="/contact" variant="secondary">Contact me</ButtonLink>
             <ActionLink href="/shantanu-chandra-resume.pdf" prefetch={false}>Download resume</ActionLink>
           </div>
         </div>
 
-        <aside aria-label="Operating thesis" className="self-end border-t border-ink pt-4">
-          <p className="mt-0 mb-[18px] text-xs font-bold tracking-[0.08em] text-muted-ink uppercase">
-            Useful transformation has a sequence.
-          </p>
-          <ol className="m-0 grid p-0 [list-style:none]">
-            <li className="grid grid-cols-[minmax(82px,0.7fr)_1.8fr] items-baseline gap-4 border-b border-line py-[13px]">
-              <span className="font-display text-2xl font-semibold">Signal</span>
-              <small className="text-[0.83rem] text-muted-ink">Choose the valuable problem.</small>
-            </li>
-            <li className="grid grid-cols-[minmax(82px,0.7fr)_1.8fr] items-baseline gap-4 border-b border-line py-[13px]">
-              <span className="font-display text-2xl font-semibold">System</span>
-              <small className="text-[0.83rem] text-muted-ink">Design the work and controls.</small>
-            </li>
-            <li className="grid grid-cols-[minmax(82px,0.7fr)_1.8fr] items-baseline gap-4 border-b border-line py-[13px]">
-              <span className="font-display text-2xl font-semibold">Scale</span>
-              <small className="text-[0.83rem] text-muted-ink">Earn adoption and measure change.</small>
-            </li>
-          </ol>
-        </aside>
+        <SignalProfileCard />
       </Container>
     </section>
   );

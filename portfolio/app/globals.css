@@ -996,6 +996,112 @@ button {
   color: var(--muted-ink);
 }
 
+.signal-profile-card {
+  align-self: end;
+  border: 1px solid var(--ink);
+  border-radius: 22px;
+  background: var(--dark-teal);
+  color: #fff;
+  padding: clamp(20px, 3vw, 30px);
+  transform-style: preserve-3d;
+  transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+  will-change: transform;
+}
+
+.signal-profile-card:hover,
+.signal-profile-card:focus-within {
+  box-shadow: 0 22px 58px rgb(16 37 34 / 20%);
+}
+
+.signal-profile-card__topline,
+.signal-profile-card__current,
+.signal-profile-card__role,
+.signal-profile-card__actions {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.signal-profile-card__topline {
+  display: flex;
+  justify-content: space-between;
+  color: rgb(255 255 255 / 70%);
+  font-weight: 800;
+}
+
+.signal-profile-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 34px;
+}
+
+.signal-profile-card__portrait,
+.signal-profile-card__monogram {
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.signal-profile-card__monogram {
+  display: grid;
+  place-items: center;
+  background: var(--sand);
+  color: var(--dark-teal);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.signal-profile-card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.signal-profile-card__role { margin: 8px 0 0; color: rgb(255 255 255 / 72%); }
+.signal-profile-card__context { display: block; color: var(--sand); }
+.signal-profile-card__current { margin: 24px 0 0; color: var(--sand); font-weight: 800; }
+
+.signal-profile-card__sequence {
+  display: grid;
+  gap: 0;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signal-profile-card__sequence li {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  border-top: 1px solid rgb(255 255 255 / 22%);
+  padding: 10px 0;
+}
+
+.signal-profile-card__sequence strong { font-family: var(--font-display); font-size: 1.25rem; }
+.signal-profile-card__sequence span { color: rgb(255 255 255 / 68%); font-size: 0.8rem; }
+
+.signal-profile-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 18px;
+  font-weight: 800;
+}
+
+.signal-profile-card__actions a { min-height: 44px; display: inline-flex; align-items: center; gap: 5px; color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-profile-card { transition: none; transform: none !important; }
+}
+
 .resume-document__footer p {
   margin: 0;
   color: var(--color-muted-ink);

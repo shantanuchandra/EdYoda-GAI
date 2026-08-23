@@ -30,7 +30,7 @@ it("presents the proof-first hero and impact record", async () => {
   expect(screen.getByText("Across retail, lending, AdTech, SaaS and enterprise software.")).toBeInTheDocument();
 
   for (const [name, href] of [
-    ["Explore selected work", "/work"],
+    ["Explore case studies", "/case-studies"],
     ["Contact me", "/contact"],
     ["Download resume", "/shantanu-chandra-resume.pdf"],
   ]) {
