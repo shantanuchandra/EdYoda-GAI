@@ -20,7 +20,7 @@ export function WorkCard({ headingLevel, item }: WorkCardProps) {
   const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
 
   return (
-    <article className="group flex h-full min-h-[360px] flex-col rounded-card border border-line bg-surface p-[clamp(24px,4vw,36px)] transition-[border-color,box-shadow,translate] duration-200 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-teal hover:shadow-[0_18px_48px_rgb(16_37_34_/_9%)] focus-within:-translate-y-1 focus-within:border-teal focus-within:shadow-[0_18px_48px_rgb(16_37_34_/_9%)]">
+    <article className="work-card group flex h-full min-h-[360px] flex-col rounded-card border border-line bg-surface p-[clamp(24px,4vw,36px)] transition-[border-color,box-shadow,translate] duration-200 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-teal hover:shadow-[0_18px_48px_rgb(16_37_34_/_9%)] focus-within:-translate-y-1 focus-within:border-teal focus-within:shadow-[0_18px_48px_rgb(16_37_34_/_9%)]">
       <div className="flex items-start justify-between gap-4 text-teal">
         <div>
           <p className="m-0 text-xs font-extrabold tracking-[0.1em] uppercase">{publicCompanyName(metadata.company)}</p>

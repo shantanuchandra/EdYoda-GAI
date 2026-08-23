@@ -125,7 +125,7 @@ test("normal motion creates the approved progressive entrance after viewport ent
   });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("[data-reveal-motion-observed='true']")).toHaveCount(2);
+  await expect(page.locator("[data-reveal-motion-observed='true']")).toHaveCount(1);
 
   for (const selector of revealSelectors) {
     const snapshots = await enterViewportAndSample(page, selector, true);

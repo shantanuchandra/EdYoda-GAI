@@ -154,3 +154,12 @@ invent course commerce, accounts, certificates, or payment flows.
 | Protected live Home | Authenticated `vercel curl` confirms the five-tab markers, Learning Lab, AI Transformation Leader descriptor, and local portrait asset reference |
 | Live sitemap/robots | Sitemap contains 17 public URLs; robots points to the current protected Preview host after the Preview-host RCA fix |
 | Production safety | No `--prod`, promote, alias, domain, or protection mutation was run; Preview protection remains enabled |
+
+### Visual RCA and correction
+
+| Finding | Root cause | Correction |
+|---|---|---|
+| Home felt like a content dump rather than a portfolio landing page | Home repeated Products, Learning, Industry, Principles, Work, and Career content in one 8,000px flow | Home now leads with Hero → proof → employer case studies → capabilities → career → conversation; Products, Learning, Insights, and About remain complete dedicated routes behind the five-tab shell |
+| Hero did not match the reference's visual balance | Narrow profile card, oversized editorial heading, right-aligned nav, and undefined legacy color aliases | Centered desktop nav, white/system-typography surface, 15ch hero measure, larger balanced profile card, corrected token aliases, and restrained card shadows |
+| Mobile visual overflow risk | Desktop `minmax(360px, .8fr)` hero rule applied below the breakpoint | Hero is one column below 900px; 390px browser check reports `scrollWidth === innerWidth` |
+| Home motion contract became stale after streamlining | Reveal test still expected two regions after the second animated section was intentionally removed | Reduced-motion and normal-motion contracts now assert the one remaining progressive boundary |

@@ -9,7 +9,7 @@ type WorkGridProps = {
 
 export function WorkGrid({ headingLevel, items }: WorkGridProps) {
   return (
-    <div className="mt-12 grid gap-4 md:grid-cols-2">
+    <div className="work-grid mt-12 grid gap-4 md:grid-cols-2">
       {items.map((item) => (
         <WorkCard headingLevel={headingLevel} item={item} key={item.metadata.slug} />
       ))}

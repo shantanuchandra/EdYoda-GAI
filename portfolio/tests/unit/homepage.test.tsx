@@ -50,7 +50,7 @@ it("presents the proof-first hero and impact record", async () => {
   }
 });
 
-it("preserves the approved work, capability, industry, product and Learning Lab inventory", async () => {
+it("preserves the approved work and capability inventory without turning Home into a catalogue", async () => {
   await renderHomepage();
 
   const featuredWork = screen.getByRole("region", { name: "Selected employer work" });
@@ -82,41 +82,8 @@ it("preserves the approved work, capability, industry, product and Learning Lab 
     "measurement, iteration and scale",
   ]);
 
-  for (const [industry, href] of [
-    ["Retail", "/work/lenskart-ai-retail"],
-    ["Lending", "/work/iifl-digital-lending"],
-    ["AdTech", "/work/agl-adtech-operations"],
-    ["SaaS", "/work/builder-conversational-ai"],
-    ["Enterprise software", "/about"],
-  ]) {
-    const index = screen.getByRole("region", { name: "Five contexts. One operating discipline." });
-    expect(within(index).getByRole("link", { name: new RegExp(`^${industry}`) })).toHaveAttribute("href", href);
-  }
-
-  const independentProducts = screen.getByRole("region", { name: "Independent products" });
-  expect(within(independentProducts).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
-    "Wasabi Travels",
-    "Card Compass",
-  ]);
-  expect(within(independentProducts).getAllByRole("article").map((card) => card.textContent)).toEqual([
-    expect.stringContaining("Wasabi Travels"),
-    expect.stringContaining("Card Compass"),
-  ]);
-
-  const learningLab = screen.getByRole("region", { name: "Learning Lab paths" });
-  expect(within(learningLab).getAllByRole("article").map((card) => card.textContent)).toEqual([
-    expect.stringContaining("Applied AI for non-technical professionals"),
-    expect.stringContaining("AI product transformation"),
-    expect.stringContaining("Practical agents for founders"),
-  ]);
-  expect(within(learningLab).getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual([
-    "Make the work legible.",
-  ]);
-  expect(within(learningLab).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
-    "Applied AI for non-technical professionals",
-    "AI product transformation",
-    "Practical agents for founders",
-  ]);
+  expect(screen.queryByRole("region", { name: "Independent products" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("region", { name: "Learning Lab paths" })).not.toBeInTheDocument();
 });
 
 it("keeps cards semantic and gives every title and visible action its own link", async () => {
@@ -132,21 +99,6 @@ it("keeps cards semantic and gives every title and visible action its own link",
         ["Conversational AI for customer-success scale", "Read case study", "/work/builder-conversational-ai"],
       ],
     },
-    {
-      region: "Independent products",
-      cards: [
-        ["Wasabi Travels", "View product", "/products/wasabi-travels"],
-        ["Card Compass", "View product", "/products/card-compass"],
-      ],
-    },
-    {
-      region: "Learning Lab paths",
-      cards: [
-        ["Applied AI for non-technical professionals", "Explore path", "/learning/applied-ai-non-technical"],
-        ["AI product transformation", "Explore path", "/learning/ai-product-transformation"],
-        ["Practical agents for founders", "Explore path", "/learning/practical-agents-founders"],
-      ],
-    },
   ] as const;
 
   for (const group of cardGroups) {
@@ -160,27 +112,17 @@ it("keeps cards semantic and gives every title and visible action its own link",
       const actionLink = within(article).getByRole("link", { name: action });
       expect(actionLink).toHaveAttribute("href", href);
       expect(actionLink).toHaveClass("inline-flex", "min-h-11", "items-center");
-      if (action === "View product") {
-        expect(actionLink).toHaveTextContent("→");
-        expect(actionLink).not.toHaveTextContent("↗");
-      }
     });
   }
 });
 
 it("uses exactly two progressive Reveal boundaries", async () => {
   await renderHomepage();
-  expect(document.querySelectorAll("[data-reveal]")).toHaveLength(2);
+  expect(document.querySelectorAll("[data-reveal]")).toHaveLength(1);
 });
 
 it("explains the operating model, career path and contact routes without placeholder imagery", async () => {
   await renderHomepage();
-
-  expect(
-    screen.getByText(
-      "Signal identifies the valuable problem, System makes the workflow reliable and responsible, and Scale turns adoption into measurable change.",
-    ),
-  ).toBeInTheDocument();
 
   const career = screen.getByRole("region", { name: "Career snapshot" });
   for (const employer of ["Lenskart", "IIFL", "AGL", "Builder.ai", "Earlier career"]) {

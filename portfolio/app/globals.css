@@ -27,6 +27,14 @@
   --motion-fast: 150ms;
   --motion-standard: 200ms;
   --motion-settle: 320ms;
+  /* compatibility aliases for the component layer */
+  --ink: var(--color-ink);
+  --teal: var(--color-teal);
+  --muted-ink: var(--color-muted-ink);
+  --sand: var(--color-sand);
+  --font-body: var(--font-manrope), system-ui, sans-serif;
+  --font-display: var(--font-manrope), system-ui, sans-serif;
+  --section-space: clamp(52px, 6vw, 88px);
 }
 
 @theme inline {
@@ -67,12 +75,65 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--color-canvas);
+  background: #fff;
   color: var(--color-ink);
   font-family: var(--font-manrope), system-ui, sans-serif;
   font-size: var(--body-size);
   line-height: 1.65;
   text-rendering: optimizeLegibility;
+}
+
+/* Reference-parity visual system: clean white canvas, centered navigation,
+   compact section rhythm, and a balanced two-column first impression. */
+.site-header { background: #fff; border-bottom-color: #e7e7e7; }
+.site-header__inner { max-width: 1248px; }
+.site-wordmark { font-size: 1rem; }
+.site-wordmark__monogram { background: #111; color: #fff; font-family: var(--font-manrope), system-ui, sans-serif; }
+.desktop-navigation { gap: 2px; }
+.nav-link { color: #555; }
+.nav-link:hover, .nav-link[aria-current="page"] { color: #111; }
+.nav-link--contact { border-color: #111; color: #111; }
+.nav-link--contact:hover, .nav-link--contact[aria-current="page"] { background: #111; color: #fff; }
+@media (min-width: 900px) {
+  .site-header__inner { position: relative; }
+  .desktop-navigation { position: absolute; left: 50%; transform: translateX(-50%); }
+}
+
+section[aria-labelledby="home-hero-title"] > .container {
+  grid-template-columns: 1fr;
+}
+.hero-heading { max-width: 15ch; font-family: var(--font-manrope), system-ui, sans-serif; font-size: clamp(3.5rem, 6.2vw, 6rem); font-weight: 700; letter-spacing: -.065em; line-height: .98; }
+section[aria-labelledby="home-hero-title"] { padding-top: 40px !important; padding-bottom: 56px !important; }
+@media (min-width: 900px) {
+  section[aria-labelledby="home-hero-title"] > .container { grid-template-columns: minmax(0, 1.35fr) minmax(360px, .8fr); align-items: center; gap: clamp(48px, 7vw, 96px); }
+}
+section[aria-labelledby="home-hero-title"] .text-muted-ink { font-size: clamp(1.15rem, 2vw, 1.65rem); line-height: 1.35; }
+.signal-profile-card { min-height: 440px; border: 0; border-radius: 28px; background: #f4f1ea; color: #111; box-shadow: 0 18px 48px rgb(17 17 17 / 9%); padding: clamp(28px, 3vw, 42px); }
+.signal-profile-card__topline { color: #555; }
+.signal-profile-card__identity { margin-top: 40px; }
+.signal-profile-card__portrait, .signal-profile-card__monogram { width: 112px; height: 112px; flex-basis: 112px; border-color: rgb(17 17 17 / 15%); }
+.signal-profile-card__name { font-family: var(--font-manrope), system-ui, sans-serif; font-size: clamp(1.35rem, 2.5vw, 1.8rem); font-weight: 700; }
+.signal-profile-card__role { color: #555; }
+.signal-profile-card__current { color: #111; }
+.signal-profile-card__sequence li { border-top-color: rgb(17 17 17 / 16%); }
+.signal-profile-card__sequence strong { font-family: var(--font-manrope), system-ui, sans-serif; font-size: 1rem; }
+.signal-profile-card__sequence span { color: #555; }
+.signal-profile-card__actions a { color: #111; }
+.section-heading__title { font-family: var(--font-manrope), system-ui, sans-serif; font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 700; letter-spacing: -.055em; line-height: 1.06; }
+.section-heading__description { max-width: 56ch; color: #666; }
+.case-study-card { border-color: #e3e3e3; border-radius: 20px; background: #fff; }
+.case-study-card h3, .product-card h3, .learning-path-card h3 { font-family: var(--font-manrope), system-ui, sans-serif; font-weight: 700; letter-spacing: -.04em; }
+.impact-strip, .career-rail__item { border-color: #e3e3e3; }
+section[aria-label="Selected employer work"] .case-study-card { min-height: 330px; }
+section[aria-label="Selected employer work"] .work-grid { margin-top: 32px; }
+section[aria-label="Selected employer work"] .work-card { min-height: 320px; padding: 24px; }
+section[aria-label="Selected employer work"] .work-card h3 { margin-top: 18px; font-size: clamp(1.35rem, 2.2vw, 1.8rem); }
+section[aria-label="Selected employer work"] .work-card > p { margin-top: 12px; margin-bottom: 16px; font-size: .86rem; line-height: 1.45; }
+section[aria-label="Selected employer work"] .work-card .mt-5 { margin-top: 12px; }
+section[aria-label="Career snapshot"] > .container { gap: 32px; }
+.career-rail__item { min-height: 170px; }
+@media (min-width: 900px) {
+  section[aria-label="Career snapshot"] > .container { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); align-items: start; gap: 64px; }
 }
 
 a {
