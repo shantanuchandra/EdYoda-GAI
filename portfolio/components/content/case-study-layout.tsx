@@ -40,7 +40,10 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
       </header>
 
       <div className="container mt-10 grid gap-10 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-        <div className="min-w-0">
+        <aside className="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-[calc(var(--header-height)+24px)]">
+          <TableOfContents headings={item.headings} />
+        </aside>
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           <section aria-labelledby="case-study-outcomes">
             <h2 id="case-study-outcomes" className="m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">Outcomes</h2>
             <div className="mt-5"><OutcomeList outcomes={metadata.outcomes} /></div>
@@ -61,9 +64,6 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
             </nav>
           ) : null}
         </div>
-        <aside className="order-first lg:sticky lg:top-[calc(var(--header-height)+24px)] lg:order-none">
-          <TableOfContents headings={item.headings} />
-        </aside>
       </div>
     </article>
   );

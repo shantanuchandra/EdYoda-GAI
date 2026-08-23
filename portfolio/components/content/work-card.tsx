@@ -17,14 +17,24 @@ export function WorkCard({ item }: WorkCardProps) {
 
   return (
     <article className="group flex h-full min-h-[360px] flex-col rounded-card border border-line bg-surface p-[clamp(24px,4vw,36px)] transition-[border-color,box-shadow,translate] duration-200 ease-[var(--ease-out)] hover:-translate-y-1 hover:border-teal hover:shadow-[0_18px_48px_rgb(16_37_34_/_9%)] focus-within:-translate-y-1 focus-within:border-teal focus-within:shadow-[0_18px_48px_rgb(16_37_34_/_9%)]">
-      <div className="flex items-center justify-between gap-4 text-teal">
-        <p className="m-0 text-xs font-extrabold tracking-[0.1em] uppercase">{publicCompanyName(metadata.company)}</p>
+      <div className="flex items-start justify-between gap-4 text-teal">
+        <div>
+          <p className="m-0 text-xs font-extrabold tracking-[0.1em] uppercase">{publicCompanyName(metadata.company)}</p>
+          {metadata.industry.length > 0 ? <p className="mt-2 mb-0 text-xs font-semibold text-muted-ink">{metadata.industry.join(" · ")}</p> : null}
+        </div>
         <span aria-hidden="true">↗</span>
       </div>
       <h3 className="mt-7 mb-0 font-display text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.05] font-semibold tracking-[-0.025em]">
         <Link className="no-underline" href={href}>{metadata.title}</Link>
       </h3>
       <p className="mt-[18px] mb-7 text-[0.94rem] text-muted-ink">{metadata.description}</p>
+      {metadata.methods.length > 0 ? (
+        <ul aria-label="Methods and capabilities" className="mt-0 mb-0 flex list-none flex-wrap gap-2 p-0">
+          {metadata.methods.map((method) => (
+            <li className="rounded-full border border-line bg-canvas px-2.5 py-1 text-xs font-semibold text-teal-dark" key={method}>{method}</li>
+          ))}
+        </ul>
+      ) : null}
       {metadata.role ? <p className="mt-auto mb-0 text-xs font-bold tracking-[0.04em] text-teal-dark">{metadata.role}</p> : null}
       {outcome ? (
         <div className="mt-5 grid gap-[5px] border-t border-line pt-5">
