@@ -19,6 +19,8 @@ export const siteConfig = {
 };
 
 export function getSiteUrl(): URL {
-  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  const host = process.env.VERCEL_ENV === "preview"
+    ? process.env.VERCEL_URL
+    : process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
   return new URL(host ? `https://${host}` : "http://localhost:3000");
 }

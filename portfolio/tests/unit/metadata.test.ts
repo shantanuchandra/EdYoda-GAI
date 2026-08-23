@@ -9,6 +9,15 @@ import { metadata as homeMetadata } from "@/app/(site)/page";
 import sitemap from "@/app/sitemap";
 import robots from "@/app/robots";
 import { buildContentMetadata } from "@/lib/metadata";
+import { getSiteUrl } from "@/lib/site-config";
+
+it("uses the deployment URL for protected Preview metadata endpoints", () => {
+  vi.stubEnv("VERCEL_ENV", "preview");
+  vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "shantanu-chandra-portfolio.vercel.app");
+  vi.stubEnv("VERCEL_URL", "shantanu-chandra-portfolio-preview.vercel.app");
+  expect(getSiteUrl().toString()).toBe("https://shantanu-chandra-portfolio-preview.vercel.app/");
+  vi.unstubAllEnvs();
+});
 
 it("applies the Shantanu Chandra title template without duplicating the homepage title", () => {
   expect(rootMetadata.title).toEqual({
