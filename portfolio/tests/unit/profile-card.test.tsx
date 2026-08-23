@@ -7,7 +7,8 @@ it("renders the local portrait, identity, latest role and truthful skill chips",
 
   expect(screen.getByRole("img", { name: "Shantanu Chandra" })).toHaveAttribute("src", expect.stringContaining("shantanu-chandra-linkedin"));
   expect(screen.getByText("AI Transformation Leader")).toBeInTheDocument();
-  expect(screen.getByText("AI Product Lead at Lenskart")).toBeInTheDocument();
+  expect(screen.getByText("AI Product Lead")).toBeInTheDocument();
+  expect(screen.getByText("Lenskart")).toBeInTheDocument();
   expect(screen.getByText("November 2025 — Present")).toBeInTheDocument();
   const skills = screen.getByRole("list", { name: "Key skills" });
   expect(within(skills).getAllByRole("listitem").map((item) => item.textContent)).toEqual([

@@ -15,10 +15,11 @@ export function Hero() {
             Shantanu Chandra
           </h1>
           <span aria-hidden="true" className={styles.heroRule} />
-          <p className={styles.heroLead}>
-            <strong>AI Transformation Leader</strong>
-            <span>across industries, from strategy to scale.</span>
-          </p>
+          <h2 className={styles.heroLead}>
+            <strong>AI Transformation Leader</strong>{" "}
+            <span>across industries</span>
+            <span aria-hidden="true" className={styles.heroCaret} />
+          </h2>
           <div className={styles.heroActions}>
             <Button asChild className={styles.heroAction}>
               <Link href="/resume">View Resume <ArrowRight aria-hidden="true" /></Link>

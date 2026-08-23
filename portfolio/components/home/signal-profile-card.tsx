@@ -61,7 +61,8 @@ export function SignalProfileCard({ portraitSrc = "/images/shantanu-chandra-link
       <div className="signal-profile-card__section">
         <p className="signal-profile-card__section-title"><Briefcase aria-hidden="true" />Latest Role</p>
         <div className="signal-profile-card__current">
-          <strong>AI Product Lead at Lenskart</strong>
+          <strong>AI Product Lead</strong>
+          <span className="signal-profile-card__company">Lenskart</span>
           <span>November 2025 — Present</span>
           <span>Selecting, launching and governing AI products for retail journeys and operations.</span>
         </div>

@@ -28,7 +28,12 @@ it("presents the identity-first reference-parity hero and impact record", async 
   expect(heading).toHaveTextContent("Shantanu Chandra");
   const hero = heading.closest("section");
   expect(hero).not.toBeNull();
-  expect(within(hero as HTMLElement).getAllByText(/AI Transformation Leader/i)).not.toHaveLength(0);
+  expect(
+    within(hero as HTMLElement).getByRole("heading", {
+      level: 2,
+      name: "AI Transformation Leader across industries",
+    }),
+  ).toBeInTheDocument();
 
   for (const [name, href] of [
     ["View Resume", "/resume"],

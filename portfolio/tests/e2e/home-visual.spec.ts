@@ -17,9 +17,11 @@ test("desktop header and hero match the reference first-fold proportions", async
     const heroBox = hero.getBoundingClientRect();
     const headerBox = header.getBoundingClientRect();
     const portrait = profileCard.querySelector<HTMLElement>("img, [role='img']");
+    const lead = hero.querySelector<HTMLElement>("h2");
     const actionBoxes = [...hero.querySelectorAll<HTMLElement>("a")].map((action) => action.getBoundingClientRect());
     const wordmark = header.querySelector<HTMLElement>("a");
     if (!portrait) throw new Error("Professional portrait is missing");
+    if (!lead) throw new Error("Hero role statement is missing");
     if (!wordmark) throw new Error("Site wordmark is missing");
     const headingRange = document.createRange();
     headingRange.selectNodeContents(heading);
@@ -36,6 +38,8 @@ test("desktop header and hero match the reference first-fold proportions", async
       headingTop: headingBox.top,
       heroHeight: heroBox.height,
       heroTop: heroBox.top,
+      leadHeight: lead.getBoundingClientRect().height,
+      leadTop: lead.getBoundingClientRect().top,
       portraitSize: portrait.getBoundingClientRect().width,
       profileHeight: profileBox.height,
       profileLeft: profileBox.left,
@@ -55,28 +59,32 @@ test("desktop header and hero match the reference first-fold proportions", async
   expect(geometry.heroHeight).toBeGreaterThanOrEqual(740);
   expect(geometry.heroHeight).toBeLessThanOrEqual(790);
   expect(geometry.headingLines).toBeLessThanOrEqual(1.1);
-  expect(geometry.headingSize).toBeGreaterThanOrEqual(94);
-  expect(geometry.headingSize).toBeLessThanOrEqual(98);
+  expect(geometry.headingSize).toBeGreaterThanOrEqual(88);
+  expect(geometry.headingSize).toBeLessThanOrEqual(92);
   expect(geometry.headingTop).toBeGreaterThanOrEqual(305);
   expect(geometry.headingTop).toBeLessThanOrEqual(330);
-  expect(geometry.headingInkRight).toBeLessThanOrEqual(850);
+  expect(geometry.headingInkRight).toBeLessThanOrEqual(825);
   expect(geometry.profileLeft).toBeGreaterThan(geometry.headingRight);
-  expect(geometry.profileLeft).toBeGreaterThanOrEqual(860);
-  expect(geometry.profileLeft).toBeLessThanOrEqual(890);
-  expect(geometry.profileTop).toBeGreaterThanOrEqual(235);
-  expect(geometry.profileTop).toBeLessThanOrEqual(265);
-  expect(geometry.profileWidth).toBeGreaterThanOrEqual(405);
-  expect(geometry.profileWidth).toBeLessThanOrEqual(430);
-  expect(geometry.profileHeight).toBeGreaterThanOrEqual(475);
-  expect(geometry.profileHeight).toBeLessThanOrEqual(505);
-  expect(geometry.portraitSize).toBeGreaterThanOrEqual(72);
-  expect(geometry.portraitSize).toBeLessThanOrEqual(82);
+  expect(geometry.profileLeft).toBeGreaterThanOrEqual(824);
+  expect(geometry.profileLeft).toBeLessThanOrEqual(842);
+  expect(geometry.profileTop).toBeGreaterThanOrEqual(178);
+  expect(geometry.profileTop).toBeLessThanOrEqual(198);
+  expect(geometry.profileWidth).toBeGreaterThanOrEqual(495);
+  expect(geometry.profileWidth).toBeLessThanOrEqual(520);
+  expect(geometry.profileHeight).toBeGreaterThanOrEqual(600);
+  expect(geometry.profileHeight).toBeLessThanOrEqual(630);
+  expect(geometry.portraitSize).toBeGreaterThanOrEqual(90);
+  expect(geometry.portraitSize).toBeLessThanOrEqual(100);
+  expect(geometry.leadTop).toBeGreaterThanOrEqual(462);
+  expect(geometry.leadTop).toBeLessThanOrEqual(480);
+  expect(geometry.leadHeight).toBeGreaterThanOrEqual(105);
+  expect(geometry.leadHeight).toBeLessThanOrEqual(125);
   expect(geometry.resumeActionWidth).toBeGreaterThanOrEqual(145);
-  expect(geometry.resumeActionTop).toBeGreaterThanOrEqual(638);
-  expect(geometry.resumeActionTop).toBeLessThanOrEqual(655);
+  expect(geometry.resumeActionTop).toBeGreaterThanOrEqual(620);
+  expect(geometry.resumeActionTop).toBeLessThanOrEqual(636);
   expect(geometry.caseStudyActionWidth).toBeGreaterThanOrEqual(198);
-  expect(geometry.wordmarkLeft).toBeGreaterThanOrEqual(90);
-  expect(geometry.wordmarkLeft).toBeLessThanOrEqual(102);
+  expect(geometry.wordmarkLeft).toBeGreaterThanOrEqual(106);
+  expect(geometry.wordmarkLeft).toBeLessThanOrEqual(116);
   expect(geometry.actions).toBe(2);
 });
 
@@ -93,13 +101,24 @@ test("mobile hero stacks the reference composition without horizontal overflow",
     const profileBox = profileCard.getBoundingClientRect();
     const header = document.querySelector<HTMLElement>("header");
     const actions = [...hero.querySelectorAll<HTMLElement>("a")].map((action) => action.getBoundingClientRect());
+    const lead = hero.querySelector<HTMLElement>("h2");
     if (!header) throw new Error("Mobile header is missing");
+    if (!lead) throw new Error("Mobile role statement is missing");
+    const menuTrigger = header.querySelector<HTMLElement>("button");
+    if (!menuTrigger) throw new Error("Mobile menu trigger is missing");
+    const headingLineHeight = Number.parseFloat(getComputedStyle(heading).lineHeight);
+    const menuDisc = getComputedStyle(menuTrigger, "::before");
     return {
       fontSize: Number.parseFloat(getComputedStyle(heading).fontSize),
       headerHeight: header.getBoundingClientRect().height,
       heroHeight: heroBox.height,
       heroTop: heroBox.top,
       pageWidth: document.documentElement.scrollWidth,
+      headingLines: heading.getBoundingClientRect().height / headingLineHeight,
+      leadTop: lead.getBoundingClientRect().top,
+      menuDiscBackground: menuDisc.backgroundColor,
+      menuDiscRadius: menuDisc.borderRadius,
+      menuDiscWidth: Number.parseFloat(menuDisc.width),
       profileBelowHeading: profileBox.top > heading.getBoundingClientRect().bottom,
       profileLeft: profileBox.left,
       profileTop: profileBox.top,
@@ -111,22 +130,28 @@ test("mobile hero stacks the reference composition without horizontal overflow",
     };
   });
 
-  expect(geometry.fontSize).toBeGreaterThanOrEqual(48);
-  expect(geometry.fontSize).toBeLessThanOrEqual(60);
+  expect(geometry.fontSize).toBeGreaterThanOrEqual(42);
+  expect(geometry.fontSize).toBeLessThanOrEqual(46);
+  expect(geometry.headingLines).toBeLessThanOrEqual(1.1);
   expect(geometry.headerHeight).toBeGreaterThanOrEqual(78);
   expect(geometry.headerHeight).toBeLessThanOrEqual(82);
   expect(geometry.heroTop).toBeGreaterThanOrEqual(94);
   expect(geometry.heroTop).toBeLessThanOrEqual(98);
   expect(geometry.heroHeight).toBeGreaterThanOrEqual(900);
   expect(geometry.heroHeight).toBeLessThanOrEqual(1030);
-  expect(geometry.profileLeft).toBeGreaterThanOrEqual(44);
-  expect(geometry.profileLeft).toBeLessThanOrEqual(60);
-  expect(geometry.profileTop).toBeGreaterThanOrEqual(575);
-  expect(geometry.profileTop).toBeLessThanOrEqual(625);
-  expect(geometry.profileWidth).toBeGreaterThanOrEqual(278);
-  expect(geometry.profileWidth).toBeLessThanOrEqual(300);
-  expect(geometry.profileHeight).toBeGreaterThanOrEqual(385);
-  expect(geometry.profileHeight).toBeLessThanOrEqual(420);
+  expect(geometry.leadTop).toBeGreaterThanOrEqual(245);
+  expect(geometry.leadTop).toBeLessThanOrEqual(262);
+  expect(geometry.menuDiscBackground).toBe("rgb(238, 238, 238)");
+  expect(geometry.menuDiscRadius).toBe("50%");
+  expect(geometry.menuDiscWidth).toBe(40);
+  expect(geometry.profileLeft).toBeGreaterThanOrEqual(24);
+  expect(geometry.profileLeft).toBeLessThanOrEqual(38);
+  expect(geometry.profileTop).toBeGreaterThanOrEqual(540);
+  expect(geometry.profileTop).toBeLessThanOrEqual(565);
+  expect(geometry.profileWidth).toBeGreaterThanOrEqual(325);
+  expect(geometry.profileWidth).toBeLessThanOrEqual(345);
+  expect(geometry.profileHeight).toBeGreaterThanOrEqual(485);
+  expect(geometry.profileHeight).toBeLessThanOrEqual(515);
   expect(geometry.resumeActionWidth).toBeGreaterThanOrEqual(145);
   expect(geometry.resumeActionWidth).toBeLessThanOrEqual(165);
   expect(geometry.caseStudyActionWidth).toBeGreaterThanOrEqual(198);
