@@ -1,7 +1,9 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not apply TypeScript scope analysis. */
 import { readFile, readdir } from "node:fs/promises";
 import { extname, relative, resolve, sep } from "node:path";
-import { execFileSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
+
+import { extractText } from "unpdf";
 
 const scanRoots = ["app", "components", "content", "public"];
 const textExtensions = new Set([
@@ -76,8 +78,7 @@ function labelForPattern(pattern: RegExp): string {
   return pattern.toString();
 }
 
-export async function checkPublicCopy(): Promise<{ scannedFiles: number; scannedPdfs: number }> {
-  const root = process.cwd();
+export async function checkPublicCopy(root = process.cwd()): Promise<{ scannedFiles: number; scannedPdfs: number }> {
   const files = (await Promise.all(scanRoots.map((scanRoot) => collectFiles(resolve(root, scanRoot))))).flat();
   const failures: string[] = [];
   let scannedFiles = 0;
@@ -97,7 +98,8 @@ export async function checkPublicCopy(): Promise<{ scannedFiles: number; scanned
       scannedPdfs += 1;
       let pdfText: string;
       try {
-        pdfText = execFileSync("pdftotext", [filePath, "-"], { encoding: "utf8" });
+        const result = await extractText(new Uint8Array(await readFile(filePath)), { mergePages: true });
+        pdfText = result.text;
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
         failures.push(`${relative(root, filePath)}: unable to extract PDF text (${detail})`);
@@ -124,7 +126,9 @@ async function main(): Promise<void> {
   );
 }
 
-void main().catch((error: unknown) => {
-  globalThis.console.error(error);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  void main().catch((error: unknown) => {
+    globalThis.console.error(error);
+    process.exitCode = 1;
+  });
+}
