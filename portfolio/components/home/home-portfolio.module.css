@@ -599,6 +599,150 @@
   text-underline-offset: 5px;
 }
 
+.specializationSection {
+  box-sizing: border-box;
+  height: 716px;
+  overflow: hidden;
+  padding: 96px 16px;
+  background:
+    radial-gradient(circle at 82% 12%, rgb(183 228 213 / 16%), transparent 26%),
+    linear-gradient(180deg, rgb(251 252 251 / 90%), #fff);
+}
+
+.specializationSection :global(.container) {
+  width: min(calc(100% - 32px), 1280px);
+}
+
+.specializationHeader { text-align: center; }
+
+.specializationTitle {
+  margin: 0;
+  color: var(--home-ink);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 40px;
+}
+
+.specializationTitle span {
+  position: relative;
+  display: inline-block;
+}
+
+.specializationTitle span::after {
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--home-green-bright) 20%, var(--home-green) 80%, transparent);
+  content: "";
+  opacity: 0.72;
+  transform: scaleX(0.48);
+  transform-origin: center;
+  transition: transform 300ms var(--ease-out-expo), opacity 300ms ease;
+}
+
+.specializationSection:hover .specializationTitle span::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.specializationIntro {
+  width: min(100%, 672px);
+  margin: 16px auto 0;
+  color: var(--home-muted);
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.specializationGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 64px;
+}
+
+.specializationCard {
+  position: relative;
+  height: 348px;
+  overflow: hidden;
+  border: 1px solid rgb(15 107 93 / 13%);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 96%), rgb(240 246 243 / 70%)),
+    #fff;
+  padding: 48px 24px 24px;
+  box-shadow: 0 10px 15px -3px rgb(11 23 20 / 10%), 0 4px 6px -4px rgb(11 23 20 / 10%);
+  will-change: transform;
+  transition: border-color 300ms ease, background-color 300ms ease, box-shadow 300ms var(--ease-out-expo);
+}
+
+.specializationCard::after {
+  position: absolute;
+  right: -54px;
+  bottom: -72px;
+  width: 160px;
+  height: 160px;
+  border: 1px solid rgb(44 155 130 / 11%);
+  border-radius: 50%;
+  content: "";
+  transition: border-color 300ms ease, scale 300ms var(--ease-out-expo);
+}
+
+.specializationCard:hover {
+  border-color: rgb(15 107 93 / 28%);
+  box-shadow: 0 22px 34px -16px rgb(11 87 75 / 30%), 0 8px 14px -9px rgb(11 23 20 / 14%);
+}
+
+.specializationCard:hover::after {
+  border-color: rgb(44 155 130 / 24%);
+  scale: 1.16;
+}
+
+.specializationIcon {
+  display: inline-flex;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(15 107 93 / 10%);
+  border-radius: 10px;
+  background: var(--home-fog);
+  color: var(--home-green-dark);
+  box-shadow: 0 6px 12px rgb(11 87 75 / 8%);
+  transition: color 300ms ease, transform 300ms var(--ease-out-expo), background-color 300ms ease;
+}
+
+.specializationCard:hover .specializationIcon {
+  background: #dcece6;
+  color: var(--home-green);
+  transform: rotate(-3deg) scale(1.06);
+}
+
+.specializationCardTitle {
+  position: relative;
+  z-index: 1;
+  margin: 24px 0 0;
+  color: var(--home-ink);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 28px;
+}
+
+.specializationCardDescription {
+  position: relative;
+  z-index: 1;
+  margin: 12px 0 0;
+  color: var(--home-muted);
+  font-size: 14px;
+  line-height: 23px;
+}
+
 .systemGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1060,6 +1204,8 @@
   .sectionTop { grid-template-columns: 1fr; gap: 26px; }
   .sectionTitle { max-width: 14ch; }
   .workGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .specializationSection { height: auto; }
+  .specializationGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .systemGrid { grid-template-columns: 1fr; }
   .systemStage { min-height: 0; border-right: 0; border-bottom: 1px solid var(--home-line); }
   .systemStage:last-child { border-bottom: 0; }
@@ -1118,6 +1264,12 @@
   .careerViewport::after { width: 36px; }
   .careerItem { width: 280px; flex-basis: 280px; }
   .careerMotionButton { right: 2px; }
+  .specializationSection { height: 1652px; }
+  .specializationSection :global(.container) { width: 358px; }
+  .specializationTitle { font-size: 30px; line-height: 36px; }
+  .specializationIntro { height: 84px; }
+  .specializationGrid { grid-template-columns: 1fr; gap: 24px; }
+  .specializationCard { height: 297px; }
   .contactPanel { border-radius: 22px; }
   .contactActions { grid-template-columns: 1fr; }
 }
@@ -1137,4 +1289,5 @@
   .home *::after {
     transition-duration: 0.01ms !important;
   }
+  .specializationTitle span::after { opacity: 1; transform: scaleX(1); }
 }

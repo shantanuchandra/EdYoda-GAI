@@ -79,23 +79,30 @@ it("organizes the approved work and capabilities around Signal, System and Scale
     "Builder.ai",
   ]);
 
-  const capabilitiesHeading = screen.getByRole("heading", { name: "Transformation is an operating system." });
+  const capabilitiesHeading = screen.getByRole("heading", { name: "Areas of Specialization" });
   const capabilitiesSection = capabilitiesHeading.closest("section");
   expect(capabilitiesSection).not.toBeNull();
   expect(within(capabilitiesSection as HTMLElement).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
     "Signal",
     "System",
     "Scale",
+    "Across industries",
   ]);
-  expect(within(capabilitiesSection as HTMLElement).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
-    "AI product strategy and portfolio prioritization",
-    "workflow and operating-model redesign",
-    "product discovery and adoption",
-    "RAG, agentic systems and evaluation design",
-    "human review and responsible deployment",
-    "cross-functional product and engineering leadership",
-    "measurement, iteration and scale",
-  ]);
+  expect(capabilitiesSection).toHaveAttribute("aria-labelledby", "specialization-title");
+  expect(capabilitiesSection?.querySelectorAll("[data-specialization-card]")).toHaveLength(4);
+  expect(capabilitiesSection?.querySelectorAll("svg[aria-hidden='true']")).toHaveLength(4);
+  expect(capabilitiesSection).toHaveTextContent("AI product strategy and portfolio prioritization");
+  expect(capabilitiesSection).toHaveTextContent("workflow and operating-model redesign");
+  expect(capabilitiesSection).toHaveTextContent("RAG, agentic systems and evaluation design");
+  expect(capabilitiesSection).toHaveTextContent("human review and responsible deployment");
+  expect(capabilitiesSection).toHaveTextContent("cross-functional product and engineering leadership");
+  expect(capabilitiesSection).toHaveTextContent("measurement, iteration and scale");
+  expect(capabilitiesSection).toHaveTextContent("Retail, lending, AdTech, SaaS and enterprise software");
+
+  const career = screen.getByRole("region", { name: "Career snapshot" });
+  const impact = screen.getByRole("region", { name: "Impact highlights" });
+  expect(career.compareDocumentPosition(capabilitiesSection as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect((capabilitiesSection as HTMLElement).compareDocumentPosition(impact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
   expect(screen.queryByRole("region", { name: "Independent products" })).not.toBeInTheDocument();
   expect(screen.queryByRole("region", { name: "Learning Lab paths" })).not.toBeInTheDocument();

@@ -65,6 +65,7 @@ export function CareerRail({ roles }: CareerRailProps) {
     earlierCareer,
   ], [roles]);
   const primaryGroupRef = useRef<HTMLOListElement>(null);
+  const dragOriginRef = useRef<{ clientX: number; pointerId: number; x: number } | null>(null);
   const x = useMotionValue(0);
   const shouldReduceMotion = useReducedMotion();
   const [cycleWidth, setCycleWidth] = useState(0);
@@ -118,6 +119,29 @@ export function CareerRail({ roles }: CareerRailProps) {
     x.set(wrap(-cycleWidth, 0, x.get() + direction * 324));
   }
 
+  function beginDrag(event: React.PointerEvent<HTMLDivElement>) {
+    if (motionDisabled || cycleWidth <= 0) return;
+    dragOriginRef.current = { clientX: event.clientX, pointerId: event.pointerId, x: x.get() };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setInteracting(true);
+  }
+
+  function continueDrag(event: React.PointerEvent<HTMLDivElement>) {
+    const origin = dragOriginRef.current;
+    if (!origin || origin.pointerId !== event.pointerId) return;
+    x.set(Math.min(0, Math.max(-cycleWidth, origin.x + event.clientX - origin.clientX)));
+  }
+
+  function endDrag(event: React.PointerEvent<HTMLDivElement>) {
+    const origin = dragOriginRef.current;
+    if (!origin || origin.pointerId !== event.pointerId) return;
+    dragOriginRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setInteracting(false);
+  }
+
   return (
     <div className={styles.careerRail}>
       <p className="sr-only" id="career-rail-instructions">
@@ -142,17 +166,15 @@ export function CareerRail({ roles }: CareerRailProps) {
         }}
         onMouseEnter={() => setInteracting(true)}
         onMouseLeave={() => setInteracting(false)}
+        onPointerCancel={endDrag}
+        onPointerDown={beginDrag}
+        onPointerMove={continueDrag}
+        onPointerUp={endDrag}
         tabIndex={0}
       >
         <motion.div
           className={styles.careerTrack}
           data-career-track
-          drag={motionDisabled ? false : "x"}
-          dragConstraints={{ left: -cycleWidth, right: 0 }}
-          dragElastic={0.04}
-          dragMomentum={false}
-          onDragEnd={() => setInteracting(false)}
-          onDragStart={() => setInteracting(true)}
           style={{ x }}
         >
           <ol aria-label="Career timeline" className={styles.careerGroup} ref={primaryGroupRef}>
