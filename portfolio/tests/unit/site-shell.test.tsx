@@ -1,0 +1,95 @@
+/* eslint-disable no-undef -- the inherited Babel parser does not apply DOM type scope analysis. */
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
+import SiteLayout from "@/app/(site)/layout";
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/work",
+}));
+
+it("provides semantic landmarks and a keyboard skip link", () => {
+  render(
+    <SiteLayout>
+      <h1>Page title</h1>
+    </SiteLayout>,
+  );
+
+  expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#main-content");
+  expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  expect(screen.getByRole("banner")).toBeInTheDocument();
+  expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+});
+
+it("exposes the brand and complete primary navigation", () => {
+  render(
+    <SiteLayout>
+      <h1>Page title</h1>
+    </SiteLayout>,
+  );
+
+  const header = within(screen.getByRole("banner"));
+  const primaryNavigation = within(header.getByRole("navigation", { name: "Primary" }));
+  expect(header.getByRole("link", { name: "Shantanu Chandra" })).toHaveAttribute("href", "/");
+
+  for (const [name, href] of [
+    ["Work", "/work"],
+    ["Products", "/products"],
+    ["Learning", "/learning"],
+    ["Insights", "/insights"],
+    ["About", "/about"],
+    ["Contact", "/contact"],
+  ]) {
+    expect(primaryNavigation.getByRole("link", { name })).toHaveAttribute("href", href);
+  }
+
+  expect(primaryNavigation.getByRole("link", { name: "Work" })).toHaveAttribute("aria-current", "page");
+});
+
+it("opens and closes the mobile navigation accessibly and restores trigger focus", async () => {
+  const user = userEvent.setup();
+  render(
+    <SiteLayout>
+      <h1>Page title</h1>
+    </SiteLayout>,
+  );
+
+  const trigger = screen.getByRole("button", { name: "Open menu" });
+  expect(trigger).toHaveStyle({ minHeight: "44px", minWidth: "44px" });
+  expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+  await user.click(trigger);
+
+  expect(trigger).toHaveAttribute("aria-expanded", "true");
+  const dialog = screen.getByRole("dialog", { name: "Site navigation" });
+  const close = screen.getByRole("button", { name: "Close menu" });
+  expect(dialog).toContainElement(close);
+  expect(close).toHaveFocus();
+
+  await user.click(close);
+
+  expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument();
+  expect(trigger).toHaveFocus();
+});
+
+it("contains focus in the open menu and closes it with Escape", async () => {
+  const user = userEvent.setup();
+  render(
+    <SiteLayout>
+      <h1>Page title</h1>
+    </SiteLayout>,
+  );
+
+  const trigger = screen.getByRole("button", { name: "Open menu" });
+  await user.click(trigger);
+  const dialog = screen.getByRole("dialog", { name: "Site navigation" });
+  const focusable = dialog.querySelectorAll<HTMLElement>("a, button");
+
+  focusable.item(focusable.length - 1).focus();
+  await user.tab();
+  expect(focusable.item(0)).toHaveFocus();
+
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument();
+  expect(trigger).toHaveFocus();
+});
