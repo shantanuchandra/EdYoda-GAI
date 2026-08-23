@@ -3,7 +3,21 @@ import { expect, test } from "@playwright/test";
 
 const pdfPath = "/shantanu-chandra-resume.pdf";
 
-test("does not prefetch any rendered PDF resume link", async ({ page }) => {
+test("does not prefetch PDF resume links on any sitemap route", async ({ page, request }, testInfo) => {
+  const sitemapResponse = await request.get("/sitemap.xml");
+  expect(sitemapResponse.status(), "sitemap.xml must be available for route discovery").toBe(200);
+
+  const sitemapXml = await sitemapResponse.text();
+  const sitemapLocations = Array.from(sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g), (match) => match[1]);
+  expect(sitemapLocations.length, "sitemap.xml must publish at least one route").toBeGreaterThan(0);
+
+  const sitemapUrls = sitemapLocations.map((location) => new URL(location));
+  const sitemapOrigins = new Set(sitemapUrls.map((url) => url.origin));
+  expect(sitemapOrigins.size, "every sitemap entry must use one canonical origin").toBe(1);
+
+  const routes = sitemapUrls.map((url) => `${url.pathname}${url.search}`);
+  expect(new Set(routes).size, "sitemap.xml must not contain duplicate routes").toBe(routes.length);
+
   const pdfRequests: string[] = [];
   page.on("request", (request) => {
     if (new URL(request.url()).pathname === pdfPath) {
@@ -11,12 +25,16 @@ test("does not prefetch any rendered PDF resume link", async ({ page }) => {
     }
   });
 
-  for (const route of ["/", "/contact", "/resume?print=1"]) {
+  let checkedLinks = 0;
+  for (const route of routes) {
     pdfRequests.length = 0;
-    await page.goto(route, { waitUntil: "domcontentloaded" });
+    const routeResponse = await page.goto(route, { waitUntil: "domcontentloaded" });
+    expect(routeResponse?.status(), `sitemap route ${route} must return HTTP 200`).toBe(200);
 
     const renderedPdfLinks = page.locator(`a[href="${pdfPath}"]`);
-    expect(await renderedPdfLinks.count(), `${route} must render at least one PDF link`).toBeGreaterThan(0);
+    const routeLinkCount = await renderedPdfLinks.count();
+    expect(routeLinkCount, `${route} must render at least one PDF link`).toBeGreaterThan(0);
+    checkedLinks += routeLinkCount;
 
     for (const link of await renderedPdfLinks.all()) {
       await link.scrollIntoViewIfNeeded();
@@ -25,6 +43,14 @@ test("does not prefetch any rendered PDF resume link", async ({ page }) => {
 
     expect(pdfRequests, `${route} made an unsolicited PDF request`).toEqual([]);
   }
+
+  testInfo.annotations.push({
+    type: "coverage",
+    description: `${routes.length} sitemap routes; ${checkedLinks} rendered PDF links checked`,
+  });
+  globalThis.console.log(
+    `PDF prefetch coverage: ${routes.length} sitemap routes; ${checkedLinks} rendered PDF links checked; 0 unsolicited requests`,
+  );
 });
 
 test("fetches the PDF when a visitor activates a resume link", async ({ page }) => {
