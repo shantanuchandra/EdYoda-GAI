@@ -107,7 +107,15 @@ it("renders a print-ready public resume with individually named, verified experi
   expect(within(education).getByText("Bachelor of Engineering, Computer Science")).toBeInTheDocument();
   expect(within(education).getByText(/Manipal Institute of Technology/i)).toBeInTheDocument();
 
-  const methods = screen.getByRole("region", { name: "Methods and tools" });
+  const methods = screen.getByRole("region", { name: "Professional Skills" });
+  expect(methods).toHaveAttribute("data-resume-skills", "true");
+  expect(within(methods).getByRole("heading", { level: 2, name: "Professional Skills" })).toBeInTheDocument();
+  expect(within(methods).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
+    "Applied AI",
+    "Product leadership",
+    "Data and platforms",
+    "Design and delivery",
+  ]);
   for (const method of ["RAG", "AI agents", "model evaluation", "SQL", "Python", "AWS", "Figma", "Miro"]) {
     expect(within(methods).getByText(new RegExp(method, "i"))).toBeInTheDocument();
   }

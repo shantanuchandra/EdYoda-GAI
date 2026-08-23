@@ -102,3 +102,31 @@ test("education starts left and alternates like the reference timeline", async (
   expect(positions[1].top - positions[0].top).toBeGreaterThanOrEqual(196);
   positions.forEach((position) => expect(position.width).toBeGreaterThanOrEqual(460));
 });
+
+test("professional skills uses the reference two-column card grid", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/resume", { waitUntil: "domcontentloaded" });
+
+  const geometry = await page.evaluate(() => {
+    const section = document.querySelector<HTMLElement>("[data-resume-skills]");
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-resume-skill-card]"));
+    if (!section || cards.length !== 4) throw new Error("Professional skills grid is incomplete");
+    const heading = section.querySelector<HTMLElement>("h2");
+    if (!heading) throw new Error("Professional skills heading is missing");
+    return {
+      heading: heading.getBoundingClientRect(),
+      section: section.getBoundingClientRect(),
+      cards: cards.map((card) => card.getBoundingClientRect()),
+    };
+  });
+
+  expect(geometry.section.width).toBeGreaterThanOrEqual(988);
+  expect(geometry.heading.width).toBeGreaterThanOrEqual(988);
+  expect(geometry.cards[0].left).toBeGreaterThanOrEqual(164);
+  expect(geometry.cards[0].left).toBeLessThanOrEqual(174);
+  expect(geometry.cards[1].left).toBeGreaterThanOrEqual(659);
+  expect(geometry.cards[1].left).toBeLessThanOrEqual(669);
+  expect(geometry.cards[2].top).toBeGreaterThan(geometry.cards[0].top);
+  expect(geometry.cards[3].top).toBeGreaterThan(geometry.cards[1].top);
+  expect(geometry.cards.every((card) => card.width >= 440 && card.width <= 452)).toBe(true);
+});

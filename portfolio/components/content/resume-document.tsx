@@ -128,6 +128,52 @@ export function ResumeDocument() {
         </article>
       </section>
 
+      <section aria-label="Professional Skills" className="resume-section resume-section--skills" data-resume-skills="true">
+        <h2>Professional Skills</h2>
+        <div className="resume-skills__panel">
+          <section className="resume-skill-card" data-resume-skill-card>
+            <h3>Applied AI</h3>
+            <ul>
+              <li>RAG</li>
+              <li>AI agents</li>
+              <li>Model evaluation</li>
+              <li>Human-review workflows</li>
+              <li>Rule-based intent detection</li>
+            </ul>
+          </section>
+          <section className="resume-skill-card" data-resume-skill-card>
+            <h3>Product leadership</h3>
+            <ul>
+              <li>Product strategy</li>
+              <li>Discovery and roadmaps</li>
+              <li>Operating design</li>
+              <li>Go-to-market</li>
+              <li>Stakeholder leadership</li>
+            </ul>
+          </section>
+          <section className="resume-skill-card" data-resume-skill-card>
+            <h3>Data and platforms</h3>
+            <ul>
+              <li>SQL</li>
+              <li>Python</li>
+              <li>AWS</li>
+              <li>Supabase</li>
+              <li>Railway</li>
+            </ul>
+          </section>
+          <section className="resume-skill-card" data-resume-skill-card>
+            <h3>Design and delivery</h3>
+            <ul>
+              <li>Figma</li>
+              <li>Miro</li>
+              <li>Jira</li>
+              <li>Agile delivery</li>
+              <li>Customer adoption</li>
+            </ul>
+          </section>
+        </div>
+      </section>
+
       <section aria-label="Profile" className="resume-profile">
         <h2>Profile</h2>
         <p className="resume-document__descriptor">{siteConfig.descriptor}</p>
@@ -138,24 +184,6 @@ export function ResumeDocument() {
         <p className="resume-document__summary">
           AI product and transformation leader with 12+ years across retail, lending, AdTech, SaaS and enterprise software, including five years building and launching AI products. I connect product judgment, operating design, evaluation, governance and adoption to turn useful signals into measurable systems at scale.
         </p>
-      </section>
-
-      <section aria-label="Methods and tools" className="resume-section resume-section--methods">
-          <h2>Methods and tools</h2>
-          <dl className="resume-methods">
-            <div>
-              <dt>Applied AI</dt>
-              <dd>RAG, AI agents, model evaluation, human-review workflows, rule-based intent detection</dd>
-            </div>
-            <div>
-              <dt>Data and infrastructure</dt>
-              <dd>SQL, Python, AWS, Supabase, Railway</dd>
-            </div>
-            <div>
-              <dt>Product</dt>
-              <dd>Jira, Figma, Miro</dd>
-            </div>
-          </dl>
       </section>
 
       <footer className="resume-document__footer">
