@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize imports used by JSX or TypeScript. */
 import Link from "next/link";
+import { builderRoles } from "@/lib/resume-data";
 import { siteConfig } from "@/lib/site-config";
 
 type ResumeRoleProps = {
@@ -55,7 +56,7 @@ export function ResumeDocument() {
         <ResumeRole company="IIFL Home Loans" period="May 2024–Oct 2025" role="AVP / Lead Product Manager">
           <p className="resume-role__scope">Managed six product managers and led 25 engineers and data scientists across three squads.</p>
           <ul>
-            <li>Integrated credit bureau, KYC and Account Aggregator services into an app handling about one million onboardings a month; employed-customer onboarding and approval moved from one week to 20 minutes.</li>
+            <li>Integrated credit bureau, KYC and Account Aggregator services into an app handling about one million onboardings a month; employed-customer onboarding and approval reached 20 minutes.</li>
             <li>Piloted a RAG policy assistant with 2,000 field-sales employees. Of about 100 weekly questions, 80% cleared a 95% confidence threshold; remaining questions went to policy specialists.</li>
             <li>Kept customer communications and collections actions behind human approval and an audit trail, with KYC and anti-money-laundering checks aligned to RBI and NHB requirements.</li>
           </ul>
@@ -69,7 +70,14 @@ export function ResumeDocument() {
           </ul>
         </ResumeRole>
 
-        <ResumeRole company="Builder.ai" period="Dec 2020–Aug 2023" role="Senior Product Manager, Conversational AI">
+        <ResumeRole company={builderRoles[0].company} period={builderRoles[0].periodLabel} role={builderRoles[0].title}>
+          <p className="resume-role__scope">Product design systems and customer problem framing.</p>
+          <ul>
+            <li>Led early customer discovery and product design work that established the foundations for the conversational planning workflow.</li>
+          </ul>
+        </ResumeRole>
+
+        <ResumeRole company={builderRoles[1].company} period={builderRoles[1].periodLabel} role={builderRoles[1].title}>
           <p className="resume-role__scope">Led four product managers, two designers and 14 engineers and data scientists across five product squads.</p>
           <ul>
             <li>Led customer interviews, beta programmes, product demos and sales enablement for a conversational planning product, reaching 90% adoption among 150 customer-success managers.</li>

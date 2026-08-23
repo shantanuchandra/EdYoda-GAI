@@ -27,6 +27,8 @@ it("presents the verified first-person career narrative and complete chronology"
   expect(screen.getByText(/software and data foundations/i)).toBeInTheDocument();
   expect(screen.getByText(/moved through customer-facing operations and product leadership/i)).toBeInTheDocument();
   expect(screen.getByText(/AI product scale/i)).toBeInTheDocument();
+  expect(screen.getByText("Product Manager (Design)")).toBeInTheDocument();
+  expect(screen.getByText("Senior Product Manager (Conversational AI)")).toBeInTheDocument();
   expect(screen.getByText(/enterprise transformation/i)).toBeInTheDocument();
   expect(screen.getByText(/independent products and practical instruction in generative AI and no-code agents/i)).toBeInTheDocument();
 
@@ -35,6 +37,7 @@ it("presents the verified first-person career narrative and complete chronology"
     "Lenskart",
     "IIFL Home Loans",
     "AGL (Hakuhodo)",
+    "Builder.ai",
     "Builder.ai",
     "NUiO",
     "Pantheon",
@@ -78,10 +81,12 @@ it("renders a print-ready public resume with verified groupings and safe identit
     "IIFL Home Loans",
     "AGL (Hakuhodo)",
     "Builder.ai",
+    "Builder.ai",
     "Earlier career",
     "Independent products",
   ]);
   expect(within(career).getByText(/more than 75%/i)).toBeInTheDocument();
+  expect(within(career).getByText(/reached 20 minutes/i)).toBeInTheDocument();
   expect(within(career).getByText(/121 early-access requests/i)).toBeInTheDocument();
   expect(within(career).getByText("Card Compass · Case study only")).toBeInTheDocument();
 

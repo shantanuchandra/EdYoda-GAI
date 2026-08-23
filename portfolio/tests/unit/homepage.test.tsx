@@ -39,7 +39,7 @@ it("presents the proof-first hero and impact record", async () => {
 
   for (const [value, label] of [
     ["200 stores", "Hindi and English voice-guided eye test at Lenskart"],
-    ["1 week → 20 minutes", "Employed-customer onboarding and approval at IIFL"],
+    ["20 minutes", "Employed-customer onboarding and approval at IIFL"],
     ["70% less manual work", "Campaign operations across five commerce platforms at AGL"],
     ["50 → 25,000", "Monthly completed onboardings in six months at Builder.ai"],
   ]) {
