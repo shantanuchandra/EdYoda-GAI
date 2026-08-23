@@ -1,5 +1,5 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not apply DOM type scope analysis. */
-import { act, render, screen, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import SiteLayout from "@/app/(site)/layout";
@@ -132,7 +132,7 @@ it("opens and closes the mobile navigation accessibly and restores trigger focus
 
   await user.click(close);
 
-  expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument());
   expect(trigger).toHaveFocus();
 });
 
@@ -157,7 +157,7 @@ it("contains focus in the open menu and closes it with Escape", async () => {
   expect(focusable.item(focusable.length - 1)).toHaveFocus();
 
   await user.keyboard("{Escape}");
-  expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument());
   expect(trigger).toHaveFocus();
 });
 
@@ -174,7 +174,8 @@ it("locks body scrolling only while the mobile menu is open", async () => {
   expect(document.body.style.overflow).toBe("hidden");
 
   await user.click(screen.getByRole("button", { name: "Close menu" }));
-  expect(document.body.style.overflow).toBe("auto");
+  expect(document.body.style.overflow).toBe("hidden");
+  await waitFor(() => expect(document.body.style.overflow).toBe("auto"));
 });
 
 it("restores body scrolling and removes the breakpoint listener when unmounted open", async () => {
@@ -209,7 +210,7 @@ it("closes an open mobile menu when the viewport becomes desktop", async () => {
 
   enterDesktopViewport();
 
-  expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Site navigation" })).not.toBeInTheDocument());
   expect(document.body.style.overflow).toBe("auto");
   expect(within(screen.getByRole("banner")).getByRole("link", { name: "Shantanu Chandra" })).toHaveFocus();
 });

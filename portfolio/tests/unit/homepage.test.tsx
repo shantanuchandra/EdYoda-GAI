@@ -41,7 +41,11 @@ it("presents the identity-first reference-parity hero and impact record", async 
   ]) {
     expect(within(hero as HTMLElement).getByRole("link", { name })).toHaveAttribute("href", href);
   }
-  expect(within(hero as HTMLElement).getAllByRole("link")).toHaveLength(2);
+  expect(within(hero as HTMLElement).getByRole("link", { name: "Scroll to impact highlights" })).toHaveAttribute(
+    "href",
+    "#impact-highlights",
+  );
+  expect(within(hero as HTMLElement).getAllByRole("link")).toHaveLength(3);
 
   for (const [value, label] of [
     ["200 stores", "Hindi and English voice-guided eye test at Lenskart"],

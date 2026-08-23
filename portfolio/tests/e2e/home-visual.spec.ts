@@ -4,6 +4,9 @@ import { expect, test } from "@playwright/test";
 test("desktop header and hero match the reference first-fold proportions", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.locator("[data-hero-motion='card']").evaluate((element) => Promise.all(
+    element.getAnimations().map((animation) => animation.finished),
+  ));
 
   const geometry = await page.evaluate(() => {
     const heading = document.querySelector<HTMLElement>("#home-hero-title");
@@ -18,7 +21,8 @@ test("desktop header and hero match the reference first-fold proportions", async
     const headerBox = header.getBoundingClientRect();
     const portrait = profileCard.querySelector<HTMLElement>("img, [role='img']");
     const lead = hero.querySelector<HTMLElement>("h2");
-    const actionBoxes = [...hero.querySelectorAll<HTMLElement>("a")].map((action) => action.getBoundingClientRect());
+    const actionLinks = hero.querySelectorAll<HTMLElement>("a[href='/resume'], a[href='/case-studies']");
+    const actionBoxes = [...actionLinks].map((action) => action.getBoundingClientRect());
     const wordmark = header.querySelector<HTMLElement>("a");
     if (!portrait) throw new Error("Professional portrait is missing");
     if (!lead) throw new Error("Hero role statement is missing");
@@ -28,7 +32,7 @@ test("desktop header and hero match the reference first-fold proportions", async
     const lineHeight = Number.parseFloat(getComputedStyle(heading).lineHeight);
 
     return {
-      actions: hero.querySelectorAll("a").length,
+      actions: actionLinks.length,
       headerHeight: headerBox.height,
       headingHeight: headingBox.height,
       headingLines: headingBox.height / lineHeight,
@@ -91,6 +95,9 @@ test("desktop header and hero match the reference first-fold proportions", async
 test("mobile hero stacks the reference composition without horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.locator("[data-hero-motion='card']").evaluate((element) => Promise.all(
+    element.getAnimations().map((animation) => animation.finished),
+  ));
 
   const geometry = await page.evaluate(() => {
     const heading = document.querySelector<HTMLElement>("#home-hero-title");
@@ -100,7 +107,8 @@ test("mobile hero stacks the reference composition without horizontal overflow",
     const heroBox = hero.getBoundingClientRect();
     const profileBox = profileCard.getBoundingClientRect();
     const header = document.querySelector<HTMLElement>("header");
-    const actions = [...hero.querySelectorAll<HTMLElement>("a")].map((action) => action.getBoundingClientRect());
+    const actions = [...hero.querySelectorAll<HTMLElement>("a[href='/resume'], a[href='/case-studies']")]
+      .map((action) => action.getBoundingClientRect());
     const lead = hero.querySelector<HTMLElement>("h2");
     if (!header) throw new Error("Mobile header is missing");
     if (!lead) throw new Error("Mobile role statement is missing");

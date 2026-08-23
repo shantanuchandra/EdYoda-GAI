@@ -3,40 +3,54 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize JSX/DOM scope analysis. */
 import Image from "next/image";
 import { Award, Briefcase } from "lucide-react";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
-import { useState, type PointerEvent } from "react";
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
-type SignalProfileCardProps = {
-  portraitSrc?: string;
-};
+type SignalProfileCardProps = { portraitSrc?: string };
 
 export function SignalProfileCard({ portraitSrc = "/images/shantanu-chandra-linkedin.jpg" }: SignalProfileCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
+  const cardRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
-  const pointerX = useMotionValue(0.5);
-  const pointerY = useMotionValue(0.5);
-  const rotateX = useSpring(useTransform(pointerY, [0, 1], [6, -6]), { stiffness: 320, damping: 32 });
-  const rotateY = useSpring(useTransform(pointerX, [0, 1], [-6, 6]), { stiffness: 320, damping: 32 });
-  const sheenX = useTransform(pointerX, [0, 1], ["-115%", "115%"]);
+  const rotateX = useMotionValue(2);
+  const rotateY = useMotionValue(-1);
+  const sheen = useMotionValue(0);
+  const sheenX = useTransform(sheen, (value) => `${value}%`);
 
-  function handlePointerMove(event: PointerEvent<HTMLElement>) {
+  function updatePointer(clientX: number, clientY: number, bounds: DOMRect) {
     if (reducedMotion) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - bounds.left) / bounds.width);
-    pointerY.set((event.clientY - bounds.top) / bounds.height);
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
+    const nextRotateX = ((clientY - centerY) / (bounds.height / 2)) * 6;
+    const nextRotateY = -6 * ((clientX - centerX) / (bounds.width / 2));
+    const nextSheen = ((clientX - bounds.left) / bounds.width) * 100;
+
+    requestAnimationFrame(() => {
+      animate(rotateX, nextRotateX, { duration: 0.1, ease: "linear" });
+      animate(rotateY, nextRotateY, { duration: 0.1, ease: "linear" });
+      animate(sheen, nextSheen, { duration: 0.1, ease: "linear" });
+    });
   }
 
-  function resetTilt() {
-    pointerX.set(0.5);
-    pointerY.set(0.5);
-  }
+  useEffect(() => {
+    if (reducedMotion) return;
+    const card = cardRef.current;
+    if (!card) return;
+
+    const followPointer = (event: globalThis.PointerEvent) => {
+      updatePointer(event.clientX, event.clientY, card.getBoundingClientRect());
+    };
+
+    window.addEventListener("pointermove", followPointer, { passive: true });
+    return () => window.removeEventListener("pointermove", followPointer);
+  }, [reducedMotion, rotateX, rotateY, sheen]);
 
   return (
     <motion.aside
       aria-label="Professional profile"
       className="signal-profile-card"
-      onPointerLeave={resetTilt}
-      onPointerMove={handlePointerMove}
+      data-hero-motion="card"
+      ref={cardRef}
       style={reducedMotion ? undefined : { rotateX, rotateY, rotateZ: -1, transformPerspective: 1000 }}
     >
       <motion.span aria-hidden="true" className="signal-profile-card__sheen" style={reducedMotion ? undefined : { x: sheenX }} />

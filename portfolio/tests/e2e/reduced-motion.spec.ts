@@ -8,6 +8,14 @@ const revealSelectors = [
 async function enterViewportAndSample(page: Page, selector: string, waitForAnimation: boolean) {
   const wrapper = page.locator(selector).first();
 
+  const before = await wrapper.boundingBox();
+  if (!before || (before.y + before.height > 0 && before.y < (page.viewportSize()?.height ?? 0))) {
+    throw new Error(`Reveal must start outside the viewport; box=${JSON.stringify(before)}`);
+  }
+
+  await wrapper.scrollIntoViewIfNeeded();
+  await expect(wrapper).toBeInViewport();
+
   return wrapper.evaluate(async (element, shouldWaitForAnimation) => {
     const relevantAnimations = () => element.getAnimations()
       .map((animation) => {
@@ -32,24 +40,6 @@ async function enterViewportAndSample(page: Page, selector: string, waitForAnima
         translateY: computed.transform === "none" ? 0 : new DOMMatrixReadOnly(computed.transform).m42,
       };
     };
-
-    const before = element.getBoundingClientRect();
-    if (before.bottom > 0 && before.top < innerHeight) {
-      throw new Error(`Reveal must start outside the viewport; top=${before.top}, bottom=${before.bottom}, height=${innerHeight}`);
-    }
-
-    const entered = new Promise<void>((resolve) => {
-      const observer = new IntersectionObserver((entries) => {
-        if (entries.some((entry) => entry.target === element && entry.isIntersecting)) {
-          observer.disconnect();
-          resolve();
-        }
-      });
-      observer.observe(element);
-    });
-
-    element.scrollIntoView({ block: "center" });
-    await entered;
 
     if (shouldWaitForAnimation) {
       await new Promise<void>((resolve, reject) => {
@@ -100,6 +90,7 @@ test("server-rendered Reveal regions stay visible and untransformed without Java
 test("reduced motion is final immediately with no opacity or transform animation", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("[data-reveal]")).toHaveAttribute("style", /opacity: 1; transform: none/);
 
   for (const selector of revealSelectors) {
     const snapshots = await enterViewportAndSample(page, selector, false);

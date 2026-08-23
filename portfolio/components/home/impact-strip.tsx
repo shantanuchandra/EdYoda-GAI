@@ -12,7 +12,7 @@ export const impactMetrics = [
 
 export function ImpactStrip() {
   return (
-    <section aria-label="Impact highlights" className={styles.proofBand}>
+    <section aria-label="Impact highlights" className={styles.proofBand} id="impact-highlights">
       <Container>
         <Reveal>
           <div className={styles.proofInner}>
