@@ -28,21 +28,10 @@ function ResumeRole({ children, company, period, role }: ResumeRoleProps) {
 export function ResumeDocument() {
   return (
     <article className="resume-document">
-      <header className="resume-document__header">
-        <p className="resume-document__eyebrow">Public resume</p>
-        <h1>Shantanu Chandra</h1>
-        <p className="resume-document__descriptor">{siteConfig.descriptor}</p>
-        <address className="resume-document__contact">
-          <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-          <a href={siteConfig.linkedin}>linkedin.com/in/chandrashantanu</a>
-        </address>
-        <p className="resume-document__summary">
-          AI product and transformation leader with 12+ years across retail, lending, AdTech, SaaS and enterprise software, including five years building and launching AI products. I connect product judgment, operating design, evaluation, governance and adoption to turn useful signals into measurable systems at scale.
-        </p>
-      </header>
+      <h1 className="sr-only">Shantanu Chandra</h1>
 
-      <section aria-label="Career experience" className="resume-section">
-        <h2>Career experience</h2>
+      <section aria-label="Career experience" className="resume-section resume-section--experience" data-resume-experience>
+        <h2>Experience</h2>
 
         <ResumeRole company="Lenskart" period="Nov 2025–Present" role="AI Product Lead">
           <p className="resume-role__scope">Reports to a co-founder; works with three AI engineers, two ML engineers and one DevOps engineer.</p>
@@ -115,6 +104,18 @@ export function ResumeDocument() {
             </div>
           </dl>
         </ResumeRole>
+      </section>
+
+      <section aria-label="Profile" className="resume-profile">
+        <h2>Profile</h2>
+        <p className="resume-document__descriptor">{siteConfig.descriptor}</p>
+        <address className="resume-document__contact">
+          <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+          <a href={siteConfig.linkedin}>linkedin.com/in/chandrashantanu</a>
+        </address>
+        <p className="resume-document__summary">
+          AI product and transformation leader with 12+ years across retail, lending, AdTech, SaaS and enterprise software, including five years building and launching AI products. I connect product judgment, operating design, evaluation, governance and adoption to turn useful signals into measurable systems at scale.
+        </p>
       </section>
 
       <div className="resume-document__columns">

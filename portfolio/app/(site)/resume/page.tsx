@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize imports used by JSX. */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Download } from "lucide-react";
 import { ResumeDocument } from "@/components/content/resume-document";
 import { Container } from "@/components/ui/container";
 import { siteConfig } from "@/lib/site-config";
@@ -17,8 +18,10 @@ export default function ResumePage() {
     <section className="resume-page">
       <Container>
         <nav aria-label="Resume actions" className="resume-actions">
-          <Link href="/contact">Contact Shantanu</Link>
-          <Link href={siteConfig.resumePath} prefetch={false}>Download PDF resume</Link>
+          <Link aria-label="Download PDF resume" data-resume-download href={siteConfig.resumePath} prefetch={false}>
+            <Download aria-hidden="true" />
+            Download Resume PDF
+          </Link>
         </nav>
         <ResumeDocument />
       </Container>
