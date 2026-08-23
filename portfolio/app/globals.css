@@ -961,6 +961,41 @@ button {
   padding-top: 16px;
 }
 
+.case-study-artwork {
+  position: relative;
+  min-height: 118px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgb(14 90 85 / 18%);
+  background: linear-gradient(135deg, rgb(217 198 162 / 45%), rgb(14 90 85 / 10%));
+  color: var(--ink);
+}
+
+.case-study-artwork--product {
+  background: linear-gradient(135deg, rgb(14 90 85 / 13%), rgb(217 198 162 / 55%));
+}
+
+.case-study-artwork span {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.case-study-artwork__signal { top: 18px; left: 20px; }
+.case-study-artwork__system { top: 48px; left: 34%; color: var(--teal); }
+.case-study-artwork__scale { right: 20px; bottom: 18px; }
+.case-study-artwork__industry {
+  right: 20px;
+  top: 18px;
+  font-family: var(--font-body);
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-ink);
+}
+
 .resume-document__footer p {
   margin: 0;
   color: var(--color-muted-ink);
