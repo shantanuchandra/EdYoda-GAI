@@ -1,26 +1,37 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize imports used by JSX or TypeScript. */
+import Image from "next/image";
 import Link from "next/link";
-import { builderRoles } from "@/lib/resume-data";
+import { CalendarDays, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 
 type ResumeRoleProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   company: string;
+  logo?: string;
   period?: string;
   role?: string;
+  summary?: string;
 };
 
-function ResumeRole({ children, company, period, role }: ResumeRoleProps) {
+function ResumeRole({ children, company, logo, period, role, summary }: ResumeRoleProps) {
   return (
-    <article className="resume-role">
+    <article className="resume-role" data-resume-role>
+      <span aria-hidden="true" className="resume-role__wash" />
       <header className="resume-role__header">
         <div>
-          <h3>{company}</h3>
-          {role ? <p>{role}</p> : null}
+          <h3>{role ?? company}</h3>
+          {role ? <p className="resume-role__company">{company}</p> : null}
         </div>
-        {period ? <p className="resume-role__period">{period}</p> : null}
+        {period ? <p className="resume-role__period"><CalendarDays aria-hidden="true" />{period}</p> : null}
       </header>
-      {children}
+      {logo ? <Image alt={`${company} logo`} className="resume-role__logo" height={36} src={logo} width={96} /> : null}
+      {summary ? <p className="resume-role__summary">{summary}</p> : null}
+      {children ? (
+        <details className="resume-role__detail">
+          <summary>Role detail <ChevronDown aria-hidden="true" /></summary>
+          <div>{children}</div>
+        </details>
+      ) : null}
     </article>
   );
 }
@@ -33,7 +44,7 @@ export function ResumeDocument() {
       <section aria-label="Career experience" className="resume-section resume-section--experience" data-resume-experience>
         <h2>Experience</h2>
 
-        <ResumeRole company="Lenskart" period="Nov 2025–Present" role="AI Product Lead">
+        <ResumeRole company="Lenskart" logo="/images/companies/lenskart.png" period="Nov 2025–Present" role="AI Product Lead" summary="Selected three of 10 AI use cases for delivery, launched eye-test and recruiting products, and moved Marketing Intelligence into pilot.">
           <p className="resume-role__scope">Reports to a co-founder; works with three AI engineers, two ML engineers and one DevOps engineer.</p>
           <ul>
             <li>Selected three of 10 AI use cases for delivery, launched the eye-test and recruiting products, and moved Marketing Intelligence into pilot.</li>
@@ -42,7 +53,7 @@ export function ResumeDocument() {
           </ul>
         </ResumeRole>
 
-        <ResumeRole company="IIFL Home Loans" period="May 2024–Oct 2025" role="AVP / Lead Product Manager">
+        <ResumeRole company="IIFL Home Loans" logo="/images/companies/iifl-home-loans.png" period="May 2024–Oct 2025" role="AVP / Lead Product Manager" summary="Integrated credit bureau, KYC and Account Aggregator services into an app handling about one million onboardings a month; employed-customer onboarding and approval reached 20 minutes.">
           <p className="resume-role__scope">Managed six product managers and led 25 engineers and data scientists across three squads.</p>
           <ul>
             <li>Integrated credit bureau, KYC and Account Aggregator services into an app handling about one million onboardings a month; employed-customer onboarding and approval reached 20 minutes.</li>
@@ -51,7 +62,7 @@ export function ResumeDocument() {
           </ul>
         </ResumeRole>
 
-        <ResumeRole company="Hakuhodo" period="Sep 2023–Apr 2024" role="Senior Product Manager, AdTech">
+        <ResumeRole company="Hakuhodo" logo="/images/companies/hakuhodo.png" period="Sep 2023–Apr 2024" role="Senior Product Manager, AdTech" summary="Led automation of budgets, bids, campaign rules, inventory checks and reporting, reducing manual campaign work by 70% and new-client onboarding from several months to one week.">
           <p className="resume-role__scope">Mentored two product managers; worked across five commerce platforms and two national FMCG clients.</p>
           <ul>
             <li>Led automation of budgets, bids, campaign rules, inventory checks and reporting, reducing manual campaign work by 70% and new-client onboarding from several months to one week.</li>
@@ -59,51 +70,44 @@ export function ResumeDocument() {
           </ul>
         </ResumeRole>
 
-        <ResumeRole company={builderRoles[0].company} period={builderRoles[0].periodLabel} role={builderRoles[0].title}>
-          <p className="resume-role__scope">Product design systems and customer problem framing.</p>
-          <ul>
-            <li>Led early customer discovery and product design work that established the foundations for the conversational planning workflow.</li>
-          </ul>
-        </ResumeRole>
-
-        <ResumeRole company={builderRoles[1].company} period={builderRoles[1].periodLabel} role={builderRoles[1].title}>
+        <ResumeRole company="Builder.ai" logo="/images/companies/builder-ai.png" period="Dec 2020–Aug 2023" role="Product Manager → Senior Product Manager" summary="Established product-design foundations and then scaled conversational planning, evaluation standards and customer adoption.">
           <p className="resume-role__scope">Led four product managers, two designers and 14 engineers and data scientists across five product squads.</p>
           <ul>
+            <li>Led early customer discovery and product design work that established the foundations for the conversational planning workflow.</li>
             <li>Led customer interviews, beta programmes, product demos and sales enablement for a conversational planning product, reaching 90% adoption among 150 customer-success managers.</li>
             <li>Introduced consistent intent labels, training-data review and model-evaluation standards.</li>
             <li>A freemium offer increased completed monthly onboardings from 50 to 25,000 in six months; 12,500 users bought at least one month of service in month six.</li>
           </ul>
         </ResumeRole>
 
-        <ResumeRole company="Earlier career">
-          <dl className="resume-earlier-career">
-            <div>
-              <dt>NUiO</dt>
-              <dd>Product Manager, Salesforce Consulting · Mar–Dec 2020</dd>
-            </div>
-            <div>
-              <dt>Pantheon</dt>
-              <dd>Product Analyst · Jul 2019–Mar 2020. Built an SQL, Excel and VBA database-migration testing tool, reducing test execution time by more than 75%.</dd>
-            </div>
-            <div>
-              <dt>Toshiba Softwares</dt>
-              <dd>Software Engineer · Aug 2013–Sep 2016</dd>
-            </div>
-          </dl>
+        <ResumeRole company="NUiO" logo="/images/companies/nuio.png" period="Mar 2020–Nov 2020" role="Product Manager / Salesforce Administrator" summary="Led discovery, user-story development and roadmap work for CRM solutions with cross-functional delivery teams.">
+          <ul>
+            <li>Led discovery sessions, mapped user needs into product requirements and coordinated delivery with cross-cultural Scrum teams.</li>
+            <li>Created product strategy and roadmap materials, alongside dashboards that supported metric-based decisions.</li>
+          </ul>
         </ResumeRole>
 
-        <ResumeRole company="Independent products">
-          <dl className="resume-earlier-career">
-            <div>
-              <dt>WasabiTravels</dt>
-              <dd>Built and launched a Japan itinerary planner using more than 2,000 curated places to suggest routes and check whether each day&apos;s plan is practical.</dd>
-            </div>
-            <div>
-              <dt>Card Compass · Case study only</dt>
-              <dd>Built a credit-card discovery product using spending patterns and reward rules; it attracted 121 early-access requests. The current public destination is the portfolio case study only.</dd>
-            </div>
-          </dl>
+        <ResumeRole company="Pantheon" logo="/images/companies/pantheon.png" period="Jul 2019–Mar 2020" role="Business Analyst" summary="Built SQL, Excel and VBA migration-testing automation, reducing test execution time by 73%.">
+          <ul>
+            <li>Translated product features into user stories, acceptance criteria and test plans for healthcare technology work.</li>
+            <li>Built a repeatable database-migration QA tool using SQL, Excel and VBA, reducing test execution time by 73%.</li>
+          </ul>
         </ResumeRole>
+
+        <ResumeRole company="Cummins" logo="/images/companies/cummins.png" period="Jun 2018–Aug 2018" role="Business Development Analyst" summary="Mapped growth opportunities across industrial verticals and researched predictive-maintenance customer potential.">
+          <ul>
+            <li>Mapped business challenges across four verticals and used design thinking to identify scalable process opportunities.</li>
+            <li>Researched North American hospital groups to evaluate the potential for predictive-maintenance services.</li>
+          </ul>
+        </ResumeRole>
+
+        <ResumeRole company="Toshiba Softwares" logo="/images/companies/toshiba.png" period="Aug 2013–Sep 2016" role="Software Engineer / Project Coordinator" summary="Contributed to weather-radar visualization software and coordinated a smart-parking pilot selected for Toshiba Global Innovation Day.">
+          <ul>
+            <li>Helped build weather-radar visualization software deployed in India and other markets.</li>
+            <li>Coordinated a smart-parking pilot selected for Toshiba Global Innovation Day.</li>
+          </ul>
+        </ResumeRole>
+
       </section>
 
       <section aria-label="Profile" className="resume-profile">

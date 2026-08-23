@@ -13,8 +13,8 @@ it("renders all four employer and two independent records once with truthful des
   expect(screen.getByRole("heading", { level: 2, name: "Employer transformations" })).toBeInTheDocument();
   expect(screen.getByRole("heading", { level: 2, name: "Independent products" })).toBeInTheDocument();
   expect(within(cards[4]).getByText("Active")).toBeInTheDocument();
-  expect(within(cards[5]).getByText("Case study only")).toBeInTheDocument();
-  expect(within(cards[5]).queryByRole("link", { name: /visit/i })).not.toBeInTheDocument();
+  expect(within(cards[5]).getByText("Active")).toBeInTheDocument();
+  expect(within(cards[5]).getByRole("link", { name: "View product" })).toHaveAttribute("href", "/products/card-compass");
   expect(screen.getAllByRole("link", { name: /Read case study|View product/ })).toHaveLength(6);
 });
 

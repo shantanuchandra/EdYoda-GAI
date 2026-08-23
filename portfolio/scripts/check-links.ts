@@ -2,6 +2,7 @@
 import { siteConfig } from "@/lib/site-config";
 
 const wasabiUrl = "https://wasabitravels.com/";
+const cardCompassUrl = "https://www.cardcompass.in/";
 const requestTimeoutMs = 15_000;
 const pdfSignature = "%PDF";
 
@@ -10,6 +11,7 @@ type LinkInventory = {
   linkedInSources: Set<string>;
   mailtoSources: Set<string>;
   wasabiSources: Set<string>;
+  cardCompassSources: Set<string>;
 };
 
 function decodeHtmlAttribute(value: string): string {
@@ -85,6 +87,7 @@ async function inventoryRenderedLinks(baseUrl: URL, routes: string[]): Promise<L
     linkedInSources: new Set<string>(),
     mailtoSources: new Set<string>(),
     wasabiSources: new Set<string>(),
+    cardCompassSources: new Set<string>(),
   };
   const failures: string[] = [];
 
@@ -104,10 +107,6 @@ async function inventoryRenderedLinks(baseUrl: URL, routes: string[]): Promise<L
     }
 
     const html = await response.text();
-    if (/cardcompass\.in/i.test(html)) {
-      failures.push(`${sourceRoute} -> retired destination cardcompass.in is present in rendered HTML`);
-    }
-
     for (const href of extractHrefs(html)) {
       if (href === `mailto:${siteConfig.email}`) {
         inventory.mailtoSources.add(sourceRoute);
@@ -127,6 +126,10 @@ async function inventoryRenderedLinks(baseUrl: URL, routes: string[]): Promise<L
       }
       if (href === wasabiUrl) {
         inventory.wasabiSources.add(sourceRoute);
+        continue;
+      }
+      if (href === cardCompassUrl) {
+        inventory.cardCompassSources.add(sourceRoute);
         continue;
       }
 
@@ -158,6 +161,9 @@ async function inventoryRenderedLinks(baseUrl: URL, routes: string[]): Promise<L
   }
   if (inventory.wasabiSources.size === 0) {
     failures.push(`No rendered route links to the approved live product URL ${wasabiUrl}`);
+  }
+  if (inventory.cardCompassSources.size === 0) {
+    failures.push(`No rendered route links to the approved live product URL ${cardCompassUrl}`);
   }
 
   if (failures.length > 0) {
@@ -263,6 +269,22 @@ async function checkWasabiDestination(sourceRoutes: Set<string>): Promise<void> 
   }
 }
 
+async function checkCardCompassDestination(sourceRoutes: Set<string>): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetchWithinTimeout(cardCompassUrl, { redirect: "follow" });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`${[...sourceRoutes].join(", ")} -> ${cardCompassUrl} failed within ${requestTimeoutMs / 1000}s (${detail})`, { cause: error });
+  }
+  if (!response.ok) throw new Error(`${[...sourceRoutes].join(", ")} -> ${cardCompassUrl} returned HTTP ${response.status}`);
+
+  const html = await response.text();
+  if (!/card\s*compass/i.test(html)) {
+    throw new Error(`${[...sourceRoutes].join(", ")} -> ${cardCompassUrl} did not return semantically recognizable Card Compass content`);
+  }
+}
+
 async function main(): Promise<void> {
   const baseUrl = parseBaseUrl();
   const routes = await loadSitemapRoutes(baseUrl);
@@ -271,6 +293,7 @@ async function main(): Promise<void> {
   await checkLegacyRedirects(baseUrl);
   await checkInternalDestinations(inventory);
   await checkWasabiDestination(inventory.wasabiSources);
+  await checkCardCompassDestination(inventory.cardCompassSources);
 
   globalThis.console.log(
     [
@@ -279,7 +302,7 @@ async function main(): Promise<void> {
       `${inventory.mailtoSources.size} routes expose the exact mailto syntax.`,
       `${inventory.linkedInSources.size} routes expose the canonical LinkedIn syntax without an HTTP request.`,
       `${inventory.wasabiSources.size} source route links to the semantically verified Wasabi destination (15s timeout).`,
-      "cardcompass.in is absent from every rendered route.",
+      `${inventory.cardCompassSources.size} source route links to the semantically verified Card Compass destination (15s timeout).`,
     ].join("\n"),
   );
 }

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 const products = [
   { slug: "wasabi-travels", title: "Wasabi Travels", outcome: "2,000+ places", status: "Active" },
-  { slug: "card-compass", title: "Card Compass", outcome: "121", status: "Case study only" },
+  { slug: "card-compass", title: "Card Compass", outcome: "121", status: "Active" },
 ] as const;
 
 test("lists the two verified independent products without a placeholder third card", async ({ page }) => {
@@ -26,7 +26,7 @@ test("lists the two verified independent products without a placeholder third ca
   }
 });
 
-test("renders Wasabi as the only active live destination", async ({ page }) => {
+test("renders Wasabi as an active live destination", async ({ page }) => {
   const response = await page.goto("/products/wasabi-travels");
 
   expect(response?.status()).toBe(200);
@@ -39,15 +39,17 @@ test("renders Wasabi as the only active live destination", async ({ page }) => {
   await expect(page.locator('[target="_blank"]')).toHaveCount(1);
 });
 
-test("renders Card Compass as case-study-only without an outbound destination", async ({ page }) => {
+test("renders Card Compass as an active live destination", async ({ page }) => {
   const response = await page.goto("/products/card-compass");
 
   expect(response?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1, name: "Card Compass" })).toBeVisible();
-  await expect(page.getByText("Case study only")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Visit Card Compass/i })).toHaveCount(0);
-  await expect(page.locator('[href="https://cardcompass.in/"]')).toHaveCount(0);
-  await expect(page.locator('[target="_blank"]')).toHaveCount(0);
+  await expect(page.getByText("Active")).toBeVisible();
+  const externalLink = page.getByRole("link", { name: "Visit Card Compass (opens in a new tab)" });
+  await expect(externalLink).toHaveAttribute("href", "https://www.cardcompass.in/");
+  await expect(externalLink).toHaveAttribute("target", "_blank");
+  await expect(externalLink).toHaveAttribute("rel", "noreferrer");
+  await expect(page.locator('[target="_blank"]')).toHaveCount(1);
 });
 
 test("returns the branded 404 page for an unpublished product slug", async ({ page }) => {

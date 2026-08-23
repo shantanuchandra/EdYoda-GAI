@@ -1,4 +1,4 @@
-import { Allura, Manrope, Newsreader } from "next/font/google";
+import { Allura, Inter, Manrope, Newsreader } from "next/font/google";
 
 export const bodyFont = Manrope({
   subsets: ["latin"],
@@ -17,4 +17,10 @@ export const signatureFont = Allura({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-signature",
+});
+
+export const resumeFont = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
 });

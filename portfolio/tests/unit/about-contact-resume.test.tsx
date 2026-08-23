@@ -69,7 +69,7 @@ it("offers direct contact and both resume paths without a form or JavaScript dep
   expect(container.querySelector("script")).toBeNull();
 });
 
-it("renders a print-ready public resume with verified groupings and safe identity data", () => {
+it("renders a print-ready public resume with individually named, verified experience", () => {
   const { container } = render(<ResumePage />);
 
   expect(screen.getByRole("heading", { level: 1, name: "Shantanu Chandra" })).toBeInTheDocument();
@@ -77,18 +77,23 @@ it("renders a print-ready public resume with verified groupings and safe identit
 
   const career = screen.getByRole("region", { name: "Career experience" });
   expect(within(career).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
-    "Lenskart",
-    "IIFL Home Loans",
-    "Hakuhodo",
-    "Builder.ai",
-    "Builder.ai",
-    "Earlier career",
-    "Independent products",
+    "AI Product Lead",
+    "AVP / Lead Product Manager",
+    "Senior Product Manager, AdTech",
+    "Product Manager → Senior Product Manager",
+    "Product Manager / Salesforce Administrator",
+    "Business Analyst",
+    "Business Development Analyst",
+    "Software Engineer / Project Coordinator",
   ]);
-  expect(within(career).getByText(/more than 75%/i)).toBeInTheDocument();
-  expect(within(career).getByText(/reached 20 minutes/i)).toBeInTheDocument();
-  expect(within(career).getByText(/121 early-access requests/i)).toBeInTheDocument();
-  expect(within(career).getByText("Card Compass · Case study only")).toBeInTheDocument();
+  expect(within(career).getAllByText(/reached 20 minutes/i)).not.toHaveLength(0);
+  expect(within(career).queryByText("Earlier career")).not.toBeInTheDocument();
+  expect(within(career).queryByText("Independent products")).not.toBeInTheDocument();
+  expect(within(career).queryByText(/121 early-access requests/i)).not.toBeInTheDocument();
+  expect(within(career).getByText("NUiO")).toBeInTheDocument();
+  expect(within(career).getByText("Pantheon")).toBeInTheDocument();
+  expect(within(career).getByText("Cummins")).toBeInTheDocument();
+  expect(within(career).getByText("Toshiba Softwares")).toBeInTheDocument();
 
   const education = screen.getByRole("region", { name: "Education" });
   expect(within(education).getByText("MBA, Marketing")).toBeInTheDocument();

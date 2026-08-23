@@ -2,6 +2,7 @@ import { expect, it, vi } from "vitest";
 
 vi.mock("next/font/google", () => ({
   Allura: () => ({ variable: "font-signature" }),
+  Inter: () => ({ variable: "font-resume" }),
   Manrope: () => ({ variable: "font-body" }),
   Newsreader: () => ({ variable: "font-display" }),
 }));

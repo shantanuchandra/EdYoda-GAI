@@ -15,7 +15,7 @@ export const metadata: Metadata = buildContentMetadata({
 
 export default function ResumePage() {
   return (
-    <section className="resume-page">
+    <section className="resume-page" data-resume-canvas>
       <Container>
         <nav aria-label="Resume actions" className="resume-actions">
           <Link aria-label="Download PDF resume" data-resume-download href={siteConfig.resumePath} prefetch={false}>

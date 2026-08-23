@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars -- the inherited Babel parser does not recognize imports used only by JSX or TypeScript. */
 import "./globals.css";
 import type { Metadata } from "next";
-import { bodyFont, displayFont, signatureFont } from "@/lib/fonts";
+import { bodyFont, displayFont, resumeFont, signatureFont } from "@/lib/fonts";
 import { getSiteUrl, siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }}
         />
       </head>
-      <body className={`${bodyFont.variable} ${displayFont.variable} ${signatureFont.variable}`}>{children}</body>
+      <body className={`${bodyFont.variable} ${displayFont.variable} ${resumeFont.variable} ${signatureFont.variable}`}>{children}</body>
     </html>
   );
 }

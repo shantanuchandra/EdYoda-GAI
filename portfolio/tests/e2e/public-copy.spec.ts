@@ -7,7 +7,6 @@ const forbiddenPublicCopy = [
   /edyoda/i,
   /80887\s*52191/,
   /SC_Enterprise_AI_Product_Transformation_Resume_Dubai/i,
-  /cardcompass\.in/i,
   /\b(?:TO(?:DO)|TBD)\b/i,
   /lorem ipsum/i,
 ] as const;

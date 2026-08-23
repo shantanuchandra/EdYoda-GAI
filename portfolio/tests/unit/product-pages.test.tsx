@@ -5,7 +5,7 @@ import ProductDetailPage, {
   generateStaticParams,
 } from "@/app/(site)/products/[slug]/page";
 
-it("renders Wasabi as the only active live destination and keeps Card Compass case-study-only", async () => {
+it("renders both independent products as active live destinations", async () => {
   const { container, rerender } = render(
     await ProductDetailPage({ params: Promise.resolve({ slug: "wasabi-travels" }) }),
   );
@@ -19,10 +19,9 @@ it("renders Wasabi as the only active live destination and keeps Card Compass ca
   expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(1);
 
   rerender(await ProductDetailPage({ params: Promise.resolve({ slug: "card-compass" }) }));
-  expect(screen.getByText("Case study only")).toBeInTheDocument();
-  expect(screen.queryByRole("link", { name: /Visit Card Compass/i })).not.toBeInTheDocument();
-  expect(container.querySelector('[href="https://cardcompass.in/"]')).toBeNull();
-  expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(0);
+  expect(screen.getByText("Active")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Visit Card Compass (opens in a new tab)" })).toHaveAttribute("href", "https://www.cardcompass.in/");
+  expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(1);
   expect(screen.getByText("121")).toBeInTheDocument();
 });
 
