@@ -21,7 +21,7 @@ async function renderHomepage() {
   render(await HomePage());
 }
 
-it("presents the identity-first reference-parity hero and impact record", async () => {
+it("presents the identity-first reference-parity hero without a duplicate evidence band", async () => {
   await renderHomepage();
 
   const heading = screen.getByRole("heading", { level: 1 });
@@ -41,23 +41,12 @@ it("presents the identity-first reference-parity hero and impact record", async 
   ]) {
     expect(within(hero as HTMLElement).getByRole("link", { name })).toHaveAttribute("href", href);
   }
-  expect(within(hero as HTMLElement).getByRole("link", { name: "Scroll to impact highlights" })).toHaveAttribute(
+  expect(within(hero as HTMLElement).getByRole("link", { name: "Scroll to career snapshot" })).toHaveAttribute(
     "href",
-    "#impact-highlights",
+    "#career-snapshot",
   );
   expect(within(hero as HTMLElement).getAllByRole("link")).toHaveLength(3);
-
-  for (const [value, label] of [
-    ["200 stores", "Hindi and English voice-guided eye test at Lenskart"],
-    ["20 minutes", "Employed-customer onboarding and approval at IIFL"],
-    ["70% less manual work", "Campaign operations across five commerce platforms at Hakuhodo"],
-    ["50 → 25,000", "Monthly completed onboardings in six months at Builder.ai"],
-  ]) {
-    const impact = screen.getByRole("region", { name: "Impact highlights" });
-    const metric = within(impact).getByText(value).closest("li");
-    expect(metric).not.toBeNull();
-    expect(within(metric as HTMLElement).getByText(label)).toBeInTheDocument();
-  }
+  expect(screen.queryByRole("region", { name: "Impact highlights" })).not.toBeInTheDocument();
 });
 
 it("organizes the approved work and capabilities around Signal, System and Scale", async () => {
@@ -100,9 +89,9 @@ it("organizes the approved work and capabilities around Signal, System and Scale
   expect(capabilitiesSection).toHaveTextContent("Retail, lending, AdTech, SaaS and enterprise software");
 
   const career = screen.getByRole("region", { name: "Career snapshot" });
-  const impact = screen.getByRole("region", { name: "Impact highlights" });
+  const featuredWorkForOrder = screen.getByRole("region", { name: "Selected employer work" });
   expect(career.compareDocumentPosition(capabilitiesSection as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect((capabilitiesSection as HTMLElement).compareDocumentPosition(impact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect((capabilitiesSection as HTMLElement).compareDocumentPosition(featuredWorkForOrder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
   expect(screen.queryByRole("region", { name: "Independent products" })).not.toBeInTheDocument();
   expect(screen.queryByRole("region", { name: "Learning Lab paths" })).not.toBeInTheDocument();
@@ -136,11 +125,6 @@ it("keeps cards semantic and gives every title and visible action its own link",
       expect(actionLink).toHaveClass("inline-flex", "min-h-11", "items-center");
     });
   }
-});
-
-it("uses one progressive Reveal boundary", async () => {
-  await renderHomepage();
-  expect(document.querySelectorAll("[data-reveal]")).toHaveLength(1);
 });
 
 it("explains the operating model, career path and contact routes without placeholder imagery", async () => {

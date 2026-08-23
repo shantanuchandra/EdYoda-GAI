@@ -381,64 +381,6 @@
 .home :global(.signal-profile-card__skills) { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .home :global(.signal-profile-card__skills li) { border: 1px solid #386457; border-radius: 999px; background: #17372f; padding: 7px 11px; color: var(--home-mint); font-size: .68rem; line-height: 1; box-shadow: 0 2px 5px rgb(0 0 0 / 15%); }
 
-.proofBand {
-  border-block: 1px solid var(--home-line);
-  background: var(--home-mist);
-}
-
-.proofInner {
-  display: grid;
-  grid-template-columns: 150px 1fr;
-  align-items: stretch;
-}
-
-.proofLabel {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  border-right: 1px solid var(--home-line);
-  color: var(--home-green);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.68rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.proofList {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.proofItem {
-  min-width: 0;
-  border-right: 1px solid var(--home-line);
-  padding: 28px 24px;
-}
-
-.proofItem:last-child { border-right: 0; }
-
-.proofValue {
-  display: block;
-  color: var(--home-ink);
-  font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: clamp(1.45rem, 2.5vw, 2rem);
-  font-weight: 720;
-  letter-spacing: -0.045em;
-  line-height: 1;
-}
-
-.proofText {
-  display: block;
-  margin-top: 10px;
-  color: var(--home-muted);
-  font-size: 0.72rem;
-  line-height: 1.5;
-}
-
 .section {
   padding: clamp(72px, 6.1vw, 88px) 0;
 }
@@ -1365,11 +1307,6 @@
   .heroGrid { grid-template-columns: 1fr; align-items: start; }
   .heroTitle { max-width: none; white-space: normal; }
   .home :global(.signal-profile-card) { width: min(100%, 500px); }
-  .proofInner { grid-template-columns: 1fr; }
-  .proofLabel { min-height: 54px; border-right: 0; border-bottom: 1px solid var(--home-line); }
-  .proofList { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .proofItem:nth-child(2) { border-right: 0; }
-  .proofItem:nth-child(-n + 2) { border-bottom: 1px solid var(--home-line); }
   .sectionTop { grid-template-columns: 1fr; gap: 26px; }
   .sectionTitle { max-width: 14ch; }
   .workGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1412,10 +1349,6 @@
   .home :global(.signal-profile-card__current span) { font-size: .63rem; line-height: 1.4; }
   .home :global(.signal-profile-card__skills) { gap: 7px; }
   .home :global(.signal-profile-card__skills li) { padding: 6px 9px; font-size: .6rem; }
-  .proofList { grid-template-columns: 1fr; }
-  .proofItem { border-right: 0; border-bottom: 1px solid var(--home-line); padding: 23px 0; }
-  .proofItem:nth-child(3) { border-bottom: 1px solid var(--home-line); }
-  .proofItem:last-child { border-bottom: 0; }
   .section { padding-block: 78px; }
   .sectionTitle { font-size: clamp(2.6rem, 12vw, 3.5rem); }
   .workGrid { grid-template-columns: 1fr; }

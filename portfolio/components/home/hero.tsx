@@ -76,10 +76,10 @@ export function Hero() {
         {reducedMotion ? (
           showScrollCue ? (
             <a
-              aria-label="Scroll to impact highlights"
+              aria-label="Scroll to career snapshot"
               className={styles.scrollCue}
               data-hero-scroll-cue
-              href="#impact-highlights"
+              href="#career-snapshot"
             >
               <ChevronDown aria-hidden="true" />
             </a>
@@ -88,11 +88,11 @@ export function Hero() {
           <AnimatePresence>
             {showScrollCue ? (
               <motion.a
-                aria-label="Scroll to impact highlights"
+                aria-label="Scroll to career snapshot"
                 className={styles.scrollCue}
                 data-hero-scroll-cue
                 exit={{ opacity: 0, y: 10 }}
-                href="#impact-highlights"
+                href="#career-snapshot"
                 initial={false}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
               >

@@ -100,10 +100,10 @@ test("Fold 1 is complete without JavaScript and static under reduced motion", as
   await expect(noScriptPage.getByRole("heading", { level: 1, name: "Shantanu Chandra" })).toBeVisible();
   await expect(noScriptPage.getByRole("heading", { level: 2, name: "AI Transformation Leader across industries" })).toBeVisible();
   await expect(noScriptPage.getByLabel("Professional profile")).toBeVisible();
-  const nativeCue = noScriptPage.getByRole("link", { name: "Scroll to impact highlights" });
-  await expect(nativeCue).toHaveAttribute("href", "#impact-highlights");
+  const nativeCue = noScriptPage.getByRole("link", { name: "Scroll to career snapshot" });
+  await expect(nativeCue).toHaveAttribute("href", "#career-snapshot");
   await nativeCue.click();
-  await expect(noScriptPage).toHaveURL(/#impact-highlights$/);
+  await expect(noScriptPage).toHaveURL(/#career-snapshot$/);
   await noScriptContext.close();
 
   const reducedContext = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });

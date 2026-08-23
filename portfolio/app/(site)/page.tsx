@@ -5,7 +5,6 @@ import { CareerSnapshot } from "@/components/home/career-snapshot";
 import { ContactCallout } from "@/components/home/contact-callout";
 import { FeaturedWork } from "@/components/home/featured-work";
 import { Hero } from "@/components/home/hero";
-import { ImpactStrip } from "@/components/home/impact-strip";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getPublicContent } from "@/lib/content/loader";
 import { buildContentMetadata } from "@/lib/metadata";
@@ -30,7 +29,6 @@ export default async function HomePage() {
         <Hero />
         <CareerSnapshot />
         <Capabilities />
-        <ImpactStrip />
         <FeaturedWork items={work} />
         <ContactCallout />
       </div>
