@@ -1090,7 +1090,7 @@ button {
   width: 464px;
   min-height: 358px;
   flex-direction: column;
-  margin: 0 0 24px max(16px, calc(50% - 464px));
+  margin: 0 0 80px max(16px, calc(50% - 482px));
   overflow: hidden;
   border: 1px solid rgb(224 224 224 / 50%);
   border-radius: 12px;
@@ -1099,6 +1099,12 @@ button {
   box-shadow: 0 2px 6px rgb(11 23 20 / 10%);
   backdrop-filter: blur(10px);
   transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1), transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  .resume-section--experience .resume-role:nth-of-type(even) {
+    margin-left: min(calc(100% - 480px), calc(50% + 2px));
+  }
 }
 
 .resume-section--experience .resume-role::after {
@@ -1348,6 +1354,7 @@ button {
     width: calc(100% - 32px);
     min-height: 0;
     margin-left: 16px;
+    margin-bottom: 24px;
     padding: 24px;
   }
 

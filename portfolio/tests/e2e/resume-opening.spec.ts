@@ -47,8 +47,8 @@ test("resume opens with the reference download-to-experience hierarchy", async (
   expect(geometry.canvasLeft).toBe(0);
   expect(geometry.canvasWidth).toBe(1440);
   expect(geometry.experienceTop).toBeGreaterThan(geometry.buttonTop + 80);
-  expect(geometry.cardLeft).toBeGreaterThanOrEqual(252);
-  expect(geometry.cardLeft).toBeLessThanOrEqual(260);
+  expect(geometry.cardLeft).toBeGreaterThanOrEqual(232);
+  expect(geometry.cardLeft).toBeLessThanOrEqual(244);
   expect(geometry.cardWidth).toBeGreaterThanOrEqual(460);
   expect(geometry.cardWidth).toBeLessThanOrEqual(468);
   expect(geometry.experienceSize).toBeGreaterThanOrEqual(29);
@@ -56,4 +56,29 @@ test("resume opens with the reference download-to-experience hierarchy", async (
   expect(geometry.cardTop).toBeGreaterThan(geometry.experienceTop + 60);
   expect(geometry.cardTop).toBeLessThanOrEqual(440);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1440);
+});
+
+test("desktop experience follows the reference alternating timeline rhythm", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/resume", { waitUntil: "domcontentloaded" });
+
+  const positions = await page.locator("[data-resume-role]").evaluateAll((cards) =>
+    cards.slice(0, 4).map((card) => {
+      const { height, left, top, width } = card.getBoundingClientRect();
+      return { height, left, top, width };
+    }),
+  );
+
+  expect(positions).toHaveLength(4);
+  expect(positions[0].left).toBeGreaterThanOrEqual(152);
+  expect(positions[0].left).toBeLessThanOrEqual(164);
+  expect(positions[1].left).toBeGreaterThanOrEqual(636);
+  expect(positions[1].left).toBeLessThanOrEqual(648);
+  expect(positions[2].left).toBeGreaterThanOrEqual(152);
+  expect(positions[2].left).toBeLessThanOrEqual(164);
+  expect(positions[3].left).toBeGreaterThanOrEqual(636);
+  expect(positions[3].left).toBeLessThanOrEqual(648);
+  positions.forEach((position) => expect(position.width).toBeGreaterThanOrEqual(460));
+  expect(positions[1].top - (positions[0].top + positions[0].height)).toBeGreaterThanOrEqual(72);
+  expect(positions[2].top - (positions[1].top + positions[1].height)).toBeGreaterThanOrEqual(72);
 });
