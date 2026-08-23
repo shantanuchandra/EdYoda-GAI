@@ -3,33 +3,42 @@
 /* eslint-disable no-undef, no-unused-vars -- the inherited Babel parser does not recognize DOM/TypeScript scope analysis or imports used by JSX. */
 import { Pause, Play } from "lucide-react";
 import { animate, motion, useMotionValue, useReducedMotion, wrap } from "motion/react";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CareerRole } from "@/lib/resume-data";
 import styles from "@/components/home/home-portfolio.module.css";
 
 type CareerRailProps = { roles: readonly CareerRole[] };
 
-type CareerCard = CareerRole & { key: string; periodOverride?: string };
-
-const earlierCareer: CareerCard = {
-  company: "Earlier career",
-  title: "Product, growth and operating foundations",
-  start: "before-2019",
-  end: "before-2019",
-  periodLabel: "Before 2019",
-  periodOverride: "Before 2019",
-  focus: "Customer-facing and commercial work that shaped the operating discipline behind today’s product leadership.",
-  key: "earlier-career",
+type CareerCard = {
+  company: string;
+  end: string;
+  focus: string;
+  key: string;
+  logoSrc: string;
+  roles: readonly CareerRole[];
+  start: string;
+  periodLabel?: string;
 };
 
-function displayCompany(company: string) {
-  if (company === "IIFL Home Loans") return "IIFL";
-  if (company === "AGL (Hakuhodo)") return "AGL";
-  return company;
-}
+const companyProfiles: Readonly<Record<string, { company: string; logoSrc: string }>> = {
+  Lenskart: { company: "Lenskart.com", logoSrc: "/images/companies/lenskart.png" },
+  "IIFL Home Loans": { company: "IIFL Home Loans", logoSrc: "/images/companies/iifl-home-loans.png" },
+  Hakuhodo: { company: "Hakuhodo", logoSrc: "/images/companies/hakuhodo.png" },
+  "Builder.ai": { company: "Builder.ai", logoSrc: "/images/companies/builder-ai.png" },
+  NUiO: { company: "NUiO", logoSrc: "/images/companies/nuio.png" },
+  Pantheon: { company: "Pantheon", logoSrc: "/images/companies/pantheon.png" },
+  Cummins: { company: "Cummins", logoSrc: "/images/companies/cummins.png" },
+  "Toshiba Softwares": { company: "Toshiba", logoSrc: "/images/companies/toshiba.png" },
+  POWERGRID: { company: "POWERGRID", logoSrc: "/images/companies/powergrid.svg" },
+  "Telerik (now Progress Software)": {
+    company: "Telerik (now Progress Software)",
+    logoSrc: "/images/companies/progress-software.png",
+  },
+};
 
-function numericPeriod({ start, end, periodOverride }: CareerCard) {
-  if (periodOverride) return periodOverride;
+function numericPeriod({ start, end, periodLabel }: CareerCard) {
+  if (!start && !end && periodLabel) return periodLabel;
   const format = (value: string) => {
     if (value === "present") return "Present";
     const [year, month] = value.split("-");
@@ -38,17 +47,54 @@ function numericPeriod({ start, end, periodOverride }: CareerCard) {
   return `${format(start)} – ${format(end)}`;
 }
 
+function employerCards(roles: readonly CareerRole[]): CareerCard[] {
+  const groups = new Map<string, CareerRole[]>();
+
+  roles.forEach((role) => {
+    if (!companyProfiles[role.company]) return;
+    groups.set(role.company, [...(groups.get(role.company) ?? []), role]);
+  });
+
+  return Array.from(groups.entries())
+    .map(([sourceCompany, companyRoles]) => {
+      const orderedRoles = companyRoles.sort((left, right) => right.start.localeCompare(left.start));
+      const profile = companyProfiles[sourceCompany];
+      return {
+        company: profile.company,
+        end: orderedRoles.reduce((latest, role) => role.end.localeCompare(latest) > 0 ? role.end : latest, orderedRoles[0].end),
+        focus: orderedRoles[0].focus,
+        key: sourceCompany,
+        logoSrc: profile.logoSrc,
+        periodLabel: orderedRoles.every((role) => !role.start && !role.end) ? orderedRoles[0].periodLabel : undefined,
+        roles: orderedRoles,
+        start: orderedRoles.reduce((earliest, role) => role.start.localeCompare(earliest) < 0 ? role.start : earliest, orderedRoles[0].start),
+      };
+    })
+    .sort((left, right) => right.end.localeCompare(left.end));
+}
+
 function CareerCardContent({ card, clone = false }: { card: CareerCard; clone?: boolean }) {
-  const company = displayCompany(card.company);
+  const [currentRole, ...previousRoles] = card.roles;
   const content = (
     <article className={styles.careerCard} data-career-card={clone ? undefined : "true"}>
       <div className={styles.careerWordmark} aria-hidden="true">
-        <span>{company}</span>
+        <Image
+          alt=""
+          className={styles.careerLogo}
+          data-career-logo
+          height={64}
+          src={card.logoSrc}
+          unoptimized
+          width={112}
+        />
       </div>
-      <p className={styles.careerCompany}>{company}</p>
+      <p className={styles.careerCompany}>{card.company}</p>
       <p className={styles.careerPeriod}>{numericPeriod(card)}</p>
-      <h3 className={styles.careerRole}>{card.title}</h3>
-      <p className={styles.careerFocus}>{card.focus}</p>
+      <h3 className={styles.careerRole}>{currentRole.title}</h3>
+      {previousRoles.map((role) => (
+        <p className={styles.careerPreviousRole} key={`${role.title}-${role.start}`}>{role.title}</p>
+      ))}
+      {previousRoles.length === 0 ? <p className={styles.careerFocus}>{card.focus}</p> : null}
     </article>
   );
 
@@ -58,12 +104,7 @@ function CareerCardContent({ card, clone = false }: { card: CareerCard; clone?: 
 }
 
 export function CareerRail({ roles }: CareerRailProps) {
-  const cards = useMemo<CareerCard[]>(() => [
-    ...roles
-      .map((role) => ({ ...role, key: `${role.company}-${role.start}` }))
-      .sort((left, right) => right.start.localeCompare(left.start)),
-    earlierCareer,
-  ], [roles]);
+  const cards = useMemo<CareerCard[]>(() => employerCards(roles), [roles]);
   const primaryGroupRef = useRef<HTMLOListElement>(null);
   const dragOriginRef = useRef<{ clientX: number; pointerId: number; x: number } | null>(null);
   const x = useMotionValue(0);

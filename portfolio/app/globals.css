@@ -1206,7 +1206,7 @@ button {
 
 @media print {
   :root {
-    --body-size: 9pt;
+    --body-size: 8.6pt;
   }
 
   html {
@@ -1216,7 +1216,7 @@ button {
   body {
     background: #fff;
     color: #111;
-    line-height: 1.42;
+    line-height: 1.36;
   }
 
   .skip-link,
@@ -1300,6 +1300,14 @@ button {
   .resume-document__columns {
     grid-template-columns: 1fr 1fr;
     gap: 8mm;
+  }
+
+  .resume-document__columns .resume-credential {
+    margin-top: 2mm;
+  }
+
+  .resume-document__columns .resume-methods {
+    gap: 2mm;
   }
 }
 

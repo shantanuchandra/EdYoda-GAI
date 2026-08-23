@@ -50,7 +50,7 @@ it("presents the identity-first reference-parity hero and impact record", async 
   for (const [value, label] of [
     ["200 stores", "Hindi and English voice-guided eye test at Lenskart"],
     ["20 minutes", "Employed-customer onboarding and approval at IIFL"],
-    ["70% less manual work", "Campaign operations across five commerce platforms at AGL"],
+    ["70% less manual work", "Campaign operations across five commerce platforms at Hakuhodo"],
     ["50 → 25,000", "Monthly completed onboardings in six months at Builder.ai"],
   ]) {
     const impact = screen.getByRole("region", { name: "Impact highlights" });
@@ -75,7 +75,7 @@ it("organizes the approved work and capabilities around Signal, System and Scale
   expect(workCards.map((card) => card.querySelector("p")?.textContent)).toEqual([
     "Lenskart",
     "IIFL",
-    "AGL",
+    "Hakuhodo",
     "Builder.ai",
   ]);
 
@@ -148,10 +148,29 @@ it("explains the operating model, career path and contact routes without placeho
 
   const career = screen.getByRole("region", { name: "Career snapshot" });
   const timeline = within(career).getByRole("list", { name: "Career timeline" });
-  for (const employer of ["Lenskart", "IIFL", "AGL", "Builder.ai", "Earlier career"]) {
-    expect(within(timeline).getAllByText(employer).length).toBeGreaterThan(0);
-  }
-  expect(within(timeline).getByText("Before 2019")).toBeInTheDocument();
+  const employerCards = within(timeline).getAllByRole("listitem");
+  expect(employerCards).toHaveLength(10);
+  expect(employerCards.map((card) => card.querySelector("p")?.textContent)).toEqual([
+    "Lenskart.com",
+    "IIFL Home Loans",
+    "Hakuhodo",
+    "Builder.ai",
+    "NUiO",
+    "Pantheon",
+    "Cummins",
+    "Toshiba",
+    "POWERGRID",
+    "Telerik (now Progress Software)",
+  ]);
+  expect(within(timeline).getAllByText("Builder.ai")).toHaveLength(1);
+  expect(within(timeline).getByText("Senior Product Manager (Conversational AI)")).toBeInTheDocument();
+  expect(within(timeline).getByText("Product Manager (Design)")).toBeInTheDocument();
+  expect(within(timeline).queryByText(/Covalent|\bAGL\b/i)).not.toBeInTheDocument();
+  expect(within(timeline).queryByText(/Earlier career/i)).not.toBeInTheDocument();
+  employerCards.forEach((card) => {
+    const logo = card.querySelector<HTMLImageElement>("img[data-career-logo]");
+    expect(logo?.getAttribute("src")).toMatch(/^\/images\/companies\/.+\.(?:png|svg)$/);
+  });
 
   const contact = screen.getByRole("region", { name: "Start a conversation" });
   expect(within(contact).getByRole("link", { name: "Email" })).toHaveAttribute(

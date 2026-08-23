@@ -6,7 +6,7 @@ import styles from "@/components/home/home-portfolio.module.css";
 export const impactMetrics = [
   { value: "200 stores", label: "Hindi and English voice-guided eye test at Lenskart" },
   { value: "20 minutes", label: "Employed-customer onboarding and approval at IIFL" },
-  { value: "70% less manual work", label: "Campaign operations across five commerce platforms at AGL" },
+  { value: "70% less manual work", label: "Campaign operations across five commerce platforms at Hakuhodo" },
   { value: "50 → 25,000", label: "Monthly completed onboardings in six months at Builder.ai" },
 ] as const;
 

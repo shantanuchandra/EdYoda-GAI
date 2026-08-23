@@ -45,7 +45,7 @@ export const publicCareer: readonly CareerRole[] = [
     focus: "Digital lending, enterprise AI assistance and cross-functional product leadership.",
   },
   {
-    company: "AGL (Hakuhodo)",
+    company: "Hakuhodo",
     title: "Senior Product Manager, AdTech",
     start: "2023-09",
     end: "2024-04",
@@ -70,12 +70,12 @@ export const publicCareer: readonly CareerRole[] = [
     focus: "Data-led product analysis and database-migration test automation.",
   },
   {
-    company: "Covalent Softwares",
-    title: "Manager, Sales & Support",
-    start: "2016-10",
-    end: "2017-08",
-    periodLabel: "Oct 2016–Aug 2017",
-    focus: "Customer, commercial and operating foundations.",
+    company: "Cummins",
+    title: "Business Development Analyst",
+    start: "2018-06",
+    end: "2018-08",
+    periodLabel: "Jun 2018–Aug 2018",
+    focus: "Market analysis and growth opportunities across industrial verticals.",
   },
   {
     company: "Toshiba Softwares",
@@ -84,5 +84,25 @@ export const publicCareer: readonly CareerRole[] = [
     end: "2016-09",
     periodLabel: "Aug 2013–Sep 2016",
     focus: "Software engineering foundations.",
+  },
+] as const;
+
+export const homepageCareer: readonly CareerRole[] = [
+  ...publicCareer,
+  {
+    company: "POWERGRID",
+    title: "Selected enterprise technology work",
+    start: "",
+    end: "",
+    periodLabel: "Selected engagement",
+    focus: "Infrastructure and enterprise technology experience.",
+  },
+  {
+    company: "Telerik (now Progress Software)",
+    title: "Selected enterprise software work",
+    start: "",
+    end: "",
+    periodLabel: "Selected engagement",
+    focus: "Developer tooling and enterprise software experience.",
   },
 ] as const;

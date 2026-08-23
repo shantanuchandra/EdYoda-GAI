@@ -1,6 +1,12 @@
 /* eslint-disable no-undef -- callbacks execute in the browser context. */
 import { expect, test } from "@playwright/test";
 
+function translateX(transform: string) {
+  if (transform === "none") return 0;
+  const values = transform.slice(transform.indexOf("(") + 1, transform.lastIndexOf(")")).split(",").map(Number);
+  return values.length === 6 ? values[4] : values[12];
+}
+
 test("desktop career fold matches the reference marquee proportions and placement", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -72,22 +78,24 @@ test("desktop career fold matches the reference marquee proportions and placemen
   expect(await track.evaluate((element) => getComputedStyle(element).transform)).toBe(pausedTransform);
 
   await section.getByRole("button", { name: "Resume career motion" }).click();
+  await expect(section.getByRole("button", { name: "Pause career motion" })).toBeVisible();
   const viewport = section.locator("[data-career-viewport]");
-  await viewport.hover();
-  await page.waitForTimeout(32);
-  const hoverTransform = await track.evaluate((element) => getComputedStyle(element).transform);
-  await page.waitForTimeout(180);
-  expect(await track.evaluate((element) => getComputedStyle(element).transform)).toBe(hoverTransform);
-
   const viewportBox = await viewport.boundingBox();
   expect(viewportBox).not.toBeNull();
-  const dragStartX = (viewportBox?.x ?? 0) + (viewportBox?.width ?? 0) / 2;
-  const dragY = (viewportBox?.y ?? 0) + (viewportBox?.height ?? 0) / 2;
-  await page.mouse.move(dragStartX, dragY);
-  await page.mouse.down();
-  await page.mouse.move(dragStartX - 90, dragY, { steps: 5 });
-  await page.mouse.up();
-  expect(await track.evaluate((element) => getComputedStyle(element).transform)).not.toBe(hoverTransform);
+  const viewportCenterX = (viewportBox?.x ?? 0) + (viewportBox?.width ?? 0) / 2;
+  const viewportCenterY = (viewportBox?.y ?? 0) + (viewportBox?.height ?? 0) / 2;
+  const resumedTransform = await track.evaluate((element) => getComputedStyle(element).transform);
+  await expect.poll(() => track.evaluate((element) => getComputedStyle(element).transform)).not.toBe(resumedTransform);
+  await page.mouse.move(1, 1);
+  await page.mouse.move(viewportCenterX, viewportCenterY);
+  await expect.poll(async () => {
+    await viewport.dispatchEvent("mouseover");
+    await page.waitForTimeout(40);
+    const first = translateX(await track.evaluate((element) => getComputedStyle(element).transform));
+    await page.waitForTimeout(180);
+    const second = translateX(await track.evaluate((element) => getComputedStyle(element).transform));
+    return Math.abs(second - first);
+  }, { timeout: 3_000 }).toBeLessThanOrEqual(1);
 });
 
 test("mobile career fold shows one reference-sized card with edge peeks and no overflow", async ({ page }) => {

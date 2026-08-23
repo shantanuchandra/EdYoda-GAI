@@ -997,12 +997,15 @@
   color: var(--home-green);
 }
 
-.careerWordmark span {
-  max-width: 220px;
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -.025em;
-  line-height: 1.05;
+.careerLogo {
+  width: 112px;
+  height: 64px;
+  border: 1px solid rgb(15 107 93 / 10%);
+  border-radius: 14px;
+  background: #fff;
+  object-fit: contain;
+  padding: 5px;
+  box-shadow: 0 6px 16px rgb(11 23 20 / 8%);
 }
 
 .careerCompany {
@@ -1059,6 +1062,16 @@
   line-height: 1.45;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+.careerPreviousRole {
+  position: relative;
+  z-index: 1;
+  margin: 5px 0 0;
+  color: var(--home-muted);
+  font-size: .76rem;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .careerMotionControls {

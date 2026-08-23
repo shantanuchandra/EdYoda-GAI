@@ -36,12 +36,12 @@ it("presents the verified first-person career narrative and complete chronology"
   expect(within(timeline).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
     "Lenskart",
     "IIFL Home Loans",
-    "AGL (Hakuhodo)",
+    "Hakuhodo",
     "Builder.ai",
     "Builder.ai",
     "NUiO",
     "Pantheon",
-    "Covalent Softwares",
+    "Cummins",
     "Toshiba Softwares",
   ]);
 });
@@ -79,7 +79,7 @@ it("renders a print-ready public resume with verified groupings and safe identit
   expect(within(career).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
     "Lenskart",
     "IIFL Home Loans",
-    "AGL (Hakuhodo)",
+    "Hakuhodo",
     "Builder.ai",
     "Builder.ai",
     "Earlier career",
@@ -109,4 +109,5 @@ it("renders a print-ready public resume with verified groupings and safe identit
   expect(publicText).not.toContain(["Ed", "Yoda"].join(""));
   expect(publicText).not.toContain(["80887", "52191"].join(" "));
   expect(publicText).not.toMatch(/Dubai|relocat/i);
+  expect(publicText).not.toMatch(/Covalent|\bAGL\b/i);
 });

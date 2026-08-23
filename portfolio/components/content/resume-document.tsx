@@ -62,7 +62,7 @@ export function ResumeDocument() {
           </ul>
         </ResumeRole>
 
-        <ResumeRole company="AGL (Hakuhodo)" period="Sep 2023–Apr 2024" role="Senior Product Manager, AdTech">
+        <ResumeRole company="Hakuhodo" period="Sep 2023–Apr 2024" role="Senior Product Manager, AdTech">
           <p className="resume-role__scope">Mentored two product managers; worked across five commerce platforms and two national FMCG clients.</p>
           <ul>
             <li>Led automation of budgets, bids, campaign rules, inventory checks and reporting, reducing manual campaign work by 70% and new-client onboarding from several months to one week.</li>
@@ -95,10 +95,6 @@ export function ResumeDocument() {
             <div>
               <dt>Pantheon</dt>
               <dd>Product Analyst · Jul 2019–Mar 2020. Built an SQL, Excel and VBA database-migration testing tool, reducing test execution time by more than 75%.</dd>
-            </div>
-            <div>
-              <dt>Covalent Softwares</dt>
-              <dd>Manager, Sales &amp; Support · Oct 2016–Aug 2017</dd>
             </div>
             <div>
               <dt>Toshiba Softwares</dt>

@@ -33,7 +33,7 @@ export default function AboutPage() {
                 My path began with software and data foundations, moved through customer-facing operations and product leadership, and then into AI product scale. That sequence still shapes how I work: understand the operating reality, make the product decision explicit, and build the controls and feedback loops that help a team improve it.
               </p>
               <p>
-                At Builder.ai, AGL and IIFL Home Loans, my scope expanded from conversational products to commerce operations and enterprise transformation. At IIFL, I managed six product managers and led 25 engineers and data scientists across three squads while working on lending journeys and an enterprise AI assistant.
+                At Builder.ai, Hakuhodo and IIFL Home Loans, my scope expanded from conversational products to commerce operations and enterprise transformation. At IIFL, I managed six product managers and led 25 engineers and data scientists across three squads while working on lending journeys and an enterprise AI assistant.
               </p>
               <p>
                 Today I combine AI product leadership with independent products and practical instruction in generative AI and no-code agents. The through-line is the same: signal, system and scale—find a worthwhile problem, design responsible operating mechanics, and make adoption measurable.
