@@ -9,7 +9,9 @@ test("featured work adopts the reference media-led card composition", async ({ p
   const section = page.getByRole("region", { name: "Selected employer work" });
   const cards = section.getByRole("article");
   await expect(cards).toHaveCount(4);
+  await expect(cards.first()).toBeVisible();
   await section.evaluate((element) => element.scrollIntoView({ block: "center" }));
+  await expect.poll(async () => (await cards.first().boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(338);
 
   const geometry = await section.evaluate((element) => {
     const cardElements = [...element.querySelectorAll<HTMLElement>("[data-featured-work-card]")];
@@ -37,8 +39,8 @@ test("featured work adopts the reference media-led card composition", async ({ p
   });
 
   expect(geometry.sameRow).toBe(true);
-  expect(geometry.cardWidth).toBeGreaterThanOrEqual(296);
-  expect(geometry.cardWidth).toBeLessThanOrEqual(306);
+  expect(geometry.cardWidth).toBeGreaterThanOrEqual(338);
+  expect(geometry.cardWidth).toBeLessThanOrEqual(342);
   expect(geometry.cardHeight).toBeGreaterThanOrEqual(485);
   expect(geometry.cardHeight).toBeLessThanOrEqual(515);
   expect(geometry.cardGap).toBeGreaterThanOrEqual(14);

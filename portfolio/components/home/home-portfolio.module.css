@@ -18,7 +18,10 @@
 }
 
 .home :global(.container) {
-  width: min(calc(100% - 32px), 1248px);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  padding-inline: 16px;
 }
 
 .eyebrow {
@@ -647,14 +650,14 @@
   box-sizing: border-box;
   height: 716px;
   overflow: hidden;
-  padding: 96px 16px;
+  padding: 96px 0;
   background:
     radial-gradient(circle at 82% 12%, rgb(183 228 213 / 16%), transparent 26%),
     linear-gradient(180deg, rgb(251 252 251 / 90%), #fff);
 }
 
 .specializationSection :global(.container) {
-  width: min(calc(100% - 32px), 1280px);
+  width: 100%;
 }
 
 .specializationHeader { text-align: center; }
@@ -881,7 +884,7 @@
 }
 
 .careerSection :global(.container) {
-  width: min(calc(100% - 32px), 1280px);
+  width: 100%;
 }
 
 .careerHeading {
@@ -1323,7 +1326,7 @@
 }
 
 @media (max-width: 700px) {
-  .home :global(.container) { width: min(calc(100% - 32px), 1240px); }
+  .home :global(.container) { width: 100%; }
   .hero { height: 952px; min-height: 952px; margin-top: 16px; padding: 0; }
   .heroGrid { display: block; height: 952px; min-height: 952px; }
   .heroCopy { padding-top: 40px; }
@@ -1364,7 +1367,7 @@
   .careerItem { width: 280px; flex-basis: 280px; }
   .careerMotionButton { right: 2px; }
   .specializationSection { height: 1652px; }
-  .specializationSection :global(.container) { width: 358px; }
+  .specializationSection :global(.container) { width: 100%; }
   .specializationTitle { font-size: 30px; line-height: 36px; }
   .specializationIntro { height: 84px; }
   .specializationGrid { grid-template-columns: 1fr; gap: 24px; }

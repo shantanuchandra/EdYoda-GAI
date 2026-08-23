@@ -44,8 +44,8 @@ test("desktop specialization fold matches the reference four-card composition", 
   expect(geometry.introFontSize).toBe(18);
   expect(geometry.introWidth).toBeGreaterThanOrEqual(668);
   expect(geometry.introWidth).toBeLessThanOrEqual(676);
-  expect(geometry.cardWidth).toBeGreaterThanOrEqual(294);
-  expect(geometry.cardWidth).toBeLessThanOrEqual(298);
+  expect(geometry.cardWidth).toBeGreaterThanOrEqual(326);
+  expect(geometry.cardWidth).toBeLessThanOrEqual(330);
   expect(geometry.cardHeight).toBeGreaterThanOrEqual(345);
   expect(geometry.cardHeight).toBeLessThanOrEqual(351);
   expect(geometry.cardGap).toBeGreaterThanOrEqual(30);

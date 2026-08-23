@@ -1,6 +1,51 @@
 /* eslint-disable no-undef -- callbacks execute in the browser context. */
 import { expect, test } from "@playwright/test";
 
+test("desktop homepage folds stay fluid with the reference edge gutters", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("load");
+
+  const folds = [
+    ["hero", page.locator("section[aria-labelledby='home-hero-title']")],
+    ["career", page.getByRole("region", { name: "Career snapshot" })],
+    ["specialization", page.getByRole("region", { name: "Areas of Specialization" })],
+    ["work", page.getByRole("region", { name: "Selected employer work" })],
+    ["contact", page.getByRole("region", { name: "Start a conversation" })],
+  ] as const;
+
+  for (const [name, fold] of folds) {
+    await expect(fold).toBeVisible();
+    const innerContainer = fold.locator(":scope > .container");
+    await expect(innerContainer).toHaveCount(1);
+    await expect.poll(async () => (await innerContainer.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(1_439);
+    const geometry = await innerContainer.evaluate((inner) => {
+      const box = inner.getBoundingClientRect();
+      return {
+        className: inner.className,
+        paddingLeft: Number.parseFloat(getComputedStyle(inner).paddingLeft),
+        paddingRight: Number.parseFloat(getComputedStyle(inner).paddingRight),
+        left: box.left,
+        right: box.right,
+        width: box.width,
+        viewportWidth: document.documentElement.clientWidth,
+      };
+    });
+
+    expect(geometry.left, `${name} left edge (${geometry.className})`).toBeGreaterThanOrEqual(-1);
+    expect(geometry.left, `${name} left edge`).toBeLessThanOrEqual(1);
+    expect(geometry.right, `${name} right edge`).toBeGreaterThanOrEqual(geometry.viewportWidth - 1);
+    expect(geometry.right, `${name} right edge`).toBeLessThanOrEqual(geometry.viewportWidth + 1);
+    expect(geometry.width, `${name} fluid width`).toBeGreaterThanOrEqual(1_439);
+    expect(geometry.width, `${name} fluid width`).toBeLessThanOrEqual(1_441);
+    expect(geometry.paddingLeft, `${name} content gutter`).toBe(16);
+    expect(geometry.paddingRight, `${name} content gutter`).toBe(16);
+  }
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1_440);
+});
+
 test("desktop header and hero match the reference first-fold proportions", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -69,8 +114,8 @@ test("desktop header and hero match the reference first-fold proportions", async
   expect(geometry.headingTop).toBeLessThanOrEqual(330);
   expect(geometry.headingInkRight).toBeLessThanOrEqual(825);
   expect(geometry.profileLeft).toBeGreaterThan(geometry.headingRight);
-  expect(geometry.profileLeft).toBeGreaterThanOrEqual(824);
-  expect(geometry.profileLeft).toBeLessThanOrEqual(842);
+  expect(geometry.profileLeft).toBeGreaterThanOrEqual(875);
+  expect(geometry.profileLeft).toBeLessThanOrEqual(892);
   expect(geometry.profileTop).toBeGreaterThanOrEqual(178);
   expect(geometry.profileTop).toBeLessThanOrEqual(198);
   expect(geometry.profileWidth).toBeGreaterThanOrEqual(495);
@@ -152,8 +197,8 @@ test("mobile hero stacks the reference composition without horizontal overflow",
   expect(geometry.menuDiscBackground).toBe("rgb(231, 239, 235)");
   expect(geometry.menuDiscRadius).toBe("50%");
   expect(geometry.menuDiscWidth).toBe(40);
-  expect(geometry.profileLeft).toBeGreaterThanOrEqual(24);
-  expect(geometry.profileLeft).toBeLessThanOrEqual(38);
+  expect(geometry.profileLeft).toBeGreaterThanOrEqual(14);
+  expect(geometry.profileLeft).toBeLessThanOrEqual(20);
   expect(geometry.profileTop).toBeGreaterThanOrEqual(540);
   expect(geometry.profileTop).toBeLessThanOrEqual(565);
   expect(geometry.profileWidth).toBeGreaterThanOrEqual(325);
