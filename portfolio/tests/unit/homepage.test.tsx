@@ -117,8 +117,8 @@ it("keeps cards semantic and gives every title and visible action its own link",
     {
       region: "Independent products",
       cards: [
-        ["Wasabi Travels", "View product", "https://wasabitravels.com/"],
-        ["Card Compass", "View product", "https://cardcompass.in/"],
+        ["Wasabi Travels", "View product", "/products/wasabi-travels"],
+        ["Card Compass", "View product", "/products/card-compass"],
       ],
     },
     {
