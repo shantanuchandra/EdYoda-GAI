@@ -1,5 +1,6 @@
 /* eslint-disable no-undef -- the inherited Babel parser does not recognize TypeScript syntax in E2E tests. */
 import { expect, test, type Page } from "@playwright/test";
+import { findExcludedLearningClaim } from "@/tests/e2e/learning-claim-patterns";
 
 const learningPaths = [
   {
@@ -27,9 +28,7 @@ const learningPaths = [
 
 async function expectNoExcludedLearningClaims(page: Page) {
   const visibleCopy = await page.locator("main").innerText();
-  expect(visibleCopy).not.toMatch(/\b(?:checkout|payment|pay now|buy now|purchase access)\b/i);
-  expect(visibleCopy).not.toMatch(/\b(?:log[ -]?in|sign[ -]?in|create (?:an? )?account|learner account)\b/i);
-  expect(visibleCopy).not.toMatch(/\b(?:certificate|certification|certified)\b/i);
+  expect(findExcludedLearningClaim(visibleCopy)).toBeNull();
 }
 
 test("lists exactly three complete Learning Lab paths without commerce or account controls", async ({ page }) => {
