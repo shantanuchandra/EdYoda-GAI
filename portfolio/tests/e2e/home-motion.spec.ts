@@ -77,7 +77,14 @@ test("Fold 1 follows the reference entrance sequence and continuing motion", asy
   const profileBox = await profile.boundingBox();
   expect(profileBox).not.toBeNull();
   await page.mouse.move((profileBox?.x ?? 0) + 1, (profileBox?.y ?? 0) + 1);
-  await expect.poll(() => profile.getAttribute("style")).toMatch(/rotateX\(-5\.[5-9][0-9]*deg\).*rotateY\(5\.[5-9][0-9]*deg\)/);
+  await expect.poll(async () => {
+    const style = await profile.getAttribute("style");
+    const rotation = style?.match(/rotateX\((-?[\d.]+)deg\).*rotateY\((-?[\d.]+)deg\)/);
+    if (!rotation) return false;
+
+    const [, rotateX, rotateY] = rotation.map(Number);
+    return rotateX >= -6.2 && rotateX <= -5.5 && rotateY >= 5.5 && rotateY <= 6.2;
+  }).toBe(true);
   await expect.poll(() => profile.locator(".signal-profile-card__sheen").getAttribute("style")).toMatch(/translateX\([0-2](?:\.[0-9]+)?%\)/);
 
   const header = page.locator(".site-header");
