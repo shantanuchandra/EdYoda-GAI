@@ -57,6 +57,10 @@ test("lists exactly three complete Learning Lab paths without commerce or accoun
 });
 
 test("keeps the Lumiere demo on a working same-origin integration boundary", async ({ request }) => {
+  const favicon = await request.get("/favicon.ico");
+  expect(favicon.status()).toBe(200);
+  expect(favicon.headers()["content-type"]).toContain("image/");
+
   const demo = await request.get("/learning-materials/lumiere-app/index.html");
   expect(demo.status()).toBe(200);
   const html = await demo.text();
