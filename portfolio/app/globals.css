@@ -2207,7 +2207,7 @@ button {
 
 .contact-page {
   width: 100%;
-  padding: 96px 16px 112px;
+  padding: 76px 16px 112px;
 }
 
 .contact-page__canvas { width: 100%; }
@@ -2216,14 +2216,6 @@ button {
   display: grid;
   justify-items: center;
   text-align: center;
-}
-
-.contact-page__intro > p:first-child {
-  margin: 0 0 12px;
-  color: var(--color-teal-dark);
-  font: 700 0.75rem/1.2 var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: .12em;
-  text-transform: uppercase;
 }
 
 .contact-page__intro h1 {
@@ -2248,7 +2240,7 @@ button {
   display: grid;
   width: min(100%, 1248px);
   gap: 48px;
-  margin: 88px auto 0;
+  margin: 64px auto 0;
 }
 
 .contact-panel {

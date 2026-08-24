@@ -49,7 +49,7 @@ it("presents the verified first-person career narrative and complete chronology"
 it("offers direct contact and both resume paths without a form or JavaScript dependency", () => {
   const { container } = render(<ContactPage />);
 
-  expect(screen.getByRole("heading", { level: 1, name: "Start a direct conversation." })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 1, name: "Get in touch" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "shantanu.msp@gmail.com" })).toHaveAttribute(
     "href",
     "mailto:shantanu.msp@gmail.com",

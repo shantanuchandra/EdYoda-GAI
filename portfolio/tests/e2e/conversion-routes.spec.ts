@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 test("About, Contact and Resume support the direct conversion journey", async ({ page }) => {
   for (const [path, heading] of [
     ["/about", "I build the operating system around useful AI."],
-    ["/contact", "Start a direct conversation."],
+    ["/contact", "Get in touch"],
     ["/resume", "Shantanu Chandra"],
   ] as const) {
     const response = await page.goto(path);

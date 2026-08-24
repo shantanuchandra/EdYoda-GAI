@@ -16,9 +16,8 @@ export default function ContactPage() {
     <section className="contact-page" data-contact-canvas>
       <div className="contact-page__canvas">
         <header className="contact-page__intro" data-contact-intro>
-          <p>Contact</p>
-          <h1>Start a direct conversation.</h1>
-          <p>For AI product leadership, transformation work, independent building or practical learning, email is the simplest way to reach me. No form or account is required.</p>
+          <h1>Get in touch</h1>
+          <p>Reach out directly about AI product leadership, transformation work, independent products, or practical learning.</p>
         </header>
 
         <div className="contact-page__panels">
