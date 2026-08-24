@@ -49,24 +49,8 @@ it("presents the identity-first reference-parity hero without a duplicate eviden
   expect(screen.queryByRole("region", { name: "Impact highlights" })).not.toBeInTheDocument();
 });
 
-it("organizes the approved work and capabilities around Signal, System and Scale", async () => {
+it("keeps the reference homepage focused on career, specialization and the closing action", async () => {
   await renderHomepage();
-
-  const featuredWork = screen.getByRole("region", { name: "Selected employer work" });
-  const workCards = within(featuredWork).getAllByRole("article");
-  expect(workCards).toHaveLength(4);
-  expect(within(featuredWork).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual([
-    "AI-assisted retail journeys at Lenskart",
-    "Responsible AI operations for digital lending",
-    "Scaling ad-tech operations with automation",
-    "Conversational AI for customer-success scale",
-  ]);
-  expect(workCards.map((card) => card.querySelector("p")?.textContent)).toEqual([
-    "Lenskart",
-    "IIFL",
-    "Hakuhodo",
-    "Builder.ai",
-  ]);
 
   const capabilitiesHeading = screen.getByRole("heading", { name: "Areas of Specialization" });
   const capabilitiesSection = capabilitiesHeading.closest("section");
@@ -89,42 +73,20 @@ it("organizes the approved work and capabilities around Signal, System and Scale
   expect(capabilitiesSection).toHaveTextContent("Retail, lending, AdTech, SaaS and enterprise software");
 
   const career = screen.getByRole("region", { name: "Career snapshot" });
-  const featuredWorkForOrder = screen.getByRole("region", { name: "Selected employer work" });
+  const closing = screen.getByRole("region", { name: "Start a conversation" });
   expect(career.compareDocumentPosition(capabilitiesSection as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect((capabilitiesSection as HTMLElement).compareDocumentPosition(featuredWorkForOrder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect((capabilitiesSection as HTMLElement).compareDocumentPosition(closing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(screen.queryByRole("region", { name: "Selected employer work" })).not.toBeInTheDocument();
 
   expect(screen.queryByRole("region", { name: "Independent products" })).not.toBeInTheDocument();
   expect(screen.queryByRole("region", { name: "Learning Lab paths" })).not.toBeInTheDocument();
 });
 
-it("keeps cards semantic and gives every title and visible action its own link", async () => {
+it("keeps portfolio detail destinations out of the homepage while preserving the direct case-studies route", async () => {
   await renderHomepage();
 
-  const cardGroups = [
-    {
-      region: "Selected employer work",
-      cards: [
-        ["AI-assisted retail journeys at Lenskart", "Read case study", "/work/lenskart-ai-retail"],
-        ["Responsible AI operations for digital lending", "Read case study", "/work/iifl-digital-lending"],
-        ["Scaling ad-tech operations with automation", "Read case study", "/work/agl-adtech-operations"],
-        ["Conversational AI for customer-success scale", "Read case study", "/work/builder-conversational-ai"],
-      ],
-    },
-  ] as const;
-
-  for (const group of cardGroups) {
-    const articles = within(screen.getByRole("region", { name: group.region })).getAllByRole("article");
-    expect(articles).toHaveLength(group.cards.length);
-
-    group.cards.forEach(([title, action, href], index) => {
-      const article = articles[index];
-      expect(article.closest("a")).toBeNull();
-      expect(within(article).getByRole("heading", { name: title }).querySelector("a")).toHaveAttribute("href", href);
-      const actionLink = within(article).getByRole("link", { name: action });
-      expect(actionLink).toHaveAttribute("href", href);
-      expect(actionLink).toHaveClass("inline-flex", "min-h-11", "items-center");
-    });
-  }
+  expect(screen.getByRole("link", { name: "Explore Case Studies" })).toHaveAttribute("href", "/case-studies");
+  expect(screen.queryByRole("link", { name: "Read case study" })).not.toBeInTheDocument();
 });
 
 it("explains the operating model, career path and contact routes without placeholder imagery", async () => {

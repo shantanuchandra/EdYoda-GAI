@@ -11,7 +11,6 @@ test("desktop homepage folds stay fluid with the reference edge gutters", async 
     ["hero", page.locator("section[aria-labelledby='home-hero-title']")],
     ["career", page.getByRole("region", { name: "Career snapshot" })],
     ["specialization", page.getByRole("region", { name: "Areas of Specialization" })],
-    ["work", page.getByRole("region", { name: "Selected employer work" })],
     ["contact", page.getByRole("region", { name: "Start a conversation" })],
   ] as const;
 

@@ -3,10 +3,8 @@ import type { Metadata } from "next";
 import { Capabilities } from "@/components/home/capabilities";
 import { CareerSnapshot } from "@/components/home/career-snapshot";
 import { ContactCallout } from "@/components/home/contact-callout";
-import { FeaturedWork } from "@/components/home/featured-work";
 import { Hero } from "@/components/home/hero";
 import { JsonLd } from "@/components/seo/json-ld";
-import { getPublicContent } from "@/lib/content/loader";
 import { buildContentMetadata } from "@/lib/metadata";
 import { buildPersonJsonLd } from "@/lib/structured-data";
 import styles from "@/components/home/home-portfolio.module.css";
@@ -21,15 +19,12 @@ export const metadata: Metadata = buildContentMetadata({
 });
 
 export default async function HomePage() {
-  const work = await getPublicContent("work");
-
   return (
     <>
       <div className={styles.home}>
         <Hero />
         <CareerSnapshot />
         <Capabilities />
-        <FeaturedWork items={work} />
         <ContactCallout />
       </div>
       <JsonLd data={buildPersonJsonLd({
