@@ -13,8 +13,8 @@ export function LearningPathDetail({ children, item }: LearningPathDetailProps) 
   const outcome = metadata.outcomes[0];
 
   return (
-    <article className="pb-[var(--section-space)]">
-      <header className="border-b border-line bg-surface py-10 sm:py-14">
+    <article className="detail-page" data-portfolio-template>
+      <header className="detail-page__header border-b border-line bg-surface py-10 sm:py-14">
         <div className="container">
           <Breadcrumbs items={[{ label: "Learning", href: "/learning" }, { label: metadata.title }]} />
           <p className="mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Shantanu Chandra Learning Lab</p>

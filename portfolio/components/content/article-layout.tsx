@@ -14,8 +14,8 @@ export function ArticleLayout({ children, item }: ArticleLayoutProps) {
   const { metadata } = item;
 
   return (
-    <article className="pb-[var(--section-space)]">
-      <header className="border-b border-line bg-surface py-10 sm:py-14">
+    <article className="detail-page" data-portfolio-template>
+      <header className="detail-page__header border-b border-line bg-surface py-10 sm:py-14">
         <div className="container">
           <Breadcrumbs items={[{ label: "Insights", href: "/insights" }, { label: metadata.title }]} />
           <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">

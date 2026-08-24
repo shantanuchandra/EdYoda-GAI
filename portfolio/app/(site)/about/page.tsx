@@ -19,7 +19,7 @@ export const metadata: Metadata = buildContentMetadata({
 export default function AboutPage() {
   return (
     <>
-      <section className="py-[var(--section-space)]">
+      <section className="portfolio-index-page portfolio-index-page--about" data-portfolio-template>
         <Container>
           <ContentIndexHeader
             eyebrow="About"

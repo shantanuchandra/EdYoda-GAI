@@ -2190,6 +2190,96 @@ button {
   margin-top: 10px;
 }
 
+.portfolio-index-page {
+  width: 100%;
+  padding: 96px 16px 112px;
+}
+
+.portfolio-index-page > .container {
+  width: min(100%, 1248px);
+  max-width: none;
+}
+
+.portfolio-index-page .content-index-header {
+  text-align: center;
+}
+
+.portfolio-index-page .content-index-header > * { margin-inline: auto; }
+
+.portfolio-index-page .content-index-header h1 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.portfolio-index-page .content-index-header p {
+  max-width: 672px;
+  font-size: 1.125rem;
+  line-height: 1.45;
+}
+
+.portfolio-index-page--about .about-story,
+.portfolio-index-page--insights > .container > div:last-child {
+  margin-top: 88px;
+}
+
+.portfolio-index-page--insights article {
+  border-radius: 12px;
+  background: rgb(255 255 255 / 76%);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
+}
+
+.detail-page {
+  width: 100%;
+  padding-bottom: 112px;
+}
+
+.detail-page__header {
+  width: 100%;
+  padding: 72px 16px 64px !important;
+  background: linear-gradient(135deg, rgb(255 255 255 / 96%), rgb(238 249 246 / 70%)) !important;
+}
+
+.detail-page__header > .container {
+  width: min(100%, 1248px);
+  max-width: none;
+}
+
+.detail-page__header h1 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.05em !important;
+  line-height: .98 !important;
+}
+
+.detail-page > .container {
+  width: min(100% - 32px, 1248px);
+  max-width: none;
+}
+
+.detail-page .article-layout__body,
+.detail-page .learning-path-detail__body,
+.detail-page .case-study__body,
+.detail-page .product-detail__body {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.not-found-template {
+  width: 100%;
+  min-height: calc(100vh - var(--header-height));
+  padding: 96px 16px;
+  background: linear-gradient(135deg, rgb(255 255 255 / 96%), rgb(238 249 246 / 70%));
+}
+
+.not-found-template .not-found-content {
+  width: min(100%, 1248px);
+  max-width: none;
+}
+
 @media (min-width: 900px) {
   .contact-page__panels { grid-template-columns: minmax(0, 1.55fr) minmax(400px, 1fr); }
   .contact-panel--primary { min-height: 488px; }

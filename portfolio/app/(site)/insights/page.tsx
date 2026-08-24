@@ -16,7 +16,7 @@ export const metadata: Metadata = buildContentMetadata({
 
 export function InsightsIndex({ items }: { items: ContentItem[] }) {
   return (
-    <section className="py-[var(--section-space)]">
+    <section className="portfolio-index-page portfolio-index-page--insights" data-portfolio-template>
       <Container>
         <ContentIndexHeader
           eyebrow="Ideas in practice"

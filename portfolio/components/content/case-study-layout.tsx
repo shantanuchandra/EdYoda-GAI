@@ -21,8 +21,8 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
   const company = publicCompanyName(metadata.company);
 
   return (
-    <article className="pb-[var(--section-space)]">
-      <header className="border-b border-line bg-surface py-10 sm:py-14">
+    <article className="detail-page" data-portfolio-template>
+      <header className="detail-page__header border-b border-line bg-surface py-10 sm:py-14">
         <div className="container">
           <Breadcrumbs items={[{ label: "Work", href: "/work" }, { label: company }]} />
           <p className="mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Employer transformation case study</p>
