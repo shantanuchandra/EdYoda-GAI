@@ -79,7 +79,8 @@ const learningPaths = [
 it("lists exactly three AI courses with their exact audience, outcome and four launch modules", async () => {
   render(await LearningIndexPage());
 
-  expect(screen.getByRole("heading", { level: 1, name: "Shantanu Chandra AI Courses" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 1, name: "Learn AI by Building Real Things" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 1 })).not.toHaveTextContent("Shantanu Chandra");
   const cards = screen.getAllByRole("article");
   expect(cards).toHaveLength(3);
   expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(
@@ -143,8 +144,8 @@ it("renders each AI course detail as a public overview with the exact audience, 
 it("publishes only the three approved learning routes with route and index metadata", async () => {
   await expect(generateLearningStaticParams()).resolves.toEqual(learningPaths.map(({ slug }) => ({ slug })));
   expect(learningMetadata).toMatchObject({
-    title: "Shantanu Chandra AI Courses",
-    description: expect.stringContaining("three practical AI courses"),
+    title: "Learn AI by Building Real Things",
+    description: "Three practical AI courses for operators, product leaders, founders, and emerging AI builders.",
   });
   await expect(generateLearningMetadata({ params: Promise.resolve({ slug: "ai-product-transformation" }) })).resolves.toMatchObject({
     title: "AI product transformation for product leaders",

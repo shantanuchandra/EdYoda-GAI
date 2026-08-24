@@ -7,8 +7,8 @@ import type { ContentItem } from "@/lib/content/schema";
 import { buildContentMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildContentMetadata({
-  title: "Shantanu Chandra AI Courses",
-  description: "Shantanu Chandra AI Courses offers three practical AI courses for operators, product leaders, founders, and emerging AI builders.",
+  title: "Learn AI by Building Real Things",
+  description: "Three practical AI courses for operators, product leaders, founders, and emerging AI builders.",
   path: "/learning",
 });
 
@@ -18,7 +18,7 @@ export function LearningIndex({ items }: { items: ContentItem[] }) {
       <div className="learning-page__canvas">
         <header className="learning-page__intro" data-learning-intro>
           <p>AI Courses</p>
-          <h1>Shantanu Chandra AI Courses</h1>
+          <h1>Learn AI by Building Real Things</h1>
           <p>Three practical overviews for people turning AI ideas into useful workflows, governed products, and production-ready systems.</p>
         </header>
         {items.length > 0 ? (

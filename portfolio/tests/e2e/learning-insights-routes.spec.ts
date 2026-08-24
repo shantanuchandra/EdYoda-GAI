@@ -41,7 +41,7 @@ test("lists exactly three complete AI courses without commerce or account contro
   const response = await page.goto("/learning");
 
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1, name: "Shantanu Chandra AI Courses" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Learn AI by Building Real Things" })).toBeVisible();
   await expect(page.getByRole("article")).toHaveCount(3);
 
   for (const path of learningPaths) {

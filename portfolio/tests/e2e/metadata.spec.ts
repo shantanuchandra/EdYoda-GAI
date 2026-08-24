@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 const routes = [
   ["/", "Shantanu Chandra | AI Transformation Leader"],
   ["/case-studies", "Case Studies | Shantanu Chandra"],
-  ["/learning", "Shantanu Chandra AI Courses | Shantanu Chandra"],
+  ["/learning", "Learn AI by Building Real Things | Shantanu Chandra"],
   ["/insights", "Insights | Shantanu Chandra"],
   ["/about", "About | Shantanu Chandra"],
   ["/contact", "Contact | Shantanu Chandra"],

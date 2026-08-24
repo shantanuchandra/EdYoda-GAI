@@ -44,6 +44,29 @@ test("Learning Lab uses the full-width heading and three-card portfolio grid", a
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
+test("AI Courses keeps the value-led heading legible on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/learning", { waitUntil: "domcontentloaded" });
+
+  const heading = page.getByRole("heading", { level: 1, name: "Learn AI by Building Real Things" });
+  await expect(heading).toBeVisible();
+  const geometry = await heading.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      left: rect.left,
+      right: rect.right,
+      height: rect.height,
+      lineHeight: Number.parseFloat(getComputedStyle(element).lineHeight),
+      overflow: document.documentElement.scrollWidth - innerWidth,
+    };
+  });
+
+  expect(geometry.left).toBeGreaterThanOrEqual(16);
+  expect(geometry.right).toBeLessThanOrEqual(374);
+  expect(geometry.height).toBeLessThanOrEqual(geometry.lineHeight * 3.1);
+  expect(geometry.overflow).toBeLessThanOrEqual(0);
+});
+
 test("Learning details extend the approved visual language across the complete path", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/learning/applied-ai-non-technical", { waitUntil: "domcontentloaded" });
