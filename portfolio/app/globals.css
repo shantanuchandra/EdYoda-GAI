@@ -27,6 +27,12 @@
   --motion-fast: 150ms;
   --motion-standard: 200ms;
   --motion-settle: 320ms;
+  --glass-frost: rgb(255 255 255 / 68%);
+  --glass-frost-strong: rgb(251 252 251 / 82%);
+  --glass-border: rgb(255 255 255 / 72%);
+  --glass-edge: inset 0 1px 0 rgb(255 255 255 / 88%);
+  --glass-shadow: 0 18px 46px rgb(11 38 31 / 10%);
+  --glass-filter: blur(18px) saturate(1.12);
   /* compatibility aliases for the component layer */
   --ink: var(--color-ink);
   --teal: var(--color-teal);
@@ -109,6 +115,10 @@ body {
 .case-studies-page {
   width: 100%;
   padding: 100px 16px 112px;
+  background:
+    radial-gradient(circle at 8% 18%, rgb(183 228 213 / 18%), transparent 24%),
+    radial-gradient(circle at 92% 54%, rgb(213 226 220 / 22%), transparent 27%),
+    var(--color-canvas);
 }
 
 .case-studies-page__canvas {
@@ -153,8 +163,11 @@ body {
   justify-content: center;
   border: 1px solid rgb(11 23 20 / 10%);
   border-radius: 8px;
-  background: rgb(250 252 251 / 72%);
+  background: rgb(250 252 251 / 62%);
   padding: 16px;
+  box-shadow: var(--glass-edge), 0 12px 34px rgb(11 38 31 / 5%);
+  -webkit-backdrop-filter: blur(16px) saturate(1.08);
+  backdrop-filter: blur(16px) saturate(1.08);
 }
 
 .case-study-filters__controls {
@@ -313,8 +326,11 @@ button {
   top: 0;
   z-index: 40;
   height: var(--header-height);
-  border-bottom: 0;
-  background: var(--color-canvas);
+  border-bottom: 1px solid rgb(15 107 93 / 8%);
+  background: rgb(251 252 251 / 76%);
+  box-shadow: var(--glass-edge);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   transition:
     background-color 300ms ease,
     border-color 300ms ease,
@@ -324,9 +340,10 @@ button {
 
 .site-header[data-compact="true"] {
   border-bottom: 1px solid rgb(15 107 93 / 13%);
-  background: rgb(251 252 251 / 86%);
-  box-shadow: 0 6px 18px rgb(11 38 31 / 7%);
-  backdrop-filter: blur(14px);
+  background: var(--glass-frost-strong);
+  box-shadow: var(--glass-edge), 0 8px 24px rgb(11 38 31 / 8%);
+  -webkit-backdrop-filter: blur(20px) saturate(1.14);
+  backdrop-filter: blur(20px) saturate(1.14);
 }
 
 .site-header__inner {
@@ -512,6 +529,12 @@ button {
   z-index: 1;
 }
 
+.mobile-navigation__close > span {
+  position: relative;
+  z-index: 1;
+  color: var(--color-ink);
+}
+
 .mobile-navigation__menu-icon span {
   height: 2px;
   background: var(--color-ink);
@@ -532,8 +555,10 @@ button {
   width: min(100%, 380px);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
-  box-shadow: 0 24px 64px rgb(16 37 34 / 18%);
+  background: rgb(247 250 248 / 97%);
+  box-shadow: var(--glass-edge), 0 24px 64px rgb(16 37 34 / 20%);
+  -webkit-backdrop-filter: blur(24px) saturate(1.16);
+  backdrop-filter: blur(24px) saturate(1.16);
   padding: 16px;
 }
 
@@ -1813,9 +1838,11 @@ button {
   overflow: hidden;
   border: 1px solid rgb(11 23 20 / 14%);
   border-radius: 12px;
-  background: rgb(255 255 255 / 76%);
+  background: rgb(255 255 255 / 72%);
   padding: 24px 0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
+  box-shadow: var(--glass-edge), 0 12px 32px rgb(11 38 31 / 9%);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   transition: border-color 300ms var(--ease-out), box-shadow 300ms var(--ease-out), transform 300ms var(--ease-out);
 }
 
@@ -1824,7 +1851,9 @@ button {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(135deg, rgb(15 107 93 / 6%), transparent 58%);
+  background:
+    radial-gradient(circle at 12% 0%, rgb(255 255 255 / 88%), transparent 34%),
+    linear-gradient(135deg, rgb(15 107 93 / 7%), transparent 58%);
 }
 
 .case-study-card__body {
@@ -1977,6 +2006,10 @@ button {
 .learning-page {
   width: 100%;
   padding: 96px 16px 112px;
+  background:
+    radial-gradient(circle at 12% 32%, rgb(183 228 213 / 20%), transparent 27%),
+    radial-gradient(circle at 88% 70%, rgb(240 180 95 / 10%), transparent 24%),
+    var(--color-canvas);
 }
 
 .learning-page__canvas {
@@ -2030,9 +2063,11 @@ button {
   overflow: hidden;
   border: 1px solid rgb(11 23 20 / 14%);
   border-radius: 12px;
-  background: rgb(255 255 255 / 76%);
+  background: var(--glass-frost);
   padding: 24px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
+  box-shadow: var(--glass-edge), 0 12px 34px rgb(11 38 31 / 9%);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   transition: border-color 300ms var(--ease-out), box-shadow 300ms var(--ease-out), transform 300ms var(--ease-out);
 }
 
@@ -2040,7 +2075,9 @@ button {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(135deg, rgb(15 107 93 / 6%), transparent 58%);
+  background:
+    radial-gradient(circle at 10% 0%, rgb(255 255 255 / 92%), transparent 34%),
+    linear-gradient(135deg, rgb(15 107 93 / 7%), transparent 58%);
   content: "";
 }
 
@@ -2851,9 +2888,11 @@ button {
   overflow: hidden;
   border: 1px solid rgb(11 23 20 / 11%);
   border-radius: 10px;
-  background: rgb(255 255 255 / 92%);
+  background: rgb(255 255 255 / 74%);
   padding: clamp(28px, 3.2vw, 42px);
-  box-shadow: 0 14px 34px rgb(11 23 20 / 7%), 0 2px 5px rgb(11 23 20 / 5%);
+  box-shadow: var(--glass-edge), var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
 }
 
@@ -2861,7 +2900,9 @@ button {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(135deg, rgb(15 107 93 / 5%), transparent 48%);
+  background:
+    radial-gradient(circle at 6% 0%, rgb(255 255 255 / 94%), transparent 32%),
+    linear-gradient(135deg, rgb(15 107 93 / 7%), transparent 48%);
   content: "";
 }
 
@@ -4258,8 +4299,11 @@ button {
    their original display typography. */
 @media screen {
   .site-header {
-    background: #fff;
-    border-bottom-color: #e7e7e7;
+    border-bottom-color: rgb(15 107 93 / 8%);
+    background: rgb(251 252 251 / 76%);
+    box-shadow: var(--glass-edge);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
   }
 
   .site-header__inner {
