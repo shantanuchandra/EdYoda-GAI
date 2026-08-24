@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize imports used by JSX or TypeScript. */
+import Link from "next/link";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Breadcrumbs } from "@/components/content/breadcrumbs";
 import type { ContentItem } from "@/lib/content/schema";
@@ -8,38 +10,78 @@ type LearningPathDetailProps = {
   item: ContentItem;
 };
 
+const learningPaths = [
+  { slug: "applied-ai-non-technical", title: "Applied AI for non-technical professionals" },
+  { slug: "ai-product-transformation", title: "AI product transformation" },
+  { slug: "practical-agents-founders", title: "Practical agents for founders" },
+] as const;
+
 export function LearningPathDetail({ children, item }: LearningPathDetailProps) {
   const { metadata } = item;
   const outcome = metadata.outcomes[0];
+  const pathIndex = Math.max(0, learningPaths.findIndex(({ slug }) => slug === metadata.slug));
+  const nextPath = learningPaths[(pathIndex + 1) % learningPaths.length];
+  const subject = metadata.industry[1] ?? "Learning Lab";
+  const pathNumber = String(pathIndex + 1).padStart(2, "0");
 
   return (
-    <article className="detail-page" data-portfolio-template>
-      <header className="detail-page__header border-b border-line bg-surface py-10 sm:py-14">
-        <div className="container">
+    <article className="learning-detail" data-learning-detail data-portfolio-template>
+      <header className="learning-detail__hero">
+        <div className="learning-detail__canvas" data-learning-detail-canvas>
           <Breadcrumbs items={[{ label: "Learning", href: "/learning" }, { label: metadata.title }]} />
-          <p className="mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Shantanu Chandra Learning Lab</p>
-          <h1 className="mt-3 mb-0 max-w-[1000px] font-display text-[clamp(3rem,7vw,6rem)] font-medium tracking-[-0.04em] leading-[0.96]">
-            {metadata.title}
-          </h1>
-          <p className="reading-measure mt-6 mb-0 text-[1.08rem] text-muted-ink">{metadata.description}</p>
-          <dl className="mt-9 grid max-w-[1000px] gap-6 border-t border-line pt-6 md:grid-cols-2">
+
+          <div className="learning-detail__hero-grid">
+            <div className="learning-detail__hero-copy">
+              <p className="learning-detail__eyebrow">Shantanu Chandra Learning Lab</p>
+              <h1>{metadata.title}</h1>
+              <p className="learning-detail__description">{metadata.description}</p>
+            </div>
+
+            <div aria-hidden="true" className="learning-detail__visual" data-learning-detail-visual>
+              <span className="learning-detail__visual-label">{subject}</span>
+              <span className="learning-detail__visual-index">Path {pathNumber} / 03</span>
+              <span className="learning-detail__visual-orbit learning-detail__visual-orbit--one" />
+              <span className="learning-detail__visual-orbit learning-detail__visual-orbit--two" />
+              <span className="learning-detail__visual-line" />
+              <div className="learning-detail__visual-nodes">
+                {metadata.methods.map((method, index) => (
+                  <span className={`learning-detail__visual-node learning-detail__visual-node--${index + 1}`} key={method}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <dl className="learning-detail__meta">
             <div>
-              <dt className="text-xs font-extrabold tracking-[0.1em] text-teal uppercase">Audience</dt>
-              <dd className="mt-2 ml-0 font-semibold">{metadata.audience}</dd>
+              <dt>Audience</dt>
+              <dd>{metadata.audience}</dd>
             </div>
             {outcome ? (
               <div>
-                <dt className="text-xs font-extrabold tracking-[0.1em] text-teal uppercase">Outcome</dt>
-                <dd className="mt-2 ml-0 font-semibold">{outcome.label}</dd>
+                <dt>Outcome</dt>
+                <dd>{outcome.label}</dd>
               </div>
             ) : null}
           </dl>
         </div>
       </header>
 
-      <div className="container mt-10 max-w-[900px] lg:mt-14">
-        <div className="reading-measure learning-path-detail__body text-[1.05rem] leading-8">{children}</div>
-      </div>
+      <section className="learning-detail__content">
+        <div className="learning-detail__body learning-path-detail__body" data-learning-detail-body>{children}</div>
+      </section>
+
+      <nav aria-label="Learning path navigation" className="learning-detail__navigation" data-learning-path-navigation>
+        <Link className="learning-detail__navigation-card" href="/learning">
+          <span>Learning Lab</span>
+          <strong><ArrowLeft aria-hidden="true" size={18} strokeWidth={1.8} /> All learning paths</strong>
+        </Link>
+        <Link aria-label={`Next learning path: ${nextPath.title}`} className="learning-detail__navigation-card learning-detail__navigation-card--next" href={`/learning/${nextPath.slug}`}>
+          <span>Next learning path</span>
+          <strong>{nextPath.title} <ArrowRight aria-hidden="true" size={18} strokeWidth={1.8} /></strong>
+        </Link>
+      </nav>
     </article>
   );
 }

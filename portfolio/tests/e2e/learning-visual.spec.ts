@@ -43,3 +43,53 @@ test("Learning Lab uses the full-width heading and three-card portfolio grid", a
   }
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
+
+test("Learning details extend the approved visual language across the complete path", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/learning/applied-ai-non-technical", { waitUntil: "domcontentloaded" });
+
+  const geometry = await page.evaluate(() => {
+    const canvas = document.querySelector<HTMLElement>("[data-learning-detail-canvas]");
+    const visual = document.querySelector<HTMLElement>("[data-learning-detail-visual]");
+    const body = document.querySelector<HTMLElement>("[data-learning-detail-body]");
+    const modules = document.querySelector<HTMLElement>("#launch-modules + ul");
+    const teaching = document.querySelector<HTMLElement>("#how-i-teach-it + p");
+    const navigation = document.querySelector<HTMLElement>("[data-learning-path-navigation]");
+    if (!canvas || !visual || !body || !modules || !teaching || !navigation) {
+      throw new Error("Learning detail is missing the full-width path structure");
+    }
+    const box = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect();
+      return { left: rect.left, width: rect.width, height: rect.height };
+    };
+
+    return {
+      canvas: box(canvas),
+      visual: box(visual),
+      body: box(body),
+      moduleColumns: getComputedStyle(modules).gridTemplateColumns.split(" ").length,
+      modules: [...modules.querySelectorAll<HTMLElement>("li")].map(box),
+      teaching: box(teaching),
+      links: [...navigation.querySelectorAll<HTMLAnchorElement>("a")].map((link) => ({
+        href: link.getAttribute("href"),
+        minHeight: Number.parseFloat(getComputedStyle(link).minHeight),
+        text: link.textContent?.trim(),
+      })),
+      overflow: document.documentElement.scrollWidth - innerWidth,
+    };
+  });
+
+  expect(geometry.canvas.width).toBeGreaterThanOrEqual(1180);
+  expect(geometry.visual.width).toBeGreaterThanOrEqual(360);
+  expect(geometry.visual.height).toBeGreaterThanOrEqual(300);
+  expect(geometry.body.width).toBeGreaterThanOrEqual(1180);
+  expect(geometry.moduleColumns).toBe(2);
+  expect(geometry.modules).toHaveLength(4);
+  for (const module of geometry.modules) expect(module.height).toBeGreaterThanOrEqual(110);
+  expect(geometry.teaching.width).toBeGreaterThanOrEqual(760);
+  expect(geometry.links).toEqual([
+    expect.objectContaining({ href: "/learning", minHeight: 44, text: expect.stringContaining("All learning paths") }),
+    expect.objectContaining({ href: "/learning/ai-product-transformation", minHeight: 44, text: expect.stringContaining("AI product transformation") }),
+  ]);
+  expect(geometry.overflow).toBeLessThanOrEqual(0);
+});

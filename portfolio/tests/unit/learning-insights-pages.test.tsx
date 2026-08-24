@@ -69,7 +69,7 @@ it("lists exactly three Learning Lab paths with their exact audience, outcome an
 });
 
 it("renders each Learning Lab detail as a public overview with the exact audience, outcome and four modules", async () => {
-  for (const path of learningPaths) {
+  for (const [index, path] of learningPaths.entries()) {
     const view = render(await LearningDetailPage({ params: Promise.resolve({ slug: path.slug }) }));
 
     expect(screen.getByRole("article")).toBeInTheDocument();
@@ -82,6 +82,13 @@ it("renders each Learning Lab detail as a public overview with the exact audienc
     const modules = launchModulesHeading.nextElementSibling;
     expect(modules?.tagName).toBe("UL");
     expect(within(modules as HTMLElement).getAllByRole("listitem").map((item) => item.textContent)).toEqual(path.modules);
+    const navigation = screen.getByRole("navigation", { name: "Learning path navigation" });
+    expect(within(navigation).getByRole("link", { name: /all learning paths/i })).toHaveAttribute("href", "/learning");
+    const nextPath = learningPaths[(index + 1) % learningPaths.length];
+    expect(within(navigation).getByRole("link", { name: `Next learning path: ${nextPath.title}` })).toHaveAttribute(
+      "href",
+      `/learning/${nextPath.slug}`,
+    );
     expect(document.querySelector('script[type="application/ld+json"]')).not.toBeNull();
 
     view.unmount();
