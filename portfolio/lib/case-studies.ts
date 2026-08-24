@@ -12,6 +12,7 @@ export type CaseStudySummary = {
   href: `/work/${string}` | `/products/${string}`;
   title: string;
   description: string;
+  company?: string;
   industry: string;
   outcome: { value: string; label: string };
   status?: "active" | "in-development" | "archived" | "case-study-only";
@@ -32,6 +33,7 @@ function toSummary(item: ContentItem, kind: CaseStudyKind): CaseStudySummary {
     href,
     title: metadata.title,
     description: metadata.description,
+    ...(kind === "employer" ? { company: metadata.company } : {}),
     industry: metadata.industry.join(" · "),
     outcome: { value: outcome.value, label: outcome.label },
     ...(kind === "product" ? { status: metadata.status, externalUrl: metadata.externalUrl } : {}),
