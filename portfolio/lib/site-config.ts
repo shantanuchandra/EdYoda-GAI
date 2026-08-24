@@ -19,6 +19,10 @@ export const siteConfig = {
 };
 
 export function getSiteUrl(): URL {
+  if (process.env.VERCEL_ENV === "production") {
+    return new URL("https://shantanuchandra.vercel.app");
+  }
+
   const host = process.env.VERCEL_ENV === "preview"
     ? process.env.VERCEL_URL
     : process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;

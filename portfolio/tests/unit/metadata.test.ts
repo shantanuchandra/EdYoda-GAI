@@ -21,6 +21,17 @@ it("uses the deployment URL for protected Preview metadata endpoints", () => {
   vi.unstubAllEnvs();
 });
 
+it("uses the public portfolio alias for production metadata endpoints", () => {
+  vi.stubEnv("VERCEL_ENV", "production");
+  vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "shantanu-chandra-portfolio.vercel.app");
+  vi.stubEnv("VERCEL_URL", "shantanu-chandra-portfolio-a4zl5l0vx.vercel.app");
+  try {
+    expect(getSiteUrl().toString()).toBe("https://shantanuchandra.vercel.app/");
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+
 it("applies the Shantanu Chandra title template without duplicating the homepage title", () => {
   expect(rootMetadata.title).toEqual({
     default: "Shantanu Chandra | AI Transformation Leader",
