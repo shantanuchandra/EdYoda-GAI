@@ -35,5 +35,5 @@ it("uses quiet reference-style tags without visible result counts", async () => 
   expect(within(filters).getByRole("button", { name: "Retail media" })).toBeInTheDocument();
   expect(within(filters).getByRole("button", { name: "Independent products" })).toBeInTheDocument();
   expect(within(filters).queryByRole("button", { name: /All case studies/ })).not.toBeInTheDocument();
-  expect(screen.getByRole("combobox", { name: "Filter case studies" })).toBeInTheDocument();
+  expect(screen.queryByRole("combobox", { name: "Filter case studies" })).not.toBeInTheDocument();
 });

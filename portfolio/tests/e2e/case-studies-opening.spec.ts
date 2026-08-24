@@ -141,7 +141,7 @@ test("every case-study card routes readers through the story, evidence, and meth
   }
 });
 
-test("portfolio-focus controls filter truthfully on desktop and collapse to a selector on mobile", async ({ page }) => {
+test("portfolio-focus controls filter truthfully through the same chip language on desktop and mobile", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/case-studies", { waitUntil: "domcontentloaded" });
 
@@ -159,8 +159,10 @@ test("portfolio-focus controls filter truthfully on desktop and collapse to a se
   await expect(results.locator("[data-case-study-card]:visible")).toHaveCount(6);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(page.getByRole("combobox", { name: "Filter case studies" })).toBeVisible();
-  await page.getByRole("combobox", { name: "Filter case studies" }).selectOption("retail");
+  await expect(page.getByRole("combobox", { name: "Filter case studies" })).toHaveCount(0);
+  const retail = page.getByRole("button", { exact: true, name: "Retail" });
+  await expect(retail).toBeVisible();
+  await retail.click();
   await expect(results).toHaveAttribute("data-case-study-filter", "retail");
   await expect(results.locator("[data-case-study-card]:visible")).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);

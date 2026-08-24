@@ -24,8 +24,6 @@ const filters: readonly { key: CaseStudyFilter; label: string }[] = [
   { key: "product", label: "Independent products" },
 ];
 
-const mobileFilters = [{ key: "all", label: "All case studies" } as const, ...filters];
-
 function matchesFilter(item: CaseStudySummary, filter: CaseStudyFilter) {
   if (filter === "all") return true;
   if (filter === "employer") return item.kind === "employer";
@@ -55,12 +53,6 @@ export function CaseStudyFilters({ items, children }: CaseStudyFiltersProps) {
           ))}
         </div>
       </div>
-      <label className="case-study-filters__mobile">
-        <span>Filter case studies</span>
-        <select aria-label="Filter case studies" onChange={(event) => setActive(event.target.value as CaseStudyFilter)} value={active}>
-          {mobileFilters.map((filter) => <option key={filter.key} value={filter.key}>{filter.label}</option>)}
-        </select>
-      </label>
       <p aria-live="polite" className="sr-only">{resultLabel}</p>
       <div className="case-study-filters__results" data-case-study-filter={active} data-case-study-results>
         {children}
