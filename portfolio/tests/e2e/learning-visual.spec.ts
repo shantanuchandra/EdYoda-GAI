@@ -19,8 +19,13 @@ test("Learning Lab uses the full-width heading and three-card portfolio grid", a
       gridGap: Number.parseFloat(getComputedStyle(grid).columnGap),
       cards: [...grid.querySelectorAll<HTMLElement>("[data-learning-path-card]")].map((card) => {
         const media = card.querySelector<HTMLElement>("[data-learning-card-media]");
-        if (!media) throw new Error("Learning path card is missing its visual header");
-        return { card: box(card), media: box(media) };
+        const title = card.querySelector<HTMLElement>(".learning-path-card__title");
+        if (!media || !title) throw new Error("Learning path card is missing its visual header or title");
+        return {
+          card: { ...box(card), background: getComputedStyle(card).backgroundColor },
+          media: { ...box(media), backgroundImage: getComputedStyle(media).backgroundImage },
+          titleFamily: getComputedStyle(title).fontFamily,
+        };
       }),
       overflow: document.documentElement.scrollWidth - innerWidth,
     };
@@ -37,9 +42,12 @@ test("Learning Lab uses the full-width heading and three-card portfolio grid", a
   for (const card of geometry.cards) {
     expect(card.card.width).toBeGreaterThanOrEqual(390);
     expect(card.card.width).toBeLessThanOrEqual(400);
-    expect(card.card.height).toBeGreaterThanOrEqual(560);
-    expect(card.media.height).toBeGreaterThanOrEqual(150);
-    expect(card.media.height).toBeLessThanOrEqual(170);
+    expect(card.card.height).toBeGreaterThanOrEqual(520);
+    expect(card.card.background).toBe("rgb(255, 255, 255)");
+    expect(card.media.height).toBeGreaterThanOrEqual(185);
+    expect(card.media.height).toBeLessThanOrEqual(200);
+    expect(card.media.backgroundImage).toBe("none");
+    expect(card.titleFamily).toContain("ui-sans-serif");
   }
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
