@@ -23,17 +23,17 @@ it("renders all four employer and two independent records once with truthful des
   expect(within(cards[0]).getByText("Retail")).toBeInTheDocument();
 });
 
-it("exposes the reference-style portfolio-focus controls and result counts", async () => {
+it("uses quiet reference-style tags without visible result counts", async () => {
   render(await CaseStudiesPage());
   const filters = screen.getByRole("group", { name: "Filter case studies" });
   expect(filters).toHaveAttribute("data-case-studies-filter-controls", "true");
-  expect(screen.getByText("Filter by portfolio focus")).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /All.*6/ })).toHaveAttribute("aria-pressed", "true");
-  expect(within(filters).getByRole("button", { name: /Employer transformations.*4/ })).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /Retail.*1/ })).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /Financial services.*1/ })).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /AdTech.*1/ })).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /SaaS.*1/ })).toBeInTheDocument();
-  expect(within(filters).getByRole("button", { name: /Independent products.*2/ })).toBeInTheDocument();
+  expect(within(filters).queryByText("Filter by portfolio focus")).not.toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: "Employer transformations" })).toHaveAttribute("aria-pressed", "false");
+  expect(within(filters).getByRole("button", { name: "Retail" })).toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: "Applied AI" })).toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: "Financial services" })).toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: "Retail media" })).toBeInTheDocument();
+  expect(within(filters).getByRole("button", { name: "Independent products" })).toBeInTheDocument();
+  expect(within(filters).queryByRole("button", { name: /All case studies/ })).not.toBeInTheDocument();
   expect(screen.getByRole("combobox", { name: "Filter case studies" })).toBeInTheDocument();
 });

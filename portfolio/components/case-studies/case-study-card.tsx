@@ -6,7 +6,7 @@ import type { CaseStudySummary } from "@/lib/case-studies";
 
 export function CaseStudyCard({ item }: { item: CaseStudySummary }) {
   const isProduct = item.kind === "product";
-  const tags = item.industry.split(" · ").slice(0, 2);
+  const tags = item.tags.slice(0, 2);
   return (
     <article
       className="case-study-card"

@@ -72,6 +72,7 @@ test("the desktop employer row uses the reference three-card media rhythm", asyn
     expect(card.titleSize).toBeGreaterThanOrEqual(17);
     expect(card.titleSize).toBeLessThanOrEqual(20);
   }
+  await expect(page.locator(".case-study-card__tags > span:not(.status-label)").first()).toHaveCSS("background-color", "rgb(244, 245, 245)");
 });
 
 test("portfolio-focus controls filter truthfully on desktop and collapse to a selector on mobile", async ({ page }) => {
@@ -79,10 +80,17 @@ test("portfolio-focus controls filter truthfully on desktop and collapse to a se
   await page.goto("/case-studies", { waitUntil: "domcontentloaded" });
 
   const results = page.locator("[data-case-study-results]");
-  await page.getByRole("button", { name: /Financial services 1/ }).click();
+  const financialServices = page.getByRole("button", { name: "Financial services" });
+  await financialServices.click();
   await expect(results).toHaveAttribute("data-case-study-filter", "financial-services");
+  await expect(financialServices).toHaveAttribute("aria-pressed", "true");
+  await expect(financialServices).toHaveCSS("background-color", "rgb(11, 23, 20)");
   await expect(results.locator("[data-case-study-card]:visible")).toHaveCount(1);
   await expect(results.locator("[data-case-study-card]:visible")).toContainText("Responsible AI operations for digital lending");
+
+  await financialServices.click();
+  await expect(results).toHaveAttribute("data-case-study-filter", "all");
+  await expect(results.locator("[data-case-study-card]:visible")).toHaveCount(6);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole("combobox", { name: "Filter case studies" })).toBeVisible();

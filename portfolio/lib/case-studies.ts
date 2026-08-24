@@ -3,7 +3,20 @@ import { getPublicContent } from "@/lib/content/loader";
 import type { ContentItem } from "@/lib/content/schema";
 
 export type CaseStudyKind = "employer" | "product";
-export type CaseStudyFilter = "all" | "employer" | "product" | "retail" | "financial-services" | "adtech" | "saas";
+export type CaseStudyFilter =
+  | "all"
+  | "employer"
+  | "product"
+  | "retail"
+  | "applied-ai"
+  | "financial-services"
+  | "adtech"
+  | "retail-media"
+  | "saas"
+  | "conversational-ai"
+  | "travel"
+  | "consumer-product"
+  | "personal-finance";
 
 export type CaseStudySummary = {
   id: string;
@@ -14,6 +27,7 @@ export type CaseStudySummary = {
   description: string;
   company?: string;
   industry: string;
+  tags: readonly string[];
   outcome: { value: string; label: string };
   status?: "active" | "in-development" | "archived" | "case-study-only";
   externalUrl?: string;
@@ -35,6 +49,7 @@ function toSummary(item: ContentItem, kind: CaseStudyKind): CaseStudySummary {
     description: metadata.description,
     ...(kind === "employer" ? { company: metadata.company } : {}),
     industry: metadata.industry.join(" · "),
+    tags: metadata.industry,
     outcome: { value: outcome.value, label: outcome.label },
     ...(kind === "product" ? { status: metadata.status, externalUrl: metadata.externalUrl } : {}),
   };
