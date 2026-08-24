@@ -25,36 +25,19 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
       <header className="detail-page__header case-study-layout__header border-b border-line bg-surface py-10 sm:py-14" data-case-study-header>
         <div className="container">
           <Breadcrumbs items={[{ label: "Work", href: "/work" }, { label: company }]} />
-          <div className="case-study-layout__brief" data-case-study-brief>
-            <div className="case-study-layout__brief-copy">
-              <p className="case-study-layout__eyebrow mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Employer transformation case study</p>
-              <h1 className="case-study-layout__title mt-3 mb-0 max-w-[1000px] font-display text-[clamp(3rem,7vw,6rem)] font-medium tracking-[-0.04em] leading-[0.96]">
-                {metadata.title}
-              </h1>
-              <p className="case-study-layout__description reading-measure mt-6 mb-0 text-[1.08rem] text-muted-ink">{metadata.description}</p>
-            </div>
-            <aside className="case-study-layout__brief-panel" data-case-study-brief-panel aria-label={`${company} case-study evidence`}>
-              <p className="case-study-layout__brief-label">Case file</p>
-              <p className="case-study-layout__brief-company">{company}</p>
-              <dl className="case-study-layout__meta" data-case-study-meta>
-                <div><dt>Company</dt><dd>{company}</dd></div>
-                <div><dt>Industry</dt><dd>{metadata.industry.join(" · ")}</dd></div>
-                {metadata.role ? <div><dt>Role</dt><dd>{metadata.role}</dd></div> : null}
-                {metadata.period ? <div><dt>Period</dt><dd>{metadata.period}</dd></div> : null}
-              </dl>
-              <div className="case-study-layout__brief-evidence" data-case-study-brief-evidence>
-                <p>Evidence snapshot</p>
-                <div>
-                  {metadata.outcomes.slice(0, 2).map((outcome) => (
-                    <div key={`${outcome.value}-${outcome.label}`}>
-                      <strong>{outcome.value}</strong>
-                      <span>{outcome.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </aside>
+          <div className="case-study-layout__intro">
+            <p className="case-study-layout__eyebrow mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Employer transformation case study</p>
+            <h1 className="case-study-layout__title mt-3 mb-0 max-w-[1000px] font-display text-[clamp(3rem,7vw,6rem)] font-medium tracking-[-0.04em] leading-[0.96]">
+              {metadata.title}
+            </h1>
+            <p className="case-study-layout__description reading-measure mt-6 mb-0 text-[1.08rem] text-muted-ink">{metadata.description}</p>
           </div>
+          <dl className="case-study-layout__facts" data-case-study-facts data-case-study-meta>
+            <div><dt>Company</dt><dd>{company}</dd></div>
+            <div><dt>Industry</dt><dd>{metadata.industry.join(" · ")}</dd></div>
+            {metadata.role ? <div><dt>Role</dt><dd>{metadata.role}</dd></div> : null}
+            {metadata.period ? <div><dt>Period</dt><dd>{metadata.period}</dd></div> : null}
+          </dl>
         </div>
       </header>
 
@@ -73,7 +56,9 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
               {metadata.methods.map((method) => <li className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-semibold text-teal-dark" key={method}>{method}</li>)}
             </ul>
           </section>
-          <div className="reading-measure case-study__body case-study-layout__body mt-14 text-[1.05rem] leading-8">{children}</div>
+          <div className="case-study-layout__story" data-case-study-story>
+            <div className="reading-measure case-study__body case-study-layout__body text-[1.05rem] leading-8">{children}</div>
+          </div>
           {nextItem ? (
             <nav aria-label="Next case study" className="case-study-layout__next mt-14 border-t border-line pt-8">
               <p className="m-0 text-xs font-extrabold tracking-[0.1em] text-teal uppercase">Continue reading</p>

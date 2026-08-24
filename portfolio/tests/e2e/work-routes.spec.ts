@@ -65,33 +65,45 @@ test("case-study details use the reference's neutral, compact editorial surface"
   expect(design.headerImage).toBe("none");
   expect(design.heading.family).toContain("ui-sans-serif");
   expect(design.heading.size).toBe(48);
-  expect(design.metaColumns).toBe(2);
+  expect(design.metaColumns).toBe(4);
   expect(design.evidence.background).toBe("rgb(255, 255, 255)");
   expect(design.evidence.valueFamily).toContain("ui-sans-serif");
 });
 
-test("case-study details open with a reference-style evidence case file", async ({ page }) => {
+test("case-study details extend the reference's centered card language", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
 
-  const hero = await page.evaluate(() => {
-    const brief = document.querySelector<HTMLElement>("[data-case-study-brief]");
-    const panel = document.querySelector<HTMLElement>("[data-case-study-brief-panel]");
-    const metadata = panel?.querySelector<HTMLElement>("[data-case-study-meta]");
-    const evidence = panel?.querySelectorAll<HTMLElement>("[data-case-study-brief-evidence] strong");
-    if (!brief || !panel || !metadata || !evidence) throw new Error("Case-study evidence brief is incomplete");
+  const design = await page.evaluate(() => {
+    const header = document.querySelector<HTMLElement>("[data-case-study-header]");
+    const heading = header?.querySelector<HTMLElement>("h1");
+    const facts = document.querySelector<HTMLElement>("[data-case-study-facts]");
+    const story = document.querySelector<HTMLElement>("[data-case-study-story]");
+    if (!header || !heading || !facts || !story) throw new Error("Case-study card-language landmarks are incomplete");
     return {
-      columns: getComputedStyle(brief).gridTemplateColumns.split(" ").length,
-      panelBackground: getComputedStyle(panel).backgroundColor,
-      metadataCount: metadata.querySelectorAll(":scope > div").length,
-      evidenceValues: Array.from(evidence, (value) => value.textContent?.trim()),
+      headingAlign: getComputedStyle(heading).textAlign,
+      headingWidth: Math.round(heading.getBoundingClientRect().width),
+      facts: {
+        background: getComputedStyle(facts).backgroundColor,
+        columns: getComputedStyle(facts).gridTemplateColumns.split(" ").length,
+        count: facts.querySelectorAll(":scope > div").length,
+      },
+      story: {
+        background: getComputedStyle(story).backgroundColor,
+        borderRadius: Number.parseFloat(getComputedStyle(story).borderRadius),
+        headingSize: Number.parseFloat(getComputedStyle(story.querySelector("h2")!).fontSize),
+      },
     };
   });
 
-  expect(hero.columns).toBe(2);
-  expect(hero.panelBackground).toBe("rgb(23, 23, 23)");
-  expect(hero.metadataCount).toBe(4);
-  expect(hero.evidenceValues).toEqual(["200 stores", "95%"]);
+  expect(design.headingAlign).toBe("center");
+  expect(design.headingWidth).toBeGreaterThan(900);
+  expect(design.facts.background).toBe("rgb(255, 255, 255)");
+  expect(design.facts.columns).toBe(4);
+  expect(design.facts.count).toBe(4);
+  expect(design.story.background).toBe("rgb(255, 255, 255)");
+  expect(design.story.borderRadius).toBe(12);
+  expect(design.story.headingSize).toBe(28);
 });
 
 for (const caseStudy of caseStudies) {

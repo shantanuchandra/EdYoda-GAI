@@ -8,11 +8,6 @@ type LearningPathCardProps = {
 };
 
 const headingClassName = "learning-path-card__title";
-const visualIndexBySlug: Record<string, string> = {
-  "applied-ai-non-technical": "01",
-  "ai-product-transformation": "02",
-  "practical-agents-founders": "03",
-};
 
 export function LearningPathCard({ headingLevel, item }: LearningPathCardProps) {
   const { metadata } = item;
@@ -20,13 +15,11 @@ export function LearningPathCard({ headingLevel, item }: LearningPathCardProps) 
   const outcome = metadata.outcomes[0];
   const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
   const subject = metadata.industry[1] ?? "Learning Lab";
-  const visualIndex = visualIndexBySlug[metadata.slug] ?? "01";
 
   return (
     <article className="learning-path-card" data-learning-path-card>
       <div aria-hidden="true" className="learning-path-card__media" data-learning-card-media>
         <span className="learning-path-card__media-label">{subject}</span>
-        <span className="learning-path-card__media-code">{visualIndex}</span>
         <span className="learning-path-card__media-index">01—04</span>
         <span className="learning-path-card__media-orbit learning-path-card__media-orbit--one" />
         <span className="learning-path-card__media-orbit learning-path-card__media-orbit--two" />
