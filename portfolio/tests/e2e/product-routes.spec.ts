@@ -19,6 +19,7 @@ test("lists the two verified independent products without a placeholder third ca
     await expect(card.getByText("Independent product", { exact: true })).toBeVisible();
     await expect(card.getByText(product.status)).toBeVisible();
     await expect(card.getByText(product.outcome)).toBeVisible();
+    await expect(card.getByRole("img", { name: `${product.title === "Card Compass" ? "CardCompass" : product.title} brand mark` })).toBeVisible();
     const action = card.getByRole("link", { name: "View product" });
     await expect(action).toHaveAttribute("href", `/products/${product.slug}`);
     await expect(action).toContainText("→");
@@ -31,6 +32,7 @@ test("renders Wasabi as an active live destination", async ({ page }) => {
 
   expect(response?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1, name: "Wasabi Travels" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Wasabi Travels brand mark" })).toBeVisible();
   await expect(page.getByText("Active")).toBeVisible();
   const externalLink = page.getByRole("link", { name: "Visit Wasabi Travels (opens in a new tab)" });
   await expect(externalLink).toHaveAttribute("href", "https://wasabitravels.com/");
@@ -44,6 +46,7 @@ test("renders Card Compass as an active live destination", async ({ page }) => {
 
   expect(response?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1, name: "Card Compass" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "CardCompass brand mark" })).toBeVisible();
   await expect(page.getByText("Active")).toBeVisible();
   const externalLink = page.getByRole("link", { name: "Visit Card Compass (opens in a new tab)" });
   await expect(externalLink).toHaveAttribute("href", "https://www.cardcompass.in/");

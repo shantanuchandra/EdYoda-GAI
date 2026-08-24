@@ -14,12 +14,14 @@ it("renders both independent products as active live destinations", async () => 
   expect(wasabiLink).toHaveAttribute("href", "https://wasabitravels.com/");
   expect(wasabiLink).toHaveAttribute("target", "_blank");
   expect(wasabiLink).toHaveAttribute("rel", "noreferrer");
+  expect(screen.getByRole("img", { name: "Wasabi Travels brand mark" })).toBeInTheDocument();
   expect(screen.getByText("2,000+ places")).toBeInTheDocument();
   expect(screen.getByRole("list", { name: "Product evidence" })).toBeInTheDocument();
   expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(1);
 
   rerender(await ProductDetailPage({ params: Promise.resolve({ slug: "card-compass" }) }));
   expect(screen.getByText("Active")).toBeInTheDocument();
+  expect(screen.getByRole("img", { name: "CardCompass brand mark" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Visit Card Compass (opens in a new tab)" })).toHaveAttribute("href", "https://www.cardcompass.in/");
   expect(container.querySelectorAll('[target="_blank"]')).toHaveLength(1);
   expect(screen.getByText("121")).toBeInTheDocument();

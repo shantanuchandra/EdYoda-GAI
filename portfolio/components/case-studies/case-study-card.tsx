@@ -16,7 +16,7 @@ export function CaseStudyCard({ item }: { item: CaseStudySummary }) {
     >
       <div className="case-study-card__wash" aria-hidden="true" />
       <div className="case-study-card__body">
-        <CaseStudyArtwork company={item.company} industry={item.industry} kind={item.kind} />
+        <CaseStudyArtwork company={item.company} industry={item.industry} kind={item.kind} slug={item.slug} />
         <header className="case-study-card__header">
           <div className="case-study-card__tags">
             {tags.map((tag) => <span key={tag}>{tag}</span>)}

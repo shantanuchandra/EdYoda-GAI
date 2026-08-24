@@ -1693,6 +1693,14 @@ button {
   background: linear-gradient(135deg, rgb(230 245 241 / 96%), rgb(244 230 196 / 78%));
 }
 
+.case-study-artwork--wasabi-travels {
+  background: linear-gradient(135deg, #f8f5ff, #f9ecef 92%);
+}
+
+.case-study-artwork--card-compass {
+  background: #0b1015;
+}
+
 .case-study-artwork img {
   object-fit: contain;
   padding: 16px;
@@ -1718,6 +1726,80 @@ button {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted-ink);
+}
+
+.product-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+}
+
+.case-study-artwork .product-brand-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: transform 500ms var(--ease-out);
+}
+
+.product-brand-mark__wasabi-icon,
+.product-brand-mark__wasabi-name,
+.product-brand-mark__card-badge,
+.product-brand-mark__card-name {
+  position: static !important;
+}
+
+.product-brand-mark__wasabi-icon {
+  font-size: 2rem !important;
+  line-height: 1 !important;
+}
+
+.product-brand-mark__wasabi-name {
+  color: #1c253b;
+  font-family: Georgia, "Yu Mincho", serif !important;
+  font-size: 1.35rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025em;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+.product-brand-mark--card-compass {
+  color: #f4f0e6;
+}
+
+.product-brand-mark__card-badge {
+  display: grid;
+  width: 44px;
+  height: 32px;
+  place-items: center;
+  border-radius: 4px;
+  background: #3fe0d0;
+  color: #0b1015;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.06em;
+  line-height: 1 !important;
+}
+
+.product-brand-mark__card-name {
+  font-family: var(--font-manrope), system-ui, sans-serif !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+.product-detail__brand {
+  margin-top: 32px;
+}
+
+.product-detail__brand.product-brand-mark--card-compass {
+  color: var(--color-ink);
 }
 
 .case-study-card {
@@ -1877,6 +1959,11 @@ button {
 .case-study-card:hover .case-study-artwork img,
 .case-study-card:focus-within .case-study-artwork img {
   transform: scale(1.05);
+}
+
+.case-study-card:hover .case-study-artwork .product-brand-mark,
+.case-study-card:focus-within .case-study-artwork .product-brand-mark {
+  transform: translate(-50%, -50%) scale(1.05);
 }
 
 .case-study-card:hover h3 a,
@@ -2311,6 +2398,7 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .case-study-card,
   .case-study-artwork img,
+  .case-study-artwork .product-brand-mark,
   .case-study-card h3 a,
   .learning-path-card,
   .learning-path-card__signal span,
@@ -2322,6 +2410,8 @@ button {
   .case-study-card:focus-within,
   .case-study-card:hover .case-study-artwork img,
   .case-study-card:focus-within .case-study-artwork img,
+  .case-study-card:hover .case-study-artwork .product-brand-mark,
+  .case-study-card:focus-within .case-study-artwork .product-brand-mark,
   .learning-path-card:hover,
   .learning-path-card:focus-within {
     transform: none;

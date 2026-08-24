@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 import { Breadcrumbs } from "@/components/content/breadcrumbs";
 import { OutcomeList } from "@/components/content/outcome-list";
+import { ProductBrandMark } from "@/components/content/product-brand-mark";
 import { StatusLabel } from "@/components/ui/status-label";
 import type { ContentItem } from "@/lib/content/schema";
 
@@ -18,6 +19,7 @@ export function ProductDetail({ children, item }: ProductDetailProps) {
       <header className="detail-page__header border-b border-line bg-surface py-10 sm:py-14">
         <div className="container">
           <Breadcrumbs items={[{ label: "Products", href: "/products" }, { label: metadata.title }]} />
+          <ProductBrandMark className="product-detail__brand" slug={metadata.slug} />
           <p className="mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Independent product</p>
           <h1 className="mt-3 mb-0 max-w-[1000px] font-display text-[clamp(3rem,7vw,6rem)] font-medium tracking-[-0.04em] leading-[0.96]">
             {metadata.title}

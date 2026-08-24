@@ -18,6 +18,8 @@ it("renders all four employer and two independent records once with truthful des
   expect(within(cards[5]).getByRole("link", { name: "View product" })).toHaveAttribute("href", "/products/card-compass");
   expect(screen.getAllByRole("link", { name: /Read case study|View product/ })).toHaveLength(6);
   expect(within(cards[0]).getByRole("img", { name: "Lenskart" })).toHaveAttribute("src", expect.stringContaining("%2Fimages%2Fcompanies%2Flenskart.png"));
+  expect(within(cards[4]).getByRole("img", { name: "Wasabi Travels brand mark" })).toBeInTheDocument();
+  expect(within(cards[5]).getByRole("img", { name: "CardCompass brand mark" })).toBeInTheDocument();
   expect(within(cards[0]).getByText("Retail")).toBeInTheDocument();
 });
 
