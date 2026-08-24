@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===================== EDITORIAL DESIGN TOKENS ===================== */
+  :root {
+    /* Paper palette — warm, never cold */
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    /* Two accents, used like editorial highlights */
+    --terra:        #b8431b;       /* deep terracotta — for warmth, emphasis */
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;       /* deep editorial blue — for cool callouts */
+    --ink-blue-soft: rgba(30, 58, 95, 0.08);
+
+    /* Risk / status — used sparingly, only on limit slides */
+    --warn:         #a16207;       /* amber */
+    --warn-soft:    rgba(161, 98, 7, 0.10);
+    --danger:       #991b1b;       /* deep crimson, not bright red */
+    --danger-soft:  rgba(153, 27, 27, 0.08);
+    --calm:         #14532d;       /* forest green */
+    --calm-soft:    rgba(20, 83, 45, 0.08);
+
+    /* Spacing — generous, mathematical */
+    --s-1:  0.5rem;
+    --s-2:  1rem;
+    --s-3:  1.5rem;
+    --s-4:  2rem;
+    --s-5:  3rem;
+    --s-6:  4.5rem;
+    --s-7:  6rem;
+    --s-8:  9rem;
+
+    /* Type scale — anchored on a 1.25 ratio */
+    --t-eyebrow:    0.72rem;
+    --t-meta:       0.78rem;
+    --t-body:       1.05rem;
+    --t-lede:       1.35rem;
+    --t-h3:         1.5rem;
+    --t-h2:         2.5rem;
+    --t-h1:         clamp(2.8rem, 5.2vw, 4.8rem);
+    --t-display:    clamp(3.4rem, 6.6vw, 6.2rem);
+    --t-mega:       clamp(5rem, 11vw, 11rem);
+
+    /* Motion */
+    --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+    --dur:          480ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Paper grain — subtle, throughout */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  /* Vignette — barely there */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(26, 24, 20, 0.08) 100%);
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+  }
+
+  /* ===================== SLIDE LAYOUT — EDITORIAL FRAME ===================== */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.6vh 5vw 4.2vh;
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* Running header — old magazine style */
+  .running-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-eyebrow);
+    color: var(--ink-mute);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .running-head .left { display: flex; gap: 1.4em; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+  .running-head .left .topic { color: var(--ink-soft); }
+
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  /* Main canvas — vertically centered, with bottom marginalia */
+  .slide-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--s-4) 0;
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* The dropped slide number — bottom-right, oversized, low-contrast */
+  .folio {
+    position: absolute;
+    bottom: 1.2rem;
+    right: 5vw;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 8.5rem;
+    line-height: 0.8;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em;
+    vertical-align: top;
+    margin-left: 0.15em;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  /* ===================== TYPOGRAPHY ===================== */
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-eyebrow);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: var(--s-3);
+    position: relative;
+    padding-left: 1.8em;
+  }
+  .eyebrow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1.2em;
+    height: 1px;
+    background: var(--terra);
+  }
+  .eyebrow.cool { color: var(--ink-blue); }
+  .eyebrow.cool::before { background: var(--ink-blue); }
+  .eyebrow.warn { color: var(--warn); }
+  .eyebrow.warn::before { background: var(--warn); }
+  .eyebrow.danger { color: var(--danger); }
+  .eyebrow.danger::before { background: var(--danger); }
+
+  h1, h2, h3, .display, .mega {
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: var(--t-h1);
+    font-weight: 400;
+    line-height: 1.02;
+    font-variation-settings: 'opsz' 120, 'SOFT' 30;
+    margin-bottom: var(--s-4);
+  }
+
+  h2 {
+    font-size: var(--t-h2);
+    font-weight: 400;
+    line-height: 1.1;
+    font-variation-settings: 'opsz' 80;
+    margin-bottom: var(--s-3);
+  }
+
+  h3 {
+    font-size: var(--t-h3);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: var(--s-1);
+  }
+
+  .display {
+    font-size: var(--t-display);
+    font-weight: 300;
+    line-height: 1.05;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+    max-width: 18ch;
+  }
+
+  .mega {
+    font-size: var(--t-mega);
+    font-weight: 300;
+    line-height: 0.95;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    letter-spacing: -0.04em;
+  }
+
+  p, li {
+    font-size: var(--t-body);
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-size: var(--t-lede);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    font-variation-settings: 'opsz' 36;
+  }
+
+  .small-caps {
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+  }
+
+  /* Inline emphasis */
+  .terra { color: var(--terra); }
+  .blue { color: var(--ink-blue); }
+  .marked {
+    background: linear-gradient(180deg, transparent 60%, var(--terra-soft) 60%);
+    padding: 0 0.05em;
+  }
+  .marked-blue { background: linear-gradient(180deg, transparent 60%, var(--ink-blue-soft) 60%); padding: 0 0.05em; }
+
+  /* Drop cap (use sparingly — hero/quote slides) */
+  .drop {
+    float: left;
+    font-family: 'Fraunces', serif;
+    font-size: 5.2em;
+    line-height: 0.82;
+    font-weight: 400;
+    color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  /* ===================== EDITORIAL COMPONENTS ===================== */
+
+  /* Numbered marginalia (e.g., for stages, models, layers) */
+  .marginalia {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+  .marginalia .marg-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    line-height: 1;
+  }
+
+  /* Rules — horizontal and vertical dividers */
+  .rule { height: 1px; background: var(--rule); margin: var(--s-3) 0; }
+  .rule-double { height: 4px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: var(--s-3) 0; }
+  .rule-dot { height: 1px; background-image: linear-gradient(90deg, var(--ink-mute) 50%, transparent 50%); background-size: 6px 1px; background-repeat: repeat-x; margin: var(--s-3) 0; }
+
+  /* Bordered note — like a magazine sidebar */
+  .pull-quote {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.18;
+    color: var(--ink);
+    border-left: 2px solid var(--terra);
+    padding: var(--s-1) 0 var(--s-1) var(--s-3);
+    margin: var(--s-3) 0;
+    font-variation-settings: 'opsz' 80;
+    max-width: 28ch;
+  }
+
+  /* Code/prompt — like a fixed-width sidebar in a magazine */
+  .prompt {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+    padding: var(--s-3) var(--s-3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .prompt::before {
+    content: 'PROMPT';
+    position: absolute;
+    top: -0.6em;
+    left: var(--s-3);
+    background: var(--paper);
+    padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+
+  /* Specimens — for token examples, etc. */
+  .specimen {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding: 0.6em 0;
+    border-bottom: 1px dotted var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: 1rem;
+  }
+  .specimen:last-child { border-bottom: none; }
+  .specimen .label-text { color: var(--ink); }
+  .specimen .value {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    color: var(--terra);
+    font-size: 1.25rem;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+
+  /* Tag/byline */
+  .byline {
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-eyebrow);
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+
+  /* Grid systems */
+  .grid { display: grid; gap: var(--s-3); }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+  .g-4 { grid-template-columns: repeat(4, 1fr); gap: var(--s-2); }
+  .g-5 { grid-template-columns: repeat(5, 1fr); gap: var(--s-2); }
+  .g-6 { grid-template-columns: repeat(6, 1fr); gap: var(--s-2); }
+
+  /* Editorial column — narrow text */
+  .column {
+    max-width: 38ch;
+  }
+
+  /* Word-mark options (warm-up) */
+  .word-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    margin-top: var(--s-4);
+  }
+  .word-strip .word {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 2.4rem;
+    color: var(--ink-mute);
+    font-variation-settings: 'opsz' 80;
+    line-height: 1.2;
+  }
+  .word-strip .word::after {
+    content: ' /';
+    color: var(--ink-faint);
+    margin-left: 0.4em;
+  }
+  .word-strip .word:last-child::after { content: ''; }
+
+  /* Numbered list — book-style */
+  .num-list {
+    list-style: none;
+    counter-reset: numl;
+  }
+  .num-list li {
+    counter-increment: numl;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--rule-soft);
+    padding-left: 3rem;
+    position: relative;
+  }
+  .num-list li:last-child { border-bottom: none; }
+  .num-list li::before {
+    content: counter(numl, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: var(--s-2);
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-meta);
+    color: var(--terra);
+    letter-spacing: 0.1em;
+  }
+
+  /* Vote options (poll-style) */
+  .vote {
+    border-top: 1px solid var(--ink);
+    padding: var(--s-3) 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .vote:last-child { border-bottom: 1px solid var(--ink); }
+  .vote .vote-num {
+    font-family: 'Fraunces', serif;
+    font-size: 4.6rem;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .vote .vote-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-meta);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* Limit cards */
+  .limit-card {
+    padding: var(--s-3);
+    border: 1px solid var(--rule);
+    background: var(--paper-cream);
+    position: relative;
+  }
+  .limit-card .risk-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: inline-block;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid currentColor;
+    margin-bottom: var(--s-2);
+  }
+  .limit-card.high .risk-tag { color: var(--danger); }
+  .limit-card.medium .risk-tag { color: var(--warn); }
+  .limit-card.low .risk-tag { color: var(--ink-blue); }
+  .limit-card h3 { font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 400; margin-bottom: var(--s-1); }
+  .limit-card p { margin-bottom: var(--s-2); }
+  .limit-card .bite {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    border-top: 1px dotted var(--rule);
+    padding-top: var(--s-2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .limit-card .bite strong { color: var(--ink); font-weight: 500; }
+
+  /* Stack visualization */
+  .stack-row {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .stack-row:first-of-type { border-top: 1px solid var(--ink); }
+  .stack-row.featured { background: var(--terra-soft); padding: var(--s-3) var(--s-2); margin: 0 calc(-1 * var(--s-2)); }
+  .stack-row .stack-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .stack-row.featured .stack-num { color: var(--terra); }
+  .stack-row h3 { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400; }
+  .stack-row p { font-family: 'Geist Mono', monospace; font-size: 0.85rem; color: var(--ink-mute); letter-spacing: 0.04em; }
+
+  /* Demo step list */
+  .demo-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .demo-list li {
+    display: grid;
+    grid-template-columns: 2.5rem 3rem 1fr auto;
+    gap: var(--s-2);
+    align-items: baseline;
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.95rem;
+  }
+  .demo-list li:last-child { border-bottom: 1px solid var(--rule); }
+  .demo-list .marker {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .demo-list .marker.ok { color: var(--calm); }
+  .demo-list .marker.fail { color: var(--danger); }
+  .demo-list .marker.partial { color: var(--warn); }
+  .demo-list .step-num { color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .demo-list .step-text { color: var(--ink); }
+  .demo-list .step-meta { color: var(--ink-mute); font-style: italic; text-align: right; font-family: 'Fraunces', serif; font-size: 0.95rem; }
+
+  /* Temperature dial */
+  .dial {
+    margin: var(--s-3) 0;
+  }
+  .dial-axis {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Geist Mono', monospace;
+    font-size: var(--t-meta);
+    color: var(--ink-mute);
+    letter-spacing: 0.1em;
+    padding-bottom: var(--s-1);
+  }
+  .dial-track {
+    height: 1px;
+    background: var(--ink);
+    position: relative;
+    margin: var(--s-2) 0;
+  }
+  .dial-track .pip {
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    height: 7px;
+    background: var(--ink);
+  }
+  .dial-track .pip-major { height: 12px; top: -6px; }
+  .dial-track .needle {
+    position: absolute;
+    top: -1rem;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 12px solid var(--terra);
+    transform: translateX(-50%);
+  }
+  .dial-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-2);
+  }
+
+  /* Side-by-side card */
+  .ed-card {
+    border-top: 2px solid var(--ink);
+    padding: var(--s-3) 0;
+  }
+  .ed-card.terra { border-top-color: var(--terra); }
+  .ed-card.blue { border-top-color: var(--ink-blue); }
+  .ed-card.warn { border-top-color: var(--warn); }
+  .ed-card.danger { border-top-color: var(--danger); }
+  .ed-card .src {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 0.6em;
+    font-weight: 500;
+  }
+  .ed-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: var(--s-1);
+    font-variation-settings: 'opsz' 72;
+  }
+  .ed-card p { font-size: var(--t-body); color: var(--ink-soft); }
+
+  /* Model card (for grids) */
+  .model-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--ink);
+  }
+  .model-card .year {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--terra);
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+  }
+  .model-card .name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1;
+    font-variation-settings: 'opsz' 72;
+  }
+  .model-card .desc {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+    margin-top: auto;
+  }
+
+  /* Big stat (e.g., context window) */
+  .stat-card {
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--ink);
+  }
+  .stat-card.featured { border-top: 2px solid var(--terra); }
+  .stat-card .stat-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+  .stat-card .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 5rem;
+    font-weight: 300;
+    line-height: 0.95;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.03em;
+    margin: var(--s-2) 0 var(--s-1);
+    font-variation-settings: 'opsz' 144;
+  }
+  .stat-card.featured .stat-num { color: var(--terra); }
+  .stat-card .stat-foot {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+
+  /* Center utility */
+  .center { text-align: center; }
+  .mt-3 { margin-top: var(--s-3); }
+  .mt-4 { margin-top: var(--s-4); }
+  .mt-5 { margin-top: var(--s-5); }
+  .mt-6 { margin-top: var(--s-6); }
+
+  /* Cover (slide 1) — special layout */
+  .cover {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-6);
+    align-items: end;
+    height: 100%;
+    padding: var(--s-5) 0 var(--s-3);
+  }
+  .cover .vol {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    align-self: stretch;
+    border-right: 1px solid var(--rule);
+    padding-right: var(--s-2);
+  }
+  .cover .cover-main h1.cover-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.5rem, 7vw, 6.4rem);
+    font-weight: 300;
+    line-height: 0.94;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    max-width: 16ch;
+  }
+  .cover .cover-byline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-3);
+    max-width: 50ch;
+    line-height: 1.4;
+  }
+  .cover .cover-foot {
+    margin-top: var(--s-5);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--ink);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-mute);
+  }
+
+  /* Quote slide (e.g., brain in a jar) */
+  .blockquote-slide {
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 8vw;
+    padding-right: 8vw;
+  }
+
+  /* Break slide */
+  .break-slide {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .break-clock {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(7rem, 16vw, 14rem);
+    font-weight: 300;
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144;
+  }
+
+  /* Topic title slide — feels like a section divider in a book */
+  .topic-divider {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+    height: 100%;
+    align-content: center;
+    text-align: left;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-left: 12vw;
+  }
+  .topic-divider .chapter-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .topic-divider .chapter-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(4rem, 9vw, 8rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144, 'SOFT' 60, 'WONK' 1;
+    max-width: 14ch;
+  }
+  .topic-divider .chapter-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin-top: var(--s-3);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 48;
+  }
+
+  /* Exercise — feels different (more activated) */
+  .exercise-flag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding-bottom: var(--s-2);
+    border-bottom: 2px solid var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .exercise-flag .ex-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.6rem;
+    font-weight: 400;
+    color: var(--terra);
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .exercise-flag .ex-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .exercise-flag .ex-duration {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--ink-soft);
+  }
+
+  /* ===================== NAV (kept minimal) ===================== */
+  .nav {
+    position: fixed;
+    bottom: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.4rem;
+    z-index: 100;
+    background: rgba(245, 239, 230, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+  body:hover .nav { opacity: 0.5; }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: transparent;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.84rem;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-family: 'Geist Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: background var(--dur) var(--ease);
+  }
+  .nav button:hover { background: var(--paper-warm); color: var(--ink); }
+
+  /* Progress at top — like a thread */
+  .progress-thread {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--terra);
+    z-index: 200;
+    transition: width var(--dur) var(--ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .nav, .progress-thread { transition: none !important; }
+  }
+
+  @media (max-width: 900px) {
+    .g-3, .g-4, .g-5, .g-6 { grid-template-columns: 1fr 1fr; }
+    .cover { grid-template-columns: 1fr; }
+    .cover .vol { display: none; }
+  }
+
+  /* ===================== PRINT / PDF EXPORT ===================== */
+  @media print {
+    @page {
+      /* 16:9 landscape — fits Zoom share, projectors, PowerPoint imports */
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+    html, body {
+      width: 13.333in;
+      height: auto;
+      background: var(--paper) !important;
+      overflow: visible !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .deck {
+      width: 13.333in;
+      height: auto;
+      position: static;
+    }
+    /* Show ALL slides for print, one per page */
+    .slide {
+      position: relative !important;
+      inset: auto !important;
+      width: 13.333in !important;
+      height: 7.5in !important;
+      display: flex !important;
+      opacity: 1 !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      overflow: hidden;
+      padding: 0.4in 0.6in 0.5in !important;
+    }
+    .slide:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    /* Hide all on-screen navigation */
+    .nav, .progress-thread { display: none !important; }
+    /* Strip the paper grain — bloats PDF by 100MB+. Keep the warm color and vignette. */
+    body::before { background-image: none !important; opacity: 0 !important; }
+    /* Force color preservation in print */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    /* The break-slide countdown timer is meaningless on paper — show "10:00" statically */
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread" style="width: 0%"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER -->
+  <!-- ====================================================== -->
+  <div class="slide active">
+    <div class="cover">
+      <div class="vol">Session One · Two Hours · Live</div>
+      <div class="cover-main">
+        <div class="byline" style="margin-bottom: var(--s-4); color: var(--terra);">— Starting Shortly —</div>
+        <h1 class="cover-title">A field guide to <em style="font-style: italic; color: var(--terra);">Generative AI</em> for people who don't write code.</h1>
+        <p class="cover-byline">
+          In the next two hours you will prompt three different AI models, watch one of them confidently invent a fact, and leave with one tool you can use at work tomorrow morning.
+        </p>
+        <div class="cover-foot">
+          <span>No. 01 / The Foundations</span>
+          <span>Reading time: 120 min</span>
+        </div>
+      </div>
+    </div>
+    <div class="folio">1<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — WARM-UP -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Warm-up</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Type in chat</span>
+      <h1>In one word — your current feeling about <em style="font-style: italic;" class="terra">artificial intelligence</em>.</h1>
+      <div class="word-strip">
+        <span class="word">Skeptical</span>
+        <span class="word">Excited</span>
+        <span class="word">Confused</span>
+        <span class="word">Scared</span>
+        <span class="word">Hopeful</span>
+        <span class="word">Curious</span>
+        <span class="word">Tired</span>
+      </div>
+    </div>
+    <div class="folio">2<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — HOOK QUESTION -->
+  <!-- ====================================================== -->
+  <div class="slide blockquote-slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Quick Poll</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <p class="display"><span class="drop">R</span>aise your hand <em class="terra" style="font-style: normal;">🙋</em> in chat if AI has ever given you a <span class="marked">confident, completely wrong</span> answer.</p>
+    </div>
+    <div class="folio">3<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — NORMS -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">House Rules</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">How we'll work</span>
+      <h1>For the next <em style="font-style: italic;" class="terra">two hours</em>.</h1>
+      <div class="grid g-2 mt-4">
+        <div>
+          <div class="ed-card">
+            <div class="src">i · Cameras</div>
+            <h3>Encouraged but optional.</h3>
+            <p>No call-outs for off-camera folks.</p>
+          </div>
+          <div class="ed-card terra">
+            <div class="src">ii · Chat</div>
+            <h3>Use it freely.</h3>
+            <p>Questions, reactions, jokes — welcome.</p>
+          </div>
+        </div>
+        <div>
+          <div class="ed-card">
+            <div class="src">iii · Mics</div>
+            <h3>Muted by default.</h3>
+            <p>Unmute when called on or to share.</p>
+          </div>
+          <div class="ed-card">
+            <div class="src">iv · Questions</div>
+            <h3>Hot or parked.</h3>
+            <p>Quick ones answered live. Bigger ones go to the parking lot doc.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rule-dot mt-5"></div>
+      <p class="lede center" style="margin: 0 auto;">A real ten-minute break arrives at minute fifty-five.</p>
+    </div>
+    <div class="folio">4<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — PREDICT THE OUTPUT -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Live Demo · Poll</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Vote in the poll</span>
+      <h1>What will <em style="font-style: italic;">ChatGPT</em> answer?</h1>
+      <div class="prompt mt-3" style="text-align: center; font-size: 1.5rem; max-width: 800px; margin: var(--s-3) auto;">How many R's are in the word strawberry?</div>
+      <div class="grid g-4 mt-4" style="max-width: 900px; margin: var(--s-4) auto 0;">
+        <div class="vote"><span class="vote-num">2</span><span class="vote-label">Option · A</span></div>
+        <div class="vote"><span class="vote-num">3</span><span class="vote-label">Option · B</span></div>
+        <div class="vote"><span class="vote-num">4</span><span class="vote-label">Option · C</span></div>
+        <div class="vote"><span class="vote-label" style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-style: italic; text-transform: none; letter-spacing: 0; color: var(--ink);">It'll be wrong</span><span class="vote-label">D</span></div>
+      </div>
+    </div>
+    <div class="folio">5<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 06 — ROADMAP -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Contents</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Contents</span>
+      <h1>Six topics. <em style="font-style: italic;" class="terra">Two hours.</em></h1>
+      <div class="grid g-3 mt-4" style="gap: var(--s-4);">
+        <div class="marginalia">
+          <span class="marg-num">01</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Foundations</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">Evolution of AI</h3>
+            <p style="font-size: 0.95rem;">Rules to foundation models.</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">02</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Landscape</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">Key models</h3>
+            <p style="font-size: 0.95rem;">GPT · DALL·E · Claude · Gemini.</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">03</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Mechanics</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">How LLMs work</h3>
+            <p style="font-size: 0.95rem;">Tokens · context · temperature.</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">04</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Stack</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">The value chain</h3>
+            <p style="font-size: 0.95rem;">Models → platforms → apps.</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">05</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Risk</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">Limitations</h3>
+            <p style="font-size: 0.95rem;">Where AI breaks down.</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">06</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Climax</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">Chatbot ceiling</h3>
+            <p style="font-size: 0.95rem;">Why single calls fall short.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">6<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 07 — TOPIC 1 DIVIDER -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Topic 01</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="topic-divider">
+      <div class="chapter-label">— I. Foundations —</div>
+      <h1 class="chapter-title">What is <em style="font-style: italic;" class="terra">Generative AI?</em></h1>
+      <p class="chapter-sub">Evolution from rule-based systems to foundation models.</p>
+    </div>
+    <div class="folio">7<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 08 — TRANSLATOR DEMO -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 01</span><span class="dot">·</span><span class="topic">Live Demo</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Live Demo</span>
+      <h2>The same Hindi phrase. <em style="font-style: italic;" class="terra">Two translations.</em></h2>
+      <div class="prompt center mt-3" style="font-size: 1.6rem; font-family: 'Fraunces', serif; font-style: italic; color: var(--ink); max-width: 700px; margin: var(--s-3) auto;">मेरा दिल बाग बाग हो गया।</div>
+      <div class="grid g-2 mt-4">
+        <div class="ed-card">
+          <div class="src">Google Translate · Rule-based</div>
+          <h3 style="color: var(--ink-mute); font-style: italic;">"My heart has become garden garden."</h3>
+          <p>Word for word. The meaning is lost.</p>
+        </div>
+        <div class="ed-card terra">
+          <div class="src">ChatGPT · Generative</div>
+          <h3>"My heart is overjoyed — I'm blooming with happiness."</h3>
+          <p>Meaning, culture, idiom — preserved.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">8<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 09 — FOUR STAGES -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 01</span><span class="dot">·</span><span class="topic">A Brief History</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">A brief history</span>
+      <h1>How AI <em style="font-style: italic;" class="terra">evolved</em>, in four stages.</h1>
+      <div class="rule mt-3"></div>
+      <ol class="num-list">
+        <li>
+          <h3>Rule-Based <span class="byline" style="margin-left: 0.6em;">1950s — 1980s</span></h3>
+          <p>If-then logic. A vending machine: fixed input, fixed output.</p>
+        </li>
+        <li>
+          <h3>Machine Learning <span class="byline" style="margin-left: 0.6em;">1990s — 2010s</span></h3>
+          <p>Learns patterns from data. A spam filter that gets smarter over time.</p>
+        </li>
+        <li>
+          <h3>Deep Learning <span class="byline" style="margin-left: 0.6em;">2010s</span></h3>
+          <p>Neural networks. The AI that beat human champions at Go.</p>
+        </li>
+        <li>
+          <h3 style="color: var(--terra);">Foundation Models <span class="byline" style="margin-left: 0.6em; color: var(--terra);">2020 — Now</span></h3>
+          <p>Trained on the internet. Performs tasks it was never specifically trained for.</p>
+        </li>
+      </ol>
+    </div>
+    <div class="folio">9<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 10 — RECIPE / CHEF -->
+  <!-- ====================================================== -->
+  <div class="slide blockquote-slide">
+    <div class="running-head"><div class="left"><span>Topic 01</span><span class="dot">·</span><span class="topic">The Analogy</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <p class="mega"><span class="drop">R</span>ule-based AI is a <em style="font-style: italic;" class="terra">recipe book.</em><br>Generative AI is a <em style="font-style: italic;" class="terra">master chef.</em></p>
+      <p class="lede mt-5" style="max-width: 50ch;">The recipe book knows one hundred dishes. The chef invents the hundred-and-first when you describe what you want.</p>
+    </div>
+    <div class="folio">10<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 11 — EXERCISE 1 -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 01</span><span class="dot">·</span><span class="topic">Exercise</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-num">01</span>
+        <div>
+          <div class="ex-label">Exercise</div>
+          <div class="ex-duration">Seven minutes</div>
+        </div>
+      </div>
+      <h1>Your first <em style="font-style: italic;" class="terra">generative output</em>.</h1>
+      <p class="lede mt-3">Open ChatGPT. Paste the prompt below, replacing the bracketed role with your own.</p>
+      <div class="prompt mt-4">Write a 4-line poem about my job as a [your role].
+Make it warm and slightly funny.</div>
+      <div class="grid g-3 mt-4">
+        <div class="marginalia">
+          <span class="marg-num">i</span>
+          <div><h3 style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 400;">Run it.</h3><p style="font-size: 0.95rem;">Hit enter.</p></div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">ii</span>
+          <div><h3 style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 400;">Pick a line.</h3><p style="font-size: 0.95rem;">The one that made you smile.</p></div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">iii</span>
+          <div><h3 style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 400;">Share it.</h3><p style="font-size: 0.95rem;">Paste it in chat.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">11<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 12 — TOPIC 2 DIVIDER -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Topic 02</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="topic-divider">
+      <div class="chapter-label">— II. The Landscape —</div>
+      <h1 class="chapter-title">Key <em style="font-style: italic;" class="terra">milestones.</em></h1>
+      <p class="chapter-sub">GPT, DALL·E, Gemini, Claude, Llama — what each one unlocked.</p>
+    </div>
+    <div class="folio">12<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 13 — FIVE MODEL FAMILIES -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 02</span><span class="dot">·</span><span class="topic">The Family Tree</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Five families</span>
+      <h1>The <em style="font-style: italic;" class="terra">family tree</em> of modern AI.</h1>
+      <div class="grid g-5 mt-5" style="gap: var(--s-3);">
+        <div class="model-card">
+          <span class="year">— 2020 —</span>
+          <span class="name">GPT-3</span>
+          <span class="desc">Fluent language at scale.</span>
+        </div>
+        <div class="model-card">
+          <span class="year">— 2021 —</span>
+          <span class="name">DALL·E</span>
+          <span class="desc">Images from text.</span>
+        </div>
+        <div class="model-card">
+          <span class="year">— 2023 —</span>
+          <span class="name">GPT-4</span>
+          <span class="desc">Multimodal reasoning.</span>
+        </div>
+        <div class="model-card">
+          <span class="year">— 2023 —</span>
+          <span class="name">Gemini</span>
+          <span class="desc">Google ecosystem.</span>
+        </div>
+        <div class="model-card">
+          <span class="year">— 2023 / 24 —</span>
+          <span class="name">Claude · Llama</span>
+          <span class="desc">Safety & open source.</span>
+        </div>
+      </div>
+    </div>
+    <div class="folio">13<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 14 — EXERCISE 2 -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 02</span><span class="dot">·</span><span class="topic">Exercise</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-num">02</span>
+        <div>
+          <div class="ex-label">Exercise</div>
+          <div class="ex-duration">Ten minutes</div>
+        </div>
+      </div>
+      <h1>Model <em style="font-style: italic;" class="terra">speed dating</em>.</h1>
+      <p class="lede mt-3">Open ChatGPT, Claude, and Gemini in three tabs. Paste the same prompt into all three.</p>
+      <div class="prompt mt-4">I'm a [marketing manager / finance analyst / doctor].
+Explain in 4 short bullet points why our quarterly revenue dipped 12%.
+Assume nothing about my business.
+Ask me 2 clarifying questions BEFORE answering.</div>
+      <div class="grid g-3 mt-4">
+        <div class="model-card"><span class="year">OpenAI</span><span class="name">ChatGPT</span><span class="desc">chat.openai.com</span></div>
+        <div class="model-card"><span class="year">Anthropic</span><span class="name">Claude</span><span class="desc">claude.ai</span></div>
+        <div class="model-card"><span class="year">Google</span><span class="name">Gemini</span><span class="desc">gemini.google.com</span></div>
+      </div>
+    </div>
+    <div class="folio">14<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 15 — WHAT EACH UNLOCKS -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 02</span><span class="dot">·</span><span class="topic">For Your Work</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">For your work</span>
+      <h1>What each model <em style="font-style: italic;" class="terra">unlocks</em>.</h1>
+      <div class="grid g-2 mt-4">
+        <div class="ed-card"><div class="src">OpenAI</div><h3>ChatGPT</h3><p>General drafting, brainstorming, ideation.</p></div>
+        <div class="ed-card"><div class="src">Anthropic</div><h3>Claude</h3><p>Long documents, nuanced analysis. The contract lawyer's tool.</p></div>
+        <div class="ed-card"><div class="src">Google</div><h3>Gemini</h3><p>Lives inside Docs, Gmail, Sheets.</p></div>
+        <div class="ed-card"><div class="src">OpenAI · Midjourney</div><h3>DALL·E · Midjourney</h3><p>Marketing visuals, mockups, concept art.</p></div>
+        <div class="ed-card"><div class="src">Meta</div><h3>Llama</h3><p>Open source. Runs on private servers — banks, hospitals, government.</p></div>
+        <div class="ed-card terra">
+          <div class="src">A heuristic</div>
+          <h3 style="font-style: italic;">Pick the model for the job.</h3>
+          <p>Not the brand. Not the hype.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">15<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 16 — TOPIC 3 DIVIDER -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Topic 03</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="topic-divider">
+      <div class="chapter-label">— III. Mechanics —</div>
+      <h1 class="chapter-title">How <em style="font-style: italic;" class="terra">LLMs</em> work.</h1>
+      <p class="chapter-sub">Tokens, context windows, temperature.</p>
+    </div>
+    <div class="folio">16<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 17 — TOKENS -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 03</span><span class="dot">·</span><span class="topic">Tokens</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Tokens</span>
+      <h1>AI thinks in <em style="font-style: italic;" class="terra">LEGO bricks</em> of language.</h1>
+      <div class="grid g-2 mt-4">
+        <div>
+          <div class="byline" style="margin-bottom: var(--s-2);">— A few examples —</div>
+          <div class="specimen"><span class="label-text">strawberry</span><span class="value">1</span></div>
+          <div class="specimen"><span class="label-text">antidisestablishmentarianism</span><span class="value">6</span></div>
+          <div class="specimen"><span class="label-text">Shantanu Chandra</span><span class="value">~5</span></div>
+          <div class="specimen"><span class="label-text">🎉</span><span class="value">1</span></div>
+        </div>
+        <div>
+          <div class="pull-quote">You're charged by the brick, not the sentence.</div>
+          <p class="mt-4" style="font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--ink-soft);">One thousand tokens ≈ seven hundred and fifty English words.</p>
+          <p class="mt-3" style="font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--ink-soft);">Hindi, Tamil and Arabic words can run three to five times more tokens than English.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">17<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 18 — TOKENS EXERCISE -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 03</span><span class="dot">·</span><span class="topic">Hands-on</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-num">— a</span>
+        <div>
+          <div class="ex-label">Micro-exercise</div>
+          <div class="ex-duration">Four minutes</div>
+        </div>
+      </div>
+      <h1>See your <em style="font-style: italic;" class="terra">tokens</em> live.</h1>
+      <p class="lede mt-3">Open <span style="font-family: 'Geist Mono', monospace; color: var(--terra); font-style: normal;">platform.openai.com/tokenizer</span></p>
+      <div class="grid g-2 mt-5">
+        <div>
+          <div class="byline" style="margin-bottom: var(--s-2);">— Type each, note the count —</div>
+          <ol class="num-list">
+            <li><p>Your full name</p></li>
+            <li><p>A three-paragraph email you sent last week</p></li>
+            <li><p>An emoji of your choice</p></li>
+            <li><p>A Hindi or Tamil word in native script</p></li>
+          </ol>
+        </div>
+        <div class="ed-card terra" style="border-top-width: 2px;">
+          <div class="src">Then share</div>
+          <h3>What was your email's token count?</h3>
+          <p>Type the number in chat.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">18<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 19 — CONTEXT WINDOW -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 03</span><span class="dot">·</span><span class="topic">Context Window</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Context window</span>
+      <h1>The model's <em style="font-style: italic;" class="terra">whiteboard</em>.</h1>
+      <p class="lede mt-3">Everything in the conversation lives on it. When it fills, the oldest content is erased.</p>
+      <div class="grid g-3 mt-5">
+        <div class="stat-card">
+          <div class="stat-label">GPT-4o · OpenAI</div>
+          <div class="stat-num">128<span style="font-size: 0.5em;">k</span></div>
+          <div class="stat-foot">tokens · ~300 pages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Claude Sonnet · Anthropic</div>
+          <div class="stat-num">200<span style="font-size: 0.5em;">k</span></div>
+          <div class="stat-foot">tokens · ~500 pages</div>
+        </div>
+        <div class="stat-card featured">
+          <div class="stat-label">Gemini 1.5 Pro · Google</div>
+          <div class="stat-num">2<span style="font-size: 0.5em;">m</span></div>
+          <div class="stat-foot">tokens · ~5,000 pages</div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">19<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 20 — TEMPERATURE -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 03</span><span class="dot">·</span><span class="topic">Temperature</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Temperature</span>
+      <h1>The <em style="font-style: italic;" class="terra">creativity dial</em>.</h1>
+      <div class="dial mt-5">
+        <div class="dial-axis">
+          <span>— 0.0 —</span>
+          <span>— 0.5 —</span>
+          <span>— 1.0 —</span>
+        </div>
+        <div class="dial-track">
+          <div class="pip pip-major" style="left: 0%;"></div>
+          <div class="pip" style="left: 12.5%;"></div>
+          <div class="pip" style="left: 25%;"></div>
+          <div class="pip" style="left: 37.5%;"></div>
+          <div class="pip pip-major" style="left: 50%;"></div>
+          <div class="pip" style="left: 62.5%;"></div>
+          <div class="pip" style="left: 75%;"></div>
+          <div class="pip" style="left: 87.5%;"></div>
+          <div class="pip pip-major" style="left: 100%;"></div>
+          <div class="needle" style="left: 70%;"></div>
+        </div>
+        <div class="dial-labels">
+          <span>Accountant brain · predictable</span>
+          <span>Poet brain · surprising</span>
+        </div>
+      </div>
+      <div class="grid g-2 mt-6">
+        <div class="ed-card">
+          <div class="src">Facts</div>
+          <h3>"What is 2 + 2?"</h3>
+          <p>Always four. Temperature is irrelevant.</p>
+        </div>
+        <div class="ed-card terra">
+          <div class="src">Creativity</div>
+          <h3>"Name a coffee shop."</h3>
+          <p>A different answer each time.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">20<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 21 — TEMPERATURE EXERCISE -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 03</span><span class="dot">·</span><span class="topic">Hands-on</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-num">— b</span>
+        <div>
+          <div class="ex-label">Micro-exercise</div>
+          <div class="ex-duration">Three minutes</div>
+        </div>
+      </div>
+      <h1>Feel the <em style="font-style: italic;" class="terra">temperature</em>.</h1>
+      <div class="grid g-2 mt-5">
+        <div>
+          <div class="byline" style="margin-bottom: var(--s-2);">— New chat —</div>
+          <div class="prompt">Give me 5 creative names for a wellness clinic in Mumbai.</div>
+        </div>
+        <div>
+          <div class="byline" style="margin-bottom: var(--s-2);">— Another new chat —</div>
+          <div class="prompt">Give me 5 creative names for a wellness clinic in Mumbai.</div>
+        </div>
+      </div>
+      <p class="lede center mt-6" style="margin-left: auto; margin-right: auto;">Compare. The names are different.</p>
+    </div>
+    <div class="folio">21<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 22 — BREAK -->
+  <!-- ====================================================== -->
+  <div class="slide break-slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">— Intermission —</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body" style="justify-content: center;">
+      <div class="byline center" style="margin-bottom: var(--s-4); letter-spacing: 0.5em;">— BREAK —</div>
+      <div class="break-clock" id="breakClock">10:00</div>
+      <p class="lede center mt-5" style="margin-left: auto; margin-right: auto; font-size: 1.6rem;">Stand up. Water. Stretch.</p>
+    </div>
+    <div class="folio">22<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 23 — WELCOME BACK -->
+  <!-- ====================================================== -->
+  <div class="slide blockquote-slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Part Two</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <p class="display"><span class="drop">W</span>elcome back. Type any <em class="terra" style="font-style: italic;">emoji</em> in chat.</p>
+    </div>
+    <div class="folio">23<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 24 — TOPIC 4 DIVIDER -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Topic 04</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="topic-divider">
+      <div class="chapter-label">— IV. The Stack —</div>
+      <h1 class="chapter-title">The <em style="font-style: italic;" class="terra">value chain</em>.</h1>
+      <p class="chapter-sub">Models → platforms → applications → outcomes.</p>
+    </div>
+    <div class="folio">24<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 25 — FOUR LAYER STACK -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 04</span><span class="dot">·</span><span class="topic">The Stack</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">The stack</span>
+      <h1>Four <em style="font-style: italic;" class="terra">layers</em>, from brain to bottom line.</h1>
+      <div class="mt-4">
+        <div class="stack-row featured">
+          <span class="stack-num">04</span>
+          <div>
+            <h3>Outcomes — business value</h3>
+            <p>Faster proposals · lower cost · fewer wasted hours</p>
+          </div>
+        </div>
+        <div class="stack-row">
+          <span class="stack-num">03</span>
+          <div>
+            <h3>Applications — the tools you use</h3>
+            <p>Microsoft Copilot · Notion AI · GitHub Copilot · ChatGPT</p>
+          </div>
+        </div>
+        <div class="stack-row">
+          <span class="stack-num">02</span>
+          <div>
+            <h3>Platforms — secure infrastructure</h3>
+            <p>Azure OpenAI · AWS Bedrock · Google Vertex AI · Hugging Face</p>
+          </div>
+        </div>
+        <div class="stack-row">
+          <span class="stack-num">01</span>
+          <div>
+            <h3>Models — the raw brain</h3>
+            <p>GPT-4 · Claude · Gemini · Llama</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">25<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 26 — EXERCISE 3 -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 04</span><span class="dot">·</span><span class="topic">Exercise</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-num">03</span>
+        <div>
+          <div class="ex-label">Pairs · Breakout</div>
+          <div class="ex-duration">Eight minutes</div>
+        </div>
+      </div>
+      <h1>Reverse-engineer <em style="font-style: italic;" class="terra">the stack</em>.</h1>
+      <p class="lede mt-3">In your breakout pair, pick one tool. Figure out which layers it touches.</p>
+      <div class="grid g-3 mt-4" style="gap: var(--s-3);">
+        <div class="ed-card"><div class="src">Microsoft</div><h3>Copilot</h3><p>AI in Word, Excel, Outlook.</p></div>
+        <div class="ed-card"><div class="src">Notion</div><h3>Notion AI</h3><p>AI inside documents.</p></div>
+        <div class="ed-card"><div class="src">GitHub</div><h3>Copilot</h3><p>AI that writes code.</p></div>
+        <div class="ed-card"><div class="src">Banking</div><h3>WhatsApp bot</h3><p>Customer support chatbot.</p></div>
+        <div class="ed-card"><div class="src">Legal</div><h3>Harvey AI</h3><p>AI for law firms.</p></div>
+        <div class="ed-card terra">
+          <div class="src">Your task</div>
+          <h3 style="font-style: italic;">Model · Platform · Outcome.</h3>
+        </div>
+      </div>
+    </div>
+    <div class="folio">26<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 27 — TOPIC 5 DIVIDER -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Topic 05</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="topic-divider">
+      <div class="chapter-label" style="color: var(--danger);">— V. Risk —</div>
+      <h1 class="chapter-title"><em style="font-style: italic; color: var(--danger);">Limitations.</em></h1>
+      <p class="chapter-sub">Where AI breaks down — four hard limits.</p>
+    </div>
+    <div class="folio">27<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 28 — FOUR LIMITATIONS -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 05</span><span class="dot">·</span><span class="topic">The Four Limits</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow danger">Four hard limits</span>
+      <h1>Where a single LLM call <em style="font-style: italic; color: var(--danger);">falls short</em>.</h1>
+      <div class="grid g-2 mt-4">
+        <div class="limit-card high">
+          <span class="risk-tag">— High risk —</span>
+          <h3>Hallucination</h3>
+          <p>Confident, wrong answers that look factual.</p>
+          <div class="bite"><strong>Bites at:</strong> citations · names · numbers · dates</div>
+        </div>
+        <div class="limit-card medium">
+          <span class="risk-tag">— Medium risk —</span>
+          <h3>Static knowledge</h3>
+          <p>Knows nothing after its training cutoff date.</p>
+          <div class="bite"><strong>Bites at:</strong> current events · new policy · recent prices</div>
+        </div>
+        <div class="limit-card medium">
+          <span class="risk-tag">— Medium risk —</span>
+          <h3>No memory</h3>
+          <p>Forgets everything between conversations.</p>
+          <div class="bite"><strong>Bites at:</strong> long projects · repeat clients · handovers</div>
+        </div>
+        <div class="limit-card low">
+          <span class="risk-tag">— Limiting —</span>
+          <h3>No action</h3>
+          <p>Can produce text. Cannot actually do things.</p>
+          <div class="bite"><strong>Bites at:</strong> booking · sending · scheduling · checking</div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">28<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 29 — HALLUCINATION DEMO -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 05 · Live Demo</span><span class="dot">·</span><span class="topic" style="color: var(--danger);">Hallucination</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow danger">Live demo</span>
+      <h1>Confidently <em style="font-style: italic; color: var(--danger);">wrong</em>.</h1>
+      <div class="prompt mt-4">Tell me about the 2019 Indian Supreme Court case 'Mehta vs. Sharma'
+on cryptocurrency regulation.
+Cite the bench and key judgment paragraphs.</div>
+      <div class="ed-card danger mt-5">
+        <div class="src" style="color: var(--danger);">The trick</div>
+        <h3>This case does not exist.</h3>
+        <p>The model will write you a full judgment with fake judges, in confident detail.</p>
+      </div>
+    </div>
+    <div class="folio">29<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 30 — STATIC KNOWLEDGE -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 05 · Live Demo</span><span class="dot">·</span><span class="topic" style="color: var(--warn);">Static knowledge</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow warn">Live demo</span>
+      <h1>The model is <em style="font-style: italic; color: var(--warn);">frozen in time</em>.</h1>
+      <div class="prompt mt-4">Who won the most recent Indian general election?
+What was the seat count?</div>
+      <div class="grid g-2 mt-5">
+        <div class="ed-card warn">
+          <div class="src" style="color: var(--warn);">Free ChatGPT · no web</div>
+          <p style="font-family: 'Fraunces', serif; font-style: italic; font-size: 1.2rem; color: var(--ink); margin-top: var(--s-1);">Stale, hedged. Sometimes confidently wrong.</p>
+        </div>
+        <div class="ed-card terra">
+          <div class="src">With web access</div>
+          <p style="font-family: 'Fraunces', serif; font-style: italic; font-size: 1.2rem; color: var(--ink); margin-top: var(--s-1);">Reaches out. Gets the real answer.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">30<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 31 — NO MEMORY -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 05 · Live Demo</span><span class="dot">·</span><span class="topic" style="color: var(--warn);">No memory</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow warn">Live demo</span>
+      <h1>Each conversation, a <em style="font-style: italic;" class="terra">fresh slate</em>.</h1>
+      <div class="grid g-2 mt-4">
+        <div>
+          <div class="byline" style="margin-bottom: var(--s-2);">— Chat one —</div>
+          <div class="prompt">My name is Priya. I'm a marketing director at an Indian D2C skincare brand. Remember this.</div>
+          <p class="mt-3" style="font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--calm);">→ "Got it, Priya."</p>
+        </div>
+        <div>
+          <div class="byline" style="margin-bottom: var(--s-2);">— Chat two · new window —</div>
+          <div class="prompt">What's my name and what do I do?</div>
+          <p class="mt-3" style="font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--danger);">→ "I don't have that information."</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">31<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 32 — NO ACTION -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 05 · Live Demo</span><span class="dot">·</span><span class="topic">No action</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Live demo</span>
+      <h1>It can <em style="font-style: italic;" class="terra">think.</em> It can <em style="font-style: italic;" class="terra">write.</em><br>It cannot <em style="font-style: italic; color: var(--danger);">do.</em></h1>
+      <div class="prompt mt-4">Book me a flight from Delhi to Bangalore for next Tuesday morning,
+add it to my Google Calendar,
+and email the itinerary to my assistant rajesh@company.com.</div>
+      <div class="ed-card danger mt-5">
+        <div class="src" style="color: var(--danger);">What you get</div>
+        <h3>A detailed list of instructions.</h3>
+        <p>It does not actually book, schedule, or send anything.</p>
+      </div>
+    </div>
+    <div class="folio">32<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 33 — TOPIC 6 DIVIDER -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Topic 06</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="topic-divider">
+      <div class="chapter-label" style="color: var(--danger);">— VI. The Climax —</div>
+      <h1 class="chapter-title">The <em style="font-style: italic; color: var(--danger);">hard ceiling</em><br>of chatbots.</h1>
+      <p class="chapter-sub">Where single LLM calls fall short — and what comes next.</p>
+    </div>
+    <div class="folio">33<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 34 — BAKERY DEMO -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 06 · Live Demo</span><span class="dot">·</span><span class="topic">The Six-Step Test</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">The six-step test</span>
+      <h2>One complex request. <em style="font-style: italic; color: var(--danger);">Six failures.</em></h2>
+      <div class="prompt mt-3" style="font-size: 0.92rem;">I run a small bakery in Mumbai. Help me launch a new product line:
+(1) research what's trending in the Mumbai bakery scene this month,
+(2) draft 3 Instagram posts,
+(3) generate 3 images for those posts,
+(4) schedule them across the next week,
+(5) email the schedule to sneha@bakery.com,
+(6) set a reminder to review performance in 30 days.</div>
+      <ul class="demo-list mt-4">
+        <li><span class="marker fail">✕</span><span class="step-num">01</span><span class="step-text">Research trending products</span><span class="step-meta">no live web on free tier</span></li>
+        <li><span class="marker ok">✓</span><span class="step-num">02</span><span class="step-text">Draft Instagram posts</span><span class="step-meta">works</span></li>
+        <li><span class="marker partial">~</span><span class="step-num">03</span><span class="step-text">Generate images</span><span class="step-meta">partial · tier limits</span></li>
+        <li><span class="marker fail">✕</span><span class="step-num">04</span><span class="step-text">Schedule posts</span><span class="step-meta">cannot</span></li>
+        <li><span class="marker fail">✕</span><span class="step-num">05</span><span class="step-text">Email partner</span><span class="step-meta">cannot</span></li>
+        <li><span class="marker fail">✕</span><span class="step-num">06</span><span class="step-text">Set reminder</span><span class="step-meta">cannot</span></li>
+      </ul>
+    </div>
+    <div class="folio">34<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 35 — BRAIN IN A JAR -->
+  <!-- ====================================================== -->
+  <div class="slide blockquote-slide">
+    <div class="running-head"><div class="left"><span>Topic 06</span><span class="dot">·</span><span class="topic">The Punchline</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <p class="display"><span class="drop">A</span> chatbot is a <em style="font-style: italic; color: var(--danger);">brain in a jar.</em><br>It can think. It can write.<br>It cannot <em style="font-style: italic; color: var(--danger);">browse · remember · schedule · send · check.</em></p>
+      <div class="rule-double mt-6" style="max-width: 600px;"></div>
+      <p class="lede mt-3" style="max-width: 60ch;">An <em style="font-style: italic;" class="terra">Agent</em> is what you get when you give the brain hands, eyes, and a calendar.</p>
+    </div>
+    <div class="folio">35<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 36 — AGENT BUILDER PREVIEW -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Topic 06</span><span class="dot">·</span><span class="topic">Live Preview · Session 2 Preview</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Live preview</span>
+      <h1>The <em style="font-style: italic;" class="terra">Agent Builder</em>.</h1>
+      <p class="lede mt-3">Same bakery task — with hands, eyes, and a calendar attached.</p>
+      <div class="grid g-3 mt-5">
+        <div class="marginalia">
+          <span class="marg-num">01</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Role</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">System prompt</h3>
+            <p style="font-size: 0.95rem;">Plain English: "You are a marketing assistant…"</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">02</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Tools</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">Integrations</h3>
+            <p style="font-size: 0.95rem;">Web search · calendar · email · memory · files.</p>
+          </div>
+        </div>
+        <div class="marginalia">
+          <span class="marg-num">03</span>
+          <div>
+            <div class="byline" style="margin-bottom: 0.3em; color: var(--terra);">Run</div>
+            <h3 style="font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400;">Watch it work</h3>
+            <p style="font-size: 0.95rem;">Same task. Six steps. All completed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">36<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 37 — BUILD SPRINT -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Final Exercise</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="exercise-flag">
+        <span class="ex-num">04</span>
+        <div>
+          <div class="ex-label">Final Exercise</div>
+          <div class="ex-duration">Seven minutes</div>
+        </div>
+      </div>
+      <h1>Your <em style="font-style: italic;" class="terra">take-home prompt</em>.</h1>
+      <p class="lede mt-3">Pick one task you do at work every week. Write a prompt using this template.</p>
+      <div class="prompt mt-3">ROLE:        You are a [expert role].
+TASK:        I need you to [specific task].
+CONTEXT:     My situation is [brief background].
+CONSTRAINTS: Keep it [tone, length, format].
+OUTPUT:      Give me [exact format you want].</div>
+      <div class="grid g-3 mt-4">
+        <div class="ed-card"><div class="src">Doctor</div><h3>Discharge note</h3><p>→ five-bullet shift handover.</p></div>
+        <div class="ed-card"><div class="src">Marketing</div><h3>Product launch</h3><p>→ three Instagram caption variants.</p></div>
+        <div class="ed-card"><div class="src">Finance</div><h3>Revenue variance</h3><p>→ five bullets for the CEO.</p></div>
+      </div>
+    </div>
+    <div class="folio">37<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 38 — RECAP -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Recap</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Recap</span>
+      <h1>What we <em style="font-style: italic;" class="terra">covered</em>.</h1>
+      <div class="grid g-3 mt-4" style="gap: var(--s-4);">
+        <div class="marginalia"><span class="marg-num">i</span><div><h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 400;">Evolution</h3><p style="font-size: 0.95rem;">Recipe book → master chef.</p></div></div>
+        <div class="marginalia"><span class="marg-num">ii</span><div><h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 400;">Milestones</h3><p style="font-size: 0.95rem;">Five model families.</p></div></div>
+        <div class="marginalia"><span class="marg-num">iii</span><div><h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 400;">Mechanics</h3><p style="font-size: 0.95rem;">LEGO · whiteboard · dial.</p></div></div>
+        <div class="marginalia"><span class="marg-num">iv</span><div><h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 400;">Value chain</h3><p style="font-size: 0.95rem;">Models → platforms → apps.</p></div></div>
+        <div class="marginalia"><span class="marg-num">v</span><div><h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 400;">Limitations</h3><p style="font-size: 0.95rem;">Hallucinate · static · no memory · no action.</p></div></div>
+        <div class="marginalia"><span class="marg-num">vi</span><div><h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 400;">Chatbot ceiling</h3><p style="font-size: 0.95rem;">Brain in a jar — no hands.</p></div></div>
+      </div>
+      <div class="rule-double mt-5"></div>
+      <p class="lede center mt-3" style="margin-left: auto; margin-right: auto;">Every failure has a fix. <em style="font-style: italic;" class="terra">That fix is called an Agent.</em></p>
+    </div>
+    <div class="folio">38<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 39 — SESSION 2 TEASER -->
+  <!-- ====================================================== -->
+  <div class="slide blockquote-slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Coming Next</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="byline" style="margin-bottom: var(--s-3); color: var(--terra);">— Coming next session —</div>
+      <p class="display">You'll <em style="font-style: italic;" class="terra">build</em> the Agent<br>that succeeds at the bakery task.</p>
+      <p class="lede mt-5">No code. Live.</p>
+    </div>
+    <div class="folio">39<sup>/40</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 40 — HOMEWORK / CLOSE -->
+  <!-- ====================================================== -->
+  <div class="slide">
+    <div class="running-head"><div class="left"><span>Session 01</span><span class="dot">·</span><span class="topic">Homework</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <span class="eyebrow">Homework</span>
+      <h1>Take this <em style="font-style: italic;" class="terra">with you</em>.</h1>
+      <p class="lede mt-3">Reply to today's class email.</p>
+      <div class="grid g-2 mt-5">
+        <div class="ed-card terra">
+          <div class="src">— I —</div>
+          <h3>One process at your job</h3>
+          <p>… where GenAI could help today. Two sentences.</p>
+        </div>
+        <div class="ed-card danger">
+          <div class="src">— II —</div>
+          <h3>One place where it'd be dangerous</h3>
+          <p>… where guardrails would be essential. Two sentences.</p>
+        </div>
+      </div>
+      <div class="rule-double mt-6"></div>
+      <p class="lede center mt-3" style="font-size: 1.6rem; margin: var(--s-3) auto 0;">Thank you. <em style="font-style: italic;" class="terra">See you in Session 02.</em></p>
+    </div>
+    <div class="folio">40<sup>/40</sup></div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <button onclick="goFirst()">⏮</button>
+  <button onclick="toggleFullscreen()">⛶</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let current = 0;
+
+  function show(index) {
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    document.getElementById('progressThread').style.width = `${((index + 1) / totalSlides) * 100}%`;
+    try { localStorage.setItem('genai_slide', String(index)); } catch (e) {}
+    if (index === 21) startBreakClock(); else stopBreakClock();
+  }
+
+  function next() { if (current < totalSlides - 1) { current++; show(current); } }
+  function prev() { if (current > 0) { current--; show(current); } }
+  function goFirst() { current = 0; show(current); }
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key === 'Home') goFirst();
+    if (e.key === 'End') { current = totalSlides - 1; show(current); }
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  let breakInterval = null;
+  function startBreakClock() {
+    stopBreakClock();
+    let total = 10 * 60;
+    const el = document.getElementById('breakClock');
+    function tick() {
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      if (el) el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      total--;
+      if (total < 0) { stopBreakClock(); if (el) el.textContent = '00:00'; }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function stopBreakClock() { if (breakInterval) { clearInterval(breakInterval); breakInterval = null; } }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'genai_slide_master') {
+      const v = parseInt(e.newValue);
+      if (!isNaN(v) && v !== current) { current = v; show(current); }
+    }
+  });
+
+  show(current);
+</script>
+</body>
+</html>

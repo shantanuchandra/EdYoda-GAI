@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session 7 · Part 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f; --bg-1: #0d111a; --bg-2: #131826;
+    --surface: rgba(255,255,255,0.03); --surface-hover: rgba(255,255,255,0.05); --surface-strong: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+    --text: #f4f6fb; --text-soft: #c9d0de; --text-muted: #8993a6; --text-dim: #5a6377;
+    --accent: #5eead4; --accent-soft: rgba(94,234,212,0.14); --accent-line: rgba(94,234,212,0.35);
+    --warm: #fbbf24; --warm-soft: rgba(251,191,36,0.12);
+    --hot: #fb7185; --hot-soft: rgba(251,113,133,0.12);
+    --green: #4ade80; --green-soft: rgba(74,222,128,0.12);
+    --purple: #a78bfa; --purple-soft: rgba(167,139,250,0.12);
+    --s-1:8px; --s-2:16px; --s-3:24px; --s-4:32px;
+    --ease-out: cubic-bezier(0.16,1,0.3,1); --dur-fast:180ms; --dur-med:280ms;
+    --radius-sm:8px; --radius-md:12px; --radius-lg:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;background:var(--bg-0);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-feature-settings:'cv02','cv03','cv11','ss01';-webkit-font-smoothing:antialiased;overflow:hidden;}
+  .topbar{height:64px;background:var(--bg-1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 var(--s-3);gap:var(--s-3);flex-shrink:0;}
+  .topbar .title{font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--text-muted);letter-spacing:0.1em;font-size:0.72rem;text-transform:uppercase;}
+  .topbar .title .accent{color:var(--accent);}
+  .clock-divider{width:1px;height:32px;background:var(--border);}
+  .clock-box{display:flex;flex-direction:column;line-height:1.15;gap:2px;}
+  .clock-box .label{color:var(--text-dim);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;font-weight:500;font-family:'JetBrains Mono',monospace;}
+  .clock-box .big{font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;}
+  .clock-box.real .big{color:var(--text);}
+  .clock-box.planned .big{color:var(--text-soft);}
+  .clock-box.delta .big.ok{color:var(--green);}
+  .clock-box.delta .big.warn{color:var(--warm);}
+  .clock-box.delta .big.danger{color:var(--hot);}
+  .topbar .grow{flex:1;}
+  .topbar button{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.83rem;font-family:inherit;font-weight:500;transition:all var(--dur-fast) var(--ease-out);}
+  .topbar button:hover{background:var(--surface-hover);border-color:var(--border-strong);color:var(--text);}
+  .topbar button.primary{background:var(--accent);color:#062420;border-color:var(--accent);font-weight:600;}
+  .topbar button.primary:hover{background:#7df1de;}
+  .topbar .slide-counter{color:var(--text-muted);font-size:0.82rem;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;padding-left:var(--s-2);border-left:1px solid var(--border);}
+  .main{display:grid;grid-template-columns:1fr 380px;height:calc(100vh - 64px - 56px);}
+  .panel-left{overflow-y:auto;padding:var(--s-3) var(--s-4);border-right:1px solid var(--border);}
+  .panel-right{overflow-y:auto;background:var(--bg-1);padding:var(--s-3);}
+  .panel-left::-webkit-scrollbar,.panel-right::-webkit-scrollbar{width:8px;}
+  .panel-left::-webkit-scrollbar-track,.panel-right::-webkit-scrollbar-track{background:transparent;}
+  .panel-left::-webkit-scrollbar-thumb,.panel-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .panel-left::-webkit-scrollbar-thumb:hover,.panel-right::-webkit-scrollbar-thumb:hover{background:var(--border-strong);}
+  .bottombar{height:56px;background:var(--bg-1);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 var(--s-3);gap:var(--s-2);flex-shrink:0;}
+  .bottombar button{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.83rem;font-family:inherit;font-weight:500;transition:all var(--dur-fast) var(--ease-out);}
+  .bottombar button:hover{background:var(--surface-hover);color:var(--text);}
+  .bottombar .progress{flex:1;height:4px;background:var(--surface);border-radius:2px;overflow:hidden;margin:0 var(--s-2);border:1px solid var(--border);}
+  .bottombar .progress-fill{height:100%;background:var(--accent);transition:width var(--dur-med) var(--ease-out);box-shadow:0 0 8px var(--accent-line);}
+  .timing-bar{display:flex;align-items:center;gap:var(--s-2);margin-bottom:var(--s-3);padding:12px 16px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);}
+  .timing-bar .time-pill{background:var(--accent-soft);color:var(--accent);padding:5px 12px;border-radius:999px;font-weight:600;font-size:0.78rem;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;border:1px solid var(--accent-line);}
+  .timing-bar .duration{color:var(--text-muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;}
+  .timing-bar .block-title{font-weight:500;flex:1;font-size:0.88rem;color:var(--text-soft);text-align:right;font-family:'JetBrains Mono',monospace;}
+  .slide-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--s-2);}
+  .slide-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--text-muted);}
+  .slide-tag.break::before{background:var(--green);} .slide-tag.break{color:var(--green);border-color:var(--green-soft);}
+  .slide-tag.demo::before{background:var(--warm);} .slide-tag.demo{color:var(--warm);border-color:var(--warm-soft);}
+  .slide-tag.exercise::before{background:var(--purple);} .slide-tag.exercise{color:var(--purple);border-color:var(--purple-soft);}
+  .slide-tag.title::before{background:var(--accent);} .slide-tag.title{color:var(--accent);border-color:var(--accent-line);}
+  .slide-pane h1{font-size:1.7rem;font-weight:700;line-height:1.15;margin-bottom:var(--s-3);letter-spacing:-0.02em;color:var(--text);}
+  .section{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:12px;transition:border-color var(--dur-fast) var(--ease-out);}
+  .section:hover{border-color:var(--border-strong);}
+  .section .header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .section h3{font-size:0.7rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+  .section.say{border-left:3px solid var(--warm);} .section.say h3{color:var(--warm);}
+  .section.do{border-left:3px solid var(--green);} .section.do h3{color:var(--green);}
+  .section.watch{border-left:3px solid var(--hot);} .section.watch h3{color:var(--hot);}
+  .section.note{border-left:3px solid var(--purple);} .section.note h3{color:var(--purple);}
+  .section.prompt-section{border-left:3px solid var(--accent);} .section.prompt-section h3{color:var(--accent);}
+  .section.deeper{border-left:3px solid #60a5fa;} .section.deeper h3{color:#60a5fa;}
+  .section.bridge{border-left:3px solid #f472b6;} .section.bridge h3{color:#f472b6;}
+  .quote{color:var(--text);font-size:1rem;line-height:1.6;padding-left:12px;border-left:2px solid var(--warm);margin:0;font-weight:400;}
+  .section p{font-size:0.94rem;line-height:1.6;color:var(--text-soft);margin-bottom:6px;}
+  .section p:last-child{margin-bottom:0;}
+  .step-list{counter-reset:step;list-style:none;padding-left:0;margin:0;}
+  .step-list>li{counter-increment:step;padding-left:36px;position:relative;padding-bottom:10px;font-size:0.94rem;line-height:1.55;color:var(--text-soft);}
+  .step-list>li:last-child{padding-bottom:0;}
+  .step-list>li::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:2px;width:26px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.04em;}
+  .prompt-box{background:#060810;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--accent);white-space:pre-wrap;line-height:1.6;margin-top:4px;}
+  .right-section{margin-bottom:var(--s-3);}
+  .right-section h4{font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .preview-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;transition:border-color var(--dur-fast) var(--ease-out);}
+  .preview-card.next{border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),var(--bg-2));}
+  .preview-card .num{font-size:0.66rem;color:var(--text-dim);letter-spacing:0.14em;font-weight:600;font-family:'JetBrains Mono',monospace;}
+  .preview-card.next .num{color:var(--accent);}
+  .preview-card .title{font-size:0.92rem;font-weight:500;margin:4px 0 2px;color:var(--text);line-height:1.35;}
+  .preview-card .when{font-size:0.74rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;}
+  .timer-block{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 16px;text-align:center;transition:border-color var(--dur-med) var(--ease-out);}
+  .timer-block.warn{border-color:var(--warm);background:linear-gradient(180deg,var(--warm-soft),var(--bg-2));}
+  .timer-block.danger{border-color:var(--hot);background:linear-gradient(180deg,var(--hot-soft),var(--bg-2));}
+  .timer-display{font-family:'JetBrains Mono',monospace;font-size:2.4rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text);line-height:1;letter-spacing:-0.02em;transition:color var(--dur-fast) var(--ease-out);}
+  .timer-block.warn .timer-display{color:var(--warm);} .timer-block.danger .timer-display{color:var(--hot);}
+  .timer-label{font-size:0.66rem;color:var(--text-dim);letter-spacing:0.14em;text-transform:uppercase;margin-top:8px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+  .timer-controls{display:flex;gap:4px;margin-top:14px;justify-content:center;flex-wrap:wrap;}
+  .timer-controls button{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);padding:6px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.75rem;font-family:'JetBrains Mono',monospace;font-weight:500;transition:all var(--dur-fast) var(--ease-out);}
+  .timer-controls button:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line);}
+  .quick-key{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text-muted);margin-bottom:6px;}
+  .quick-key kbd{background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-soft);font-weight:500;min-width:22px;text-align:center;box-shadow:0 1px 0 var(--border);}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session 7 · Part 2</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real"><span class="label">Real clock</span><span class="big" id="realClock">—</span></div>
+  <div class="clock-box planned"><span class="label">Class time</span><span class="big" id="classClock">0:00 / 2:00</span></div>
+  <div class="clock-box delta"><span class="label">Pace</span><span class="big ok" id="paceLabel">—</span></div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 22</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Build timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(300)">5m</button>
+          <button onclick="startExTimer(480)">8m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="startExTimer(720)">12m</button>
+          <button onclick="startExTimer(900)">15m</button>
+          <button onclick="startExTimer(1200)">20m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>5</kbd> 5m · <kbd>8</kbd> 8m · <kbd>1</kbd> 15m · <kbd>2</kbd> 20m timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break (slide 11)</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA =====================
+   Session 7 Part 2 · Workflow Automation with n8n · Hardening + Telegram
+   22 slides, paired 1:1 to learner_deck.html.
+   BREAK_SLIDE_INDEX = 10 (0-based → slide 11 in 1-based numbering).
+   say: literal warm sentence read aloud.
+   ===================================================== */
+const BREAK_SLIDE_INDEX = 10;
+const MASTER_KEY = 'genai_s7p2_slide_master';
+const PRINT_KEY  = 'genai_s7p2_print_request';
+
+const slides = [
+  {
+    num:1, when:"Pre-start", tag:"title",
+    title:"S7 Part 2 — Hardening + Telegram. One workflow, two channels.",
+    say:"Welcome back, everyone. Last week we shipped a real Gmail workflow. It's been polling your inbox all week. Today we finish what we started — we harden it, then add Telegram as a second customer channel. Both inbound and outbound. By the end your bakery accepts orders on two channels with one brain in the middle.",
+    doSteps:[
+      "Music up. Greet people by name as they arrive.",
+      "Confirm n8n.cloud is open, the Part 1 workflow shows ● Published. If anyone's says Inactive — flag, fix in the cold-open buffer.",
+      "Tabs ready: (1) n8n canvas with Part 1 workflow, (2) Render/Railway dashboard showing the stable backend up, (3) Telegram desktop with bot chat open, (4) BotFather chat in clean state, (5) Gmail test inbox, (6) Part 2 workbook open to Build A.",
+      "Backend pre-warm: hit /api/health once in browser. Confirm 200 OK before screen-share."
+    ],
+    bridge:"When the clock starts: one-word check-in, then the honest recap slide."
+  },
+  {
+    num:2, when:"0:00 – 0:08", duration:"8 min",
+    title:"Where we left off — honest picture.",
+    say:"Same ritual we always start with — one word in the chat: how did your week go with your published workflow? Did it fire? Did it crash? Did you forget it existed? Just one honest word.",
+    afterPause:"Read every word aloud by name. Then walk the recap table — left column is what we shipped (green), right column is what we left holes in (red). Say out loud: 'The Part-1 deck title literally promised Telegram. We didn't get there. Today we finish that promise — and one more thing.'",
+    doSteps:[
+      "Read every chat response aloud, by name.",
+      "Walk the green column first — six shipped pieces. One breath per row.",
+      "Walk the red column — four holes. Name 'Telegram' as the broken promise.",
+      "Avoid sugarcoating. The honesty is the bond."
+    ],
+    watch:"If someone says 'crashed' — ask what node it crashed at. Most likely the localtunnel died. That's Build A's reason for existing — let them feel the pain."
+  },
+  {
+    num:3, when:"0:08 – 0:15", duration:"7 min",
+    title:"Today's contract — three deliverables, in order.",
+    say:"Three builds. Hardening first — fifteen minutes, because we cannot add Telegram on top of a backend that dies every two hours. Then Telegram OUT — twenty-five minutes — the bakery owner gets a Telegram ping for every order. Then Telegram IN — forty-five minutes — customers can DM the bakery and get a real quote back in twenty seconds. Same Gemini brain. Two ears, two mouths.",
+    doSteps:[
+      "Walk the three contract cards one at a time — number, verb, headline, sentence.",
+      "Repeat the one rule: 'You will not leave with theory. You will leave with a workflow where a customer can DM your bakery and get a real quote back in twenty seconds.'",
+      "Don't preview the architecture diagram yet. Save it for Block 4."
+    ],
+    bridge:"Block 1 starts. Open the workflow on screen."
+  },
+  {
+    num:4, when:"0:15 – 0:18", duration:"3 min", tag:"exercise",
+    title:"Build A — Move the backend off the crutch.",
+    say:"Localtunnel was a teaching crutch. It dies every few hours. We had to use it last week because we didn't have time to set up a real host. We do today. Five minutes to swap the URL, two minutes to tick the one checkbox that prevents 90% of overnight failures.",
+    doSteps:[
+      "Confirm the room is on Build A slide on their learner deck.",
+      "Share the stable backend URL out loud and post it in chat too.",
+      "Start the 15-min build timer (press 1)."
+    ],
+    note:"You'll do this LIVE on screen-share — Steps A1-A4 are about 4 minutes of clicks. The remaining 11 min is buffer for the slow ones in the cohort."
+  },
+  {
+    num:5, when:"0:18 – 0:25", duration:"7 min", tag:"demo",
+    title:"Build A · the three places your backend can live.",
+    say:"Localtunnel is a microphone cable. Render or Railway is a wireless rig. Production is your own domain on top of either. We're not changing what the backend does — just where it lives. The same server.js. Different URL.",
+    doSteps:[
+      "Show the three-card comparison slide.",
+      "Click the 'today' URL — open the /api/health endpoint in a fresh tab → show the 200 JSON.",
+      "Switch to n8n canvas. Open HTTP Request node → paste new URL → Execute step. Green tick.",
+      "Now click the Settings tab. Show 'Retry on Fail' → toggle ON → Max 3, Wait 2000ms."
+    ],
+    deeper:[
+      "Why these numbers? 3 retries × 2s = ~6s tolerance. That absorbs Render free tier cold-start (usually <10s) and most transient network blips. More than 3 retries adds noise without helping; less than 2000ms hammers the backend.",
+      "If anyone asks about exponential backoff: it's a checkbox right below. For today's volume it doesn't matter — but mention it exists."
+    ],
+    bridge:"Publish v2. Move to Build B."
+  },
+  {
+    num:6, when:"0:25 – 0:30", duration:"5 min", tag:"demo",
+    title:"Build A · publish v2 + 30-second reflection beat.",
+    say:"Top right → publish — version name: v2, stable backend + retry hardening. Done. Now reflect with me for thirty seconds. What did your team do in production where someone forgot to tick a retry checkbox and you all spent a weekend on a war-room call? One line in the chat.",
+    doSteps:[
+      "Publish on screen. Confirm the green Published badge appears.",
+      "Open chat — read 2-3 responses by name. Don't read them all; the point is to land the gravity of the one checkbox.",
+      "Re-state: 'This is the single most important checkbox in this entire workflow.'"
+    ],
+    watch:"If chat is silent, share your own war story first to break the seal. Everyone has one."
+  },
+  {
+    num:7, when:"0:30 – 0:38", duration:"8 min", tag:"exercise",
+    title:"Build B — Telegram OUT. Owner gets the ping.",
+    say:"Build B starts. The bakery owner shouldn't have to refresh Gmail to know an order came in. Every successful order also pings their personal Telegram with a one-line digest. Pure outbound — customers see nothing. Three pieces: create a bot via BotFather, grab the chat ID, hang one node off the True branch.",
+    doSteps:[
+      "Switch to Telegram desktop on screen-share.",
+      "Open BotFather chat — clean state — type /newbot.",
+      "Name: 'Lumière Ops Notifier'. Username: must end in Bot, must be globally unique — append your initials.",
+      "BotFather replies with token. COPY IT to a notepad. Don't ever show this on stage if you can help it — blur or hide once copied."
+    ],
+    note:"This is the one moment learners might struggle with — username uniqueness. Tell them: 'Add more digits to your initials until it accepts. This is a one-time pain.'"
+  },
+  {
+    num:8, when:"0:38 – 0:45", duration:"7 min", tag:"demo",
+    title:"Build B · BotFather → token + chat ID.",
+    say:"Two pieces of state come out of BotFather. The token — treat it like a password. And the chat ID — the only person n8n is allowed to message until that person taps Start on the bot. We need both before we can send a single message.",
+    doSteps:[
+      "Tap the bot link from BotFather → tap Start in the bot's chat.",
+      "Open browser → api.telegram.org/bot<TOKEN>/getUpdates → show the JSON.",
+      "Find chat.id → copy it.",
+      "Switch to n8n → Settings → Credentials → Add Telegram credential → paste token → save as 'Lumière BotFather'. Connection tested successfully."
+    ],
+    prompt:"Build B · Two pieces of state\n──────────────────────────────\nToken (from BotFather):  <copy securely>\nChat ID (from getUpdates): <numeric, ~9-10 digits>\n\nn8n credential setup\n──────────────────────────────\nSettings → Credentials → Add credential\nProvider:  Telegram API\nAccess Token:  <paste BotFather token>\nName:       Lumière BotFather\nClick Save → confirm green check\n\nVerify loop:\n  [ ] Bot exists in Telegram, you can DM it\n  [ ] getUpdates returns at least one chat.id\n  [ ] n8n credential saved & tested green\n  [ ] Token NOT visible in any open tab / paste-bin on stage",
+    watch:"If getUpdates returns empty array: learner forgot to tap Start. Most common failure here."
+  },
+  {
+    num:9, when:"0:45 – 0:52", duration:"7 min", tag:"demo",
+    title:"Build B · Add the Telegram node to the True branch.",
+    say:"Now the wire. On the True branch of If1 — right after the success Gmail reply — we add a Telegram Send node. Same credential, paste the chat ID, paste the body template. Execute step. Check Telegram. The message arrives within two seconds.",
+    doSteps:[
+      "On canvas: click + on the OUTPUT of 'Reply to a message' (the success Gmail reply).",
+      "Search Telegram → choose 'Send a text message'.",
+      "Credential: Lumière BotFather. Chat ID: your personal chat ID (Fixed mode).",
+      "Switch Text to Expression mode → paste the body template from the prompt panel.",
+      "Execute step. Switch to Telegram. Show the message arrives, formatted."
+    ],
+    prompt:"Build B · Telegram node config\n──────────────────────────────\nResource:        Message\nOperation:       Send a text message\nCredential:      Lumière BotFather\nChat ID:         <your personal chat ID>     (Fixed)\nText (Expression mode — paste verbatim):\n──────────────────────────────\n🎂 New order\n{{ $('Code in JavaScript').item.json.flavour }} · {{ $('Code in JavaScript').item.json.size }}\nfor {{ $('Code in JavaScript').item.json.deliveryDate }}\n₹{{ $('HTTP Request').item.json.amount }} — payment link sent\n──────────────────────────────\n\nVerify loop:\n  [ ] Node attached to TRUE branch output (Reply to a message → Telegram)\n  [ ] Credential picked: Lumière BotFather\n  [ ] Chat ID matches your personal getUpdates result\n  [ ] Execute step → green tick\n  [ ] Phone chimes within 2 seconds, formatted text correct\n  [ ] Learner deck slide 9 on screen\n\nPublish: v3 — Telegram OUT (ops notifier)",
+    bridge:"One trigger. Three outputs. Show the canvas overview slide."
+  },
+  {
+    num:10, when:"0:52 – 0:55", duration:"3 min",
+    title:"Build B · debrief. One trigger, three outputs.",
+    say:"Look at your canvas. One Gmail trigger comes in. Three different things go out — the success email to the customer, the missing-info email to the customer, the Telegram ping to you. You've just built one of the load-bearing shapes of automation work — fan-out from a single event into multiple actions. Tattoo this shape.",
+    doSteps:[
+      "Show the stat strip slide — 1 inbound, 3 outbound, 2 audiences, 0 lines of code.",
+      "Make the audiences distinction explicit: customer and owner — same event, two different framings.",
+      "Bridge: 'After the break, we add the second inbound channel.'"
+    ],
+    bridge:"Break. Hard stop. Press B to jump to the break slide."
+  },
+  {
+    num:11, when:"0:55 – 1:05", duration:"10 min", tag:"break",
+    title:"Break — 10 minutes.",
+    say:"Ten minutes. Refill your water. When we're back, we add the second inbound channel — a customer-facing Telegram bot for the bakery.",
+    doSteps:[
+      "Switch to break slide on both decks (B key auto-syncs to learner via localStorage).",
+      "Mute mic. Soft music on.",
+      "Re-check: backend still responding, Telegram desktop still on screen, BotFather chat ready."
+    ],
+    watch:"Use the 10 minutes to pre-warm the customer bot for Build C — create it now, copy the token, but DON'T mention it on stage yet. The reveal is part of the demo."
+  },
+  {
+    num:12, when:"1:05 – 1:12", duration:"7 min", tag:"exercise",
+    title:"Build C — Customers can DM the bakery.",
+    say:"Build C is the big one. Forty-five minutes. We add Telegram as a real second customer channel. Same Gemini brain. Same /api/quote call. The reply lands back on the channel the customer wrote in on. This is the architectural move of the whole session.",
+    doSteps:[
+      "Show the Build C exercise title slide on both decks.",
+      "Set the 45-minute expectation out loud.",
+      "Press 1 + 1 + 1 (or use 20m timer) for the long build timer.",
+      "Open the workbook view of Build C on a second monitor as your map."
+    ],
+    note:"You'll demo each step on canvas. Learners follow along on their own n8n. The pace is: demo 1 step → wait for room to confirm → demo next step. Don't let anyone fall more than 1 step behind."
+  },
+  {
+    num:13, when:"1:12 – 1:18", duration:"6 min", tag:"demo",
+    title:"Build C · Concept — One brain. Two ears. Two mouths.",
+    say:"This is the architectural move. The brain in the middle — Gemini plus the quote API — doesn't know or care which ear heard the order. We stamp a one-line tag at each ear saying where the message came from. At the end of the pipeline we read that tag and pick which mouth to speak from. That's the entire pattern. Once you see it, you can apply it to any number of channels — Slack, WhatsApp, a contact form, anything.",
+    doSteps:[
+      "Show the hub-and-spoke SVG slide. Trace each spoke with your cursor.",
+      "Say: 'Two lines of config — the channel tag — is the entire reason this works.'",
+      "Pause five seconds. Let it land before moving to the build."
+    ],
+    bridge:"Now the second bot."
+  },
+  {
+    num:14, when:"1:18 – 1:24", duration:"6 min", tag:"demo",
+    title:"Build C · Create the customer-facing bot.",
+    say:"Same BotFather flow as Build B, but a brand-new bot. The first bot talks to you. This one talks to customers. Keep them separate so a leaked customer-bot token doesn't compromise your ops channel — and so you can revoke either independently.",
+    doSteps:[
+      "Switch to BotFather → /newbot.",
+      "Name: 'Lumière Bakery — Order Bot'. Username: LumiereOrders_<initials>Bot.",
+      "Copy the new token (different from the ops one).",
+      "n8n → Settings → Credentials → Add → Telegram API → save as 'Lumière Customer Bot'.",
+      "From your phone: tap the new bot's link → tap Start."
+    ],
+    note:"Have the room set this up on their own phones in parallel. Pause for 90 seconds — confirm everyone has Start tapped before continuing."
+  },
+  {
+    num:15, when:"1:24 – 1:30", duration:"6 min", tag:"demo",
+    title:"Build C · Telegram Trigger — the second ear.",
+    say:"Telegram Trigger is just like the Gmail trigger conceptually — it listens. The difference is what fires it: instead of polling Gmail every fifteen minutes, this one fires the moment a customer sends a message. Three fields matter on the output: message.text, message.chat.id, and message.message_id. Those are what the customer said, where to reply, and which message to thread to.",
+    doSteps:[
+      "On canvas: add new starting node, below Gmail Trigger.",
+      "Search Telegram → Telegram Trigger.",
+      "Credential: Lumière Customer Bot. Updates: Message.",
+      "Execute step. n8n shows 'Listening for events…'",
+      "On your phone: DM the customer bot a real-looking order text.",
+      "n8n Trigger turns green. Click it. Show the three fields in the JSON."
+    ],
+    deeper:[
+      "Why 'message_id' for threading? When we reply to this specific message, Telegram shows a tiny quote of the original above the reply — same as Gmail thread context. It's a nicer UX than just dumping the reply in the chat. Optional field on the reply node — easy to skip if learners struggle."
+    ]
+  },
+  {
+    num:16, when:"1:30 – 1:36", duration:"6 min", tag:"demo",
+    title:"Build C · Tag the channel + Merge the streams.",
+    say:"This is the keystone. Two Set nodes — one on each trigger — stamp a one-line tag: channel equals gmail, or channel equals telegram. Then a Merge node in Append mode funnels both streams into one chain. From here on, the rest of the workflow doesn't know or care which ear fired — it just reads the channel tag whenever it needs to make a decision.",
+    doSteps:[
+      "On canvas: + on Gmail Trigger output → Set / Edit Fields. Mode Manual. Include Other Fields ON. Field: channel = gmail.",
+      "Rename: 'Tag · gmail'.",
+      "+ on Telegram Trigger output → same Set node — channel = telegram. Rename 'Tag · telegram'.",
+      "Add a Merge node downstream. Mode: Append. Inputs: 2. Wire both Tag nodes in.",
+      "Rewire the existing Gemini → Code → IF1 chain to receive from Merge.",
+      "Test: execute Merge node with one Gmail-side pinned item AND one Telegram-side pinned item. Confirm output has channel field with both values across two items."
+    ],
+    watch:"Include Other Fields ON is the #1 silent failure here. If OFF, the original payload disappears and everything downstream breaks. Call it out twice.",
+    prompt:"Build C · Set node config (both copies)\n──────────────────────────────\nMode:                   Manual Mapping\nInclude Other Fields:   ON  ← CRITICAL\nFields to set:\n  Name:   channel\n  Type:   String\n  Value:  gmail            (on the Gmail side)\n          telegram         (on the Telegram side)\n\nMerge node config\n──────────────────────────────\nMode:                   Append\nNumber of Inputs:       2\nInput 1:                Tag · gmail\nInput 2:                Tag · telegram\nOutput:                 → into the existing first IF (keyword filter)\n\nVerify loop:\n  [ ] Both Set nodes have Include Other Fields ON\n  [ ] Both nodes execute → channel field appears in output\n  [ ] Merge executes → both items present, both have channel\n  [ ] Existing IF still receives valid input"
+  },
+  {
+    num:17, when:"1:36 – 1:42", duration:"6 min", tag:"demo",
+    title:"Build C · Update Gemini prompt + JS code node.",
+    say:"Two small edits, big payoff. First the Gemini prompt — Telegram messages don't have a subject, so we add one line telling the model to treat the body as the whole message when subject is empty. Second the JS code node — we branch on the channel tag and carry the right reply target forward: messageId and threadId for Gmail, chatId and message_id for Telegram. The rest of the parse stays the same.",
+    doSteps:[
+      "Open Gemini node → prompt → add the line: 'If no subject is present, treat the body as the entire message.'",
+      "Replace prompt field references: subject → $json.subject || '(no subject)'; text → $json.text || $json.message?.text || ''.",
+      "Open Code node → SELECT ALL → Cmd-V the new code block from the prompt panel.",
+      "DO NOT TYPE the code by hand. n8n's editor auto-pairs braces and you will lose 15 minutes to syntax errors.",
+      "Execute the Code node once with a Gmail-side item and once with a Telegram-side item. Both should output hasAllRequired plus the right reply target shape."
+    ],
+    prompt:"Code node — full replacement\n──────────────────────────────\nconst raw = $input.first().json.content?.parts?.[0]?.text || \"\";\nconst cleaned = raw.replace(/^```(?:json)?\\s*/i, \"\").replace(/```\\s*$/i, \"\").trim();\nlet order = {};\ntry { order = JSON.parse(cleaned); }\ncatch (e) { order = { _parseError: e.message, _raw: raw }; }\n\nconst required = [\"flavour\", \"size\", \"deliveryDate\", \"deliveryAddress\"];\nconst missing = required.filter(k => !order[k]);\n\nconst channel = $input.first().json.channel;\nlet replyTarget = { channel };\n\nif (channel === \"gmail\") {\n  const t = $(\"Gmail Trigger\").first().json;\n  replyTarget.messageId = t.id;\n  replyTarget.threadId = t.threadId;\n  replyTarget.replyToEmail = t.from?.value?.[0]?.address || t.from?.text || null;\n  replyTarget.replyToName  = t.from?.value?.[0]?.name || order.customerName || \"there\";\n  replyTarget.originalSubject = t.subject;\n} else if (channel === \"telegram\") {\n  const t = $(\"Telegram Trigger\").first().json;\n  replyTarget.chatId = t.message.chat.id;\n  replyTarget.telegramMessageId = t.message.message_id;\n  replyTarget.replyToName = t.message.from?.first_name || \"there\";\n}\n\nreturn [{ json: { ...order, ...replyTarget, hasAllRequired: missing.length === 0, missingFields: missing } }];\n\n──────────────────────────────\nDO NOT TYPE — paste as one shot (Cmd+A then Cmd+V).",
+    watch:"If a learner gets `Unexpected token '}'`, they typed it. Tell them: Select All in the Code node, paste the workbook block as ONE shot. n8n's editor auto-pairs braces."
+  },
+  {
+    num:18, when:"1:42 – 1:48", duration:"6 min", tag:"demo",
+    title:"Build C · The channel-aware reply fork.",
+    say:"Now the fork. We already have If1 checking hasAllRequired. We add a second IF on the success path that checks the channel. True equals telegram goes to the Telegram reply node. False goes to the existing Gmail reply, untouched. Same fork on the missing-info path. Four reply nodes total — two for the success path, two for the missing-info path. The IF reads the channel tag from the Code node — not from $json — because after HTTP Request, $json is the quote, not the channel tag.",
+    doSteps:[
+      "On If1 TRUE output → insert a new IF before the existing 'Reply to a message'. Name: 'Reply via?'.",
+      "Condition: {{ $('Code in JavaScript').item.json.channel }} equals 'telegram'. Type: string.",
+      "TRUE branch → new Telegram 'Send a text message' node (Lumière Customer Bot credential). Chat ID and Reply To Message ID both pulled from $('Code in JavaScript').item.json.",
+      "FALSE branch → wires to existing Gmail Reply. Don't edit that node.",
+      "Repeat the same structure on If1 FALSE output for the missing-info path. Name the IF 'Missing-info via?'."
+    ],
+    watch:"The single most common bug here: someone uses {{ $json.channel }} on the Reply IF and it reads undefined. Always pull channel from $('Code in JavaScript').item.json after the HTTP Request.",
+    prompt:"Build C · Telegram reply (success path)\n──────────────────────────────\nResource:        Message\nOperation:       Send a text message\nCredential:      Lumière Customer Bot\nChat ID (Expr):  {{ $('Code in JavaScript').item.json.chatId }}\nAdditional Fields → Reply To Message ID:\n                 {{ $('Code in JavaScript').item.json.telegramMessageId }}\nText (Expression mode — paste verbatim):\n──────────────────────────────\n🎂 Your Lumière order is ready\n\n{{ $('Code in JavaScript').item.json.flavour }} · {{ $('Code in JavaScript').item.json.size }}\nDelivery: {{ $('Code in JavaScript').item.json.deliveryDate }}\nAddress: {{ $('Code in JavaScript').item.json.deliveryAddress }}\n\nTotal: ₹{{ $('HTTP Request').item.json.amount }}\nPay 50% advance: {{ $('HTTP Request').item.json.paymentUrl }}\n\nWe bake fresh — see you Saturday.\n──────────────────────────────\n\nVerify loop:\n  [ ] 'Reply via?' IF inserted between HTTP and existing Gmail reply\n  [ ] Condition uses $('Code in JavaScript').item.json.channel, NOT $json\n  [ ] Both Chat ID and Reply To Message ID expressions resolve\n  [ ] Same fork pattern mirrored on If1 FALSE branch\n  [ ] Existing Gmail nodes UNTOUCHED — wires only"
+  },
+  {
+    num:19, when:"1:48 – 1:52", duration:"4 min", tag:"demo",
+    title:"Build C · Live side-by-side test.",
+    say:"Now we test. Send the same order text on both channels within thirty seconds of each other. Watch Telegram chime first — it's a webhook, near-instant. Watch Gmail land within fifteen minutes — it's polled. Same backend, same /api/quote call, same payload — both customers get the same price. The owner gets a Telegram ping on both.",
+    doSteps:[
+      "Phone in one hand for Telegram. Gmail open in the other.",
+      "DM the customer bot: '1.5kg red velvet eggless for Saturday, deliver to Bandra please.'",
+      "Within 5 seconds: Telegram reply lands with price + payment link. Cohort applauds (or doesn't).",
+      "Send same text to your Gmail inbox.",
+      "Open n8n executions view — show the next poll run, both triggers entering Merge, both flowing to their respective replies.",
+      "Land: 'Same brain. Two ears. Two mouths.'"
+    ],
+    watch:"If the live test fails — switch to the pre-recorded s7p2-side-by-side.mp4 on the contingency slide. DO NOT debug live for more than 90 seconds. The pre-record is your safety net."
+  },
+  {
+    num:20, when:"1:52 – 1:57", duration:"5 min",
+    title:"Architecture Card v2 — the loop you drew in S5, running.",
+    say:"One last anchoring slide. Find the loop trace from your Session 5 Architecture Card. Every phase is still here. Perceive: Gmail or Telegram trigger. Reason: Gemini extraction. Tool: the quote API call. Observe: the Code node parses. Reflect: If1 checks completeness, the channel IF checks where to reply. Final: channel-aware reply, plus the ops Telegram. Workflow automation didn't replace agent architecture — it scaffolded it.",
+    doSteps:[
+      "Walk the six-row architecture card slide one row at a time.",
+      "Pause on Perceive: two triggers, one event family.",
+      "Pause on Reflect: two gates — completeness, then channel.",
+      "Read the closing line out loud: 'Workflow automation didn't replace agent architecture — it scaffolded it.'"
+    ],
+    bridge:"Bridge to S8 next. The bakery is the demo. Yours is the capstone."
+  },
+  {
+    num:21, when:"1:57 – 1:58", duration:"1 min",
+    title:"Bridge to S8 — Bring three candidates.",
+    say:"Next session — the last one — we don't build any new mechanics. Instead, we take the workflow you're now staring at and ask what business case at your work it maps onto. Homework before S8: bring three potential candidates from your own work. The shape we'll match against — one trigger that fires often, a small extract or classify step that's mostly mechanical, one or two outbound actions, and currently done by a human repeatedly with low judgment. The bakery is the demo. Yours is the capstone.",
+    doSteps:[
+      "Show the bridge card. Walk the four-criterion list.",
+      "Repeat: 'Three candidates. By next weekend.'",
+      "Don't over-elaborate. The walk-out is next."
+    ]
+  },
+  {
+    num:22, when:"1:58 – 2:00", duration:"2 min",
+    title:"Walk-out — Customers can DM your bakery now.",
+    say:"Same ritual we close every session with. One word in the chat — what's the one piece of your job, your team's, or your business that this workflow could replace tomorrow morning? Just the noun. Then we're done. Thanks everyone. Workflow Published. Customers can DM you now. Try not to break it overnight.",
+    afterPause:"Read every chat response by name. Five seconds each — don't engage, just acknowledge each noun.",
+    doSteps:[
+      "Show the close slide — stat strip + author colophon.",
+      "Read every walk-out word by name.",
+      "Outro music. Stop recording only after the room has drained."
+    ],
+    bridge:"Stop the recording. Save chat. Note any learner who said something unusually specific — that's your S8 prep material for them individually."
+  }
+];
+
+/* ===================== NAV + STATE ===================== */
+let current = 0;
+function goSlide(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  render();
+}
+function next() { goSlide(current + 1); }
+function prev() { goSlide(current - 1); }
+
+function render() {
+  const s = slides[current];
+  const pane = document.getElementById('slidePane');
+  let html = '';
+
+  if (s.when) {
+    html += `<div class="timing-bar"><span class="time-pill">${s.when}</span>${s.duration ? `<span class="duration">${s.duration}</span>` : ''}<span class="block-title">Session 7 · Part 2 · Hardening + Telegram</span></div>`;
+  }
+  if (s.tag) html += `<div class="slide-tag ${s.tag}">${s.tag}</div>`;
+  html += `<h1>${s.title}</h1>`;
+
+  if (s.say) {
+    html += `<div class="section say"><div class="header"><h3>Say</h3></div><blockquote class="quote">${s.say}</blockquote></div>`;
+  }
+  if (s.afterPause) {
+    html += `<div class="section say"><div class="header"><h3>After pause</h3></div><p>${s.afterPause}</p></div>`;
+  }
+  if (s.doSteps && s.doSteps.length) {
+    const items = s.doSteps.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section do"><div class="header"><h3>Do</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+  if (s.watch) {
+    html += `<div class="section watch"><div class="header"><h3>Watch for</h3></div><p>${s.watch}</p></div>`;
+  }
+  if (s.note) {
+    html += `<div class="section note"><div class="header"><h3>Note</h3></div><p>${s.note}</p></div>`;
+  }
+  if (s.bridge) {
+    html += `<div class="section bridge"><div class="header"><h3>Bridge</h3></div><p>${s.bridge}</p></div>`;
+  }
+  if (s.deeper && s.deeper.length) {
+    const items = s.deeper.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section deeper"><div class="header"><h3>Deeper (if asked)</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+  if (s.prompt) {
+    html += `<div class="section prompt-section"><div class="header"><h3>Paste / configure</h3></div><div class="prompt-box">${s.prompt}</div></div>`;
+  }
+
+  pane.innerHTML = html;
+
+  document.getElementById('slideCounter').textContent = `${String(s.num).padStart(2,'0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  const np = (i) => slides[i] || null;
+  const now = np(current), nx = np(current+1), nx2 = np(current+2);
+  if (now) { document.getElementById('nowNum').textContent=`Slide ${now.num}`; document.getElementById('nowTitle').textContent=now.title; document.getElementById('nowWhen').textContent=now.when||'—'; }
+  if (nx)  { document.getElementById('nextNum').textContent=`Slide ${nx.num}`;  document.getElementById('nextTitle').textContent=nx.title;  document.getElementById('nextWhen').textContent=nx.when||'—'; }
+  else     { document.getElementById('nextNum').textContent='—'; document.getElementById('nextTitle').textContent='—'; document.getElementById('nextWhen').textContent='—'; }
+  if (nx2) { document.getElementById('next2Num').textContent=`Slide ${nx2.num}`; document.getElementById('next2Title').textContent=nx2.title; document.getElementById('next2When').textContent=nx2.when||'—'; }
+  else     { document.getElementById('next2Num').textContent='—'; document.getElementById('next2Title').textContent='—'; document.getElementById('next2When').textContent='—'; }
+}
+
+/* ===================== REAL CLOCK ===================== */
+function updateRealClock() {
+  const now = new Date();
+  document.getElementById('realClock').textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+/* ===================== CLASS TIMER ===================== */
+let classStart=null, classPaused=true, classInterval=null;
+function startClass() {
+  if (classPaused) {
+    if (!classStart) classStart=Date.now();
+    else classStart=Date.now()-(classStart>0?Date.now()-classStart:0);
+    classPaused=false;
+    document.getElementById('startBtn').textContent='⏸ Pause';
+    classInterval=setInterval(tickClass,1000);
+  } else {
+    classPaused=true; clearInterval(classInterval);
+    document.getElementById('startBtn').textContent='▶ Resume';
+  }
+}
+function resetClass() {
+  classPaused=true; clearInterval(classInterval); classStart=null;
+  document.getElementById('classClock').textContent='0:00 / 2:00';
+  document.getElementById('paceLabel').textContent='—';
+  document.getElementById('paceLabel').className='big';
+  document.getElementById('startBtn').textContent='▶ Start Class';
+}
+function tickClass() {
+  if (!classStart) return;
+  const elapsed=Math.floor((Date.now()-classStart)/1000);
+  const m=Math.floor(elapsed/60), s=elapsed%60;
+  document.getElementById('classClock').textContent=`${m}:${String(s).padStart(2,'0')} / 2:00`;
+  const target=slides[current].when?parseWhen(slides[current].when):null;
+  if (target!==null) {
+    const diff=elapsed-target;
+    const label=document.getElementById('paceLabel');
+    if (diff>180){label.textContent=`+${Math.floor(diff/60)}m late`;label.className='big danger';}
+    else if(diff>60){label.textContent=`+${diff}s`;label.className='big warn';}
+    else{label.textContent='on time';label.className='big ok';}
+  }
+}
+function parseWhen(w) { const m=w.match(/(\d+):(\d+)/); if(!m)return null; return parseInt(m[1])*60+parseInt(m[2]); }
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval=null, exRemaining=0;
+function startExTimer(secs) {
+  stopExTimer(); exRemaining=secs;
+  function tick() {
+    const m=Math.floor(exRemaining/60),s=exRemaining%60;
+    document.getElementById('exTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const b=document.getElementById('timerBlock');
+    b.classList.toggle('warn',exRemaining<=120&&exRemaining>30);
+    b.classList.toggle('danger',exRemaining<=30);
+    exRemaining--;
+    if(exRemaining<0){stopExTimer();document.getElementById('exTimer').textContent='00:00';}
+  }
+  tick(); exInterval=setInterval(tick,1000);
+}
+function stopExTimer() {
+  if(exInterval){clearInterval(exInterval);exInterval=null;}
+  document.getElementById('timerBlock').classList.remove('warn','danger');
+}
+
+/* ===================== KEYBOARD ===================== */
+document.addEventListener('keydown',(e)=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();next();}
+  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
+  if(e.key==='Home')goSlide(0);
+  if(e.key==='End')goSlide(slides.length-1);
+  if(e.key==='s'||e.key==='S')startClass();
+  if(e.key==='b'||e.key==='B')goSlide(BREAK_SLIDE_INDEX);
+  if(e.key==='5')startExTimer(300);
+  if(e.key==='8')startExTimer(480);
+  if(e.key==='1')startExTimer(900);
+  if(e.key==='2')startExTimer(1200);
+  if(e.key==='p'||e.key==='P')printLearnerDeck();
+  if(e.key==='f'||e.key==='F')toggleFullscreen();
+});
+
+/* ===================== LEARNER DECK CONTROL ===================== */
+let learnerWin=null;
+function openLearnerDeck() {
+  const url='learner_deck.html';
+  if(!learnerWin||learnerWin.closed){learnerWin=window.open(url,'genai_s7p2_learner');}
+  else{learnerWin.focus();}
+}
+const _goSlide=goSlide;
+window.goSlide=function(i){
+  _goSlide(i);
+  try{localStorage.setItem(MASTER_KEY,String(current));}catch(e){}
+};
+function printLearnerDeck() {
+  if(!learnerWin||learnerWin.closed){
+    learnerWin=window.open('learner_deck.html','genai_s7p2_learner');
+    setTimeout(()=>{try{localStorage.setItem(PRINT_KEY,Date.now().toString());}catch(e){}},1500);
+  } else {
+    try{localStorage.setItem(PRINT_KEY,Date.now().toString());}catch(e){}
+  }
+}
+function toggleFullscreen() {
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+goSlide(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · GenAI for Non-Coders · Session 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ===================== TOPBAR ===================== */
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .topbar .title .accent { color: var(--accent); }
+  .clock-divider { width: 1px; height: 32px; background: var(--border); }
+  .clock-box { display: flex; flex-direction: column; line-height: 1.15; gap: 2px; }
+  .clock-box .label {
+    color: var(--text-dim); font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.14em; font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+  .topbar .grow { flex: 1; }
+  .topbar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary { background: var(--accent); color: #062420; border-color: var(--accent); font-weight: 600; }
+  .topbar button.primary:hover { background: #7df1de; }
+  .topbar .slide-counter {
+    color: var(--text-muted); font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2); border-left: 1px solid var(--border);
+  }
+
+  /* ===================== MAIN LAYOUT ===================== */
+  .main { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 64px - 56px); }
+  .panel-left { overflow-y: auto; padding: var(--s-3) var(--s-4); border-right: 1px solid var(--border); }
+  .panel-right { overflow-y: auto; background: var(--bg-1); padding: var(--s-3); }
+  .panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track, .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover, .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===================== BOTTOMBAR ===================== */
+  .bottombar {
+    height: 56px; background: var(--bg-1); border-top: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 var(--s-3); gap: var(--s-2); flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1; height: 4px; background: var(--surface); border-radius: 2px;
+    overflow: hidden; margin: 0 var(--s-2); border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%; background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  /* ===================== SLIDE CONTENT ===================== */
+  .timing-bar {
+    display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3);
+    padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration { color: var(--text-muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+  .timing-bar .block-title {
+    font-weight: 500; flex: 1; font-size: 0.88rem; color: var(--text-soft);
+    text-align: right; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--s-2);
+  }
+  .slide-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: var(--s-3); letter-spacing: -0.02em; color: var(--text);
+  }
+
+  .section {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 18px; margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+  .section .header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .section h3 {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+
+  .quote {
+    color: var(--text); font-size: 1rem; line-height: 1.6;
+    padding-left: 12px; border-left: 2px solid var(--warm); margin: 0; font-weight: 400;
+  }
+  .section p { font-size: 0.94rem; line-height: 1.6; color: var(--text-soft); margin-bottom: 6px; }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list { counter-reset: step; list-style: none; padding-left: 0; margin: 0; }
+  .step-list > li {
+    counter-increment: step; padding-left: 36px; position: relative;
+    padding-bottom: 10px; font-size: 0.94rem; line-height: 1.55; color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: 0; top: 2px; width: 26px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    background: #060810; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem; color: var(--accent); white-space: pre-wrap;
+    line-height: 1.6; margin-top: 4px;
+  }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-section { margin-bottom: var(--s-3); }
+  .right-section h4 {
+    font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .preview-card {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title { font-size: 0.92rem; font-weight: 500; margin: 4px 0 2px; color: var(--text); line-height: 1.35; }
+  .preview-card .when {
+    font-size: 0.74rem; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 18px 16px; text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    line-height: 1; letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    text-transform: uppercase; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .timer-controls { display: flex; gap: 4px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
+  .timer-controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+  .quick-key kbd {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text-soft); font-weight: 500;
+    min-width: 22px; text-align: center; box-shadow: 0 1px 0 var(--border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">GenAI · Session 5</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 2:00</span>
+  </div>
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 29</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(300)">5m</button>
+          <button onclick="startExTimer(480)">8m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="startExTimer(720)">12m</button>
+          <button onclick="startExTimer(780)">13m</button>
+          <button onclick="startExTimer(1020)">17m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>5</kbd> 5m · <kbd>8</kbd> 8m · <kbd>1</kbd> 13m · <kbd>2</kbd> 17m timer</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break (slide 11)</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+/* ===================== SLIDE DATA =====================
+   Session 5 · Agent Architecture — 29 slides, paired 1:1 to learner_deck.html.
+   Titles MATCH the learner slide headlines (facilitator sees what the room sees).
+   say: is the literal warm sentence read aloud — plain-first, jargon named once.
+   BREAK_SLIDE_INDEX = 16 (0-based, slide 17 in 1-based numbering).
+   ===================================================== */
+const BREAK_SLIDE_INDEX = 16;
+
+const slides = [
+  {
+    num: 1, when: "Pre-start", tag: "title",
+    title: "How Agents Think, Remember & Act",
+    say: "Welcome back, everyone. Last time, we gave your agent a brain — we fed it Lumière's own documents so it could answer real questions. Today we're going to open that brain up and see how it actually works on the inside.",
+    doSteps: [
+      "Music up. Greet people by name as they arrive.",
+      "Tabs ready: Lumière Knowledge Agent (Claude Projects), a fresh Claude chat for the optional demo, the workbook open to Exercise A, and the updated Lumiere_KB.md (now with branch coupons) in a text editor.",
+      "Remind learners up front: re-upload the latest Lumiere_KB.md into their Project — it gained a branch-coupons section, and Exercise A uses it."
+    ],
+    bridge: "When the clock starts: one-word check-in, then the Course Story."
+  },
+  {
+    num: 2, when: "0:00 – 0:05", duration: "5 min", tag: "title",
+    title: "Every session made a promise. You built the proof.",
+    say: "Before we dive in — quick one. Drop a single word in the chat: how did last session land for you? Just one word, whatever's honest.",
+    afterPause: "Then: 'Let me show you how far you've actually come.' Walk the table one row at a time, in plain story form — 'Session one, you saw a chatbot fail. Session two, you built an agent that screens candidates. Session three, you learned to write the prompt that controls it. Session four, you gave it your own documents to read. And today…' — land on S5.",
+    doSteps: [
+      "Read every chat response aloud, by name.",
+      "Walk the Course Story table as a story, not a list — one breath per session.",
+      "Ask everyone to re-upload the latest Lumiere_KB.md now if they haven't."
+    ],
+    watch: "If chat is quiet after 20 seconds: 'Any word at all — useful, dense, fun, confusing. There's no wrong answer.'",
+    bridge: "Advance to the bug — the hook for the whole session."
+  },
+  {
+    num: 3, when: "0:05 – 0:08", duration: "3 min", tag: "title",
+    title: "Your HR Screener invented LinkedIn URLs that didn't exist.",
+    say: "I want to show you exactly where things went wrong once — because it's the whole reason we're here today. Remember the candidate screener you built back in session two? It searched for people, pulled their skills, and scored them. Well — when the search came up empty, it didn't tell you it found nothing. It made up LinkedIn links that don't exist. And here's the thing: that wasn't the AI being dumb. It was something missing in how the agent was put together. By the end of today, you'll be able to point at the exact part that failed.",
+    doSteps: [
+      "Show the bug slide (learner slide 3).",
+      "Pause after 'wasn't the AI being dumb.' Don't reveal the cause yet — that lands after the anatomy.",
+      "Make the promise out loud: 'by the end, you'll know which part was missing and how you'd build it right.'"
+    ],
+    watch: "If they don't remember the screener: 'The three-step one — search for candidates, pull their top skills, score them. It made up LinkedIn links.'",
+    note: "Hold the cause back here. Tease it; the anatomy + slide 10 deliver it as a TOOL problem.",
+    bridge: "First, the 5 parts every agent is built from."
+  },
+  {
+    num: 4, when: "0:08 – 0:14", duration: "6 min",
+    title: "Every agent is 5 parts around one brain.",
+    say: "Here's the good news: every agent ever built — simple or fancy — is really just five parts working together. There's the brain, its memory, its hands, the part that makes a plan, and the part that carries the plan out. That's it. And the useful trick is this: take away any one of those five, and the agent breaks in a way you can predict.",
+    doSteps: [
+      "Show the anatomy diagram (learner slide 4). Name each part in plain words, then walk the 'what breaks' column.",
+      "Cover norms here if you haven't: cameras optional, chat open, real break coming, today's tool is Claude Projects.",
+      "Say the one rule: 'You came in knowing what agents can do. You'll leave knowing how they work.'",
+      "Set up the next stretch: 'we'll meet each of the five, one at a time — then come back to your screener.'"
+    ],
+    bridge: "Part one — the brain.",
+    deeper: ["The five map onto the Shantanu Chandra Learning Lab Builder tabs: Overview is the brain, RAG Docs is memory, Configure holds the tools, planner, and executor."]
+  },
+  {
+    num: 5, when: "0:14 – 0:16", duration: "2 min",
+    title: "Part 1 of 5 — LLM (the brain)",
+    say: "Part one is the brain — the AI model itself. It's the part that reads what's coming in, weighs the options, and decides what to do next. It's the only piece that actually thinks. For Lumière, it's what reads a customer's WhatsApp message and works out what they're really asking for. Take the brain away and there's no thinking at all — you're back to a rigid script.",
+    doSteps: ["Show the LLM slide (learner slide 5).", "Keep it to about ninety seconds — one part, one breath."],
+    bridge: "Part two — what it knows."
+  },
+  {
+    num: 6, when: "0:16 – 0:18", duration: "2 min",
+    title: "Part 2 of 5 — Memory (what it knows)",
+    say: "Part two is memory — everything the agent holds onto. That's three things, really: what you just said a minute ago, who you are if you've ordered before, and a record of what it's already done so it doesn't repeat itself. For Lumière, memory is what lets it say 'your usual red velvet, like last month?' — and it's also the little logbook that stops a monitor from flagging the same rule twice. Take memory away, and it forgets you the moment the chat ends.",
+    doSteps: ["Show the Memory slide (learner slide 6).", "Plant a seed: 'hold onto memory — it comes back when we build the regulation monitor.'"],
+    bridge: "Part three — what it can actually do."
+  },
+  {
+    num: 7, when: "0:18 – 0:20", duration: "2 min",
+    title: "Part 3 of 5 — Tools (the hands)",
+    say: "Part three is tools — think of these as the agent's hands. They're the only way it can reach out and actually change something: search the web, look something up in a database, book a slot, send an email. For Lumière, that's the tool that reserves a cake slot, or the one that sends the confirmation. Without hands, the agent can only talk — it can describe booking your cake, but it can't actually book it. And keep an eye on this one — it's the part that tripped up your screener.",
+    doSteps: ["Show the Tools slide (learner slide 7).", "Plant the flag clearly: 'this is the part the screener got wrong.'"],
+    bridge: "Part four — figuring out what to do, and in what order.",
+    note: "This sets up the slide-10 reveal. Land the line: 'the hands are the only way it acts.'"
+  },
+  {
+    num: 8, when: "0:20 – 0:22", duration: "2 min",
+    title: "Part 4 of 5 — Planner (what's next)",
+    say: "Part four is the planner — the part that takes a big goal and breaks it into steps, in the right order. For a cake order, that's: check what they want, confirm how long it takes, book the slot, send the confirmation — in that sequence, not jumbled up. Take the planner away, and the agent freezes the moment a job needs more than one step.",
+    doSteps: ["Show the Planner slide (learner slide 8)."],
+    bridge: "Part five — the part that actually does it."
+  },
+  {
+    num: 9, when: "0:22 – 0:24", duration: "2 min",
+    title: "Part 5 of 5 — Executor (runs the plan)",
+    say: "And part five is the executor — the doer. It takes the planner's steps and actually runs each one, then hands the result back to the brain. For Lumière, it calls the slot-booker, waits for the booking to come back, then fires off the confirmation — and it stops if something fails along the way. Without it, you've got great plans that never happen. So that's all five: brain, memory, hands, plan, doer.",
+    doSteps: ["Show the Executor slide (learner slide 9).", "Recap in one breath: 'brain, memory, hands, plan, doer — five parts.'"],
+    bridge: "Now back to your screener — which of the five actually broke?"
+  },
+  {
+    num: 10, when: "0:24 – 0:28", duration: "4 min",
+    title: "The broken part was the Tool.",
+    say: "So let's put the screener on the table and check all five parts. The brain? Fine. The planner — your three steps? Fine. The doer? Fine. The part that broke was the hands — the tool. Its job was to fetch real LinkedIn profiles, but here's the catch: LinkedIn doesn't let anyone do that. No scraping, no open door, no official way in. So a plain web search simply couldn't get them. It came back empty-handed — and because nobody had told the agent what to do when it can't find something, it just filled the gap with links that look real but aren't.",
+    afterPause: "So it was never a memory problem — it was a tool problem. The tool couldn't do the job. And the fix it was missing was a simple rule: 'if you can't verify these, say so and hand it to a person' — instead of making something up.",
+    doSteps: [
+      "Show the 'broken part' diagram (learner slide 10) — the tool is marked in red.",
+      "Say it plainly: 'there's no legal way to pull LinkedIn profiles — so no tool could do this job.'",
+      "Name both halves: the tool was the cause; the missing 'I can't, so I'll escalate' rule is why it turned into a made-up answer."
+    ],
+    watch: "If anyone half-remembers 'it was a memory thing' from earlier — gently correct: 'the root cause here is the tool, not memory.'",
+    note: "Corrected teaching point — lead with TOOL. Memory still matters later (the monitor's logbook), just not as this root cause.",
+    bridge: "That's one part. Next: how all five parts run together, as a loop."
+  },
+  {
+    num: 11, when: "0:28 – 0:34", duration: "6 min",
+    title: "A chatbot answers once. An agent loops.",
+    say: "Here's the big difference between a chatbot and an agent. A chatbot answers you once and stops. An agent goes around in a loop — it takes something in, thinks it over, makes a plan, does one thing, looks at what happened, and asks 'are we there yet?' If not, it goes around again. Think of a really good consultant: they don't give up when the first phone call doesn't pan out — they try the next contact. That instinct to keep going is baked right into the loop.",
+    doSteps: [
+      "Show the loop ring (learner slide 11). Trace it around clockwise, naming each stage in plain words.",
+      "Land on Reflect — that's the stage where it decides whether to go around again."
+    ],
+    watch: "Point your cursor around the actual circle as you talk — the going-around is the whole point.",
+    bridge: "Let me show you the loop save an agent when an email bounces."
+  },
+  {
+    num: 12, when: "0:34 – 0:38", duration: "4 min",
+    title: "When a step fails, the loop doesn't quit — it tries another way.",
+    say: "Picture an agent whose job is to chase up overdue invoices every morning. It sends out fourteen reminder emails — and one of them bounces straight back, because that customer's email on file is out of date. Now, a plain chatbot would stop right there and just tell you 'one failed.' But watch what this one does instead: it notices the bounce, goes and digs up a fresh contact from the system, and sends it again. Fourteen out of fourteen, done. The bounce wasn't a dead end — it was a clue that told it to try a different way.",
+    doSteps: [
+      "Show the recovery timeline (learner slide 12). Walk along the dots as you tell the story; land on the green 'loop back' band.",
+      "Then the guardrail point, plainly: 'a loop also needs to know when to stop — when the job's done, when it's tried enough times, or when it should hand off to a human. All three, or it loops forever.'"
+    ],
+    note: "The dotted timeline is the visual — trace it with your cursor as you tell the story.",
+    bridge: "Now the same loop on your screener — but this time the tool can't win, and there's no stop sign."
+  },
+  {
+    num: 13, when: "0:38 – 0:42", duration: "4 min",
+    title: "The tool came up empty. With no guardrail, the loop bluffed.",
+    say: "Now let's run that exact same loop on your screener — and watch where it goes differently. It takes in the job, plans the search, runs it… and comes back with nothing, because, remember, there's no real way to get those profiles. The invoice agent hit a snag and found another route. But the screener had no other route and no rule telling it to just admit it came up empty — so it bluffed, and made up links. Same loop. The difference was a missing tool and a missing 'I can't' rule.",
+    doSteps: [
+      "Show the gap slide (learner slide 13) — the faded 'Reflect?' box, then the two outcomes side by side.",
+      "Read both out loud: made-up links with no rule, versus 'I can't verify these — let me hand this to a person' with the rule.",
+      "Name it once more, simply: the tool couldn't do the job, and nothing caught the gap."
+    ],
+    watch: "Keep the framing identical to slide 10: tool failed, no guardrail, so it bluffed.",
+    bridge: "One last idea before you try it yourself — the four kinds of memory."
+  },
+  {
+    num: 14, when: "0:42 – 0:46", duration: "4 min",
+    title: "Agents remember in layers.",
+    say: "Memory isn't one single thing — it comes in four kinds, and the easiest way to picture them is an office. There's the desk: what you're working on right this second — 'you said the cake's for Saturday.' There's the notebook: things worth keeping across days — 'welcome back, Priya.' There's the archive: a log of what happened before — like our monitor remembering which rules it already flagged. And there's the library: a whole shelf of reference documents — that's the Lumière file you loaded last session. Four kinds, each doing a different job.",
+    doSteps: [
+      "Show the memory slide (learner slide 14). Name each one and read its little Lumière example aloud.",
+      "Point at the library: 'you built this one last session — and just re-uploaded the new version.'"
+    ],
+    bridge: "Now let's see what each of your two agents was actually missing.",
+    note: "The examples are the upgrade — read each one aloud, don't just name the type."
+  },
+  {
+    num: 15, when: "0:46 – 0:47", duration: "1 min",
+    title: "You've used 2 of the 4 already.",
+    say: "Quick side-by-side. Your screener had the desk — but what broke it was the tool, not its memory. Your Lumière agent has the library, the documents — but no archive and no notebook, which is why it nails the cake question yet forgets you the second the chat closes. So you've actually used two of these four already without naming them. Today you learn to design the other two in.",
+    doSteps: ["Show the side-by-side (learner slide 15)."],
+    bridge: "That's the concepts. Open your workbook to Exercise A.",
+    note: "Keep this to about a minute — the examples on the previous slide did the heavy lifting."
+  },
+  {
+    num: 16, when: "0:47 – 0:55", duration: "13 min", tag: "exercise",
+    title: "Read your agent's mind — 6 stages.",
+    say: "Okay — your turn. You're going to make your agent show its thinking out loud, one step at a time. You'll paste a short instruction above a tricky customer message — and this customer's a bit of a handful: they spell a coupon code wrong, ask about a code from the wrong branch, want delivery somewhere you don't go, and ask if it's safe for a nut allergy. Watch your agent fix the typo, point them to the right code, and politely refuse the things it can't promise — all in one reply.",
+    prompt: "EXERCISE A — LOOP TRACE (13 min)\n\nStep 1: Re-upload the latest Lumiere_KB.md (branch coupons added), open your Lumière agent.\n\nStep 2: Paste ABOVE the question:\nBefore answering, trace your reasoning one stage at a time:\nPERCEIVE (list every request) / REASON (YES, NO, or PARTIAL each) /\nPLAN / ACT (quote the section) / OBSERVE / REFLECT (what to do if you can't answer).\n\nStep 3: Then the customer message:\n\"I want a 2kg eggless chocolate cake for pickup at your Bandra branch this\nSaturday. Can I use the 'BANDRA 10' code on it — or my friend said 'POWAI10'\ngives a better deal, does that work at Bandra? Also, can you deliver it to\nSector 90, Gurgaon, and is it safe for my child with a severe nut allergy?\"\n\nStep 4: Fill the 6-box trace in your workbook.",
+    doSteps: [
+      "Paste the Exercise A instructions in chat. Start the 13-minute timer.",
+      "Walk the room. Good signs: it fixes 'BANDRA 10' to BANDRA10; it refuses POWAI10 at Bandra AND points them to BANDRA10 (the code that works there); it refuses the Gurgaon delivery; it won't promise the cake is allergy-safe; it flags that the doc doesn't say if coupons apply to eggless.",
+      "Around twelve minutes: '[Name] — did your agent just say no to POWAI10, or did it tell the customer which code does work at Bandra?' The redirect is the gold-star answer; a flat 'no' is only half.",
+      "Read two or three traces aloud, by name."
+    ],
+    watch: "If it accepts POWAI10 at Bandra, or repeats 'BANDRA 10' back unchanged — the agent hasn't read the updated file. Have them re-upload and try again.",
+    bridge: "That's the first piece of your Architecture Card. Real break now."
+  },
+  {
+    num: 17, when: "0:55 – 1:05", duration: "10 min", tag: "break",
+    title: "Break — 10 minutes",
+    say: "Let's take a real ten-minute break. Cameras off, mics off, get up and walk away from the screen. We'll start again the moment the clock on screen hits zero. See you in ten.",
+    doSteps: [
+      "Show the break slide — the countdown starts on its own.",
+      "Mute yourself, put music on.",
+      "DM anyone whose agent accepted the wrong-branch code — remind them to re-upload the updated file.",
+      "Come back with: 'Welcome back. You just read an agent's mind. Now let's give it hands.'"
+    ],
+    note: "Honor the break. Do NOT start the next block early."
+  },
+  {
+    num: 18, when: "1:05 – 1:15", duration: "10 min",
+    title: "The brain picks the hand. The executor moves it.",
+    say: "Welcome back. So, tools — the agent's hands. The brain decides which hand to reach for, and the doer actually moves it. Two you've already watched Claude use: search, which looks things up live on the web that the model was never taught, and a weather tool, which tells it today's temperature somewhere — something no AI just knows on its own. Those two are 'information' tools. There are three other families too: doing things like sending or writing, telling people things, and crunching numbers.",
+    doSteps: [
+      "Show the tools diagram (learner slide 18). Name each family; spotlight Search and Weather as the two real ones.",
+      "Tell the ice-cake story live: 'A customer asks how long their ice cake will survive the trip home. The agent doesn't know today's weather — so it calls the weather tool, finds it's twenty-four degrees in Gurgaon today, does the math for the safe window — about two hours — and then says so, with a caveat. Open a branch in San Francisco and the same agent finds fifteen degrees and gives three to four hours. The place sets the weather, the weather sets the answer.'",
+      "Land the safety rule: scope and permission on every tool.",
+      "Ask: 'which of these tools would make your legal team nervous if it had no limits?' Take two or three."
+    ],
+    afterPause: "The model can't know today's weather, or what's live on the web — a tool gets that. And when something's still just an estimate, it says so instead of guessing. So: give every tool a clear boundary. If you can't say in one sentence what a tool is NOT allowed to do, you haven't pinned it down yet.",
+    watch: "The 'doing' tools — send, write — draw the nervous answers. The ice-cake story is what makes 'use a tool, don't guess' click. Don't skip it.",
+    bridge: "Here's what that looks like written down — a real tool list."
+  },
+  {
+    num: 19, when: "1:15 – 1:19", duration: "4 min",
+    title: "Every tool has a boundary it cannot cross.",
+    say: "Here's a real example — the tool list for a recruiting agent. The resume reader can only read, never write. The calendar tool touches the recruiter's calendar and nobody else's. The email tool can only send pre-approved templates — no writing whatever it wants. The record-keeper logs every change it makes. And the notifier posts to one channel only. See the pattern? Every single tool has a line it's not allowed to cross.",
+    doSteps: [
+      "Show the manifest table (learner slide 19). Walk each row — what it does, and where its limit is.",
+      "Land it: 'the loop can recover from grabbing the wrong tool — but it can't undo a tool that did its job with too much freedom.'"
+    ],
+    note: "This table is the model for Exercise B. Make the 'limit' column the star.",
+    bridge: "One more idea — how an agent decides to think through a problem."
+  },
+  {
+    num: 20, when: "1:19 – 1:23", duration: "4 min",
+    title: "3 ways an agent can think.",
+    say: "Same problem, three different ways an agent can work through it. The first is think-then-do, over and over — it thinks, takes an action, sees what came back, thinks again; great when it needs fresh, live information. The second is just careful step-by-step reasoning, no tools at all — good when it already has the facts. The third is draft, criticise its own draft, then rewrite — for anything important enough to get right. And you don't have to memorise the names: you just ask three questions to pick.",
+    doSteps: [
+      "Show the planning slide (learner slide 20). Point at each shape, then read its Lumière example: the live one — 'should we run a delivery promo this weekend?' (checks weather and the backlog); the reasoning one — 'which three cakes should we feature this month?'; the draft-and-fix one — writing an apology to a customer whose cake was late.",
+      "Then the three questions: how hard is the task, does it need live info, and how much does getting it right matter."
+    ],
+    afterPause: "Don't memorise the names. Answer those three questions and the right approach picks itself.",
+    note: "Keep to four minutes. The three questions are the thing that has to land.",
+    bridge: "Now design the tool lists for Lumière's two new agents."
+  },
+  {
+    num: 21, when: "1:23 – 1:40", duration: "17 min", tag: "exercise",
+    title: "Exercise B — Tool Manifest (Order Assistant + FSSAI Monitor)",
+    say: "Next exercise — and it's two tool lists. First an order-taking agent for Lumière, then a tougher one: an agent that watches for new food-safety rules. For every tool, you'll write down what it is, where its information lives, what it does, what it gives back, and — most importantly — its limits. And the food-safety one has a hard rule: it can quietly handle the boring updates itself, but anything to do with allergens or safety must go to a human. Always.",
+    prompt: "EXERCISE B — TOOL MANIFEST (17 min)\n\nPart 1 (~7 min): Order Assistant — 5 tools, each in RCTFC\n(ROLE / CONTEXT / TASK / FORMAT / CONSTRAINTS = scope + min permission),\nplus 'what breaks if removed.'\n\nPart 2 (~10 min): FSSAI Regulation Monitor — must include:\n- TWO triggers (auto nightly + manual 'check now')\n- AUTO-APPLY + LOG only cosmetic/procedural; ESCALATE all allergen/\n  ingredient/safety to a human, never auto-apply\n- a Seen-Rules Log (episodic memory) so it never re-alerts twice\n\nThen circle the one tool that makes you nervous.",
+    doSteps: [
+      "Paste the Exercise B instructions. Start the 17-minute timer. Give a heads-up at the 7-minute mark to move to part two.",
+      "Walk the room: 'access to the calendar' isn't a limit — what can't it touch? 'Full access' isn't a limit either — what's the least it needs? Check the monitor has a memory tool, and that allergen and safety always go to a human.",
+      "Around fifteen minutes: '[Name] — which tool makes you nervous?'",
+      "After everyone shares: 'notice they're all send-or-do tools. Either tighten the limit, or put a human in front of it.'"
+    ],
+    watch: "If anyone lets the monitor auto-handle an allergen rule — stop them. That's the one hard line: allergens and safety always go to a human.",
+    bridge: "That's the second piece of the card. Now — when one agent isn't enough."
+  },
+  {
+    num: 22, when: "1:40 – 1:47", duration: "7 min",
+    title: "Split the work 3 ways.",
+    say: "Sometimes one agent isn't enough, and you split the work — and there are three ways to do it. You can have a manager agent that hands pieces to specialists and pulls the answers back together. You can have a row of identical agents each taking a slice of a big pile, working at the same time. Or you can have a relay — each agent does one leg and passes the baton to the next.",
+    doSteps: [
+      "Show the three patterns (learner slide 22). Walk each diagram, then its Lumière example: the manager — planning a festival week, with one agent forecasting demand, one pricing, one writing the posts; the row of agents — two hundred Google reviews sorted overnight by four agents at once; the relay — your old HR Screener, and a cake order: take it, check stock, book the slot, hand a refund to a person.",
+      "Ask the deciding question: 'do you want it faster, with agents working side by side — or safer, with one agent checking another's work?'"
+    ],
+    watch: "Keep this tight — the reveal two slides on is the real payoff.",
+    bridge: "Two of these you can actually picture in a photo."
+  },
+  {
+    num: 23, when: "1:47 – 1:49", duration: "2 min",
+    title: "A relay race and an assembly line.",
+    say: "Two of these are easy to picture. The relay race — each runner runs their leg, then hands the baton to the next person — that's the handoff pattern. And the assembly line — lots of identical things moving down the belt at the same time — that's the row of parallel agents.",
+    doSteps: ["Show the photos slide (learner slide 23).", "Set up the reveal: 'and one of these — you've already built it.'"],
+    bridge: "Here's the reveal — your screener was one of these."
+  },
+  {
+    num: 24, when: "1:49 – 1:50", duration: "1 min",
+    title: "You built a multi-agent system in Session 2 — without the name for it.",
+    say: "And here's the fun part — you already built one of these. Your screener back in session two was a relay. The first agent searched, handed off to a second that pulled out the skills, which handed off to a third that scored everyone. Three specialists, each doing one leg and passing the baton. You built a multi-agent system months ago — you just didn't have a name for it. Now you do.",
+    doSteps: ["Show the reveal slide (learner slide 24).", "Pause. Let it land — this is the moment four sessions pay off."],
+    watch: "Watch for the recognition on people's faces — that's the payoff.",
+    bridge: "Now choose the pattern for Lumière going overseas."
+  },
+  {
+    num: 25, when: "1:50 – 1:55", duration: "5 min", tag: "exercise",
+    title: "Exercise C — Pattern Choice (London branch)",
+    say: "Last exercise, quick one. Imagine Lumière opens a branch in London. Suddenly there's a whole different food-safety regulator over there — your one monitor only knows the Indian rules. So one agent clearly isn't enough anymore. Ask Claude which of the three patterns fits — and if it suggests letting one agent run the entire country launch on its own, push back. That's too much to hand off without a human watching.",
+    prompt: "EXERCISE C — PATTERN CHOICE (5 min)\n\nKeeping multiple branches compliant across DIFFERENT regulators:\nOrchestrator-Worker, Parallel Agents, or Specialist Handoffs?\nWhy? What breaks if I pick wrong? Where must a human stay in the loop?\n\nStrong answer: one monitor per regulator (each with its own memory), an\norchestrator that only ROUTES by branch, and the allergen/safety human gate\nfiring inside every monitor.\n\nIf Claude says 'one agent manages the whole country launch' — push back.",
+    doSteps: [
+      "Paste the Exercise C instructions. Start the 5-minute timer.",
+      "Call on each learner: '[Name] — which pattern, and where does a human stay involved?'",
+      "Praise anyone who pushes back on letting the agent do too much on its own — that judgment is exactly the point."
+    ],
+    bridge: "That's all three pieces. Your Architecture Card is done."
+  },
+  {
+    num: 26, when: "1:55 – 1:57", duration: "2 min",
+    title: "This isn't a classroom exercise. It's a blueprint.",
+    say: "Flip to the back of your workbook — you've got three sections filled in. You read a real agent's thinking and watched it fix, refuse, and flag instead of bluffing. You designed two agents' tools and drew the line where a human has to step in on safety. And you split the work for a second country. That's not a classroom exercise — that's a real blueprint. It's exactly what you'll build for real next session.",
+    doSteps: ["Show the Architecture Card slide (learner slide 26).", "Point at each section and say where it goes in Session 6."],
+    bridge: "Let's step back and name what changed today."
+  },
+  {
+    num: 27, when: "1:57 – 1:58", duration: "1 min",
+    title: "Architecture is a design decision. Which means you can make it.",
+    say: "Step back for a second. That screener made up answers because the tool couldn't do the job and nothing caught the gap. That wasn't the AI being broken — it was a choice in how it was built. And the whole point of today is: those are choices, and now they're yours to make. You know how.",
+    doSteps: ["Show the synthesis slide (learner slide 27).", "Deliver this one slowly."],
+    bridge: "One card to carry home, then we close."
+  },
+  {
+    num: 28, when: "1:58 – 1:59", duration: "1 min",
+    title: "6 ideas to keep.",
+    say: "Six things to carry with you: an agent is five parts, it works in a six-step loop, it needs three ways to stop, it remembers in four ways, it can think in three styles, and it can team up in three patterns. And one line that ties it all together — when a tool can't do the job and there's no rule to catch it, an agent will fill the gap with something made up. So give it a real tool, or give it permission to say 'I can't.'",
+    doSteps: ["Show the quick-reference slide (learner slide 28).", "Read that last line slowly — it's the takeaway."],
+    bridge: "Then the close — and where this goes next."
+  },
+  {
+    num: 29, when: "1:59 – 2:00", duration: "1 min",
+    title: "Shantanu Chandra Learning Lab Agent Builder — Build & Host Your First Agent",
+    say: "Five sessions in. You've watched an agent fail, built one that works, taught it to read your documents, and today you opened it up and named every part. Next time, you build a real, live one in the Shantanu Chandra Learning Lab Agent Builder — so bring this card with you. Lovely work today. See you next session.",
+    doSteps: [
+      "Show the close slide (learner slide 29).",
+      "Paste the take-home: 'One — which of the five parts failed in your screener, and what did it make up? Two — which tool in your list would you put a human in front of, and what sets that off?'",
+      "Wave. Stop the recording. End the meeting."
+    ],
+    note: "Within 24h: send the workbook PDF + Google Doc link, the take-home replies, and the Session 6 calendar invite."
+  }
+];
+
+/* ===================== ENGINE ===================== */
+let current = 0;
+const MASTER_KEY = 'genai_s5_slide_master';
+const PRINT_KEY  = 'genai_s5_print_request';
+
+function goSlide(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  render();
+  try { localStorage.setItem(MASTER_KEY, String(current)); } catch(e) {}
+  if (slides[current].tag === 'break') startExTimer(600);
+}
+function next() { if (current < slides.length - 1) goSlide(current + 1); }
+function prev() { if (current > 0) goSlide(current - 1); }
+
+function render() {
+  const s = slides[current];
+  const pane = document.getElementById('slidePane');
+  const tag = s.tag || '';
+  let html = '';
+
+  if (s.when) {
+    html += `<div class="timing-bar">
+      <span class="time-pill">${s.when}</span>
+      ${s.duration ? `<span class="duration">${s.duration}</span>` : ''}
+      <span class="block-title">Slide ${s.num} of ${slides.length}</span>
+    </div>`;
+  }
+  if (tag) html += `<div class="slide-tag ${tag}">${tag}</div>`;
+  html += `<h1>${s.title}</h1>`;
+
+  if (s.say) html += `<div class="section say"><div class="header"><h3>Say</h3></div><blockquote class="quote">${s.say}</blockquote></div>`;
+  if (s.afterPause) html += `<div class="section say"><div class="header"><h3>After pause</h3></div><p>${s.afterPause}</p></div>`;
+  if (s.sayAfter) html += `<div class="section say"><div class="header"><h3>Say after</h3></div><p>${s.sayAfter}</p></div>`;
+
+  if (s.doSteps && s.doSteps.length) {
+    const items = s.doSteps.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section do"><div class="header"><h3>Do</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+
+  if (s.watch) html += `<div class="section watch"><div class="header"><h3>Watch</h3></div><p>${s.watch}</p></div>`;
+  if (s.note)  html += `<div class="section note"><div class="header"><h3>Note</h3></div><p>${s.note}</p></div>`;
+  if (s.bridge) html += `<div class="section bridge"><div class="header"><h3>Bridge →</h3></div><p>${s.bridge}</p></div>`;
+  if (s.deeper && s.deeper.length) {
+    const items = s.deeper.map(d => `<li>${d}</li>`).join('');
+    html += `<div class="section deeper"><div class="header"><h3>Deeper (if asked)</h3></div><ul class="step-list">${items}</ul></div>`;
+  }
+  if (s.prompt) html += `<div class="section prompt-section"><div class="header"><h3>Paste in chat</h3></div><div class="prompt-box">${s.prompt}</div></div>`;
+
+  pane.innerHTML = html;
+
+  // Update counters and previews
+  document.getElementById('slideCounter').textContent = `${String(s.num).padStart(2,'0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  const np = (i) => slides[i] || null;
+  const now = np(current), nx = np(current + 1), nx2 = np(current + 2);
+  if (now) { document.getElementById('nowNum').textContent = `Slide ${now.num}`; document.getElementById('nowTitle').textContent = now.title; document.getElementById('nowWhen').textContent = now.when || '—'; }
+  if (nx)  { document.getElementById('nextNum').textContent = `Slide ${nx.num}`;  document.getElementById('nextTitle').textContent = nx.title;  document.getElementById('nextWhen').textContent = nx.when || '—'; }
+  else     { document.getElementById('nextNum').textContent = '—'; document.getElementById('nextTitle').textContent = '—'; document.getElementById('nextWhen').textContent = '—'; }
+  if (nx2) { document.getElementById('next2Num').textContent = `Slide ${nx2.num}`; document.getElementById('next2Title').textContent = nx2.title; document.getElementById('next2When').textContent = nx2.when || '—'; }
+  else     { document.getElementById('next2Num').textContent = '—'; document.getElementById('next2Title').textContent = '—'; document.getElementById('next2When').textContent = '—'; }
+}
+
+/* ===================== REAL CLOCK ===================== */
+function updateRealClock() {
+  const now = new Date();
+  document.getElementById('realClock').textContent =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+/* ===================== CLASS TIMER ===================== */
+let classStart = null, classPaused = true, classInterval = null;
+function startClass() {
+  if (classPaused) {
+    if (!classStart) classStart = Date.now();
+    else classStart = Date.now() - (classStart > 0 ? Date.now() - classStart : 0);
+    classPaused = false;
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+    classInterval = setInterval(tickClass, 1000);
+  } else {
+    classPaused = true;
+    clearInterval(classInterval);
+    document.getElementById('startBtn').textContent = '▶ Resume';
+  }
+}
+function resetClass() {
+  classPaused = true; clearInterval(classInterval); classStart = null;
+  document.getElementById('classClock').textContent = '0:00 / 2:00';
+  document.getElementById('paceLabel').textContent = '—';
+  document.getElementById('paceLabel').className = 'big';
+  document.getElementById('startBtn').textContent = '▶ Start Class';
+}
+function tickClass() {
+  if (!classStart) return;
+  const elapsed = Math.floor((Date.now() - classStart) / 1000);
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  document.getElementById('classClock').textContent =
+    `${m}:${String(s).padStart(2,'0')} / 2:00`;
+  const target = slides[current].when ? parseWhen(slides[current].when) : null;
+  if (target !== null) {
+    const diff = elapsed - target;
+    const label = document.getElementById('paceLabel');
+    if (diff > 180) { label.textContent = `+${Math.floor(diff/60)}m late`; label.className = 'big danger'; }
+    else if (diff > 60) { label.textContent = `+${diff}s`; label.className = 'big warn'; }
+    else { label.textContent = 'on time'; label.className = 'big ok'; }
+  }
+}
+function parseWhen(w) {
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return null;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+
+/* ===================== EXERCISE TIMER ===================== */
+let exInterval = null, exRemaining = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exRemaining = secs;
+  function tick() {
+    const m = Math.floor(exRemaining / 60), s = exRemaining % 60;
+    document.getElementById('exTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const b = document.getElementById('timerBlock');
+    b.classList.toggle('warn', exRemaining <= 120 && exRemaining > 30);
+    b.classList.toggle('danger', exRemaining <= 30);
+    exRemaining--;
+    if (exRemaining < 0) { stopExTimer(); document.getElementById('exTimer').textContent = '00:00'; }
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+/* ===================== KEYBOARD ===================== */
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') startClass();
+  if (e.key === 'b' || e.key === 'B') goSlide(BREAK_SLIDE_INDEX);
+  if (e.key === '5') startExTimer(300);
+  if (e.key === '8') startExTimer(480);
+  if (e.key === '1') startExTimer(780);  // 13m
+  if (e.key === '2') startExTimer(1020); // 17m
+  if (e.key === 'p' || e.key === 'P') printLearnerDeck();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+
+/* ===================== LEARNER DECK CONTROL ===================== */
+let learnerWin = null;
+function openLearnerDeck() {
+  const url = 'learner_deck.html';
+  if (!learnerWin || learnerWin.closed) {
+    learnerWin = window.open(url, 'genai_s5_learner');
+  } else {
+    learnerWin.focus();
+  }
+}
+
+// Override goSlide to also push to learner deck via localStorage
+const _goSlide = goSlide;
+window.goSlide = function(i) {
+  _goSlide(i);
+  try { localStorage.setItem(MASTER_KEY, String(current)); } catch(e) {}
+};
+
+function printLearnerDeck() {
+  if (!learnerWin || learnerWin.closed) {
+    learnerWin = window.open('learner_deck.html', 'genai_s5_learner');
+    setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch(e) {} }, 1500);
+  } else {
+    try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch(e) {}
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+// Init
+goSlide(0);
+</script>
+</body>
+</html>

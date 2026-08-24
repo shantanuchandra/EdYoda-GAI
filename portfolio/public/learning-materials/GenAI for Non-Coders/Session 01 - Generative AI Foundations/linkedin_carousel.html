@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Carousel — GenAI for Non-Coders · Session 1 Recap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --warn:         #a16207;
+    --danger:       #991b1b;
+    --calm:         #14532d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #2a2724;
+    font-family: 'Geist', sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px;
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .square {
+    width: 1080px;
+    height: 1080px;
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .square::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  .square::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(26, 24, 20, 0.10) 100%);
+  }
+
+  .square-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 80px 90px;
+  }
+
+  .running-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-mute);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .running-head .left { display: flex; gap: 24px; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  .folio {
+    position: absolute;
+    bottom: 30px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 140px;
+    line-height: 0.8;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    z-index: 0;
+    opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em;
+    vertical-align: top;
+    margin-left: 0.15em;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  .swipe {
+    position: absolute;
+    bottom: 38px;
+    left: 80px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terra);
+    z-index: 5;
+    font-weight: 500;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: 36px;
+    position: relative;
+    padding-left: 2em;
+  }
+  .eyebrow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1.5em;
+    height: 1px;
+    background: var(--terra);
+  }
+
+  h1, .display, .mega {
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    font-weight: 300;
+  }
+
+  h1 {
+    font-size: 78px;
+    line-height: 1.02;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+  }
+
+  .display {
+    font-size: 104px;
+    line-height: 0.98;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+  }
+
+  .mega {
+    font-size: 132px;
+    line-height: 0.92;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  em.terra-em { font-style: italic; color: var(--terra); }
+  em.blue-em { font-style: italic; color: var(--ink-blue); }
+  em.danger-em { font-style: italic; color: var(--danger); }
+  em.calm-em { font-style: italic; color: var(--calm); }
+
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 22ch;
+    font-variation-settings: 'opsz' 60;
+  }
+
+  .drop {
+    float: left;
+    font-family: 'Fraunces', serif;
+    font-size: 5.6em;
+    line-height: 0.82;
+    font-weight: 400;
+    color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  .rule-double { height: 6px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: 32px 0; }
+
+  /* ===================== SLIDE 1: COVER ===================== */
+  .cover-slide .body {
+    justify-content: flex-end;
+    padding-bottom: 0;
+  }
+  .cover-byline {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .cover-question {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--ink-mute);
+    margin-bottom: 32px;
+    font-style: italic;
+    font-variation-settings: 'opsz' 30;
+  }
+  .cover-footer {
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+
+  /* ===================== SLIDE 2: BEFORE/AFTER ===================== */
+  .ba-grid {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 0;
+    margin-top: 48px;
+    align-items: stretch;
+  }
+  .ba-col .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .ba-col.after .label { color: var(--terra); }
+  .ba-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .ba-divider .arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    color: var(--terra);
+    line-height: 1;
+    transform: translateY(-10px);
+  }
+  .ba-divider .vline {
+    width: 1px;
+    flex: 1;
+    background: linear-gradient(180deg, transparent 0%, var(--rule) 20%, var(--rule) 80%, transparent 100%);
+  }
+  .ba-col ul { list-style: none; }
+  .ba-col li {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--ink-mute);
+    line-height: 1.45;
+    padding: 18px 0;
+    border-bottom: 1px dotted var(--rule);
+    font-style: italic;
+    font-variation-settings: 'opsz' 36;
+  }
+  .ba-col li:last-child { border-bottom: none; }
+  .ba-col.after li {
+    color: var(--ink);
+    font-style: normal;
+    font-weight: 400;
+  }
+  .ba-col.after li strong {
+    color: var(--terra);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===================== SLIDE 3: TOPICS WITH ICONS ===================== */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 36px 28px;
+    margin-top: 48px;
+  }
+  .topic-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 18px;
+    border-top: 1px solid var(--ink);
+  }
+  .topic-cell .topic-icon {
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 4px;
+  }
+  .topic-cell .topic-icon svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .topic-cell .topic-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--terra);
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .topic-cell .topic-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+    font-variation-settings: 'opsz' 60;
+  }
+
+  /* ===================== SLIDE 4: ONE DEEP DEMO (BAKERY) ===================== */
+  .bakery-prompt {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+    padding: 18px 24px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-top: 24px;
+    position: relative;
+    font-variation-settings: 'opsz' 36;
+  }
+  .bakery-prompt::before {
+    content: 'THE PROMPT I GAVE CHATGPT';
+    position: absolute;
+    top: -0.6em;
+    left: 18px;
+    background: var(--paper);
+    padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+    font-weight: 500;
+    font-style: normal;
+  }
+  .scorecard {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 56px 56px 1fr 180px;
+    border-top: 1px solid var(--ink);
+    width: 100%;
+  }
+  .scorecard .row {
+    display: contents;
+  }
+  .scorecard .row > * {
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    min-width: 0;
+  }
+  .scorecard .row > *:first-child { padding-left: 0; justify-content: center; }
+  .scorecard .row > *:last-child { padding-right: 0; }
+  .scorecard .row .mark {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    line-height: 1;
+  }
+  .scorecard .row .mark.ok { color: var(--calm); }
+  .scorecard .row .mark.fail { color: var(--danger); }
+  .scorecard .row .num {
+    color: var(--ink-mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .scorecard .row .task {
+    color: var(--ink);
+    font-size: 17px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-variation-settings: 'opsz' 36;
+  }
+  .scorecard .row .reason {
+    color: var(--ink-mute);
+    font-size: 13px;
+    justify-content: flex-end;
+    text-align: right;
+  }
+  .score-tally {
+    margin-top: 20px;
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    align-items: baseline;
+  }
+  .score-tally .stat {
+    text-align: center;
+  }
+  .score-tally .num {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+  }
+  .score-tally .num.fail { color: var(--danger); }
+  .score-tally .num.ok { color: var(--calm); }
+  .score-tally .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .score-tally .divider {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    color: var(--ink-faint);
+    align-self: center;
+  }
+
+  /* ===================== SLIDE 5: FAILED DEMO (GOOD) ===================== */
+  .twist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 32px;
+  }
+  .twist .col {
+    border-top: 2px solid var(--ink);
+    padding-top: 24px;
+  }
+  .twist .col.warm { border-top-color: var(--terra); }
+  .twist .col .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  .twist .col.warm .label { color: var(--terra); }
+  .twist .col h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  .twist .col p {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-variation-settings: 'opsz' 30;
+  }
+  .twist-stamp {
+    margin-top: 40px;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--ink);
+    font-style: italic;
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 80;
+  }
+  .twist-stamp em { color: var(--terra); }
+
+  /* ===================== SLIDE 6: BRAIN-IN-A-JAR ===================== */
+  .brain-scene {
+    margin: 32px auto 0;
+    width: 720px;
+    height: 540px;
+    position: relative;
+  }
+  .brain-scene svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .brain-caption {
+    text-align: center;
+    margin-top: 32px;
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.35;
+    font-variation-settings: 'opsz' 60;
+  }
+  .brain-caption strong {
+    font-style: normal;
+    color: var(--terra);
+    font-weight: 400;
+  }
+
+  /* ===================== SLIDE 7: NUMERICAL TAKEAWAYS ===================== */
+  .num-takeaways {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px 56px;
+    margin-top: 48px;
+  }
+  .num-takeaway {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 24px;
+    align-items: baseline;
+    padding-top: 16px;
+    border-top: 1px solid var(--ink);
+  }
+  .num-takeaway .big {
+    font-family: 'Fraunces', serif;
+    font-size: 100px;
+    line-height: 0.9;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144;
+  }
+  .num-takeaway .big .unit {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-left: 2px;
+    font-variation-settings: 'opsz' 36;
+  }
+  .num-takeaway .copy h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .num-takeaway .copy p {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    font-variation-settings: 'opsz' 24;
+  }
+
+  /* ===================== SLIDE 8: BUILD THE AGENT (VISUAL) ===================== */
+  .agent-scene {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    align-items: center;
+    gap: 0;
+  }
+  .agent-scene .agent-col {
+    text-align: center;
+  }
+  .agent-scene .agent-col .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .agent-scene .agent-col.next .label { color: var(--terra); }
+  .agent-scene .agent-col .visual {
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .agent-scene .agent-col .name {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    margin-top: 22px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .agent-scene .agent-col.next .name { color: var(--terra); font-style: italic; }
+  .agent-scene .agent-col .desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin-top: 8px;
+    font-variation-settings: 'opsz' 24;
+  }
+  .agent-arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    color: var(--terra);
+    text-align: center;
+    line-height: 1;
+  }
+  .agent-foot {
+    margin-top: 48px;
+    padding-top: 22px;
+    border-top: 1px solid var(--ink);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .agent-foot .item {
+    text-align: center;
+    padding: 0 16px;
+    border-right: 1px dotted var(--rule);
+  }
+  .agent-foot .item:last-child { border-right: none; }
+  .agent-foot .item .roman {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    color: var(--terra);
+    font-variant-numeric: oldstyle-nums;
+    margin-bottom: 6px;
+  }
+  .agent-foot .item .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .agent-foot .item .v {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  /* ===================== SLIDE 9: CLOSING SIGN-OFF — REBUILT ===================== */
+  .closing .body {
+    justify-content: space-between !important;
+    padding: 40px 0 0 !important;
+  }
+
+  /* Top stamp */
+  .closing-stamp {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: 28px;
+  }
+
+  /* Hero ask — the primary CTA */
+  .ask-primary {
+    margin-bottom: 32px;
+  }
+  .ask-primary .ask-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 64px;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+    max-width: 16ch;
+  }
+  .ask-primary .ask-headline em {
+    font-style: italic;
+    color: var(--terra);
+  }
+
+  .ask-primary .ask-action {
+    margin-top: 28px;
+    display: inline-block;
+    padding: 14px 28px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Geist Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .ask-primary .ask-action span.kw {
+    color: var(--terra);
+    font-weight: 600;
+  }
+
+  .ask-primary .ask-help {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-mute);
+    margin-top: 18px;
+    font-variation-settings: 'opsz' 30;
+  }
+
+  /* Secondary aside — the gentle question */
+  .ask-secondary {
+    padding: 24px 0;
+    border-top: 1px dotted var(--rule);
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+  .ask-secondary .a-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--terra);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+    flex-shrink: 0;
+  }
+  .ask-secondary .a-text {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+  }
+  .ask-secondary .a-text em {
+    font-style: italic;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  /* Signature — now the focal close */
+  .sig-block {
+    padding-top: 32px;
+    border-top: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+    padding-bottom: 6px;
+  }
+  .sig-block .sig-name {
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'opsz' 80;
+  }
+  .sig-block .sig-role {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-mute);
+    margin-top: 12px;
+    font-variation-settings: 'opsz' 24;
+    max-width: 32ch;
+    line-height: 1.4;
+  }
+  .sig-block .sig-li {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .sig-block .sig-li .li-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .sig-block .sig-li .li-url {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .sig-block .sig-li .li-url .handle {
+    color: var(--terra);
+  }
+  .sig-block .sig-li .li-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+
+  /* ===================== TOOLBAR / PRINT ===================== */
+  @media print {
+    @page {
+      size: 11.25in 11.25in;  /* 1080px @ 96dpi = exactly 11.25 inches */
+      margin: 0;
+    }
+    html, body {
+      background: white !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 11.25in;
+    }
+    .stage {
+      gap: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+    }
+    .square {
+      width: 11.25in !important;
+      height: 11.25in !important;
+      box-shadow: none !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .square:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    .toolbar { display: none !important; }
+    /* Print-color-adjust forces backgrounds to render */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    /* Strip the grain texture in print — it bloats file size by ~100MB.
+       The warm paper color alone holds the editorial feel. */
+    .square::before {
+      background-image: none !important;
+      opacity: 0 !important;
+    }
+    /* Keep the soft vignette */
+    .square::after {
+      opacity: 1 !important;
+    }
+  }
+
+  .toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(245, 239, 230, 0.96);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 10px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .toolbar button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background 200ms ease;
+  }
+  .toolbar button:hover { background: var(--terra); }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>9 slides · 1080 × 1080</span>
+  <button onclick="window.print()">⤓ Export PDF</button>
+</div>
+
+<div class="stage">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER (redesigned with hero illustration) -->
+  <!-- ====================================================== -->
+  <div class="square cover-slide">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 01</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+
+      <!-- Hero illustration — large, central, evocative -->
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 0;">
+        <svg viewBox="0 0 600 460" width="600" height="460" style="overflow: visible;">
+          <defs>
+            <filter id="softshadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+              <feOffset dx="0" dy="4"/>
+              <feComponentTransfer><feFuncA type="linear" slope="0.15"/></feComponentTransfer>
+              <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Title curve label at top of arc — softer contrast (lets AGENT · TOMORROW lead) -->
+          <path id="arc" d="M 50 240 A 250 250 0 0 1 550 240" fill="none"/>
+          <text font-family="Geist Mono, monospace" font-size="24" letter-spacing="8" fill="#a8a092" font-weight="500">
+            <textPath href="#arc" startOffset="50%" text-anchor="middle">CHATBOT  ·  TODAY</textPath>
+          </text>
+
+          <!-- ============ LEFT SIDE: Brain in a jar (current state) ============ -->
+          <g transform="translate(150, 230)" filter="url(#softshadow)">
+            <!-- Jar lid -->
+            <rect x="-55" y="-105" width="110" height="16" rx="2" fill="#f5efe6" stroke="#1a1814" stroke-width="2.5"/>
+            <line x1="-48" y1="-97" x2="48" y2="-97" stroke="#1a1814" stroke-width="0.8" opacity="0.4"/>
+            <!-- Jar body -->
+            <path d="M -55 -89 L -55 75 Q -55 92, -38 92 L 38 92 Q 55 92, 55 75 L 55 -89"
+                  fill="rgba(184, 67, 27, 0.05)" stroke="#1a1814" stroke-width="2.5"/>
+            <!-- Glass highlight -->
+            <line x1="-45" y1="-75" x2="-45" y2="65" stroke="#1a1814" stroke-width="0.8" opacity="0.2"/>
+            <!-- Liquid line -->
+            <line x1="-52" y1="-50" x2="52" y2="-50" stroke="#1a1814" stroke-width="0.8" opacity="0.3" stroke-dasharray="3,3"/>
+            <!-- Brain inside -->
+            <g transform="translate(0, 10)">
+              <path d="M -38 -8
+                       Q -46 -20, -34 -28
+                       Q -34 -42, -18 -42
+                       Q -10 -50, 0 -46
+                       Q 10 -50, 18 -42
+                       Q 34 -42, 34 -28
+                       Q 46 -20, 38 -8
+                       Q 46 4, 38 14
+                       Q 46 22, 34 26
+                       Q 34 38, 18 38
+                       Q 10 46, 0 42
+                       Q -10 46, -18 38
+                       Q -34 38, -34 26
+                       Q -46 22, -38 14
+                       Q -46 4, -38 -8 Z"
+                    fill="rgba(184, 67, 27, 0.18)" stroke="#b8431b" stroke-width="2"/>
+              <line x1="0" y1="-44" x2="0" y2="42" stroke="#b8431b" stroke-width="1.5"/>
+              <path d="M -26 -18 Q -16 -12, -8 -18" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M 8 -18 Q 16 -12, 26 -18" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M -28 4 Q -18 10, -8 4" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M 8 4 Q 18 10, 28 4" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M -24 22 Q -14 28, -8 22" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M 8 22 Q 14 28, 24 22" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+            </g>
+            <!-- Disconnected floating limbs as small icons OUTSIDE the jar -->
+            <g opacity="0.55">
+              <!-- Eyes (top-left float) -->
+              <g transform="translate(-90, -60)">
+                <ellipse cx="0" cy="0" rx="10" ry="6" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+                <circle cx="0" cy="0" r="2.5" fill="#1a1814"/>
+              </g>
+              <!-- Ears (top-right float) -->
+              <g transform="translate(90, -60)">
+                <path d="M -8 -5 Q -12 -2, -10 4 Q -6 8, 0 6 Q 4 4, 2 -2 Q 0 -8, -8 -5 Z"
+                      fill="none" stroke="#1a1814" stroke-width="1.5"/>
+              </g>
+              <!-- Hand (bottom-left float) -->
+              <g transform="translate(-95, 50)">
+                <path d="M -6 4 L -6 -4 Q -6 -8, -3 -8 L -3 -2 L -1 -2 L -1 -10 Q -1 -13, 2 -13 L 2 -2 L 4 -2 L 4 -11 Q 4 -14, 7 -14 L 7 -2 Q 7 6, 0 6 Q -6 6, -6 4 Z"
+                      fill="none" stroke="#1a1814" stroke-width="1.5"/>
+              </g>
+              <!-- Calendar (bottom-right float) -->
+              <g transform="translate(95, 50)">
+                <rect x="-7" y="-6" width="14" height="12" rx="1" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+                <line x1="-7" y1="-2" x2="7" y2="-2" stroke="#1a1814" stroke-width="1"/>
+                <circle cx="0" cy="3" r="1" fill="#b8431b"/>
+              </g>
+            </g>
+            <!-- Disconnection marks (small Xs) -->
+            <g stroke="#991b1b" stroke-width="1.5" opacity="0.7">
+              <g transform="translate(-65, -45)"><line x1="-3" y1="-3" x2="3" y2="3"/><line x1="-3" y1="3" x2="3" y2="-3"/></g>
+              <g transform="translate(65, -45)"><line x1="-3" y1="-3" x2="3" y2="3"/><line x1="-3" y1="3" x2="3" y2="-3"/></g>
+              <g transform="translate(-65, 50)"><line x1="-3" y1="-3" x2="3" y2="3"/><line x1="-3" y1="3" x2="3" y2="-3"/></g>
+              <g transform="translate(65, 50)"><line x1="-3" y1="-3" x2="3" y2="3"/><line x1="-3" y1="3" x2="3" y2="-3"/></g>
+            </g>
+          </g>
+
+          <!-- ============ ARROW + LABEL ============ -->
+          <g transform="translate(300, 230)">
+            <text x="0" y="-12" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="4" fill="#b8431b" font-weight="600">SESSION 02</text>
+            <path d="M -38 8 L 38 8" stroke="#b8431b" stroke-width="2"/>
+            <path d="M 30 -2 L 40 8 L 30 18" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="0" y="28" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="14" fill="#8a8478">becomes</text>
+          </g>
+
+          <!-- ============ RIGHT SIDE: Connected agent (future state) ============ -->
+          <g transform="translate(450, 230)" filter="url(#softshadow)">
+            <!-- Connecting lines (solid, terra) -->
+            <line x1="0" y1="0" x2="-75" y2="-75" stroke="#b8431b" stroke-width="2"/>
+            <line x1="0" y1="0" x2="75" y2="-75" stroke="#b8431b" stroke-width="2"/>
+            <line x1="0" y1="0" x2="-75" y2="75" stroke="#b8431b" stroke-width="2"/>
+            <line x1="0" y1="0" x2="75" y2="75" stroke="#b8431b" stroke-width="2"/>
+
+            <!-- Central brain (no jar) -->
+            <g>
+              <circle r="50" fill="rgba(184, 67, 27, 0.06)" stroke="#1a1814" stroke-width="2"/>
+              <g>
+                <path d="M -28 -6
+                         Q -34 -16, -25 -22
+                         Q -25 -32, -14 -32
+                         Q -8 -38, 0 -34
+                         Q 8 -38, 14 -32
+                         Q 25 -32, 25 -22
+                         Q 34 -16, 28 -6
+                         Q 34 4, 28 12
+                         Q 34 18, 25 22
+                         Q 25 30, 14 30
+                         Q 8 36, 0 32
+                         Q -8 36, -14 30
+                         Q -25 30, -25 22
+                         Q -34 18, -28 12
+                         Q -34 4, -28 -6 Z"
+                      fill="rgba(184, 67, 27, 0.25)" stroke="#b8431b" stroke-width="1.8"/>
+                <line x1="0" y1="-34" x2="0" y2="32" stroke="#b8431b" stroke-width="1.3"/>
+              </g>
+            </g>
+
+            <!-- Connected limbs (full opacity, on cream circles) -->
+            <!-- Eyes top-left -->
+            <g transform="translate(-75, -75)">
+              <circle r="22" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+              <ellipse cx="-6" cy="0" rx="7" ry="5" fill="none" stroke="#1a1814" stroke-width="1.4"/>
+              <ellipse cx="6" cy="0" rx="7" ry="5" fill="none" stroke="#1a1814" stroke-width="1.4"/>
+              <circle cx="-6" cy="0" r="2" fill="#1a1814"/>
+              <circle cx="6" cy="0" r="2" fill="#1a1814"/>
+            </g>
+            <!-- Ears top-right -->
+            <g transform="translate(75, -75)">
+              <circle r="22" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+              <path d="M -10 -10 Q -15 -5, -10 5 Q -3 10, 5 8 Q 10 3, 8 -5 Q 3 -12, -10 -10 Z"
+                    fill="none" stroke="#1a1814" stroke-width="1.6"/>
+              <path d="M -6 -2 Q -8 2, -4 6" fill="none" stroke="#1a1814" stroke-width="1"/>
+            </g>
+            <!-- Hand bottom-left -->
+            <g transform="translate(-75, 75)">
+              <circle r="22" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+              <path d="M -10 8 L -10 -5 Q -10 -10, -5 -10 L -5 -2 L -2 -2 L -2 -12 Q -2 -16, 2 -16 L 2 -2 L 5 -2 L 5 -13 Q 5 -17, 10 -17 L 10 -3 Q 10 10, 0 10 Q -10 10, -10 8 Z"
+                    fill="none" stroke="#1a1814" stroke-width="1.6"/>
+            </g>
+            <!-- Calendar bottom-right -->
+            <g transform="translate(75, 75)">
+              <circle r="22" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+              <rect x="-10" y="-8" width="20" height="17" rx="1.5" fill="none" stroke="#1a1814" stroke-width="1.6"/>
+              <line x1="-10" y1="-2" x2="10" y2="-2" stroke="#1a1814" stroke-width="1.2"/>
+              <line x1="-6" y1="-12" x2="-6" y2="-6" stroke="#1a1814" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="6" y1="-12" x2="6" y2="-6" stroke="#1a1814" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="-5" cy="3" r="1.3" fill="#1a1814"/>
+              <circle cx="0" cy="3" r="1.3" fill="#b8431b"/>
+              <circle cx="5" cy="3" r="1.3" fill="#1a1814"/>
+            </g>
+          </g>
+
+          <!-- Bottom arc label — LARGER -->
+          <path id="arc2" d="M 50 220 A 250 250 0 0 0 550 220" fill="none"/>
+          <text font-family="Geist Mono, monospace" font-size="24" letter-spacing="8" fill="#b8431b" font-weight="600">
+            <textPath href="#arc2" startOffset="50%" text-anchor="middle">AGENT  ·  TOMORROW</textPath>
+          </text>
+        </svg>
+      </div>
+
+      <!-- Headline + meta below illustration -->
+      <div style="flex-shrink: 0;">
+        <h1 style="font-size: 56px; line-height: 1.05; max-width: 18ch;">
+          The 2-hour class that turned <em class="terra-em">non-coders</em> into AI <em class="terra-em">operators</em>.
+        </h1>
+        <div style="margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; font-family: 'Geist Mono', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-mute);">
+          <span>By Shantanu Chandra</span>
+          <span style="color: var(--terra);">9 slides · Swipe →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — BEFORE / AFTER (reframed) -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Session 01</span><span class="dot">·</span><span>The Shift</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">In 120 minutes</span>
+        <h1>The shift from <em class="terra-em">user</em> to <em class="terra-em">operator</em>.</h1>
+        <div class="ba-grid">
+          <div class="ba-col">
+            <div class="label">— What they walked in as —</div>
+            <ul>
+              <li>"I've used ChatGPT a few times."</li>
+              <li>"All these models look the same."</li>
+              <li>"I don't really know when to trust it."</li>
+              <li>"It's impressive but kind of scary."</li>
+            </ul>
+          </div>
+          <div class="ba-divider">
+            <div class="vline"></div>
+            <div class="arrow">→</div>
+            <div class="vline"></div>
+          </div>
+          <div class="ba-col after">
+            <div class="label">— What they walked out as —</div>
+            <ul>
+              <li>Fluent in <strong>3 different models</strong>, side by side</li>
+              <li>A mental model of <strong>how LLMs work</strong> — in plain English</li>
+              <li>A framework for the <strong>4 limits</strong> of AI</li>
+              <li><strong>1 prompt</strong> they'll use at work tomorrow</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="swipe">02 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">2<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — TOPICS WITH SVG ICONS -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Session 01</span><span class="dot">·</span><span>The Curriculum</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">6 topics · 120 minutes</span>
+        <h1>What we <em class="terra-em">covered</em>.</h1>
+        <div class="topic-grid">
+
+          <!-- 01: Chef hat (recipe → chef) -->
+          <div class="topic-cell">
+            <div class="topic-icon">
+              <svg viewBox="0 0 88 88" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Chef's hat -->
+                <path d="M22 50 C 14 50, 10 42, 14 34 C 8 30, 12 18, 22 20 C 24 12, 36 10, 42 18 C 48 8, 64 10, 64 22 C 76 20, 80 32, 74 38 C 78 46, 70 52, 64 50 Z"/>
+                <!-- Hat band -->
+                <line x1="22" y1="50" x2="64" y2="50"/>
+                <line x1="22" y1="56" x2="64" y2="56"/>
+                <!-- Steam wisps -->
+                <path d="M30 28 C 28 24, 32 22, 30 18" opacity="0.5"/>
+                <path d="M44 24 C 42 20, 46 18, 44 14" opacity="0.5"/>
+              </svg>
+            </div>
+            <span class="topic-num">— 01 —</span>
+            <span class="topic-name">Evolution<br>of AI</span>
+          </div>
+
+          <!-- 02: Family tree -->
+          <div class="topic-cell">
+            <div class="topic-icon">
+              <svg viewBox="0 0 88 88" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Root circle -->
+                <circle cx="44" cy="20" r="6"/>
+                <!-- Branch lines -->
+                <line x1="44" y1="26" x2="44" y2="38"/>
+                <line x1="16" y1="42" x2="72" y2="42"/>
+                <line x1="16" y1="42" x2="16" y2="52"/>
+                <line x1="32" y1="42" x2="32" y2="52"/>
+                <line x1="44" y1="42" x2="44" y2="52"/>
+                <line x1="56" y1="42" x2="56" y2="52"/>
+                <line x1="72" y1="42" x2="72" y2="52"/>
+                <!-- Leaf circles -->
+                <circle cx="16" cy="60" r="6"/>
+                <circle cx="32" cy="60" r="6"/>
+                <circle cx="44" cy="60" r="6"/>
+                <circle cx="56" cy="60" r="6"/>
+                <circle cx="72" cy="60" r="6"/>
+              </svg>
+            </div>
+            <span class="topic-num">— 02 —</span>
+            <span class="topic-name">The model<br>landscape</span>
+          </div>
+
+          <!-- 03: LEGO bricks -->
+          <div class="topic-cell">
+            <div class="topic-icon">
+              <svg viewBox="0 0 88 88" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Top brick -->
+                <rect x="18" y="18" width="36" height="20"/>
+                <circle cx="26" cy="14" r="3"/>
+                <circle cx="36" cy="14" r="3"/>
+                <circle cx="46" cy="14" r="3"/>
+                <line x1="22" y1="18" x2="22" y2="14"/>
+                <line x1="30" y1="18" x2="30" y2="14"/>
+                <line x1="42" y1="18" x2="42" y2="14"/>
+                <line x1="50" y1="18" x2="50" y2="14"/>
+                <!-- Bottom brick -->
+                <rect x="32" y="46" width="42" height="22"/>
+                <circle cx="40" cy="42" r="3"/>
+                <circle cx="52" cy="42" r="3"/>
+                <circle cx="64" cy="42" r="3"/>
+              </svg>
+            </div>
+            <span class="topic-num">— 03 —</span>
+            <span class="topic-name">How LLMs<br>work</span>
+          </div>
+
+          <!-- 04: 4-layer stack -->
+          <div class="topic-cell">
+            <div class="topic-icon">
+              <svg viewBox="0 0 88 88" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="14" y="14" width="60" height="12"/>
+                <rect x="14" y="30" width="60" height="12"/>
+                <rect x="14" y="46" width="60" height="12"/>
+                <rect x="14" y="62" width="60" height="12"/>
+              </svg>
+            </div>
+            <span class="topic-num">— 04 —</span>
+            <span class="topic-name">The<br>value chain</span>
+          </div>
+
+          <!-- 05: Warning / cracked surface -->
+          <div class="topic-cell">
+            <div class="topic-icon">
+              <svg viewBox="0 0 88 88" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Triangle -->
+                <path d="M44 14 L 76 70 L 12 70 Z"/>
+                <!-- Exclamation -->
+                <line x1="44" y1="34" x2="44" y2="54"/>
+                <circle cx="44" cy="62" r="1.5" fill="#b8431b"/>
+              </svg>
+            </div>
+            <span class="topic-num">— 05 —</span>
+            <span class="topic-name">Where it<br>breaks</span>
+          </div>
+
+          <!-- 06: Brain in jar (sneak peek to slide 6) -->
+          <div class="topic-cell">
+            <div class="topic-icon">
+              <svg viewBox="0 0 88 88" fill="none" stroke="#b8431b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Jar -->
+                <path d="M22 24 L 22 70 Q 22 76, 28 76 L 60 76 Q 66 76, 66 70 L 66 24"/>
+                <!-- Jar lid -->
+                <rect x="18" y="18" width="52" height="8" rx="2"/>
+                <!-- Brain inside -->
+                <path d="M34 44 Q 30 38, 36 36 Q 36 32, 44 32 Q 52 32, 52 36 Q 58 38, 54 44 Q 58 50, 52 54 Q 52 58, 44 58 Q 36 58, 36 54 Q 30 50, 34 44 Z" stroke-width="1.5"/>
+                <line x1="44" y1="32" x2="44" y2="58" stroke-width="1" opacity="0.5"/>
+              </svg>
+            </div>
+            <span class="topic-num">— 06 —</span>
+            <span class="topic-name">The chatbot<br>ceiling</span>
+          </div>
+
+        </div>
+      </div>
+      <div class="swipe">03 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">3<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — ONE DEEP DEMO (THE BAKERY TEST) -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Live Demo</span><span class="dot">·</span><span>The Bakery Test</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">1 prompt · 6 sub-tasks</span>
+        <h1>How many can a chatbot <em class="terra-em">actually do?</em></h1>
+
+        <div class="bakery-prompt">"I run a small bakery in Mumbai. Help me launch a new product line."</div>
+
+        <div class="scorecard">
+          <div class="row">
+            <div class="num">01</div>
+            <div><span class="mark fail">✕</span></div>
+            <div class="task">Research what's trending this month</div>
+            <div class="reason">no live web on free tier</div>
+          </div>
+          <div class="row">
+            <div class="num">02</div>
+            <div><span class="mark ok">✓</span></div>
+            <div class="task">Draft 3 Instagram posts</div>
+            <div class="reason">works</div>
+          </div>
+          <div class="row">
+            <div class="num">03</div>
+            <div><span class="mark fail">✕</span></div>
+            <div class="task">Generate 3 images</div>
+            <div class="reason">tier limits</div>
+          </div>
+          <div class="row">
+            <div class="num">04</div>
+            <div><span class="mark fail">✕</span></div>
+            <div class="task">Schedule across next week</div>
+            <div class="reason">no scheduler</div>
+          </div>
+          <div class="row">
+            <div class="num">05</div>
+            <div><span class="mark fail">✕</span></div>
+            <div class="task">Email the partner</div>
+            <div class="reason">no email access</div>
+          </div>
+          <div class="row">
+            <div class="num">06</div>
+            <div><span class="mark fail">✕</span></div>
+            <div class="task">Set a 30-day reminder</div>
+            <div class="reason">no calendar</div>
+          </div>
+        </div>
+
+        <div class="score-tally">
+          <div class="stat"><div class="num ok">1</div><div class="label">Completed</div></div>
+          <div class="divider">/</div>
+          <div class="stat"><div class="num fail">5</div><div class="label">Failed</div></div>
+        </div>
+      </div>
+      <div class="swipe">04 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">4<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — THE FAILED DEMO IS A GOOD THING -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Plot Twist</span><span class="dot">·</span><span>The Demo That Refused</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">A failed demo is a curriculum update</span>
+        <h1>My most rehearsed demo —<br><em class="terra-em">broke.</em> And that's the win.</h1>
+        <div class="twist">
+          <div class="col">
+            <div class="label">— What I planned —</div>
+            <h4>Ask ChatGPT about a fake 2019 Indian Supreme Court case to demo hallucination.</h4>
+            <p>I've used this exact prompt for 2 years. It always invented a confident, fully-cited fake judgment. Every time.</p>
+          </div>
+          <div class="col warm">
+            <div class="label">— What actually happened —</div>
+            <h4>All 3 models searched the web in real time and refused.</h4>
+            <p>ChatGPT, Claude, Gemini — every one of them said: "This case does not exist." The hallucination demo refused to hallucinate.</p>
+          </div>
+        </div>
+        <div class="rule-double" style="margin-top: 40px;"></div>
+        <p class="twist-stamp">A failed demo is the best curriculum update. <em>The field outran my deck.</em></p>
+      </div>
+      <div class="swipe">05 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">5<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 06 — BRAIN IN A JAR — CUSTOM SVG -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Mental Model</span><span class="dot">·</span><span>Chatbot vs Agent</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">The line that stuck</span>
+        <h1 style="font-size: 64px;">A chatbot is a <em class="terra-em">brain in a jar.</em></h1>
+
+        <div class="brain-scene">
+          <svg viewBox="0 0 720 540" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Dashed line style for "disconnected" -->
+              <pattern id="dashpath" patternUnits="userSpaceOnUse" width="6" height="1">
+                <line x1="0" y1="0" x2="3" y2="0" stroke="#b8431b" stroke-width="1"/>
+              </pattern>
+            </defs>
+
+            <!-- ============ THE JAR (center) ============ -->
+            <!-- Jar lid -->
+            <rect x="280" y="170" width="160" height="22" rx="3" fill="none" stroke="#1a1814" stroke-width="2.5" stroke-linejoin="round"/>
+            <line x1="290" y1="180" x2="430" y2="180" stroke="#1a1814" stroke-width="1" opacity="0.4"/>
+
+            <!-- Jar body -->
+            <path d="M 290 192 L 290 388 Q 290 410, 312 410 L 408 410 Q 430 410, 430 388 L 430 192"
+                  fill="rgba(184, 67, 27, 0.05)" stroke="#1a1814" stroke-width="2.5" stroke-linejoin="round"/>
+
+            <!-- Glass highlight (vertical line for shine) -->
+            <line x1="306" y1="210" x2="306" y2="380" stroke="#1a1814" stroke-width="1" opacity="0.2"/>
+
+            <!-- Liquid line inside jar -->
+            <line x1="294" y1="240" x2="426" y2="240" stroke="#1a1814" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+
+            <!-- Brain inside jar -->
+            <g transform="translate(360, 310)">
+              <!-- Brain lobes -->
+              <path d="M -50 -10
+                       Q -60 -25, -45 -38
+                       Q -45 -55, -25 -55
+                       Q -15 -65, 0 -60
+                       Q 15 -65, 25 -55
+                       Q 45 -55, 45 -38
+                       Q 60 -25, 50 -10
+                       Q 60 5, 50 18
+                       Q 60 28, 45 35
+                       Q 45 50, 25 50
+                       Q 15 60, 0 55
+                       Q -15 60, -25 50
+                       Q -45 50, -45 35
+                       Q -60 28, -50 18
+                       Q -60 5, -50 -10 Z"
+                    fill="rgba(184, 67, 27, 0.12)" stroke="#b8431b" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Brain midline -->
+              <line x1="0" y1="-58" x2="0" y2="55" stroke="#b8431b" stroke-width="1.5"/>
+              <!-- Brain folds (suggestion) -->
+              <path d="M -32 -25 Q -20 -18, -10 -25" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M 10 -25 Q 20 -18, 32 -25" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M -38 5 Q -25 12, -12 5" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M 12 5 Q 25 12, 38 5" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M -32 30 Q -20 38, -10 30" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+              <path d="M 10 30 Q 20 38, 32 30" fill="none" stroke="#b8431b" stroke-width="1" opacity="0.6"/>
+            </g>
+
+            <!-- "BRAIN" label inside jar bottom -->
+            <text x="360" y="395" text-anchor="middle"
+                  font-family="Geist Mono, monospace" font-size="10" fill="#8a8478" letter-spacing="2">BRAIN</text>
+
+            <!-- ============ DISCONNECTED LIMBS (around the jar) ============ -->
+
+            <!-- TOP LEFT: EYES (sight / web browsing) -->
+            <g transform="translate(120, 110)">
+              <!-- Eye 1 -->
+              <ellipse cx="0" cy="0" rx="22" ry="13" fill="none" stroke="#1a1814" stroke-width="2"/>
+              <circle cx="0" cy="0" r="6" fill="#1a1814"/>
+              <circle cx="2" cy="-2" r="1.5" fill="#f5efe6"/>
+              <!-- Eye 2 -->
+              <ellipse cx="40" cy="0" rx="22" ry="13" fill="none" stroke="#1a1814" stroke-width="2"/>
+              <circle cx="40" cy="0" r="6" fill="#1a1814"/>
+              <circle cx="42" cy="-2" r="1.5" fill="#f5efe6"/>
+              <!-- Label -->
+              <text x="20" y="-32" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#1a1814" letter-spacing="2.5" font-weight="500">EYES</text>
+              <text x="20" y="38" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#8a8478">to see the web</text>
+            </g>
+            <!-- Dashed connector from eyes to jar -->
+            <path d="M 175 130 Q 230 170, 285 220" fill="none" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.55"/>
+
+            <!-- TOP RIGHT: EARS (memory / listening) -->
+            <g transform="translate(560, 110)">
+              <!-- Ear shape -->
+              <path d="M -20 -16
+                       Q -32 -16, -32 -2
+                       Q -32 14, -22 22
+                       Q -16 28, -12 22
+                       Q -8 18, -8 8
+                       Q -4 14, 2 12
+                       Q 8 10, 8 2
+                       Q 8 -6, 0 -10
+                       Q 4 -16, -4 -18
+                       Q -12 -22, -20 -16 Z"
+                    fill="none" stroke="#1a1814" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Inner curl -->
+              <path d="M -16 0 Q -18 6, -12 10 Q -6 12, -4 6" fill="none" stroke="#1a1814" stroke-width="1.2"/>
+              <!-- Label -->
+              <text x="-10" y="-32" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#1a1814" letter-spacing="2.5" font-weight="500">EARS</text>
+              <text x="-10" y="44" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#8a8478">to remember you</text>
+            </g>
+            <!-- Dashed connector from ears to jar -->
+            <path d="M 540 130 Q 490 170, 440 220" fill="none" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.55"/>
+
+            <!-- BOTTOM LEFT: HAND (action / doing) -->
+            <g transform="translate(120, 400)">
+              <!-- Palm -->
+              <path d="M -20 0
+                       L -20 -30
+                       Q -20 -38, -12 -38
+                       L -12 -10
+                       L -8 -10
+                       L -8 -42
+                       Q -8 -50, 0 -50
+                       L 0 -10
+                       L 4 -10
+                       L 4 -40
+                       Q 4 -48, 12 -48
+                       L 12 -10
+                       L 16 -10
+                       L 16 -32
+                       Q 16 -40, 24 -40
+                       L 24 -4
+                       Q 24 14, 6 14
+                       L -8 14
+                       Q -20 14, -20 0 Z"
+                    fill="none" stroke="#1a1814" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Label -->
+              <text x="2" y="-66" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#1a1814" letter-spacing="2.5" font-weight="500">HANDS</text>
+              <text x="2" y="36" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#8a8478">to send & schedule</text>
+            </g>
+            <!-- Dashed connector from hand to jar -->
+            <path d="M 175 380 Q 230 380, 285 380" fill="none" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.55"/>
+
+            <!-- BOTTOM RIGHT: CALENDAR (time / scheduling) -->
+            <g transform="translate(560, 400)">
+              <!-- Calendar body -->
+              <rect x="-22" y="-22" width="44" height="40" rx="2" fill="none" stroke="#1a1814" stroke-width="2"/>
+              <line x1="-22" y1="-12" x2="22" y2="-12" stroke="#1a1814" stroke-width="1.5"/>
+              <!-- Top rings -->
+              <line x1="-14" y1="-26" x2="-14" y2="-18" stroke="#1a1814" stroke-width="2" stroke-linecap="round"/>
+              <line x1="14" y1="-26" x2="14" y2="-18" stroke="#1a1814" stroke-width="2" stroke-linecap="round"/>
+              <!-- Grid -->
+              <circle cx="-10" cy="-4" r="1.5" fill="#1a1814"/>
+              <circle cx="0" cy="-4" r="1.5" fill="#1a1814"/>
+              <circle cx="10" cy="-4" r="1.5" fill="#1a1814"/>
+              <circle cx="-10" cy="6" r="1.5" fill="#1a1814"/>
+              <circle cx="0" cy="6" r="1.5" fill="#b8431b"/>
+              <circle cx="10" cy="6" r="1.5" fill="#1a1814"/>
+              <!-- Label -->
+              <text x="0" y="-40" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#1a1814" letter-spacing="2.5" font-weight="500">CALENDAR</text>
+              <text x="0" y="44" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#8a8478">to know "tomorrow"</text>
+            </g>
+            <!-- Dashed connector from calendar to jar -->
+            <path d="M 540 380 Q 490 380, 440 380" fill="none" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.55"/>
+
+          </svg>
+        </div>
+
+        <p class="brain-caption">Disconnect the limbs and the brain can still think.<br>It just can't <strong>do</strong>. That's a <strong>chatbot</strong>. Connect them — that's an <strong>agent</strong>.</p>
+      </div>
+      <div class="swipe">06 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">6<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 07 — NUMERICAL TAKEAWAYS -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Session 01</span><span class="dot">·</span><span>Takeaways</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">By the numbers</span>
+        <h1>What I'm taking away — from <em class="terra-em">teaching</em>, not teaching about.</h1>
+        <div class="num-takeaways">
+          <div class="num-takeaway">
+            <div class="big">60<span class="unit">%</span></div>
+            <div class="copy">
+              <h4>Hands-on is the floor.</h4>
+              <p>Anything less and you're delivering a webinar, not a class.</p>
+            </div>
+          </div>
+          <div class="num-takeaway">
+            <div class="big">0<span class="unit">slides</span></div>
+            <div class="copy">
+              <h4>Open with a demo.</h4>
+              <p>Not a definition. Not a self-intro. A demo earns the next 110 minutes.</p>
+            </div>
+          </div>
+          <div class="num-takeaway">
+            <div class="big">3<span class="unit">tabs</span></div>
+            <div class="copy">
+              <h4>Compare 3 models live.</h4>
+              <p>Builds intuition faster than any 30-minute lecture on model differences.</p>
+            </div>
+          </div>
+          <div class="num-takeaway">
+            <div class="big">1<span class="unit">demo</span></div>
+            <div class="copy">
+              <h4>Plan for it to break.</h4>
+              <p>The failure usually teaches more than the script.</p>
+            </div>
+          </div>
+          <div class="num-takeaway" style="grid-column: 1 / -1; max-width: 700px;">
+            <div class="big">1<span class="unit">prompt</span></div>
+            <div class="copy">
+              <h4>End with the prompt they'll use tomorrow.</h4>
+              <p>Nothing else compounds. If they don't leave with a tool, they leave with a feeling — and feelings fade by Friday.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swipe">07 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">7<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 08 — BUILD THE AGENT (VISUAL) -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Coming Next</span><span class="dot">·</span><span>Session 02</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">From 1 / 6 to 6 / 6</span>
+        <h1>Next session — we <em class="terra-em">build the agent.</em></h1>
+
+        <div class="agent-scene">
+          <!-- LEFT: Brain in jar (small) -->
+          <div class="agent-col">
+            <div class="label">— Session 01 · Chatbot —</div>
+            <div class="visual">
+              <svg viewBox="0 0 200 240" width="200" height="240">
+                <!-- Jar lid -->
+                <rect x="55" y="50" width="90" height="14" rx="2" fill="none" stroke="#1a1814" stroke-width="2"/>
+                <!-- Jar -->
+                <path d="M 60 64 L 60 196 Q 60 212, 76 212 L 124 212 Q 140 212, 140 196 L 140 64"
+                      fill="rgba(184, 67, 27, 0.05)" stroke="#1a1814" stroke-width="2"/>
+                <!-- Brain -->
+                <g transform="translate(100, 140)">
+                  <path d="M -28 -6
+                           Q -34 -16, -25 -22
+                           Q -25 -32, -14 -32
+                           Q -8 -38, 0 -34
+                           Q 8 -38, 14 -32
+                           Q 25 -32, 25 -22
+                           Q 34 -16, 28 -6
+                           Q 34 4, 28 12
+                           Q 34 18, 25 22
+                           Q 25 30, 14 30
+                           Q 8 36, 0 32
+                           Q -8 36, -14 30
+                           Q -25 30, -25 22
+                           Q -34 18, -28 12
+                           Q -34 4, -28 -6 Z"
+                        fill="rgba(184, 67, 27, 0.15)" stroke="#b8431b" stroke-width="1.5"/>
+                  <line x1="0" y1="-34" x2="0" y2="32" stroke="#b8431b" stroke-width="1"/>
+                </g>
+                <!-- "1 of 6" label -->
+                <text x="100" y="232" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#991b1b" letter-spacing="2" font-weight="500">1 / 6 TASKS</text>
+              </svg>
+            </div>
+            <div class="name">Chatbot</div>
+            <div class="desc">Brain — no limbs.</div>
+          </div>
+
+          <!-- ARROW -->
+          <div class="agent-arrow">→</div>
+
+          <!-- RIGHT: Connected agent -->
+          <div class="agent-col next">
+            <div class="label">— Session 02 · Agent —</div>
+            <div class="visual">
+              <svg viewBox="0 0 240 240" width="240" height="240">
+                <!-- Connecting lines first (so they sit behind) -->
+                <line x1="120" y1="120" x2="40" y2="50" stroke="#b8431b" stroke-width="1.5"/>
+                <line x1="120" y1="120" x2="200" y2="50" stroke="#b8431b" stroke-width="1.5"/>
+                <line x1="120" y1="120" x2="40" y2="190" stroke="#b8431b" stroke-width="1.5"/>
+                <line x1="120" y1="120" x2="200" y2="190" stroke="#b8431b" stroke-width="1.5"/>
+
+                <!-- Brain at center -->
+                <g transform="translate(120, 120)">
+                  <circle r="42" fill="rgba(184, 67, 27, 0.08)" stroke="#1a1814" stroke-width="2"/>
+                  <path d="M -22 -4
+                           Q -28 -12, -20 -18
+                           Q -20 -26, -11 -26
+                           Q -6 -30, 0 -28
+                           Q 6 -30, 11 -26
+                           Q 20 -26, 20 -18
+                           Q 28 -12, 22 -4
+                           Q 28 4, 22 10
+                           Q 28 16, 20 19
+                           Q 20 25, 11 25
+                           Q 6 30, 0 27
+                           Q -6 30, -11 25
+                           Q -20 25, -20 19
+                           Q -28 16, -22 10
+                           Q -28 4, -22 -4 Z"
+                        fill="rgba(184, 67, 27, 0.2)" stroke="#b8431b" stroke-width="1.5"/>
+                </g>
+
+                <!-- Eyes (top-left) -->
+                <g transform="translate(40, 50)">
+                  <circle r="18" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+                  <ellipse cx="-4" cy="0" rx="6" ry="4" fill="none" stroke="#1a1814" stroke-width="1.2"/>
+                  <ellipse cx="6" cy="0" rx="6" ry="4" fill="none" stroke="#1a1814" stroke-width="1.2"/>
+                  <circle cx="-4" cy="0" r="1.5" fill="#1a1814"/>
+                  <circle cx="6" cy="0" r="1.5" fill="#1a1814"/>
+                </g>
+
+                <!-- Ears (top-right) -->
+                <g transform="translate(200, 50)">
+                  <circle r="18" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+                  <path d="M -8 -8 Q -12 -4, -8 4 Q -2 8, 4 6 Q 8 2, 6 -4 Q 2 -10, -8 -8 Z" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+                </g>
+
+                <!-- Hand (bottom-left) -->
+                <g transform="translate(40, 190)">
+                  <circle r="18" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+                  <path d="M -8 6 L -8 -4 Q -8 -8, -4 -8 L -4 0 L -2 0 L -2 -8 Q -2 -12, 2 -12 L 2 0 L 4 0 L 4 -10 Q 4 -14, 8 -14 L 8 -2 Q 8 8, 0 8 Q -8 8, -8 6 Z" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+                </g>
+
+                <!-- Calendar (bottom-right) -->
+                <g transform="translate(200, 190)">
+                  <circle r="18" fill="#f5efe6" stroke="#1a1814" stroke-width="2"/>
+                  <rect x="-8" y="-6" width="16" height="14" rx="1" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+                  <line x1="-8" y1="-2" x2="8" y2="-2" stroke="#1a1814" stroke-width="1"/>
+                  <circle cx="-4" cy="3" r="1" fill="#1a1814"/>
+                  <circle cx="0" cy="3" r="1" fill="#b8431b"/>
+                  <circle cx="4" cy="3" r="1" fill="#1a1814"/>
+                </g>
+
+                <!-- "6 of 6" label -->
+                <text x="120" y="232" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#14532d" letter-spacing="2" font-weight="500">6 / 6 TASKS</text>
+              </svg>
+            </div>
+            <div class="name">Agent</div>
+            <div class="desc">Brain + hands + eyes + ears + calendar.</div>
+          </div>
+        </div>
+
+        <div class="agent-foot">
+          <div class="item">
+            <div class="roman">i</div>
+            <div class="label">— Configure —</div>
+            <div class="v">System prompt, plain English.</div>
+          </div>
+          <div class="item">
+            <div class="roman">ii</div>
+            <div class="label">— Connect —</div>
+            <div class="v">Web · email · calendar · files.</div>
+          </div>
+          <div class="item">
+            <div class="roman">iii</div>
+            <div class="label">— Run —</div>
+            <div class="v">6 steps. Live. No code.</div>
+          </div>
+        </div>
+      </div>
+      <div class="swipe">08 / 09 · Swipe →</div>
+    </div>
+    <div class="folio">8<sup>/9</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 09 — CLOSING / SIGN-OFF — REBUILT -->
+  <!-- ====================================================== -->
+  <div class="square closing">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>End Notes</span><span class="dot">·</span><span>No. 09</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+
+      <div class="body">
+
+        <!-- PRIMARY ASK — the offer, with a clear action button -->
+        <div>
+          <div class="closing-stamp">— If this was useful —</div>
+          <div class="ask-primary">
+            <h1 class="ask-headline">Want the full <em>workbook?</em></h1>
+            <div class="ask-action">Comment <span class="kw">"workbook"</span> below</div>
+            <p class="ask-help">I'll DM you the prompts, exercises, and take-home template — free.</p>
+          </div>
+
+          <!-- SECONDARY ASK — the gentle question -->
+          <div class="ask-secondary">
+            <span class="a-mark">&</span>
+            <span class="a-text">What's the <em>one thing</em> about AI you'd most want to learn? I'm building Session 02 around what people actually struggle with.</span>
+          </div>
+        </div>
+
+        <!-- SIGNATURE — the focal close -->
+        <div class="sig-block">
+          <div>
+            <div class="sig-name">Shantanu Chandra</div>
+            <div class="sig-role">Teaching AI fluency to professionals who don't write code.</div>
+          </div>
+          <div class="sig-li">
+            <div class="li-label">— Connect —</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="li-icon">in</div>
+              <div class="li-url">linkedin.com/in/<span class="handle">chandrashantanu</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

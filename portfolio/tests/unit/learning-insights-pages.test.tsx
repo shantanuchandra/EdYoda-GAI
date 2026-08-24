@@ -27,6 +27,20 @@ const learningPaths = [
     audience: "Operators and non-technical professionals",
     outcome: "Identify a valuable workflow, prototype safely, and evaluate output quality",
     modules: ["Opportunity framing", "Prompt-to-workflow design", "Grounding and verification", "Human-review checkpoints"],
+    curriculum: [
+      "Generative AI Foundations",
+      "From Chatbot to Agent",
+      "Prompt & Context Engineering",
+      "RAG — Giving Agents Your Data",
+      "Agent Architecture",
+      "Workflow Automation with n8n",
+      "n8n Part 2 — Deploy & Automate",
+      "AI Evals · Elective",
+    ],
+    materialCount: 27,
+    firstMaterial: "/learning-materials/GenAI%20for%20Non-Coders/Session%2001%20-%20Generative%20AI%20Foundations/learner_deck.html",
+    lastMaterial: "/learning-materials/GenAI%20for%20Non-Coders/AI%20Evals%20-%20Elective/linkedin_carousel.html",
+    demo: "/learning-materials/lumiere-app/index.html",
   },
   {
     slug: "ai-product-transformation",
@@ -34,6 +48,20 @@ const learningPaths = [
     audience: "Product leaders and transformation teams",
     outcome: "Turn an AI opportunity into an adopted, measurable operating change",
     modules: ["Portfolio prioritization", "System and data design", "Evals and governance", "Adoption and measurement"],
+    curriculum: [
+      "Program Resources",
+      "AI Product Judgment for Senior PMs",
+      "AI Strategy, Moats & Business Case",
+      "GenAI System Design for PMs",
+      "Agentic Product Design",
+      "Evals as the New PRD",
+      "Working with AI / ML Engineering Teams",
+      "Production Readiness — Cost, Latency & Launch",
+      "Executive Narrative, Portfolio & AI PM Interview",
+    ],
+    materialCount: 18,
+    firstMaterial: "/learning-materials/AI-PM/Production%20AI%20PM%20Program/index.html",
+    lastMaterial: "/learning-materials/AI-PM/Production%20AI%20PM%20Program/Week%2008%20-%20Executive%20Narrative%20Portfolio%20and%20AI%20PM%20Interview%20Readiness/W08_Presenter_Deck.html",
   },
   {
     slug: "practical-agents-founders",
@@ -41,6 +69,10 @@ const learningPaths = [
     audience: "Founders and operators",
     outcome: "Decide when an agent is justified and design one with explicit tools, controls, and fallbacks",
     modules: ["Agent-vs-prompt test", "Tools and state", "Approval boundaries", "Production readiness"],
+    curriculum: ["Pre-Read & Preparation", "Workshop — Decks & Live Sessions", "Ops & Reference Materials"],
+    materialCount: 6,
+    firstMaterial: "/learning-materials/Founder's%20Guide%20to%20Agents/session/00_Pre_Read.html",
+    lastMaterial: "/learning-materials/Founder's%20Guide%20to%20Agents/session/morning_report.html",
   },
 ] as const;
 
@@ -82,6 +114,19 @@ it("renders each Learning Lab detail as a public overview with the exact audienc
     const modules = launchModulesHeading.nextElementSibling;
     expect(modules?.tagName).toBe("UL");
     expect(within(modules as HTMLElement).getAllByRole("listitem").map((item) => item.textContent)).toEqual(path.modules);
+
+    const curriculum = screen.getByRole("region", { name: `${path.title} curriculum` });
+    expect(within(curriculum).getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toEqual(
+      path.curriculum,
+    );
+    const materialLinks = Array.from(curriculum.querySelectorAll<HTMLAnchorElement>(".learning-curriculum__materials a"));
+    expect(materialLinks).toHaveLength(path.materialCount);
+    expect(materialLinks[0]).toHaveAttribute("href", path.firstMaterial);
+    expect(materialLinks.at(-1)).toHaveAttribute("href", path.lastMaterial);
+    expect(new Set(materialLinks.map((link) => link.getAttribute("href"))).size).toBe(path.materialCount);
+    if ("demo" in path) {
+      expect(screen.getByRole("link", { name: "Open Lumiere Bakery demo" })).toHaveAttribute("href", path.demo);
+    }
     const navigation = screen.getByRole("navigation", { name: "Learning path navigation" });
     expect(within(navigation).getByRole("link", { name: /all learning paths/i })).toHaveAttribute("href", "/learning");
     const nextPath = learningPaths[(index + 1) % learningPaths.length];

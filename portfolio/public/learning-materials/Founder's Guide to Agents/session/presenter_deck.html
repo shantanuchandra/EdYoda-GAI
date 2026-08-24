@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenter · Founder's Guide to Agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07090f;
+    --bg-1: #0d111a;
+    --bg-2: #131826;
+
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.06);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text: #f4f6fb;
+    --text-soft: #c9d0de;
+    --text-muted: #8993a6;
+    --text-dim: #5a6377;
+
+    --accent: #5eead4;
+    --accent-soft: rgba(94, 234, 212, 0.14);
+    --accent-line: rgba(94, 234, 212, 0.35);
+    --warm: #fbbf24;
+    --warm-soft: rgba(251, 191, 36, 0.12);
+    --hot: #fb7185;
+    --hot-soft: rgba(251, 113, 133, 0.12);
+    --green: #4ade80;
+    --green-soft: rgba(74, 222, 128, 0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+
+    --s-1: 8px;  --s-2: 16px;  --s-3: 24px;  --s-4: 32px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-fast: 180ms;
+    --dur-med: 280ms;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .topbar {
+    height: 64px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s-3);
+    gap: var(--s-3);
+    flex-shrink: 0;
+  }
+  .topbar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .topbar .title .accent { color: var(--accent); }
+  .clock-divider { width: 1px; height: 32px; background: var(--border); }
+  .clock-box { display: flex; flex-direction: column; line-height: 1.15; gap: 2px; }
+  .clock-box .label {
+    color: var(--text-dim); font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.14em; font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  }
+  .clock-box .big {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .clock-box.real .big { color: var(--text); }
+  .clock-box.planned .big { color: var(--text-soft); }
+  .clock-box.delta .big.ok { color: var(--green); }
+  .clock-box.delta .big.warn { color: var(--warm); }
+  .clock-box.delta .big.danger { color: var(--hot); }
+  .topbar .grow { flex: 1; }
+  .topbar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .topbar button:hover { background: var(--surface-hover); border-color: var(--border-strong); color: var(--text); }
+  .topbar button.primary { background: var(--accent); color: #062420; border-color: var(--accent); font-weight: 600; }
+  .topbar button.primary:hover { background: #7df1de; }
+  .topbar .slide-counter {
+    color: var(--text-muted); font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    padding-left: var(--s-2); border-left: 1px solid var(--border);
+  }
+
+  .main { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 64px - 56px); }
+  .panel-left { overflow-y: auto; padding: var(--s-3) var(--s-4); border-right: 1px solid var(--border); }
+  .panel-right { overflow-y: auto; background: var(--bg-1); padding: var(--s-3); }
+  .panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 8px; }
+  .panel-left::-webkit-scrollbar-track, .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .panel-left::-webkit-scrollbar-thumb:hover, .panel-right::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  .bottombar {
+    height: 56px; background: var(--bg-1); border-top: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 var(--s-3); gap: var(--s-2); flex-shrink: 0;
+  }
+  .bottombar button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.83rem; font-family: inherit; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .bottombar button:hover { background: var(--surface-hover); color: var(--text); }
+  .bottombar .progress {
+    flex: 1; height: 4px; background: var(--surface); border-radius: 2px;
+    overflow: hidden; margin: 0 var(--s-2); border: 1px solid var(--border);
+  }
+  .bottombar .progress-fill {
+    height: 100%; background: var(--accent);
+    transition: width var(--dur-med) var(--ease-out);
+    box-shadow: 0 0 8px var(--accent-line);
+  }
+
+  .timing-bar {
+    display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3);
+    padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border);
+  }
+  .timing-bar .time-pill {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--accent-line);
+  }
+  .timing-bar .duration { color: var(--text-muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+  .timing-bar .block-title {
+    font-weight: 500; flex: 1; font-size: 0.88rem; color: var(--text-soft);
+    text-align: right; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .slide-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--s-2);
+  }
+  .slide-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  .slide-tag.break::before { background: var(--green); }
+  .slide-tag.break { color: var(--green); border-color: var(--green-soft); }
+  .slide-tag.demo::before { background: var(--warm); }
+  .slide-tag.demo { color: var(--warm); border-color: var(--warm-soft); }
+  .slide-tag.exercise::before { background: var(--purple); }
+  .slide-tag.exercise { color: var(--purple); border-color: var(--purple-soft); }
+  .slide-tag.title::before { background: var(--accent); }
+  .slide-tag.title { color: var(--accent); border-color: var(--accent-line); }
+
+  .slide-pane h1 {
+    font-size: 1.7rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: var(--s-3); letter-spacing: -0.02em; color: var(--text);
+  }
+
+  .section {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 18px; margin-bottom: 12px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .section:hover { border-color: var(--border-strong); }
+  .section .header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .section h3 {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .section.say { border-left: 3px solid var(--warm); }
+  .section.say h3 { color: var(--warm); }
+  .section.do { border-left: 3px solid var(--green); }
+  .section.do h3 { color: var(--green); }
+  .section.watch { border-left: 3px solid var(--hot); }
+  .section.watch h3 { color: var(--hot); }
+  .section.note { border-left: 3px solid var(--purple); }
+  .section.note h3 { color: var(--purple); }
+  .section.prompt-section { border-left: 3px solid var(--accent); }
+  .section.prompt-section h3 { color: var(--accent); }
+  .section.deeper { border-left: 3px solid #60a5fa; }
+  .section.deeper h3 { color: #60a5fa; }
+  .section.bridge { border-left: 3px solid #f472b6; }
+  .section.bridge h3 { color: #f472b6; }
+  .section.bridge .quote { border-left-color: #f472b6; }
+  .section.deeper .quote { border-left-color: #60a5fa; }
+
+  .quote {
+    color: var(--text); font-size: 1rem; line-height: 1.6;
+    padding-left: 12px; border-left: 2px solid var(--warm); margin: 0; font-weight: 400;
+  }
+  .section p { font-size: 0.94rem; line-height: 1.6; color: var(--text-soft); margin-bottom: 6px; }
+  .section p:last-child { margin-bottom: 0; }
+
+  .step-list { counter-reset: step; list-style: none; padding-left: 0; margin: 0; }
+  .step-list > li {
+    counter-increment: step; padding-left: 36px; position: relative;
+    padding-bottom: 10px; font-size: 0.94rem; line-height: 1.55; color: var(--text-soft);
+  }
+  .step-list > li:last-child { padding-bottom: 0; }
+  .step-list > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute; left: 0; top: 2px; width: 26px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    font-weight: 600; color: var(--accent); letter-spacing: 0.04em;
+  }
+
+  .prompt-box {
+    background: #060810; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem; color: var(--accent); white-space: pre-wrap;
+    line-height: 1.6; margin-top: 4px;
+  }
+
+  .right-section { margin-bottom: var(--s-3); }
+  .right-section h4 {
+    font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .preview-card {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-card.next {
+    border-color: var(--accent-line);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-2));
+  }
+  .preview-card .num {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    font-weight: 600; font-family: 'JetBrains Mono', monospace;
+  }
+  .preview-card.next .num { color: var(--accent); }
+  .preview-card .title { font-size: 0.92rem; font-weight: 500; margin: 4px 0 2px; color: var(--text); line-height: 1.35; }
+  .preview-card .when {
+    font-size: 0.74rem; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+  }
+
+  .timer-block {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 18px 16px; text-align: center;
+    transition: border-color var(--dur-med) var(--ease-out);
+  }
+  .timer-block.warn { border-color: var(--warm); background: linear-gradient(180deg, var(--warm-soft), var(--bg-2)); }
+  .timer-block.danger { border-color: var(--hot); background: linear-gradient(180deg, var(--hot-soft), var(--bg-2)); }
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    line-height: 1; letter-spacing: -0.02em;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .timer-block.warn .timer-display { color: var(--warm); }
+  .timer-block.danger .timer-display { color: var(--hot); }
+  .timer-label {
+    font-size: 0.66rem; color: var(--text-dim); letter-spacing: 0.14em;
+    text-transform: uppercase; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .timer-controls { display: flex; gap: 4px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
+  .timer-controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-soft);
+    padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .timer-controls button:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+
+  .quick-key { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+  .quick-key kbd {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text-soft); font-weight: 500;
+    min-width: 22px; text-align: center; box-shadow: 0 1px 0 var(--border);
+  }
+
+  /* ── SVG MOTION GRAPHICS ── */
+  @keyframes p-drawLine {
+    from { stroke-dashoffset: var(--dl, 200); }
+    to   { stroke-dashoffset: 0; }
+  }
+  @keyframes p-popIn {
+    0%   { opacity: 0; transform: scale(0.86); }
+    60%  { transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes p-fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes p-pulse {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0.45; }
+  }
+  @keyframes p-dotFlow {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+
+  .p-svg-wrap {
+    margin: 14px 0 8px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 12px 12px;
+    overflow: visible;
+  }
+  .p-svg-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .p-anim-node { opacity: 0; animation: p-popIn 0.36s cubic-bezier(0.22,1,0.36,1) both; }
+  .p-anim-line { animation: p-drawLine 0.48s cubic-bezier(0.22,1,0.36,1) both; }
+  .p-anim-label { opacity: 0; animation: p-fadeUp 0.36s cubic-bezier(0.22,1,0.36,1) both; }
+  .p-anim-quad  { opacity: 0; animation: p-fadeUp 0.42s cubic-bezier(0.22,1,0.36,1) both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .p-anim-node, .p-anim-line, .p-anim-label, .p-anim-quad { opacity: 1; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="title">Presenter · <span class="accent">Founder's Guide to Agents</span></span>
+  <div class="clock-divider"></div>
+  <div class="clock-box real">
+    <span class="label">Real clock</span>
+    <span class="big" id="realClock">—</span>
+  </div>
+  <div class="clock-box planned">
+    <span class="label">Class time</span>
+    <span class="big" id="classClock">0:00 / 4:00</span>
+  </div>
+  <div class="clock-box delta">
+    <span class="label">Pace</span>
+    <span class="big ok" id="paceLabel">—</span>
+  </div>
+  <div class="grow"></div>
+  <button id="startBtn" class="primary" onclick="startClass()">▶ Start Class</button>
+  <button onclick="resetClass()">↺ Reset</button>
+  <button onclick="openLearnerDeck()">↗ Learner Deck</button>
+  <span class="slide-counter" id="slideCounter">01 / 16</span>
+</div>
+
+<div class="main">
+  <div class="panel-left slide-pane" id="slidePane"></div>
+
+  <div class="panel-right">
+    <div class="right-section">
+      <div class="timer-block" id="timerBlock">
+        <div class="timer-display" id="exTimer">00:00</div>
+        <div class="timer-label">Exercise timer</div>
+        <div class="timer-controls">
+          <button onclick="startExTimer(300)">5m</button>
+          <button onclick="startExTimer(600)">10m</button>
+          <button onclick="startExTimer(900)">15m</button>
+          <button onclick="startExTimer(1200)">20m</button>
+          <button onclick="startExTimer(2700)">45m</button>
+          <button onclick="stopExTimer()">■</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Now</h4>
+      <div class="preview-card" id="nowCard">
+        <div class="num" id="nowNum">—</div>
+        <div class="title" id="nowTitle">—</div>
+        <div class="when" id="nowWhen">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Coming up</h4>
+      <div class="preview-card next" id="nextCard">
+        <div class="num" id="nextNum">—</div>
+        <div class="title" id="nextTitle">—</div>
+        <div class="when" id="nextWhen">—</div>
+      </div>
+      <div class="preview-card" id="next2Card">
+        <div class="num" id="next2Num">—</div>
+        <div class="title" id="next2Title">—</div>
+        <div class="when" id="next2When">—</div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <h4>Keyboard</h4>
+      <div class="quick-key"><kbd>→</kbd> <kbd>␣</kbd> next slide</div>
+      <div class="quick-key"><kbd>←</kbd> previous</div>
+      <div class="quick-key"><kbd>S</kbd> start / pause class</div>
+      <div class="quick-key"><kbd>5m</kbd> <kbd>10m</kbd> <kbd>15m</kbd> <kbd>20m</kbd> <kbd>45m</kbd> timer buttons (sidebar)</div>
+      <div class="quick-key"><kbd>B</kbd> jump to break</div>
+      <div class="quick-key"><kbd>P</kbd> export learner → PDF</div>
+      <div class="quick-key"><kbd>End</kbd> last slide</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <button onclick="goSlide(0)">⏮ First</button>
+  <button onclick="goSlide(slides.length - 1)">⏭ Last</button>
+</div>
+
+<script>
+const slides = [
+  {
+    num: 1, when: "09:55 – 10:00", duration: "5 min", tag: "title",
+    title: "Cover — Pre-Session",
+    ask: "Is everyone's Hermes running and the learner deck open?",
+    say: "Get settled. Learner deck should be open on your screen — the paper-toned one. Have your GitHub repo URL ready and your Hermes bot awake. We start at 10:00 sharp.",
+    doSteps: [
+      "Put the learner deck on the projector — slide 1, the cover.",
+      "Start the pre-class countdown on the learner deck cover (click Start).",
+      "Scan the room: anyone who hasn't confirmed Hermes is alive, help them now.",
+      "Start the class clock at 10:00 when the round-robin begins."
+    ],
+    watch: "If more than 2 founders still have Hermes problems at 10:00, delay the round-robin by 5 min and use that time to unblock them — do not start the mental model until setup failures are cleared.",
+    bridge: "At 10:00 exactly: start class clock, go straight into round-robin."
+  },
+  {
+    num: 2, when: "10:00 – 10:10", duration: "10 min", tag: "title",
+    title: "Round-Robin Opener",
+    ask: "Who's got the most painful ops task in the room right now — let's find out.",
+    say: "Go around the room — 30 seconds each. Your one-line pitch, and the one ops task that's eating your week right now. Not your product roadmap — the annoying, repetitive thing that isn't your product but won't leave you alone.",
+    doSteps: [
+      "Go around all 10 founders. Keep it moving.",
+      "If someone runs long, gently cut in: 'Love it — hold that thought, we're coming back to it.'",
+      "Mentally note which domains come up (sales, hiring, IR, marketing, product, finance) — you'll call back to this in the Generalize block."
+    ],
+    watch: "This primes the room and gives you real material to reference later. Don't let any one founder dominate past 45 seconds.",
+    bridge: "Straight into the mental model — the framework for everything today."
+  },
+  {
+    num: 2, sync: "model", when: "10:10 – 10:20", duration: "10 min", tag: "demo",
+    title: "The Mental Model — 2×2",
+    // svgHtml is static hardcoded markup — no user/external data injected, innerHTML is safe here
+    svgHtml: `<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="pm-arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 Z" fill="#5eead4" opacity="0.6"/>
+    </marker>
+  </defs>
+  <!-- axes -->
+  <line class="p-anim-line" x1="240" y1="20" x2="240" y2="260" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="240" style="--dl:240;animation-delay:.05s" opacity="0.45"/>
+  <line class="p-anim-line" x1="20"  y1="140" x2="460" y2="140" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="440" style="--dl:440;animation-delay:.15s" opacity="0.45"/>
+  <!-- axis labels -->
+  <text class="p-anim-label" x="240" y="13" text-anchor="middle" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">HIGH JUDGMENT</text>
+  <text class="p-anim-label" x="240" y="272" text-anchor="middle" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">LOW JUDGMENT</text>
+  <text class="p-anim-label" x="14" y="143" text-anchor="start" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">RARE</text>
+  <text class="p-anim-label" x="446" y="143" text-anchor="end" font-size="9" fill="#8993a6" font-family="JetBrains Mono,monospace" letter-spacing="0.08em" style="animation-delay:.3s">DAILY</text>
+  <!-- Q1 top-left: high-judgment rare → hire/consult -->
+  <rect class="p-anim-quad" x="28" y="28" width="200" height="104" rx="8" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.2)" stroke-width="1" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="128" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#fbbf24" font-family="Inter,sans-serif" style="animation-delay:.52s">Hire / Consult</text>
+  <text class="p-anim-quad" x="128" y="90" text-anchor="middle" font-size="9.5" fill="#8993a6" font-family="Inter,sans-serif" style="animation-delay:.58s">High judgment, one-off decisions</text>
+  <!-- Q2 top-right: high-judgment daily → augment -->
+  <rect class="p-anim-quad" x="252" y="28" width="200" height="104" rx="8" fill="rgba(167,139,250,0.07)" stroke="rgba(167,139,250,0.22)" stroke-width="1" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="352" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#a78bfa" font-family="Inter,sans-serif" style="animation-delay:.52s">Augment</text>
+  <text class="p-anim-quad" x="352" y="90" text-anchor="middle" font-size="9.5" fill="#8993a6" font-family="Inter,sans-serif" style="animation-delay:.58s">Daily + judgment — AI assists you</text>
+  <!-- Q3 bottom-left: low-judgment rare → buy a tool -->
+  <rect class="p-anim-quad" x="28" y="148" width="200" height="104" rx="8" fill="rgba(148,163,184,0.05)" stroke="rgba(148,163,184,0.15)" stroke-width="1" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="128" y="192" text-anchor="middle" font-size="13" font-weight="600" fill="#94a3b8" font-family="Inter,sans-serif" style="animation-delay:.52s">Buy a Tool</text>
+  <text class="p-anim-quad" x="128" y="210" text-anchor="middle" font-size="9.5" fill="#8993a6" font-family="Inter,sans-serif" style="animation-delay:.58s">Low judgment, happens rarely</text>
+  <!-- Q4 bottom-right: low-judgment daily → BUILD AN AGENT (hero) -->
+  <rect class="p-anim-quad" x="252" y="148" width="200" height="104" rx="8" fill="rgba(94,234,212,0.09)" stroke="rgba(94,234,212,0.4)" stroke-width="1.5" style="animation-delay:.45s"/>
+  <text class="p-anim-quad" x="352" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" style="animation-delay:.52s">BUILD AN AGENT</text>
+  <text class="p-anim-quad" x="352" y="203" text-anchor="middle" font-size="9.5" fill="#5eead4" opacity="0.75" font-family="Inter,sans-serif" style="animation-delay:.58s">Daily + low judgment = automate it</text>
+  <text class="p-anim-quad" x="352" y="220" text-anchor="middle" font-size="9" fill="#5eead4" opacity="0.55" font-family="JetBrains Mono,monospace" style="animation-delay:.64s">← this is today's session</text>
+</svg>`,
+    ask: "Where does your chosen task sit today — and what evidence says it needs an agent rather than a tool or a human?",
+    say: "Here's the one framework I want you to leave with today — not just for what we build in this room, but for every future 'should I build an agent for this' decision you'll ever make.",
+    doSteps: [
+      "Draw the 2×2 live on whiteboard or point to the slide: Task Frequency (occasional ↔ daily) vs Judgment Required (low ↔ high).",
+      "Walk each quadrant: high-freq/low-judgment = build an agent. High-freq/high-judgment = augment, don't automate. Low-freq/high-judgment = hire/consult. Low-freq/low-judgment = buy a tool."
+    ],
+    deeper: "Honest caveat for if someone asks: tasks migrate. Something that needs your judgment the first 20 times can become mechanical by the 21st. Revisit this quadrant as your ops rhythm matures.",
+    note: "Analogy to memorize: 'Think of it like hiring your first employee. You wouldn't hire someone for a one-time decision — you'd hire them for the thing you do every single day that doesn't need you anymore.'",
+    bridge: "Now the harder question — how do you tell a real agent from a fancy prompt?"
+  },
+  {
+    num: 3, sync: "agent-test", when: "10:20 – 10:30", duration: "10 min", tag: "demo",
+    title: "Agent vs. Prompt: The Real Distinction",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="at-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#5eead4" opacity="0.7"/>
+    </marker>
+  </defs>
+  <!-- node 1: Live Data -->
+  <rect class="p-anim-node" x="8" y="22" width="118" height="56" rx="10" fill="rgba(94,234,212,0.08)" stroke="rgba(94,234,212,0.38)" stroke-width="1.5" style="animation-delay:.08s"/>
+  <text x="67" y="46" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.18s">Acts on Live Data</text>
+  <text x="67" y="62" text-anchor="middle" font-size="9" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.24s">pulls repo / web / inbox</text>
+  <!-- connector 1→2 -->
+  <line class="p-anim-line" x1="126" y1="50" x2="162" y2="50" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="36" style="--dl:36;animation-delay:.32s" opacity="0.55" marker-end="url(#at-arr)"/>
+  <!-- node 2: Real Action -->
+  <rect class="p-anim-node" x="164" y="22" width="118" height="56" rx="10" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.35)" stroke-width="1.5" style="animation-delay:.26s"/>
+  <text x="223" y="46" text-anchor="middle" font-size="11.5" font-weight="600" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.36s">Takes Real Action</text>
+  <text x="223" y="62" text-anchor="middle" font-size="9" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.42s">writes file · creates draft</text>
+  <!-- connector 2→3 -->
+  <line class="p-anim-line" x1="282" y1="50" x2="318" y2="50" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="36" style="--dl:36;animation-delay:.50s" opacity="0.55" marker-end="url(#at-arr)"/>
+  <!-- node 3: Trigger -->
+  <rect class="p-anim-node" x="320" y="22" width="150" height="56" rx="10" fill="rgba(167,139,250,0.08)" stroke="rgba(167,139,250,0.38)" stroke-width="1.5" style="animation-delay:.44s"/>
+  <text x="395" y="46" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a78bfa" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.54s">Runs on a Trigger</text>
+  <text x="395" y="62" text-anchor="middle" font-size="9" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.60s">schedule · webhook · event</text>
+  <!-- "all 3 = agent" label -->
+  <text x="240" y="92" text-anchor="middle" font-size="9" fill="#5eead4" opacity="0.6" font-family="JetBrains Mono,monospace" class="p-anim-label" letter-spacing="0.06em" style="animation-delay:.72s">MISSING ANY ONE → it's a prompt with a costume on</text>
+</svg>`,
+    ask: "Which of the three tests does your current AI workflow fail?",
+    say: "Quick gut check — raise your hand if you've ever asked ChatGPT or Claude to draft something and called it 'using AI.' That's not an agent. That's a smart prompt.",
+    doSteps: [
+      "State the 3-part test clearly, one at a time:",
+      "1. Acts on live data — pulls something itself (repo, web search, inbox), not just what you typed.",
+      "2. Takes real action in another system — sends the email, writes the file. Doesn't just hand you text.",
+      "3. Doesn't wait to be re-prompted — runs on a trigger: schedule, webhook, event."
+    ],
+    sayAfter: "If it's missing any of those three, it's a prompt with a costume on. Today we're building two real agents — both pass all three tests.",
+    bridge: "Time to make the promise concrete — here's what you're walking out with."
+  },
+  {
+    num: 4, sync: "roadmap", when: "10:30 – 10:35", duration: "5 min", tag: "title",
+    title: "The Promise + Roadmap",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 86" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="rd-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#5eead4" opacity="0.65"/>
+    </marker>
+  </defs>
+  <!-- Node A: Build Agent 1 -->
+  <rect class="p-anim-node" x="6" y="18" width="108" height="50" rx="8" fill="rgba(94,234,212,0.09)" stroke="rgba(94,234,212,0.45)" stroke-width="1.5" style="animation-delay:.06s"/>
+  <text x="60" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.16s">Build Agent 1</text>
+  <text x="60" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.22s">Repo Digest</text>
+  <!-- connector -->
+  <line class="p-anim-line" x1="114" y1="43" x2="140" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="26" style="--dl:26;animation-delay:.30s" opacity="0.5" marker-end="url(#rd-arr)"/>
+  <!-- BREAK node -->
+  <rect class="p-anim-node" x="142" y="18" width="90" height="50" rx="8" fill="rgba(74,222,128,0.07)" stroke="rgba(74,222,128,0.35)" stroke-width="1.5" stroke-dasharray="4 3" style="animation-delay:.22s"/>
+  <text x="187" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#4ade80" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.32s">BREAK</text>
+  <text x="187" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.38s">15 min</text>
+  <!-- connector -->
+  <line class="p-anim-line" x1="232" y1="43" x2="258" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="26" style="--dl:26;animation-delay:.46s" opacity="0.5" marker-end="url(#rd-arr)"/>
+  <!-- Node B: Build Agent 2 -->
+  <rect class="p-anim-node" x="260" y="18" width="108" height="50" rx="8" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.38)" stroke-width="1.5" style="animation-delay:.38s"/>
+  <text x="314" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.48s">Build Agent 2</text>
+  <text x="314" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.54s">Investor Outreach</text>
+  <!-- connector -->
+  <line class="p-anim-line" x1="368" y1="43" x2="394" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="26" style="--dl:26;animation-delay:.62s" opacity="0.5" marker-end="url(#rd-arr)"/>
+  <!-- Node D: Apply to Your Domain -->
+  <rect class="p-anim-node" x="396" y="18" width="78" height="50" rx="8" fill="rgba(167,139,250,0.07)" stroke="rgba(167,139,250,0.35)" stroke-width="1.5" style="animation-delay:.54s"/>
+  <text x="435" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#a78bfa" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.64s">Generalize</text>
+  <text x="435" y="54" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.70s">Your domain</text>
+  <!-- bottom label -->
+  <text x="240" y="80" text-anchor="middle" font-size="9" fill="#5eead4" opacity="0.55" font-family="JetBrains Mono,monospace" class="p-anim-label" letter-spacing="0.06em" style="animation-delay:.78s">YOU LEAVE WITH TWO RUNNING AGENTS · NOT NOTES</text>
+</svg>`,
+    ask: "What will count as proof that you have a working agent by 2pm?",
+    say: "By 2pm, you will have built two working agents on your own machine, connected to your own tools. Not a demo. Not a template you'll never open again. Something you can leave running Monday morning.",
+    doSteps: [
+      "Show the roadmap slide: Build Agent 1 (repo digest) → break → Build Agent 2 (investor outreach) → apply the same pattern to your own bottleneck domain.",
+      "State the one rule: 'You will not leave with notes. You will leave with two agents actually running.'"
+    ],
+    watch: "Time check: 10:35. If running long here, cut the round-robin to 20 sec/founder next time — never cut the mental model or the agent-vs-prompt distinction.",
+    bridge: "First build starts now — the simpler of the two, to build confidence."
+  },
+  {
+    num: 5, sync: "repo-intro", when: "10:35 – 10:40", duration: "5 min", tag: "demo",
+    title: "Build Block A — Setup: Repo Digest Agent",
+    ask: "Who is the non-technical reader of this digest, and what decision should it help them make?",
+    say: "First agent: it watches your repo, and every week it tells you — in plain English, not git-speak — what actually shipped. Useful for your own memory, for a co-founder who doesn't read code, for an investor update you'll build the muscle for later today.",
+    doSteps: [
+      "Open the Hermes Build Recipe doc, Part 1, on screen.",
+      "Confirm everyone has their repo URL ready (or knows to ask for the fallback demo repo)."
+    ],
+    bridge: "Hands-on time starts — 45 minutes."
+  },
+  {
+    num: 6, sync: "repo-build", when: "10:40 – 11:25", duration: "45 min", tag: "exercise",
+    title: "BUILD STEP A: Repo Digest Agent",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 86" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="ra-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#5eead4" opacity="0.65"/>
+    </marker>
+  </defs>
+  <rect class="p-anim-node" x="4" y="14" width="106" height="58" rx="9" fill="rgba(94,234,212,0.08)" stroke="rgba(94,234,212,0.4)" stroke-width="1.5" style="animation-delay:.06s"/>
+  <text x="57" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.16s">TRIGGER</text>
+  <text x="57" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.22s">Monday 9am</text>
+  <text x="57" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.26s">cron · on-demand</text>
+  <line class="p-anim-line" x1="110" y1="43" x2="138" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="28" style="--dl:28;animation-delay:.32s" opacity="0.5" marker-end="url(#ra-arr)"/>
+  <rect class="p-anim-node" x="140" y="14" width="106" height="58" rx="9" fill="rgba(94,234,212,0.06)" stroke="rgba(94,234,212,0.28)" stroke-width="1.5" style="animation-delay:.24s"/>
+  <text x="193" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.34s">LIVE DATA</text>
+  <text x="193" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.40s">GitHub commits</text>
+  <text x="193" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.44s">7-day window</text>
+  <line class="p-anim-line" x1="246" y1="43" x2="274" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="28" style="--dl:28;animation-delay:.50s" opacity="0.5" marker-end="url(#ra-arr)"/>
+  <rect class="p-anim-node" x="276" y="14" width="106" height="58" rx="9" fill="rgba(94,234,212,0.06)" stroke="rgba(94,234,212,0.28)" stroke-width="1.5" style="animation-delay:.42s"/>
+  <text x="329" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.52s">REASONING</text>
+  <text x="329" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.58s">summarize themes</text>
+  <text x="329" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.62s">plain English</text>
+  <line class="p-anim-line" x1="382" y1="43" x2="410" y2="43" stroke="#5eead4" stroke-width="1.5" stroke-dasharray="28" style="--dl:28;animation-delay:.68s" opacity="0.5" marker-end="url(#ra-arr)"/>
+  <rect class="p-anim-node" x="412" y="14" width="64" height="58" rx="9" fill="rgba(94,234,212,0.1)" stroke="rgba(94,234,212,0.5)" stroke-width="2" style="animation-delay:.60s"/>
+  <text x="444" y="37" text-anchor="middle" font-size="10" font-weight="700" fill="#5eead4" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.70s">ACTION</text>
+  <text x="444" y="52" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.76s">Telegram</text>
+  <text x="444" y="64" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.80s">digest msg</text>
+</svg>`,
+    ask: "Can you point to one live source, one output, and one successful run before moving on?",
+    say: "Follow Part 1 of your recipe doc. I'll walk the room — flag me the second something breaks, don't sit stuck for more than 2 minutes.",
+    prompt: "1. Point Hermes at your GitHub repo (auth + repo URL)\n2. Configure the trigger: on-demand for today's demo\n3. Write the prompt that turns raw commit data into a plain-language digest\n4. Run it — confirm the digest lands somewhere you can see it\n5. Thin commit activity? Use the shared fallback demo repo",
+    doSteps: [
+      "Start the 45-min timer — click the '45m' button in the exercise timer panel on the right.",
+      "Walk the room. Fix in this order: (1) GitHub auth stall — check token scope and that GITHUB_TOKEN is in ~/.hermes/.env. (2) No recent commits — route to facilitator's shared fallback demo repo immediately. (3) Output too jargon-heavy — prompt: 'Rewrite this as if explaining to someone outside the company for the first time.'"
+    ],
+    sayAfter: "However far you got, that's fine. Let's see two or three of these live.",
+    watch: "Ask 2-3 founders to read their agent's ACTUAL output aloud — not a description of what it should do.",
+    bridge: "Debrief, then straight into the break."
+  },
+  {
+    num: 7, sync: "repo-debrief", when: "11:25 – 11:35", duration: "10 min", tag: "demo",
+    title: "Build Block A — Debrief",
+    ask: "Did the output explain what changed clearly enough for someone who never reads GitHub?",
+    say: "Notice what just happened — that agent read something live (your actual commits), did something no static prompt could do (reached into your repo), and it'll do this again next week without you touching it. That's the three-part test again, just proven with your own hands.",
+    doSteps: [
+      "If more than 3 founders are still stuck on setup, compress this debrief to one live read-aloud instead of three.",
+      "Announce the break clearly."
+    ],
+    note: "Time check: 11:35. The break is non-negotiable — protect it even if this debrief has to compress.",
+    bridge: "15-minute break. Real break."
+  },
+  {
+    num: 8, sync: "break", when: "11:35 – 11:50", duration: "15 min", tag: "break", block: "BREAK",
+    title: "🟢 BREAK · 15 minutes · NON-NEGOTIABLE",
+    ask: "What is the one blocker you need cleared before Build B starts?",
+    say: "15 minutes. Real break — grab coffee, stretch, check your phone. Back at 11:50 sharp.",
+    doSteps: [
+      "Both decks now show a 15-min countdown.",
+      "Use this time to check in with any founder who was stuck on Build A — help them get unstuck before Build B starts.",
+      "Confirm the curated fallback investor list is ready to share for Build B."
+    ],
+    note: "This session uses a 15-min break (longer than the template's 10-min virtual default) because it's an in-person 4-hour session — people need a real reset.",
+    watch: "Honor the break. Do not start Build B early."
+  },
+  {
+    num: 9, sync: "investor-intro", when: "11:50 – 11:55", duration: "5 min", tag: "demo",
+    title: "Build Block B — Setup: Investor Agent",
+    ask: "Where is the human approval gate, and what must never happen automatically?",
+    say: "This one has real stakes — it's touching your actual fundraise. You tell it your round: stage, sector, geography, check size. It searches for investors who fit. Scores them. Writes a personalized outreach for each good match.",
+    sayAfter: "One rule that never changes: it does not send. The outreach lands in Gmail drafts. You read it, fix what's off, and hit send yourself. You are always the last human check before anything reaches an investor's inbox.",
+    doSteps: [
+      "Open the Hermes Build Recipe doc, Part 2, on screen.",
+      "State explicitly: 'This agent does not send email on your behalf. You are always the last human check before anything reaches an investor's inbox.'"
+    ],
+    bridge: "Founders fill their round-description form first."
+  },
+  {
+    num: 10, sync: "round-form", when: "11:55 – 12:10", duration: "15 min", tag: "exercise",
+    title: "Round-Description Form",
+    ask: "What facts would make an investor a credible fit — not just a name in a search result?",
+    say: "Before the agent can search, it needs to know what it's searching for. Fill in your round shape — stage, sector, geography, check size, anything else that matters to your specific fundraise.",
+    prompt: "\"I'm raising a [stage] round in [sector], based in [geography], looking for [check size] checks. Here's anything else that matters: [your notes].\"",
+    doSteps: [
+      "Start the 15-min timer.",
+      "Walk the room. Coach pre-fundraise founders unsure of their round shape: fill in your best guess or next planned round — this is a rehearsal."
+    ],
+    note: "Mention the curated fallback list now — before they run search. Founders who know their sector is underrepresented online (deep tech, niche B2B) can plan to use it from the start rather than discovering it when search returns junk.",
+    bridge: "Now the real build — search, score, draft."
+  },
+  {
+    num: 11, sync: "investor-build", when: "12:10 – 12:50", duration: "40 min", tag: "exercise",
+    title: "BUILD STEP B: Investor Agent",
+    // svgHtml is static hardcoded markup — no user/external data injected
+    svgHtml: `<svg viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="ib-arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 Z" fill="#fbbf24" opacity="0.65"/>
+    </marker>
+  </defs>
+  <rect class="p-anim-node" x="4" y="16" width="96" height="56" rx="9" fill="rgba(251,191,36,0.07)" stroke="rgba(251,191,36,0.35)" stroke-width="1.5" style="animation-delay:.06s"/>
+  <text x="52" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.16s">TRIGGER</text>
+  <text x="52" y="53" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.22s">your round desc</text>
+  <text x="52" y="65" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.26s">on-demand</text>
+  <line class="p-anim-line" x1="100" y1="44" x2="124" y2="44" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="24" style="--dl:24;animation-delay:.30s" opacity="0.5" marker-end="url(#ib-arr)"/>
+  <rect class="p-anim-node" x="126" y="16" width="96" height="56" rx="9" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.25)" stroke-width="1.5" style="animation-delay:.24s"/>
+  <text x="174" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.34s">LIVE DATA</text>
+  <text x="174" y="53" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.40s">web search</text>
+  <text x="174" y="65" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.44s">2-pass · sourced</text>
+  <line class="p-anim-line" x1="222" y1="44" x2="246" y2="44" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="24" style="--dl:24;animation-delay:.48s" opacity="0.5" marker-end="url(#ib-arr)"/>
+  <rect class="p-anim-node" x="248" y="16" width="96" height="56" rx="9" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.25)" stroke-width="1.5" style="animation-delay:.40s"/>
+  <text x="296" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.50s">SCORE</text>
+  <text x="296" y="53" text-anchor="middle" font-size="8.5" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.56s">stage/sector</text>
+  <text x="296" y="65" text-anchor="middle" font-size="8" fill="#5a6377" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.60s">geo/check</text>
+  <line class="p-anim-line" x1="344" y1="44" x2="368" y2="44" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="24" style="--dl:24;animation-delay:.65s" opacity="0.5" marker-end="url(#ib-arr)"/>
+  <!-- ACTION node — heavy border, "never auto-sent" emphasis -->
+  <rect class="p-anim-node" x="370" y="10" width="106" height="68" rx="9" fill="rgba(251,191,36,0.11)" stroke="#fbbf24" stroke-width="2.5" style="animation-delay:.58s"/>
+  <text x="423" y="33" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.68s">GMAIL DRAFT</text>
+  <text x="423" y="49" text-anchor="middle" font-size="8" fill="#fb7185" font-weight="600" font-family="JetBrains Mono,monospace" class="p-anim-label" style="animation-delay:.74s">never auto-sent</text>
+  <text x="423" y="62" text-anchor="middle" font-size="8" fill="#8993a6" font-family="Inter,sans-serif" class="p-anim-label" style="animation-delay:.80s">you review · you send</text>
+  <!-- "human gate" label below -->
+  <text x="423" y="88" text-anchor="middle" font-size="8.5" fill="#fbbf24" opacity="0.7" font-family="JetBrains Mono,monospace" class="p-anim-label" letter-spacing="0.05em" style="animation-delay:.86s">← HUMAN GATE</text>
+</svg>`,
+    ask: "Can every recommended investor be traced to a current source before a draft is created?",
+    say: "Time to build. Search for matching investors, score them, draft personalized outreach — all landing in Gmail drafts, never sent.",
+    prompt: "1. Configure Hermes's web-search tool with your round-description as the query seed\n2. Add scoring logic: does stage/sector/geography/check-size actually match?\n3. For matches, draft personalized outreach referencing what specifically would sway this investor\n4. Wire output to create a Gmail draft (not send)\n5. Thin/wrong live search results? Switch to the curated fallback investor list immediately",
+    doSteps: [
+      "Start the 40-min timer.",
+      "Walk the room. Fix in this order: (1) Live search returns generic/wrong results — switch to curated fallback list; frame it as: 'this is exactly why we built a backup.' (2) Gmail draft auth fails — check gateway setup; most common second failure. (3) Draft outreach is generic — coach: 'What specifically about this investor's thesis makes them a fit? Reference that.'"
+    ],
+    sayAfter: "Let's see what landed in a few Gmail drafts folders.",
+    watch: "Ask 2-3 founders to read their agent's ACTUAL drafted outreach aloud — do not send it, just read it.",
+    bridge: "Debrief, then the block everyone's own domain gets applied."
+  },
+  {
+    num: 12, sync: "investor-debrief", when: "12:50 – 1:05", duration: "15 min", tag: "demo",
+    title: "Build Block B — Debrief",
+    ask: "Would you be comfortable reviewing this draft — and can you explain why it was written for this investor?",
+    say: "Two agents built. Both pass the same three-part test: live data, real action in another system, running without you re-prompting it every time. That's the whole pattern. Everything else is just... which tools, which data.",
+    doSteps: [
+      "If running long, compress to one shared observation instead of 3 read-alouds.",
+      "Do NOT cut into the Generalize block — that's where the session becomes personally useful to each founder instead of just impressive."
+    ],
+    note: "Time check: 1:05.",
+    bridge: "Now founders apply this to their own bottleneck domain."
+  },
+  {
+    num: 13, sync: "generalize", when: "1:05 – 1:15", duration: "10 min", tag: "demo",
+    title: "Generalize — Reintroduce the Catalog",
+    ask: "Which bottleneck has enough frequency and enough structure to earn a one-week experiment?",
+    say: "This morning you each named your own ops bottleneck. Your pre-read diagnostic scored it too. Now — same pattern, your domain.",
+    doSteps: [
+      "Hand out / point to the Agent Idea Catalog — 51 real, sourced examples across sales, hiring, investor relations, marketing, product feedback, and finance.",
+      "State clearly: 'You're not building this one today — you're sketching it. Trigger, data source, what the LLM does with it, what action it takes in another system.'"
+    ],
+    bridge: "Sketch time — 20 minutes."
+  },
+  {
+    num: 14, sync: "sketch", when: "1:15 – 1:35", duration: "20 min", tag: "exercise",
+    title: "Sketch Your Next Agent",
+    ask: "What is the smallest safe first version — trigger, data, reasoning, action, and human check?",
+    say: "Same pattern. Your bottleneck. Sketch it using trigger, live data, reasoning, action — the exact shape of both agents you built today.",
+    prompt: "TRIGGER → LIVE DATA → LLM REASONING → ACTION",
+    doSteps: [
+      "Start the 20-min timer.",
+      "Founders work individually or in pairs, their choice.",
+      "Walk the room. Watch for founders defaulting to 'a chatbot that answers questions' — that's a prompt, not an agent. Redirect to the three-part test."
+    ],
+    bridge: "Peer share-outs — who wants to show their sketch?"
+  },
+  {
+    num: 15, sync: "peer-share", when: "1:35 – 1:50", duration: "15 min", tag: "demo",
+    title: "Peer Share-Outs",
+    ask: "What would make this agent useful next Monday rather than merely impressive today?",
+    say: "Quick round — who wants to share their sketch? Not the whole thing, just: trigger, and the one action it takes.",
+    doSteps: [
+      "Take as many volunteers as time allows — aim for 4-5, not all 10.",
+      "Note common domains for your own future reference."
+    ],
+    bridge: "Time to close."
+  },
+  {
+    num: 16, sync: "close", when: "1:50 – 2:00", duration: "10 min", tag: "title",
+    title: "Close",
+    ask: "What is the single scheduled run or review you will set up before the week ends?",
+    say: "You came in this morning with an idea of what an agent is. You're leaving with two of them actually running, and a sketch of a third. That's not a framework you'll forget by Monday — that's muscle memory.",
+    doSteps: [
+      "State the one-thing-this-week ask: 'Run your Repo Digest agent for real, on a real schedule, and actually read what it tells you. That's the whole test of whether any of this was worth your Saturday.'",
+      "Thank the room. No bridge to a 'next session' — this is standalone, not a cohort course with a sequel.",
+      "Post-session (within 24 hrs): send the workbook, the full Agent Idea Catalog, and a thank-you note with a space to share what they build next."
+    ],
+    watch: "Close clean. Do not fabricate a 'session 2' — there isn't one unless explicitly planned."
+  }
+];
+
+slides.forEach((slide, index) => { slide.num = index + 1; });
+const BREAK_SLIDE_INDEX = slides.findIndex(s => s.tag === 'break');
+const SYNC_KEY = 'founders_guide_agents_slide_master';
+
+const slidePane = document.getElementById('slidePane');
+
+function el(tag, opts = {}) {
+  const e = document.createElement(tag);
+  if (opts.cls) e.className = opts.cls;
+  if (opts.text) e.textContent = opts.text;
+  return e;
+}
+
+function makeSection(cls, title, contentBuilder) {
+  const section = el('div', { cls: `section ${cls}` });
+  const header = el('div', { cls: 'header' });
+  const h = el('h3', { text: title });
+  header.appendChild(h);
+  section.appendChild(header);
+  contentBuilder(section);
+  return section;
+}
+
+function renderSlide(s) {
+  while (slidePane.firstChild) slidePane.removeChild(slidePane.firstChild);
+
+  const bar = el('div', { cls: 'timing-bar' });
+  bar.appendChild(el('span', { cls: 'time-pill', text: s.when }));
+  bar.appendChild(el('span', { cls: 'duration', text: s.duration }));
+  bar.appendChild(el('span', { cls: 'block-title', text: s.duration || '' }));
+  slidePane.appendChild(bar);
+
+  slidePane.appendChild(el('span', { cls: `slide-tag ${s.tag}`, text: s.tag }));
+  slidePane.appendChild(el('h1', { text: s.title }));
+
+  if (s.svgHtml) {
+    const wrap = el('div', { cls: 'p-svg-wrap' });
+    wrap.innerHTML = s.svgHtml;
+    slidePane.appendChild(wrap);
+  }
+
+  if (s.say) {
+    slidePane.appendChild(makeSection('say', 'Say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.say }));
+    }));
+  }
+  if (s.doSteps) {
+    slidePane.appendChild(makeSection('do', 'Do', (sec) => {
+      const ol = el('ol', { cls: 'step-list' });
+      s.doSteps.forEach(step => ol.appendChild(el('li', { text: step })));
+      sec.appendChild(ol);
+    }));
+  }
+  if (s.prompt) {
+    slidePane.appendChild(makeSection('prompt-section', 'Paste in chat', (sec) => {
+      sec.appendChild(el('div', { cls: 'prompt-box', text: s.prompt }));
+    }));
+  }
+  if (s.ask) {
+    slidePane.appendChild(makeSection('deeper', 'Ask the room', (sec) => {
+      sec.appendChild(el('p', { text: s.ask }));
+    }));
+  }
+  if (s.afterPause) {
+    slidePane.appendChild(makeSection('watch', 'Pause for', (sec) => {
+      sec.appendChild(el('p', { text: s.afterPause }));
+    }));
+  }
+  if (s.sayAfter) {
+    slidePane.appendChild(makeSection('say', 'Then say', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.sayAfter }));
+    }));
+  }
+  if (s.watch) {
+    slidePane.appendChild(makeSection('watch', 'Watch for · contingency', (sec) => {
+      sec.appendChild(el('p', { text: s.watch }));
+    }));
+  }
+  if (s.deeper) {
+    slidePane.appendChild(makeSection('deeper', 'Deeper context · use if asked', (sec) => {
+      if (Array.isArray(s.deeper)) s.deeper.forEach(d => sec.appendChild(el('p', { text: d })));
+      else sec.appendChild(el('p', { text: s.deeper }));
+    }));
+  }
+  if (s.bridge) {
+    slidePane.appendChild(makeSection('bridge', 'Bridge to next slide', (sec) => {
+      sec.appendChild(el('div', { cls: 'quote', text: s.bridge }));
+    }));
+  }
+  if (s.note) {
+    slidePane.appendChild(makeSection('note', 'Note to self', (sec) => {
+      sec.appendChild(el('p', { text: s.note }));
+    }));
+  }
+}
+
+let current = 0;
+function show(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  renderSlide(slides[current]);
+  document.getElementById('slideCounter').textContent = `${String(current + 1).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / slides.length) * 100}%`;
+
+  document.getElementById('nowNum').textContent = `SLIDE ${String(slides[current].num).padStart(2, '0')} / ${slides.length}`;
+  document.getElementById('nowTitle').textContent = slides[current].title;
+  document.getElementById('nowWhen').textContent = slides[current].when;
+
+  const nxt = slides[current + 1];
+  document.getElementById('nextNum').textContent = nxt ? `SLIDE ${String(nxt.num).padStart(2, '0')} / ${slides.length}` : '—';
+  document.getElementById('nextTitle').textContent = nxt ? nxt.title : 'End of deck';
+  document.getElementById('nextWhen').textContent = nxt ? nxt.when : '—';
+
+  const nxt2 = slides[current + 2];
+  document.getElementById('next2Num').textContent = nxt2 ? `SLIDE ${String(nxt2.num).padStart(2, '0')} / ${slides.length}` : '—';
+  document.getElementById('next2Title').textContent = nxt2 ? nxt2.title : '—';
+  document.getElementById('next2When').textContent = nxt2 ? nxt2.when : '—';
+
+  try { localStorage.setItem(SYNC_KEY, String(current)); } catch (e) {}
+
+  if (slides[current].tag === 'break') {
+    startExTimer(15 * 60);
+  } else if (typeof exSecs !== 'undefined' && exSecs > 14 * 60) {
+    stopExTimer();
+  }
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+function goSlide(i) { show(i); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goSlide(0);
+  if (e.key === 'End') goSlide(slides.length - 1);
+  if (e.key === 's' || e.key === 'S') toggleClassClock();
+  if ((e.key === 'b' || e.key === 'B') && BREAK_SLIDE_INDEX >= 0) goSlide(BREAK_SLIDE_INDEX);
+  if (e.key === 'p' || e.key === 'P') exportLearnerPDF();
+});
+
+function exportLearnerPDF() {
+  const PRINT_KEY = 'founders_guide_agents_print_request';
+  const stamp = Date.now().toString();
+  try { localStorage.setItem(PRINT_KEY, stamp); } catch (e) {}
+  const w = window.open('learner_deck.html', 'founders_guide_agents_learner_deck');
+  if (w) {
+    setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);
+  }
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(secs) { const m = Math.floor(secs / 60); const s = secs % 60; return `${pad(m)}:${pad(s)}`; }
+function fmtClass(secs) {
+  const m = Math.floor(Math.abs(secs) / 60);
+  const s = Math.abs(secs) % 60;
+  const sign = secs < 0 ? '-' : '';
+  return `${sign}${pad(m)}:${pad(s)}`;
+}
+function updateRealClock() {
+  const d = new Date();
+  document.getElementById('realClock').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+setInterval(updateRealClock, 1000);
+updateRealClock();
+
+let classStartTs = null;
+let paused = false;
+let pausedAt = 0;
+let pausedAccum = 0;
+
+function startClass() {
+  if (classStartTs === null) {
+    classStartTs = Date.now();
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+  } else { toggleClassClock(); }
+}
+function toggleClassClock() {
+  if (classStartTs === null) { startClass(); return; }
+  if (!paused) { pausedAt = Date.now(); paused = true; document.getElementById('startBtn').textContent = '▶ Resume'; }
+  else { pausedAccum += Date.now() - pausedAt; paused = false; document.getElementById('startBtn').textContent = '⏸ Pause'; }
+}
+function resetClass() {
+  if (confirm('Reset class clock?')) {
+    classStartTs = null; paused = false; pausedAccum = 0;
+    document.getElementById('startBtn').textContent = '▶ Start Class';
+    updateClassClock();
+  }
+}
+function classElapsedSecs() {
+  if (classStartTs === null) return 0;
+  const now = paused ? pausedAt : Date.now();
+  return Math.floor((now - classStartTs - pausedAccum) / 1000);
+}
+function plannedSecsForCurrent() {
+  const w = slides[current].when;
+  if (!w) return 0;
+  const m = w.match(/(\d+):(\d+)/);
+  if (!m) return 0;
+  // Session runs 10:00-14:00. Convert wall-clock "HH:MM" into minutes-since-10:00.
+  let hh = parseInt(m[1]);
+  const mm = parseInt(m[2]);
+  if (hh < 10) hh += 12; // handle "1:05" etc. meaning 13:05
+  const startMinutes = 10 * 60;
+  const slideMinutes = hh * 60 + mm;
+  return Math.max(0, (slideMinutes - startMinutes) * 60);
+}
+function updateClassClock() {
+  const elapsed = classElapsedSecs();
+  document.getElementById('classClock').textContent = `${fmt(elapsed)} / 4:00`;
+  const planned = plannedSecsForCurrent();
+  if (classStartTs === null || planned === 0) {
+    document.getElementById('paceLabel').textContent = '—';
+    document.getElementById('paceLabel').className = 'big ok';
+    return;
+  }
+  const delta = elapsed - planned;
+  const labelEl = document.getElementById('paceLabel');
+  if (Math.abs(delta) < 60) { labelEl.textContent = 'on time'; labelEl.className = 'big ok'; }
+  else if (delta > 0) { labelEl.textContent = `+${fmtClass(delta)} late`; labelEl.className = delta > 180 ? 'big danger' : 'big warn'; }
+  else { labelEl.textContent = `${fmtClass(delta)} early`; labelEl.className = 'big ok'; }
+}
+setInterval(updateClassClock, 1000);
+
+let exInterval = null;
+let exSecs = 0;
+function startExTimer(secs) {
+  stopExTimer();
+  exSecs = secs;
+  const block = document.getElementById('timerBlock');
+  const disp = document.getElementById('exTimer');
+  function tick() {
+    disp.textContent = fmt(exSecs);
+    block.classList.remove('warn', 'danger');
+    if (exSecs <= 30) block.classList.add('danger');
+    else if (exSecs <= 60) block.classList.add('warn');
+    if (exSecs <= 0) { stopExTimer(); return; }
+    exSecs--;
+  }
+  tick();
+  exInterval = setInterval(tick, 1000);
+}
+function stopExTimer() {
+  if (exInterval) { clearInterval(exInterval); exInterval = null; }
+  document.getElementById('timerBlock').classList.remove('warn', 'danger');
+}
+
+function openLearnerDeck() { window.open('learner_deck.html', '_blank'); }
+
+show(0);
+</script>
+</body>
+</html>

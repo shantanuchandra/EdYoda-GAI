@@ -9,6 +9,8 @@ const learningPaths = [
     audience: "Operators and non-technical professionals",
     outcome: "Identify a valuable workflow, prototype safely, and evaluate output quality",
     modules: ["Opportunity framing", "Prompt-to-workflow design", "Grounding and verification", "Human-review checkpoints"],
+    curriculumModules: 8,
+    materials: 27,
   },
   {
     slug: "ai-product-transformation",
@@ -16,6 +18,8 @@ const learningPaths = [
     audience: "Product leaders and transformation teams",
     outcome: "Turn an AI opportunity into an adopted, measurable operating change",
     modules: ["Portfolio prioritization", "System and data design", "Evals and governance", "Adoption and measurement"],
+    curriculumModules: 9,
+    materials: 18,
   },
   {
     slug: "practical-agents-founders",
@@ -23,6 +27,8 @@ const learningPaths = [
     audience: "Founders and operators",
     outcome: "Decide when an agent is justified and design one with explicit tools, controls, and fallbacks",
     modules: ["Agent-vs-prompt test", "Tools and state", "Approval boundaries", "Production readiness"],
+    curriculumModules: 3,
+    materials: 6,
   },
 ] as const;
 
@@ -50,6 +56,23 @@ test("lists exactly three complete Learning Lab paths without commerce or accoun
   await expectNoExcludedLearningClaims(page);
 });
 
+test("keeps the Lumiere demo on a working same-origin integration boundary", async ({ request }) => {
+  const demo = await request.get("/learning-materials/lumiere-app/index.html");
+  expect(demo.status()).toBe(200);
+  const html = await demo.text();
+  expect(html).toContain("'/api/learning/lumiere-chat'");
+  expect(html).toContain("'/api/learning/lumiere-lead'");
+  expect(html).not.toContain("app.n8n.cloud/webhook/lumiere");
+  expect(html).toContain("if (j && j.fallback)");
+  expect(html).toContain("await runOrderAssistant(text, trace)");
+  expect(html).toContain("reply.remoteBacked && isOrderConfirmed(reply.text)");
+
+  for (const channel of ["lumiere-chat", "lumiere-lead"]) {
+    const preflight = await request.fetch(`/api/learning/${channel}`, { method: "OPTIONS" });
+    expect(preflight.status()).toBe(204);
+  }
+});
+
 for (const path of learningPaths) {
   test(`renders the complete ${path.slug} Learning Lab overview`, async ({ page }) => {
     const response = await page.goto(`/learning/${path.slug}`);
@@ -60,6 +83,13 @@ for (const path of learningPaths) {
     await expect(page.getByText(path.outcome, { exact: true })).toBeVisible();
     const modules = page.getByRole("heading", { level: 2, name: "Launch modules" }).locator("+ ul > li");
     await expect(modules).toHaveText(path.modules);
+    const curriculum = page.getByRole("region", { name: `${path.title} curriculum` });
+    await expect(curriculum.getByRole("heading", { level: 3 })).toHaveCount(path.curriculumModules);
+    const materialLinks = curriculum.locator(".learning-curriculum__materials a");
+    await expect(materialLinks).toHaveCount(path.materials);
+    expect(await materialLinks.evaluateAll((links) => links.map((link) => link.getAttribute("target")))).toEqual(
+      Array(path.materials).fill("_blank"),
+    );
     await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
     await expectNoExcludedLearningClaims(page);
   });

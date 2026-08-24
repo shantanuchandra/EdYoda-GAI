@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Production AI PM Markdown Viewer</title>
+  <style>
+    :root {
+      --ink: #191714;
+      --muted: #68635b;
+      --paper: #f7f4ee;
+      --panel: #fffdf8;
+      --line: #ddd6ca;
+      --accent: #b8431b;
+      --accent-dark: #7f2d14;
+      --cool: #266170;
+      --soft: #f0e8dc;
+      --code: #27211d;
+      --code-bg: #f1e8da;
+      --highlight: #ffe27a;
+      --highlight-border: #d49b18;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: #fffaf2;
+      padding: 22px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand a {
+      color: var(--accent-dark);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .kicker {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .brand-title {
+      font-weight: 850;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+    .search {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 0 12px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+      margin-bottom: 14px;
+    }
+    .doc-list {
+      display: grid;
+      gap: 7px;
+    }
+    .doc-link {
+      display: block;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 10px 11px;
+      color: var(--ink);
+      text-decoration: none;
+      background: transparent;
+    }
+    .doc-link:hover {
+      border-color: var(--line);
+      background: white;
+    }
+    .doc-link.active {
+      border-color: var(--accent);
+      background: white;
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+    .doc-title {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .doc-path {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    main {
+      min-width: 0;
+      padding: 28px clamp(22px, 3.5vw, 56px) 72px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .topbar a {
+      color: var(--accent-dark);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .highlight-status {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .highlight-nav {
+      display: inline-flex;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: white;
+    }
+    .top-button,
+    .floating-action,
+    .menu-button,
+    .panel-button {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .top-button {
+      padding: 7px 10px;
+    }
+    .nav-button {
+      width: 34px;
+      height: 32px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .nav-button:last-child {
+      border-right: 0;
+    }
+    .top-button:hover,
+    .nav-button:hover,
+    .floating-action:hover,
+    .menu-button:hover,
+    .panel-button:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+    .top-button:disabled,
+    .nav-button:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+    }
+    .article {
+      max-width: 1320px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: clamp(24px, 5vw, 56px);
+      box-shadow: 0 18px 60px rgba(70, 53, 34, .08);
+    }
+    .article h1 {
+      margin: 0 0 22px;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .article h2 {
+      margin: 38px 0 12px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 25px;
+      line-height: 1.15;
+    }
+    .article h3 {
+      margin: 28px 0 10px;
+      color: var(--cool);
+      font-size: 19px;
+      line-height: 1.2;
+    }
+    .article h4 {
+      margin: 22px 0 8px;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .article p { margin: 12px 0; }
+    .article a { color: var(--accent-dark); font-weight: 750; }
+    .article mark.md-highlight {
+      background: linear-gradient(180deg, transparent 12%, var(--highlight) 12%, var(--highlight) 88%, transparent 88%);
+      border-bottom: 2px solid var(--highlight-border);
+      color: inherit;
+      cursor: pointer;
+      padding: 0 1px;
+    }
+    .article mark.md-highlight:hover {
+      background: var(--highlight);
+    }
+    .article mark.md-highlight.active {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      background: var(--highlight);
+    }
+    .article mark.md-highlight.has-comment {
+      border-bottom-style: double;
+    }
+    .article ul, .article ol {
+      padding-left: 24px;
+      margin: 12px 0 18px;
+    }
+    .article li { margin: 5px 0; }
+    .article blockquote {
+      margin: 20px 0;
+      padding: 14px 18px;
+      border-left: 4px solid var(--accent);
+      background: var(--soft);
+      color: var(--ink);
+    }
+    .article code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--code-bg);
+      color: var(--code);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: .92em;
+    }
+    .article pre {
+      overflow: auto;
+      margin: 18px 0;
+      padding: 16px;
+      border-radius: 7px;
+      background: var(--code);
+      color: #fffaf2;
+      line-height: 1.5;
+    }
+    .article pre code {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+      font-size: 14px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--soft);
+      color: var(--accent-dark);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .empty {
+      padding: 40px;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    .floating-action {
+      position: fixed;
+      z-index: 20;
+      display: none;
+      padding: 8px 10px;
+      box-shadow: 0 12px 32px rgba(25, 23, 20, .16);
+    }
+    .floating-menu,
+    .comment-panel {
+      position: fixed;
+      z-index: 25;
+      display: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      box-shadow: 0 18px 48px rgba(25, 23, 20, .18);
+    }
+    .floating-menu {
+      gap: 6px;
+      padding: 7px;
+    }
+    .menu-button {
+      padding: 8px 10px;
+    }
+    .comment-panel {
+      width: min(360px, calc(100vw - 24px));
+      padding: 12px;
+    }
+    .comment-panel label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .comment-panel textarea {
+      width: 100%;
+      min-height: 108px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+    }
+    .comment-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .panel-button {
+      padding: 8px 10px;
+    }
+    .floating-action.is-visible {
+      display: block;
+    }
+    .floating-menu.is-visible {
+      display: inline-flex;
+    }
+    .comment-panel.is-visible {
+      display: block;
+    }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      aside {
+        position: relative;
+        height: auto;
+        max-height: 45vh;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      main { padding: 22px 16px 40px; }
+      .article { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div>
+          <div class="kicker">Production AI PM</div>
+          <div class="brand-title">Markdown Viewer</div>
+        </div>
+        <a href="index.html">Index</a>
+      </div>
+      <input id="search" class="search" type="search" placeholder="Search docs">
+      <nav id="docList" class="doc-list" aria-label="Markdown files"></nav>
+    </aside>
+    <main>
+      <div class="topbar">
+        <span id="pathLabel">Select a document</span>
+        <div class="top-actions">
+          <span id="highlightStatus" class="highlight-status">No highlights</span>
+          <div class="highlight-nav" aria-label="Highlight navigation">
+            <button id="highlightPrev" class="nav-button" type="button" title="Previous highlight" disabled>↑</button>
+            <button id="highlightNext" class="nav-button" type="button" title="Next highlight" disabled>↓</button>
+          </div>
+          <button id="clearHighlights" class="top-button" type="button" disabled>Clear highlights</button>
+          <a id="rawLink" href="#" target="_blank" rel="noreferrer">Open raw file</a>
+        </div>
+      </div>
+      <article id="article" class="article">
+        <div class="empty">Choose a Markdown file from the sidebar.</div>
+      </article>
+    </main>
+  </div>
+  <button id="highlightAction" class="floating-action" type="button">Highlight</button>
+  <div id="highlightMenu" class="floating-menu" role="menu" aria-label="Highlight actions">
+    <button id="selectHighlightAction" class="menu-button" type="button">Select</button>
+    <button id="commentHighlightAction" class="menu-button" type="button">Comment</button>
+    <button id="deleteHighlightAction" class="menu-button" type="button">Delete</button>
+  </div>
+  <div id="highlightCommentPanel" class="comment-panel" aria-label="Highlight comment">
+    <label for="highlightCommentText">Comment</label>
+    <textarea id="highlightCommentText" placeholder="Add a note for this highlight"></textarea>
+    <div class="comment-actions">
+      <button id="cancelHighlightComment" class="panel-button" type="button">Cancel</button>
+      <button id="saveHighlightComment" class="panel-button" type="button">Save comment</button>
+    </div>
+  </div>
+
+  <script id="doc-data" type="application/json">[{"file":"00_Master_Index.md","title":"Production AI PM Master Index","body":"# Production AI PM Master Index\n\n## What This Package Contains\n\nThis is the complete operating package for the Production AI PM cohort.\n\nIt includes:\n\n- program positioning and structure;\n- learner handbook;\n- instructor delivery playbook;\n- tool setup and advanced technical companion;\n- weekly facilitator scripts;\n- weekly learner workbooks;\n- synced presenter and learner HTML decks;\n- capstone casebook;\n- assessment rubrics and certification criteria;\n- prompt and workflow library;\n- onboarding and communication templates;\n- portfolio and career kit;\n- marketing and landing page copy;\n- premium add-on playbook;\n- QA checklist and cohort tracker.\n\nUse this file as the first internal reference when preparing the cohort.\n\n---\n\n## Course-Level Files\n\n| File | Audience | Purpose |\n|---|---|---|\n| `README.md` | Internal | Quick package overview and folder map |\n| `index.html` | Internal / facilitator | Clickable local navigator for docs, decks, and weekly materials |\n| `md-viewer.html` | Internal / facilitator / learners | Local Markdown viewer for course docs |\n| `00_Master_Index.md` | Internal | Complete package map |\n| `00_Cohort_Operating_Plan.md` | Internal | Cohort rhythm, feedback checkpoints, and facilitation principles |\n| `00_Learner_Handbook.md` | Learners | How to move through the program and build the portfolio |\n| `00_Instructor_Delivery_Playbook.md` | Instructor / TA | Run-of-show, live delivery, critique, and session operations |\n| `00_Portfolio_Packet_Template.md` | Learners | Final portfolio artifact structure |\n| `00_Tool_Stack_and_Setup.md` | Learners | Quick-start tool setup |\n| `00_Advanced_Technical_Companion.md` | Advanced learners | Deeper technical guide for AI PM credibility |\n| `00_Capstone_Casebook.md` | Learners / instructor | Capstone tracks, shared case, and example product contexts |\n| `00_Assessment_Rubrics_And_Certification.md` | Instructor / learners | Artifact scoring, completion criteria, and certificate bar |\n| `00_Prompt_And_Workflow_Library.md` | Learners | Reusable prompts, critique prompts, and workflow patterns |\n| `00_Onboarding_Communications_And_Email_Templates.md` | Program ops | Welcome emails, reminders, nudges, and post-session templates |\n| `00_Portfolio_Showcase_And_Career_Kit.md` | Learners | Portfolio packaging, interview story, LinkedIn, and resume translation |\n| `00_Marketing_Landing_Page_And_Positioning.md` | Program owner | Landing page copy, offer, ICP, objections, and proof points |\n| `00_Premium_AddOns_Playbook.md` | Program owner | 1:1 capstone review, mock interviews, portfolio review, and advanced labs |\n| `00_Program_QA_And_Launch_Checklist.md` | Program ops | Pre-launch and delivery QA checklist |\n| `00_Cohort_Tracker.csv` | Program ops | Lightweight tracker for attendance, submissions, feedback, and completion |\n\n---\n\n## Weekly Folder Pattern\n\nEach weekly folder contains:\n\n- `W##_Facilitator_Script.md`\n- `W##_Learner_Workbook.md`\n- `W##_Presenter_Deck.html`\n- `W##_Learner_Deck.html`\n\nThe presenter deck can open and sync with the learner deck for the same week.\n\n---\n\n## Recommended Setup Order\n\n1. Read `00_Master_Index.md`.\n2. Read `00_Cohort_Operating_Plan.md`.\n3. Customize `00_Marketing_Landing_Page_And_Positioning.md`.\n4. Set learner expectations using `00_Learner_Handbook.md`.\n5. Send onboarding messages from `00_Onboarding_Communications_And_Email_Templates.md`.\n6. Prepare the shared capstone case using `00_Capstone_Casebook.md`.\n7. Run Week 1 using `W01_Facilitator_Script.md` and `W01_Presenter_Deck.html`.\n8. Track progress in `00_Cohort_Tracker.csv`.\n9. Score artifacts using `00_Assessment_Rubrics_And_Certification.md`.\n10. Package final learner outcomes using `00_Portfolio_Showcase_And_Career_Kit.md`.\n\n---\n\n## What Is Complete\n\nThe package is complete for a first premium cohort if these are true:\n\n- every weekly folder has a facilitator script, learner workbook, presenter deck, and learner deck;\n- the learner handbook has been sent before Week 1;\n- the tool setup doc has been sent before Week 1;\n- the shared case has been prepared before Week 1;\n- the cohort tracker has learner names and capstone tracks;\n- rubrics are shared before the first submission;\n- premium add-ons are defined before sales calls;\n- the final portfolio packet is introduced in Week 1, not Week 8.\n\n---\n\n## What To Customize Before Launch\n\nCustomize these items before selling or running the cohort:\n\n- cohort start date and schedule;\n- pricing and tier names;\n- cohort size;\n- platform and community channel;\n- tool access instructions;\n- submission mechanism;\n- feedback turnaround time;\n- certificate language;\n- examples from your own public products;\n- privacy policy and terms for learner data.\n\nKeep the curriculum logic stable. Customize the operational details.\n"},{"file":"00_Cohort_Operating_Plan.md","title":"Cohort Operating Plan","body":"# Cohort Operating Plan\n\n## Program Shape\n\n**Production AI PM** runs as an 8-week live cohort program.\n\n- 1 live session per week.\n- 120 minutes per session.\n- Blended strategy + studio / critique format.\n- 2 to 4 hours of learner assignment work per week.\n- Optional 60 to 90 minute advanced lab for technical learners.\n- Recommended cohort size: 12 to 18 learners.\n\n---\n\n## Weekly Session Rhythm\n\nEach 120-minute session uses this default flow:\n\n| Segment | Time | Purpose |\n|---|---:|---|\n| Opening and context | 0:00-0:10 | Set the session promise and connect to portfolio artifact |\n| Strategy lens | 0:10-0:35 | Teach the core judgment model |\n| Applied walkthrough | 0:35-0:55 | Show the framework on the shared case |\n| Break | 0:55-1:05 | Real 10-minute break |\n| Studio / critique | 1:05-1:45 | Learners apply the framework to capstones |\n| Artifact close | 1:45-2:00 | Commit next assignment and review quality bar |\n\nAdjust within 5 minutes as needed, but keep the strategy + studio blend in one session.\n\n---\n\n## Feedback Checkpoints\n\n| Week | Feedback item | Review mode |\n|---|---|---|\n| 2 | AI Product Strategy Memo | Short written review or live critique |\n| 4 | AI PRD + Workflow Prototype | Studio critique |\n| 5 | Eval Dataset + Rubric | Rubric review |\n| 7 | Production Readiness Review | Red-team review |\n| 8 | Final Portfolio Packet | Final critique |\n\n---\n\n## Optional Premium Add-Ons\n\nThese can be sold as a higher-touch tier or offered selectively:\n\n1. **1:1 capstone review**  \n   A private review of the learner's portfolio packet, technical architecture, and launch readiness.\n\n2. **Mock AI PM interview**  \n   A senior AI PM interview simulation focused on product judgment, technical tradeoffs, evals, and stakeholder communication.\n\n3. **Resume, LinkedIn, and portfolio positioning review**  \n   Helps learners turn course artifacts into a credible external career signal.\n\n---\n\n## Pre-Cohort Setup\n\nBefore Week 1:\n\n- Confirm learner profile and goals.\n- Send tool setup instructions.\n- Share the portfolio packet template.\n- Ask learners to bring one real AI product idea from their work or domain.\n- Prepare the shared B2B SaaS case.\n- Prepare fallback capstone prompts for learners who cannot use work context.\n\n---\n\n## Post-Session Workflow\n\nWithin 24 hours after each session:\n\n- Send the session workbook.\n- Send the assignment reminder.\n- Share the recording if applicable.\n- Share any live critique notes.\n- Add unresolved questions to a shared parking lot.\n- Remind learners which portfolio artifact is due next.\n\n---\n\n## Facilitation Principles\n\n- Assume learners already know PM fundamentals.\n- Spend less time defining terms and more time applying judgment.\n- Keep tools subordinate to product decisions.\n- Treat evals, traces, cost, latency, risk, and launch gates as core PM craft.\n- Push learners to make tradeoffs explicit.\n\n"},{"file":"00_Learner_Handbook.md","title":"Production AI PM Learner Handbook","body":"# Production AI PM Learner Handbook\n\n## Program Promise\n\nProduction AI PM is an 8-week cohort for senior PMs and product leaders who want to lead GenAI and agentic products from strategy to launch.\n\nBy the end of the program, you should be able to:\n\n- decide which AI product ideas deserve to be built;\n- explain an AI system clearly enough to work with engineering;\n- design GenAI, RAG, and agentic workflows with appropriate human control;\n- define evals, failure modes, and launch gates;\n- reason about cost, latency, safety, and production readiness;\n- package the work into a credible senior AI PM portfolio and interview story.\n\nThis is not a generic PM basics course, a coding bootcamp, a heavy ML math course, or a prompt-engineering-only workshop.\n\n---\n\n## Who This Is For\n\nThis program is built for:\n\n- senior PMs moving into AI PM, GenAI PM, or agentic product roles;\n- product leaders working with AI/ML engineering teams;\n- PMs targeting global or remote AI PM roles;\n- operators who need portfolio-grade proof of AI product judgment.\n\nYou do not need to code to complete the core path. You do need to make product decisions, write clearly, critique work, and understand technical tradeoffs well enough to lead the room.\n\n---\n\n## How The Course Works\n\nEach week has one 120-minute live session.\n\nThe session is blended:\n\n- strategy lens;\n- applied walkthrough;\n- live studio work;\n- critique;\n- portfolio artifact close.\n\nEach week also has a workbook, a presenter/learner deck pair, and a portfolio artifact. The weekly work compounds into one final Senior AI PM Portfolio Packet.\n\nExpected time:\n\n- live session: 2 hours per week;\n- assignment work: 2 to 4 hours per week;\n- optional advanced technical work: 1 to 2 hours per week.\n\n---\n\n## Your Working Folder\n\nCreate one private folder for the cohort before Week 1.\n\nRecommended structure:\n\n```text\nProduction AI PM Portfolio/\n  01_AI_Product_Strategy_Memo/\n  02_AI_PRD/\n  03_Agent_RAG_Workflow_Prototype/\n  04_Evals_And_Golden_Dataset/\n  05_Technical_Architecture_Brief/\n  06_Production_Readiness_Review/\n  07_Executive_Narrative_And_Interview_Story/\n  Scratch/\n  Private_Data_Do_Not_Share/\n```\n\nKeep public, private, and anonymized material separate from the start. Do not wait until Week 8 to decide what can be shown externally.\n\n---\n\n## Capstone Tracks\n\nChoose one capstone track by the end of Week 1.\n\n| Track | Best for | Example |\n|---|---|---|\n| Enterprise Copilot | B2B SaaS, internal tools, support, sales, success, finance, HR | Customer Success Copilot |\n| Agentic Workflow Product | Multi-step operations, approvals, routing, research, automation | Renewal Risk Agent |\n| Decision Support Product | Recommendations, summarization, personalization, trust, quality | Portfolio Risk Assistant |\n\nIf you cannot use a real work problem, use a synthetic or anonymized product context. A strong anonymized portfolio is better than a vague real one.\n\n---\n\n## Confidentiality Rules\n\nUse good judgment with company, customer, and personal data.\n\nDo:\n\n- anonymize company and customer names when needed;\n- replace real numbers with realistic ranges;\n- use synthetic examples for sensitive workflows;\n- mark anything private at the top of the document;\n- keep confidential artifacts out of public portfolio links.\n\nDo not:\n\n- paste private customer data into AI tools;\n- expose internal architecture, contracts, pricing, or strategy;\n- share production credentials, API keys, recordings, or private documents;\n- publish artifacts that imply endorsement from an employer or client.\n\nFor your final portfolio, every artifact should be labeled as one of:\n\n- public;\n- private;\n- anonymized;\n- interview-only.\n\n---\n\n## Weekly Artifact Map\n\n| Week | Session | Portfolio artifact |\n|---|---|---|\n| 1 | AI Product Judgment for Senior PMs | AI Opportunity One-Pager |\n| 2 | AI Strategy, Moats, and Business Case | AI Product Strategy Memo v1 |\n| 3 | GenAI System Design for PMs | AI PRD v1 |\n| 4 | Agentic Product Design | Agent/RAG Workflow Prototype v1 + Autonomy Map |\n| 5 | Evals as the New PRD | Eval Dataset + Rubric + Failure Mode Taxonomy |\n| 6 | Working with AI/ML Engineering Teams | Technical Architecture Brief for PMs |\n| 7 | Production Readiness: Cost, Latency, Safety, and Launch | Cost Model + Risk Register + Launch Readiness Review |\n| 8 | Executive Narrative, Portfolio, and AI PM Interview Readiness | Final Portfolio Packet + AI PM Interview Narrative |\n\n---\n\n## What Good Work Looks Like\n\nGood work in this cohort is not judged by how many tools you use. It is judged by the quality of your decisions.\n\nStrong artifacts:\n\n- name a specific user and workflow;\n- explain why AI is needed and what the non-AI alternative is;\n- make assumptions visible;\n- include failure modes and quality bars;\n- connect product decisions to system behavior;\n- show how quality will be evaluated;\n- include launch risks, cost, latency, and operational constraints;\n- are concise enough for an executive or interviewer to understand quickly.\n\nWeak artifacts:\n\n- describe a tool demo without a product decision;\n- use generic AI language without workflow detail;\n- avoid risk, failure, and cost;\n- rely on prompts as the whole product;\n- assume the model will be right because the demo looked good.\n\n---\n\n## Critique Norms\n\nThis is a senior-level cohort. Critique should make the work sharper, not safer.\n\nWhen giving critique:\n\n- point to the decision, not the person;\n- name the weakest assumption;\n- ask what would make the idea fail;\n- separate user value, business value, and technical feasibility;\n- suggest one concrete improvement.\n\nWhen receiving critique:\n\n- do not defend too early;\n- write down the risk being exposed;\n- ask what evidence would change the conclusion;\n- decide whether to pursue, reshape, or kill the current version.\n\nUse this simple critique frame:\n\n| Question | Purpose |\n|---|---|\n| What is the strongest part? | Preserve what is working |\n| What is the weakest assumption? | Focus the next validation step |\n| What failure would hurt trust? | Surface production risk |\n| What should be cut or simplified? | Reduce demo-driven scope |\n| What evidence is missing? | Make the next step concrete |\n\n---\n\n## Tool Philosophy\n\nYou will use named tools, but the course is not positioned around any one tool.\n\nThe durable principles are:\n\n- workflow before interface;\n- context before model choice;\n- evals before launch;\n- approval before autonomy;\n- telemetry before scaling;\n- product judgment before prompt polish.\n\nUse tools to make your decisions visible. If a tool changes, the product logic should still hold.\n\n---\n\n## Core Tool Setup\n\nBefore Week 1, make sure you have:\n\n- Claude or ChatGPT;\n- a research tool such as Perplexity;\n- Google Docs, Notion, or equivalent;\n- Google Sheets, Airtable, or equivalent;\n- n8n, Make, Zapier, or a workflow automation equivalent;\n- Figma, FigJam, Miro, or equivalent;\n- a private folder for portfolio artifacts.\n\nThe optional advanced path is covered in `00_Advanced_Technical_Companion.md`.\n\n---\n\n## Weekly Learner Rhythm\n\nBefore each session:\n\n- open the weekly workbook;\n- open your latest portfolio artifact;\n- bring one decision you want critiqued;\n- prepare any required sample inputs, outputs, traces, or eval rows.\n\nDuring the session:\n\n- keep notes inside the artifact, not in a disconnected notebook;\n- use the studio time to make decisions;\n- ask for critique on tradeoffs, not on polish;\n- capture one next action before the session ends.\n\nAfter the session:\n\n- finish the weekly artifact within 48 hours;\n- mark assumptions and open questions;\n- update the final portfolio packet;\n- decide what is public, private, or anonymized;\n- prepare the next artifact before the next live session.\n\n---\n\n## Portfolio Completion Bar\n\nYour final portfolio should include seven pieces.\n\n| Artifact | Completion bar |\n|---|---|\n| Strategy Memo | Clear business outcome, user workflow, AI rationale, moat, and first release |\n| AI PRD | Inputs, context, behavior, failure modes, approvals, and acceptance criteria |\n| Workflow Prototype | Clear workflow steps, tool/data dependencies, autonomy boundaries, and demo scenario |\n| Eval Plan | Golden dataset, failure taxonomy, rubric, and launch-blocking rows |\n| Architecture Brief | Plain-English system map and engineering questions |\n| Launch Review | Cost, latency, risk register, monitoring, beta/GA gates, rollback |\n| Executive Story | Two-minute narrative and interview-ready tradeoff story |\n\nThe final packet does not need to be long. It needs to be specific.\n\n---\n\n## AI Use Policy\n\nUse AI tools to accelerate thinking, drafting, critique, and prototyping. Do not use them to hide weak judgment.\n\nAcceptable uses:\n\n- turn rough notes into a structured memo;\n- generate alternative failure modes;\n- critique an eval rubric;\n- draft synthetic examples;\n- compare architecture options;\n- rehearse interview answers.\n\nUnacceptable uses:\n\n- fabricating evidence;\n- claiming a tool demo is production-ready;\n- using private data in tools that are not approved for that data;\n- submitting generic AI-written artifacts without product-specific judgment.\n\nWhen in doubt, note how AI was used in the artifact footer.\n\n---\n\n## Feedback Checkpoints\n\nYou will get the most value from the program if you submit work before these points.\n\n| Week | Feedback item | What to bring |\n|---|---|---|\n| 2 | Strategy Memo | One-pager plus target user, workflow, and business outcome |\n| 4 | AI PRD + Workflow Prototype | System map, behavior spec, and autonomy map |\n| 5 | Eval Dataset + Rubric | At least 10 rows and a first failure taxonomy |\n| 7 | Production Readiness Review | Cost/latency model, risk register, beta/GA criteria |\n| 8 | Final Portfolio Packet | Public/private/anonymized version plus interview story |\n\n---\n\n## Optional Premium Add-Ons\n\nThe program can include higher-touch support depending on the cohort tier.\n\nPossible add-ons:\n\n- 1:1 capstone review;\n- mock AI PM interview;\n- resume, LinkedIn, and portfolio positioning review;\n- advanced technical lab review;\n- public portfolio polish.\n\nUse these for high-leverage feedback, not for redoing basic assignment work.\n\n---\n\n## Final Week Readiness Checklist\n\nBefore the final session, confirm:\n\n- [ ] The portfolio packet has all seven sections.\n- [ ] Each artifact has a clear title and one-line purpose.\n- [ ] Sensitive material is labeled public, private, anonymized, or interview-only.\n- [ ] The AI PRD has failure modes and acceptance criteria.\n- [ ] The eval plan has at least 20 golden dataset rows.\n- [ ] The launch review has beta criteria, GA criteria, and rollback triggers.\n- [ ] The executive story can be delivered in 2 minutes.\n- [ ] The interview story explains judgment, tradeoffs, and leadership.\n\n---\n\n## The Standard\n\nBy the end, your work should make this claim credible:\n\n> I can lead a GenAI or agentic product from opportunity selection through system design, evals, engineering tradeoffs, launch readiness, and executive communication.\n\nThat is the bar. Every artifact should help prove it.\n"},{"file":"00_Instructor_Delivery_Playbook.md","title":"Instructor Delivery Playbook","body":"# Instructor Delivery Playbook\n\n## Purpose\n\nThis playbook is for the instructor, TA, or program operator running Production AI PM.\n\nIt explains how to deliver the cohort, manage critique, run the synced decks, keep learners on track, and protect the premium experience.\n\n---\n\n## Delivery Principles\n\n- Treat learners as senior operators, not beginners.\n- Spend more time on judgment than definitions.\n- Use tools as evidence of product thinking, not as the headline.\n- Make tradeoffs explicit.\n- Critique artifacts, not personalities.\n- Keep the weekly artifact tied to the final portfolio.\n- Protect the 120-minute session shape.\n- Never let a tool demo replace evals, risk, cost, or launch readiness.\n\n---\n\n## Standard 120-Minute Session Shape\n\n| Time | Segment | Instructor job |\n|---|---|---|\n| 0:00-0:10 | Opening and context | Re-anchor the artifact and one rule |\n| 0:10-0:35 | Strategy lens | Teach the core judgment model |\n| 0:35-0:55 | Applied walkthrough | Show the model on the shared case |\n| 0:55-1:05 | Break | Protect the break |\n| 1:05-1:30 | Studio | Learners apply the model to capstones |\n| 1:30-1:45 | Critique | Pressure-test 2 to 3 artifacts |\n| 1:45-1:55 | Artifact close | Explain the assignment and quality bar |\n| 1:55-2:00 | Close | Capture next action and preview next week |\n\nIf running late, shorten lecture. Do not cut critique, break, or artifact close.\n\n---\n\n## Pre-Session Checklist\n\nComplete this 24 hours before each session.\n\n- [ ] Review the facilitator script.\n- [ ] Open the presenter deck.\n- [ ] Open the learner deck once to confirm it loads.\n- [ ] Open the learner workbook.\n- [ ] Open the portfolio packet template.\n- [ ] Prepare the shared case example.\n- [ ] Prepare one strong and one weak example artifact.\n- [ ] Review submissions due for critique.\n- [ ] Choose 2 to 3 learner artifacts for live critique.\n- [ ] Prepare the post-session message.\n- [ ] Confirm recording and chat settings.\n\n---\n\n## How To Use The Synced Decks\n\nEach week has two HTML decks:\n\n- `W##_Presenter_Deck.html`\n- `W##_Learner_Deck.html`\n\nUse the presenter deck for facilitation notes and controls. Use the learner deck for the clean participant view.\n\nRecommended setup:\n\n1. Open the presenter deck.\n2. Click `Learner Deck`.\n3. Share the learner deck window on Zoom or Meet.\n4. Keep the presenter deck visible only to the instructor.\n5. Advance slides from the presenter deck.\n6. Confirm the learner deck follows.\n\nIf sync fails:\n\n- refresh the learner deck;\n- move both decks back to slide 1;\n- use keyboard arrows in the shared learner deck as fallback.\n\n---\n\n## Studio Facilitation Pattern\n\nUse the same pattern every week.\n\n1. Set the artifact decision.\n2. Give 6 to 8 minutes of solo work.\n3. Move to pair or small-group critique.\n4. Bring back 2 to 3 examples.\n5. Ask the room to identify the weakest assumption.\n6. Convert critique into the take-home assignment.\n\nDo not ask, \"Any thoughts?\" Ask precise critique questions:\n\n- What is the strongest decision here?\n- What is the weakest assumption?\n- What would make this unsafe to launch?\n- What data or context is missing?\n- What should be cut from scope?\n\n---\n\n## Live Critique Rubric\n\nUse this quick rubric during class.\n\n| Dimension | What to listen for |\n|---|---|\n| Specificity | Named user, workflow, decision, and context |\n| AI necessity | Clear reason AI is better than non-AI alternatives |\n| Technical realism | System behavior, data, retrieval, tools, approvals |\n| Quality bar | Concrete evals, failure modes, and launch gates |\n| Production judgment | Cost, latency, privacy, safety, operations |\n| Executive clarity | Can the learner explain the tradeoff in 2 minutes? |\n\n---\n\n## Handling Common Session Problems\n\n### Learner Has A Weak Capstone\n\nAsk:\n\n- What workflow is actually painful?\n- What decision is high-frequency or high-stakes?\n- What would the non-AI version be?\n- What evidence would make you kill this?\n\nIf still weak, move them to the shared Customer Success Copilot case for one week.\n\n### Learner Wants To Build A Generic Chatbot\n\nRedirect to workflow:\n\n- Who uses it?\n- During what task?\n- What context does it need?\n- What action does it support?\n- What failure would damage trust?\n\n### Learner Is Too Tool-Focused\n\nAsk:\n\n- What product decision does this tool output support?\n- What would be true if the tool disappeared tomorrow?\n- What eval would prove this is better than manual work?\n\n### Learner Is Too Strategy-Only\n\nAsk:\n\n- What would the system actually do?\n- What data is needed?\n- What would engineering need to build first?\n- What trace would you inspect?\n\n### Learner Shares Sensitive Work Data\n\nPause and reset:\n\n- ask them to anonymize;\n- replace names and exact values;\n- move sensitive details to a private artifact;\n- remind the cohort of the confidentiality rules.\n\n---\n\n## Feedback Workflow\n\nUse the feedback checkpoints in Weeks 2, 4, 5, 7, and 8.\n\nRecommended feedback format:\n\n```text\nArtifact:\nCurrent level:\nStrongest signal:\nWeakest assumption:\nProduction risk:\nOne improvement before next review:\n```\n\nKeep feedback short and decision-oriented. Do not rewrite the learner's work.\n\n---\n\n## TA Role\n\nIf using a TA, assign these responsibilities:\n\n- monitor chat;\n- collect questions in a parking lot;\n- track attendance;\n- note who shared artifacts;\n- capture critique decisions;\n- drop workbook and resource links;\n- flag learners who are falling behind;\n- prepare submission summaries for the instructor.\n\nThe TA should not answer strategic questions that need instructor judgment. They should triage and organize them.\n\n---\n\n## After-Session Checklist\n\nWithin 24 hours:\n\n- [ ] Send recording, if applicable.\n- [ ] Send learner workbook link.\n- [ ] Send assignment reminder.\n- [ ] Share critique notes.\n- [ ] Update cohort tracker.\n- [ ] Mark missing submissions.\n- [ ] Add unresolved questions to the parking lot.\n- [ ] Remind learners of the next artifact.\n\n---\n\n## Premium Experience Bar\n\nThe cohort feels premium when:\n\n- learners know what to prepare before each session;\n- live time is used for judgment and critique;\n- artifacts compound into the portfolio;\n- feedback is specific and fast;\n- tools are practical but not gimmicky;\n- the instructor can handle technical questions with clarity;\n- learners leave each week with a decision, not just notes.\n\nThat is the delivery standard.\n"},{"file":"00_Portfolio_Packet_Template.md","title":"Senior AI PM Portfolio Packet Template","body":"# Senior AI PM Portfolio Packet Template\n\nUse this as the final learner deliverable. Each section should be concise enough for an interviewer or executive to review, but specific enough to show real product judgment.\n\n---\n\n## 1. AI Product Strategy Memo\n\n### Product concept\n\n- Product / feature name:\n- Target user:\n- Workflow or decision being improved:\n- Current pain:\n- Why AI is relevant:\n- Why now:\n\n### Opportunity filter\n\n| Question | Answer |\n|---|---|\n| Is the pain frequent or high-stakes? | |\n| Does AI improve the workflow meaningfully? | |\n| What data/context is available? | |\n| What quality bar must be met? | |\n| What happens when the system is wrong? | |\n| What non-AI alternative exists? | |\n\n### Strategy\n\n- Business outcome:\n- User outcome:\n- Data or workflow advantage:\n- Distribution advantage:\n- Build / buy / partner recommendation:\n- 90-day roadmap:\n\n---\n\n## 2. AI PRD\n\n### User journey\n\n- Trigger:\n- User goal:\n- AI system role:\n- Human role:\n- Success state:\n- Failure state:\n\n### System behavior\n\n- Inputs:\n- Context needed:\n- Retrieval sources:\n- Tools/actions:\n- Output format:\n- Human approval points:\n\n### Failure modes\n\n| Failure mode | User impact | Detection method | Mitigation |\n|---|---|---|---|\n| | | | |\n| | | | |\n| | | | |\n\n### Acceptance criteria\n\n- Must do:\n- Must not do:\n- Escalates when:\n- Refuses when:\n- Logs when:\n\n---\n\n## 3. Agent/RAG Workflow Prototype\n\n### Prototype summary\n\n- Tool used:\n- Workflow steps:\n- Data/context sources:\n- Human approval gates:\n- Demo scenario:\n\n### Autonomy map\n\n| Step | AI role | Human role | Tool/data used | Approval needed? |\n|---|---|---|---|---|\n| | | | | |\n| | | | | |\n| | | | | |\n\n---\n\n## 4. Eval Plan And Golden Dataset\n\n### Quality goal\n\n- What good looks like:\n- What bad looks like:\n- What must be measured before launch:\n\n### Golden dataset\n\n| ID | Input | Context | Expected behavior | Failure category | Severity |\n|---|---|---|---|---|---|\n| 001 | | | | | |\n| 002 | | | | | |\n| 003 | | | | | |\n\n### Eval rubric\n\n| Criterion | Pass | Fail |\n|---|---|---|\n| Groundedness | | |\n| Task completion | | |\n| Safety / permissions | | |\n| Tone / UX | | |\n| Escalation behavior | | |\n\n---\n\n## 5. Technical Architecture Brief For PMs\n\n### Plain-English architecture\n\n- User surface:\n- Model:\n- Prompt / instruction layer:\n- Context and RAG:\n- Tools and APIs:\n- Memory:\n- Telemetry:\n- Human review:\n\n### Engineering questions to resolve\n\n1.\n2.\n3.\n4.\n5.\n\n---\n\n## 6. Production Readiness Review\n\n### Cost and latency\n\n- Cost driver:\n- Expected usage:\n- Cost per workflow:\n- Latency target:\n- Optimization levers:\n\n### Risk register\n\n| Risk | Likelihood | Impact | Mitigation | Launch gate |\n|---|---|---|---|---|\n| | | | | |\n| | | | | |\n| | | | | |\n\n### Launch plan\n\n- Alpha:\n- Beta:\n- GA criteria:\n- Rollback trigger:\n- Monitoring plan:\n- Post-launch learning loop:\n\n---\n\n## 7. Executive Narrative And Interview Story\n\n### Executive version\n\nIn 2 minutes, explain:\n\n- the business problem;\n- why AI is the right approach;\n- what system you would build;\n- how you would evaluate quality;\n- what risks you would control;\n- what you would ship first.\n\n### Interview version\n\nUse this structure:\n\n1. Situation:\n2. Product judgment:\n3. Technical tradeoff:\n4. Eval and quality bar:\n5. Launch risk:\n6. Cross-functional leadership:\n7. Result or expected result:\n\n"},{"file":"00_Tool_Stack_and_Setup.md","title":"Tool Stack And Setup","body":"# Tool Stack And Setup\n\nThe course teaches named tools deeply enough to be practical, but every tool is framed through durable PM principles: workflow modeling, context design, evals, cost, risk, and launch readiness.\n\n---\n\n## Core Path: No-Code / Low-Code\n\nLearners should have access to:\n\n- **Claude or ChatGPT** for product reasoning, structured outputs, system prompts, critique, and PRD drafting.\n- **Perplexity or equivalent research tool** for source-backed market and competitor research.\n- **Google Docs or Notion** for portfolio packet artifacts.\n- **Google Sheets or Airtable** for golden datasets, eval tables, scoring rubrics, and simple cost models.\n- **n8n** for workflow automation, tool calls, approvals, and agent demos.\n- **Lovable, v0, Bolt, or equivalent** for lightweight UI prototyping.\n- **Figma or FigJam** for flow maps, autonomy maps, system diagrams, and approval paths.\n\n---\n\n## Optional Advanced Path\n\nFor learners who want deeper technical credibility:\n\n- OpenAI or Anthropic API access.\n- Claude Code, Codex, Cursor, or similar AI coding environment.\n- GitHub for private or public portfolio artifacts.\n- LangSmith, Braintrust, Humanloop, or Langfuse for traces and evals.\n- A hosted vector/RAG tool or lightweight framework.\n- PostHog, Amplitude, or equivalent product analytics tool.\n\nUse `00_Advanced_Technical_Companion.md` for the deeper optional path: system architecture, RAG, agents, evals, tracing, cost, latency, safety, and engineering review questions.\n\n---\n\n## Learner Setup Checklist\n\nBefore Week 1:\n\n- [ ] Create or confirm access to Claude or ChatGPT.\n- [ ] Create or confirm access to a research tool.\n- [ ] Create a folder for portfolio docs.\n- [ ] Create a spreadsheet for eval datasets.\n- [ ] Create or confirm access to n8n.\n- [ ] Create or confirm access to a no-code prototype tool.\n- [ ] Decide whether to use a real work problem or the shared case.\n\nBefore Week 4:\n\n- [ ] Confirm n8n access.\n- [ ] Import or recreate the shared workflow skeleton.\n- [ ] Confirm access to any APIs or mock tools used in the session.\n\nBefore Week 5:\n\n- [ ] Prepare at least 10 candidate eval rows.\n- [ ] Prepare one example trace or sample output from the prototype.\n\nBefore Week 8:\n\n- [ ] Assemble final portfolio packet.\n- [ ] Decide what can be public, private, or anonymized.\n- [ ] Prepare a 2-minute executive narrative.\n\n---\n\n## Tool Principles\n\n- Use tools to make product judgment visible.\n- Start with spreadsheets for evals before moving to tracing platforms.\n- Prefer simple workflows before agents.\n- Add autonomy only when it improves measurable outcomes.\n- Treat every tool action as a product permission decision.\n- Keep tool choices replaceable.\n"},{"file":"00_Advanced_Technical_Companion.md","title":"Advanced Technical Companion For Production AI PM","body":"# Advanced Technical Companion For Production AI PM\n\n## Purpose\n\nThis companion is for learners who want deeper technical credibility without turning the program into a coding bootcamp.\n\nThe goal is not to become the ML engineer. The goal is to lead AI product decisions with enough technical fluency to:\n\n- ask sharper engineering questions;\n- understand architecture tradeoffs;\n- define eval and telemetry requirements;\n- identify production risks early;\n- scope prototypes responsibly;\n- explain technical decisions to executives.\n\nUse this doc alongside the weekly workbooks. The core course remains no-code / low-code. This companion adds optional depth.\n\n---\n\n## The AI Product Stack\n\nUse this stack to reason about most GenAI, RAG, and agentic products.\n\n```text\nUser surface\n  -> workflow and task model\n  -> instruction layer\n  -> model selection\n  -> context and retrieval\n  -> tools and actions\n  -> memory and state\n  -> evals and observability\n  -> governance, safety, cost, and launch controls\n```\n\nAs a PM, your job is to connect each layer to a product decision.\n\n| Layer | PM decision |\n|---|---|\n| User surface | Where does AI appear, and what does the user control? |\n| Workflow | What job is being improved, removed, or delegated? |\n| Instruction layer | What behavior must the system follow? |\n| Model | What capability, latency, cost, and reliability do we need? |\n| Context/RAG | What information must the system use to be grounded? |\n| Tools/actions | What can the system do outside the chat box? |\n| Memory/state | What should persist, and what should not? |\n| Evals | How will we know it is good enough to ship? |\n| Observability | What traces, events, and metrics must be logged? |\n| Governance | What must be approved, blocked, reviewed, or rolled back? |\n\n---\n\n## Named Tools And Durable Principles\n\nThe course can demo named tools, but the principles should survive tool changes.\n\n| Need | Named tools to know | Tool-agnostic principle |\n|---|---|---|\n| Reasoning and drafting | Claude, ChatGPT | Use AI to expose options, assumptions, and critique |\n| Source-backed research | Perplexity, ChatGPT search, Gemini | Separate sourced facts from product interpretation |\n| Workflow automation | n8n, Make, Zapier | Model the workflow before adding autonomy |\n| UI prototyping | v0, Lovable, Bolt, Figma | Prototype the decision surface, not just screens |\n| Data tables and evals | Sheets, Airtable, Notion databases | Start evals in a visible table before scaling tooling |\n| API prototyping | OpenAI API, Anthropic API | Make system behavior explicit and measurable |\n| RAG and vectors | Supabase, Pinecone, Weaviate, Chroma | Retrieval quality matters more than vector-store branding |\n| Tracing and evals | LangSmith, Braintrust, Langfuse, Humanloop | Capture traces before arguing about quality |\n| Product analytics | PostHog, Amplitude, Mixpanel | Track workflow outcomes, not just feature clicks |\n| Engineering collaboration | GitHub, Linear, Jira, Slack | Convert product risk into explicit engineering work |\n\n---\n\n## Week-By-Week Technical Depth\n\n| Week | Optional technical depth | Output |\n|---|---|---|\n| 1 | Identify AI vs automation vs rules-based alternatives | AI opportunity filter with non-AI baseline |\n| 2 | Compare build, buy, partner, and wrapper approaches | Technical assumptions in strategy memo |\n| 3 | Map a GenAI system end to end | Plain-English system architecture |\n| 4 | Prototype a workflow with tool calls and approvals | Agent/RAG workflow and autonomy map |\n| 5 | Create eval rows, rubrics, and trace review criteria | Eval dataset and failure taxonomy |\n| 6 | Review architecture tradeoffs with engineering questions | Technical architecture brief |\n| 7 | Model cost, latency, security, and launch risk | Launch readiness review |\n| 8 | Translate technical tradeoffs into portfolio and interviews | AI PM technical narrative |\n\n---\n\n## Core Concepts PMs Must Understand\n\n### Tokens And Context\n\nTokens are the units models process. Context windows define how much text, data, instructions, and history the model can consider at once.\n\nPM implications:\n\n- long context can improve recall but increase cost and latency;\n- more context is not always better;\n- important instructions and evidence can get diluted;\n- retrieved context needs prioritization;\n- UX should not assume the model remembers everything.\n\nQuestions to ask:\n\n- What context is required for this task?\n- What context can be safely omitted?\n- What happens when the context is too large?\n- How do we handle stale, missing, or conflicting context?\n\n### Prompt And Instruction Layer\n\nThe instruction layer defines role, task, constraints, output format, refusal rules, and escalation behavior.\n\nPM implications:\n\n- prompts are product behavior, not copywriting;\n- prompts should map to acceptance criteria;\n- prompts should include failure behavior;\n- structured outputs are easier to evaluate than free-form text.\n\nQuestions to ask:\n\n- What must the system always do?\n- What must it never do?\n- When should it ask for clarification?\n- When should it refuse or escalate?\n- What output schema should engineering rely on?\n\n### Model Choice\n\nModel choice is a tradeoff between capability, reliability, latency, cost, privacy, availability, and ecosystem.\n\nPM implications:\n\n- the most capable model may be too slow or expensive;\n- cheaper models may be fine for narrow subtasks;\n- routing can send simple and complex tasks to different models;\n- fallback behavior matters in production.\n\nQuestions to ask:\n\n- What capability does the task actually require?\n- Which failure modes are unacceptable?\n- What latency does the user workflow tolerate?\n- What is the cost per successful workflow?\n- Do we need model fallback or routing?\n\n---\n\n## RAG And Knowledge Systems\n\nRAG means retrieval-augmented generation. The system retrieves relevant information and gives it to the model as context.\n\n### Basic RAG Flow\n\n```text\nUser asks or workflow triggers\n  -> query is created\n  -> relevant documents or records are retrieved\n  -> retrieved context is ranked or filtered\n  -> model generates an answer or action plan\n  -> output is evaluated, logged, and shown to the user\n```\n\n### PM Decisions In RAG\n\n| Decision | Why it matters |\n|---|---|\n| Source selection | Determines what the AI is allowed to know |\n| Chunking | Affects whether useful context is retrieved |\n| Metadata | Helps filter by customer, role, permission, recency, product, or region |\n| Ranking | Determines which evidence gets priority |\n| Citations | Makes trust and review easier |\n| Freshness | Prevents stale answers |\n| Permissions | Prevents data leakage |\n| Eval set | Shows whether retrieval works before launch |\n\n### RAG Failure Modes\n\n| Failure | What it looks like | Product response |\n|---|---|---|\n| Missing retrieval | The right source is never used | Improve indexing, query generation, or metadata |\n| Wrong retrieval | The system uses irrelevant context | Add filters, ranking, or source constraints |\n| Stale retrieval | The answer uses outdated information | Add freshness checks and source dates |\n| Permission leak | User sees content they should not see | Enforce access control before retrieval |\n| Overstuffed context | Model gets too much text and misses the point | Reduce context, rank better, summarize carefully |\n| Unsupported answer | Model answers beyond retrieved evidence | Require citations or refusal behavior |\n\n---\n\n## Agents And Workflow Automation\n\nUse \"agent\" carefully. Many useful AI products are workflows with AI steps, not fully autonomous agents.\n\n### Autonomy Tiers\n\n| Tier | AI role | Human role | Example |\n|---|---|---|---|\n| 0 | No AI | Does all work | Manual checklist |\n| 1 | Suggests | Reviews and acts | Drafts support reply |\n| 2 | Prepares | Approves before action | Creates refund recommendation |\n| 3 | Acts within limits | Reviews exceptions | Sends low-risk follow-up |\n| 4 | Plans and acts | Audits and intervenes | Multi-step account workflow |\n\nMost production products should start at Tier 1 or Tier 2.\n\n### Agent Design Checklist\n\n- What is the user goal?\n- What workflow step is being delegated?\n- What tools can the system use?\n- What data can it access?\n- What actions require approval?\n- What stop conditions prevent loops?\n- What recovery path exists after failure?\n- What traces are saved?\n- What evals must pass before launch?\n\n### Tool-Calling Product Decisions\n\nEvery tool call is a permission decision.\n\nFor each tool/action, define:\n\n- name;\n- purpose;\n- required input;\n- allowed user roles;\n- data access rules;\n- approval requirement;\n- rate limit or budget limit;\n- failure behavior;\n- logging requirement.\n\n---\n\n## Evals And Observability\n\nIn AI products, evals are part of the product spec.\n\n### Eval Types\n\n| Eval type | Use it for | Example |\n|---|---|---|\n| Golden dataset | Known test cases before launch | 20 customer questions with expected behavior |\n| Rubric eval | Human or LLM-assisted quality review | Groundedness, task completion, safety |\n| Regression eval | Prevent old bugs from returning | Previously failed traces must now pass |\n| Red-team eval | Stress risky behavior | Prompt injection, bad context, unsafe action |\n| Online monitoring | Measure real-world performance | Escalation rate, correction rate, latency |\n| Human review | Align quality with expert judgment | Reviewer approves or rejects outputs |\n\n### Trace Review\n\nA trace is a record of what happened inside the AI workflow.\n\nUseful traces include:\n\n- user input;\n- system instructions;\n- retrieved context;\n- tool calls;\n- intermediate decisions;\n- final output;\n- human edits;\n- latency;\n- cost;\n- error or refusal state.\n\nPM questions:\n\n- Which traces should be reviewable?\n- Who reviews them?\n- What failures block launch?\n- Which issues become product work vs model work?\n- How will we know quality improved?\n\n---\n\n## Cost And Latency\n\nAI product economics are shaped by usage, context, model calls, tool calls, retries, evals, and human review.\n\n### Cost Drivers\n\n| Driver | PM implication |\n|---|---|\n| Number of model calls | Multi-step workflows can multiply cost quickly |\n| Context size | Long prompts and retrieved docs increase cost |\n| Output size | Long generated content costs more and takes longer |\n| Model choice | Premium models may be needed only for hard tasks |\n| Tool/API calls | External calls add cost and latency |\n| Retries | Poor quality can create hidden cost |\n| Human review | Review effort is part of cost per successful workflow |\n\n### Optimization Levers\n\n- route simple tasks to cheaper models;\n- cache repeated context;\n- summarize or compress long context;\n- use retrieval filters;\n- batch background tasks;\n- reduce unnecessary tool calls;\n- split synchronous and asynchronous work;\n- require human approval only where risk warrants it.\n\nPM questions:\n\n- What is the cost per successful workflow?\n- What latency does the user actually tolerate?\n- Which steps can happen in the background?\n- Which quality failures create rework cost?\n- What usage level breaks the business case?\n\n---\n\n## Safety, Security, And Governance\n\nAI risk is product risk. It should be handled in the PRD, architecture brief, eval plan, and launch review.\n\n### Common Risk Areas\n\n| Risk | Example | Control |\n|---|---|---|\n| Prompt injection | User tricks AI into ignoring rules | Instruction hierarchy, input filtering, tool limits |\n| Data leakage | AI exposes private data | Access control, retrieval permissions, logging |\n| Hallucination | AI makes unsupported claims | Grounding, citations, refusal rules, evals |\n| Excessive agency | AI takes action without approval | Autonomy tiers, human gates, tool limits |\n| Unsafe recommendation | AI suggests harmful action | Safety rubric, escalation rules, red-team tests |\n| High-cost loops | Agent repeats tool calls | Budget limits, stop conditions, monitoring |\n| Audit gap | Team cannot explain what happened | Trace logging and review process |\n\n### Launch Gate Examples\n\nDo not launch if:\n\n- critical eval rows fail;\n- sensitive data can leak across users or accounts;\n- risky actions lack approval gates;\n- rollback is undefined;\n- trace review is unavailable;\n- cost per workflow breaks the business case;\n- latency makes the workflow unusable.\n\n---\n\n## Architecture Brief Template\n\nUse this as the technical appendix to your AI PRD.\n\n### 1. Product Context\n\n- User:\n- Workflow:\n- AI role:\n- Human role:\n- Business outcome:\n\n### 2. System Map\n\n- User surface:\n- Input:\n- Instruction layer:\n- Model:\n- Retrieval/context:\n- Tools/actions:\n- Memory/state:\n- Output:\n- Human approval:\n- Telemetry:\n\n### 3. Data And Context\n\n| Source | Purpose | Freshness | Permission rule | Failure if missing |\n|---|---|---|---|---|\n| | | | | |\n\n### 4. Tool/Action Registry\n\n| Tool/action | What it does | Approval? | Failure behavior | Logged? |\n|---|---|---|---|---|\n| | | | | |\n\n### 5. Eval Contract\n\n- Golden dataset size:\n- Critical failure rows:\n- Rubric criteria:\n- Required pass threshold:\n- Human review process:\n- Release-blocking failures:\n\n### 6. Production Constraints\n\n- Latency target:\n- Cost target:\n- Privacy requirement:\n- Security requirement:\n- Rollback trigger:\n- Monitoring owner:\n\n### 7. Engineering Questions\n\n1. What context is required for reliable output?\n2. Which actions require approval?\n3. What should be logged for trace review?\n4. What is the fallback when the model or retrieval fails?\n5. Which eval failures block beta?\n\n---\n\n## Recommended Advanced Tool Path\n\nUse this if you want deeper technical proof in your portfolio.\n\n### Path A: Low-Code Technical Portfolio\n\nBest for PMs who want technical credibility without code.\n\nUse:\n\n- n8n or Make for workflow orchestration;\n- Google Sheets or Airtable for eval data;\n- Claude or ChatGPT for structured outputs;\n- Figma or FigJam for system maps;\n- PostHog or a spreadsheet for basic telemetry model.\n\nBuild:\n\n- one workflow with at least 4 steps;\n- one human approval gate;\n- one tool/action step;\n- one eval table with 20 rows;\n- one launch review with cost/latency assumptions.\n\n### Path B: API-Literate Portfolio\n\nBest for PMs comfortable reading API docs and working with engineering.\n\nUse:\n\n- OpenAI or Anthropic API;\n- a lightweight prototype environment;\n- LangSmith, Braintrust, Langfuse, or Humanloop for traces/evals;\n- Supabase, Pinecone, Weaviate, Chroma, or a managed RAG tool;\n- GitHub for private artifacts.\n\nBuild:\n\n- one API-based prompt or workflow spec;\n- one small RAG or tool-calling prototype;\n- one trace review;\n- one eval run;\n- one architecture brief with unresolved engineering questions.\n\n### Path C: Engineering-Team Companion\n\nBest for PMs working inside an existing AI/ML team.\n\nUse:\n\n- your team's approved stack;\n- internal telemetry and eval tools;\n- approved synthetic or anonymized data;\n- existing PRD, ticketing, and review workflows.\n\nBuild:\n\n- an AI PRD aligned to team architecture;\n- an eval contract engineering can implement;\n- a launch-readiness checklist;\n- stakeholder-facing tradeoff memo.\n\n---\n\n## PM Questions For Engineering Reviews\n\nUse these in Week 6 and Week 7.\n\n### Capability\n\n- What can the model reliably do today?\n- What does it do well only in demos?\n- What examples show the boundary of capability?\n\n### Context\n\n- What data must be available at inference time?\n- What happens when data is stale, missing, or contradictory?\n- How are permissions enforced before retrieval?\n\n### Workflow\n\n- Which steps are deterministic and which are probabilistic?\n- Which actions require human approval?\n- What is the recovery path after a failed action?\n\n### Evals\n\n- What test set represents real user risk?\n- Which eval failures block launch?\n- How will regressions be caught?\n\n### Cost And Latency\n\n- What are the biggest cost drivers?\n- Which parts must be real-time?\n- Which parts can run in the background?\n\n### Safety And Operations\n\n- What is logged?\n- Who reviews traces?\n- What is the rollback plan?\n- What incident would make us pause launch?\n\n---\n\n## Portfolio Signals For Global AI PM Roles\n\nYour technical work should signal leadership, not tool tourism.\n\nStrong signals:\n\n- clear AI PRD with acceptance criteria;\n- system map with context, tools, approvals, and telemetry;\n- eval dataset tied to real workflow risk;\n- red-team cases and launch-blocking failures;\n- cost and latency reasoning;\n- tradeoff memo on model, RAG, autonomy, or build/buy/partner;\n- concise interview story explaining technical choices in product language.\n\nWeak signals:\n\n- screenshots of chat outputs only;\n- prompt library without product context;\n- generic chatbot demo;\n- architecture diagram with no eval or launch plan;\n- tool list without tradeoffs;\n- public portfolio that exposes confidential data.\n\n---\n\n## Glossary\n\n| Term | Meaning for PMs |\n|---|---|\n| Agent | A system that can plan, use tools, and act within boundaries |\n| Context window | The amount of information a model can consider at once |\n| Embedding | Numeric representation used to compare semantic similarity |\n| Eval | A repeatable way to judge AI quality |\n| Golden dataset | Curated examples used to test expected behavior |\n| Grounding | Tying AI output to approved context or evidence |\n| Hallucination | Unsupported or false output presented confidently |\n| Human-in-the-loop | Human review or approval inside the workflow |\n| Latency | Time the user waits for the system |\n| Memory | Information persisted across turns or sessions |\n| RAG | Retrieval-augmented generation; retrieving context before generation |\n| Trace | A record of model inputs, context, tool calls, outputs, and outcomes |\n| Tool call | A model-triggered action against an API, database, or workflow step |\n| Vector database | A system that stores embeddings for semantic retrieval |\n\n---\n\n## Final Technical Bar\n\nBy the end of the program, an advanced learner should be able to explain:\n\n- what AI system they would build;\n- what context it needs;\n- where autonomy is allowed and where approval is required;\n- how quality is evaluated;\n- what traces are logged;\n- what cost and latency constraints matter;\n- what launch risks must be controlled;\n- what engineering questions remain unresolved.\n\nThat is enough technical depth for a senior AI PM portfolio without pretending to be the ML engineer.\n"},{"file":"00_Assessment_Rubrics_And_Certification.md","title":"Assessment Rubrics And Certification","body":"# Assessment Rubrics And Certification\n\n## Purpose\n\nThis document defines how learner work is reviewed, what counts as completion, and what standard earns a certificate.\n\nThe course is not graded like an academic program. It is assessed like senior product work: clear decisions, defensible tradeoffs, and production judgment.\n\n---\n\n## Completion Levels\n\n| Level | Meaning |\n|---|---|\n| Incomplete | Artifact missing or too generic to review |\n| Developing | Direction is visible, but assumptions and quality bar are weak |\n| Cohort Ready | Strong enough for cohort completion |\n| Portfolio Ready | Strong enough to show in interviews or executive conversations |\n| Showcase Ready | Strong enough for public or semi-public portfolio use after privacy review |\n\nThe default target is Portfolio Ready for the final packet.\n\n---\n\n## Certificate Criteria\n\nTo receive a certificate of completion, a learner must:\n\n- attend at least 6 of 8 live sessions or review recordings and submit make-up work;\n- submit at least 5 of 7 portfolio artifacts;\n- submit the final portfolio packet;\n- complete the eval dataset with at least 20 rows;\n- complete the launch readiness review;\n- deliver or submit the 2-minute executive narrative;\n- follow confidentiality and AI use policies.\n\nTo receive a distinction or top-performer note, a learner must:\n\n- submit all 7 artifacts;\n- reach Portfolio Ready on at least 5 artifacts;\n- show clear technical tradeoff reasoning;\n- include evals and production readiness in the final narrative;\n- provide useful critique to peers.\n\n---\n\n## Master Rubric\n\n| Dimension | Developing | Cohort Ready | Portfolio Ready |\n|---|---|---|---|\n| Product judgment | Problem and user are broad | User, workflow, and pain are specific | Clear pursue, reshape, or kill logic |\n| AI necessity | AI is assumed useful | Non-AI alternative is named | AI role is justified by workflow, context, and value |\n| Strategy | Business value is vague | Outcome and first release are defined | Moat, distribution, and build/buy/partner logic are credible |\n| System design | Tool choice dominates | System behavior is mapped | Context, tools, approvals, telemetry, and failure modes are clear |\n| Evals | Quality is subjective | Rubric and sample rows exist | Golden dataset catches launch-blocking failures |\n| Production readiness | Risks are listed | Cost, latency, safety, and rollback are addressed | Launch gates are measurable and defensible |\n| Communication | Artifact is hard to scan | Artifact is clear and concise | Executive and interview narratives are strong |\n\n---\n\n## Artifact Rubrics\n\n### 1. AI Product Strategy Memo\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| User and workflow | Specific user, workflow, trigger, and current pain |\n| AI rationale | Explains why AI is needed and why simpler alternatives are insufficient |\n| Business case | Names business outcome and leading indicators |\n| Defensibility | Explains data, workflow, distribution, or learning-loop advantage |\n| First release | Defines what should ship first and what should not |\n| Kill criteria | Names evidence that would stop or reshape the idea |\n\n### 2. AI PRD\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| User journey | Trigger, user goal, AI role, human role, success, and failure states |\n| System behavior | Inputs, context, output, retrieval, tools, and approval points |\n| Failure modes | Meaningful failures with impact, detection, and mitigation |\n| Acceptance criteria | Must-do, must-not-do, escalation, refusal, and logging rules |\n| Engineering clarity | Clear enough for an engineering review without heavy translation |\n\n### 3. Agent/RAG Workflow Prototype\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| Workflow | At least 4 meaningful steps connected to user value |\n| Context | Names data sources, permissions, and freshness needs |\n| Autonomy | Approval gates and stop conditions are explicit |\n| Demo | Demonstrates the target workflow, not just a generic chat interaction |\n| Recovery | Includes failure and recovery path |\n\n### 4. Eval Dataset And Rubric\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| Golden dataset | At least 20 rows, including edge cases and failure cases |\n| Expected behavior | Specific enough to judge pass/fail |\n| Failure taxonomy | Covers groundedness, wrong context, unsafe action, escalation, and UX/trust |\n| Severity | Launch-blocking rows are marked |\n| Rubric | Criteria can be used repeatedly by human or automated reviewers |\n\n### 5. Technical Architecture Brief\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| System map | Clear plain-English architecture |\n| Model/context/tools | Names the major components and tradeoffs |\n| Telemetry | Explains what needs to be logged and reviewed |\n| Engineering questions | Lists unresolved questions that matter before launch |\n| PM judgment | Connects technical choices to product risk and user outcomes |\n\n### 6. Production Readiness Review\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| Cost model | Includes usage, model calls, context, tool calls, and review effort |\n| Latency | Defines user-facing or background latency targets |\n| Risk register | Includes likelihood, impact, mitigation, and launch gates |\n| Safety/security | Covers prompt injection, data leakage, excessive agency, and escalation |\n| Launch plan | Defines alpha, beta, GA criteria, rollback, and monitoring |\n\n### 7. Executive Narrative And Interview Story\n\n| Criterion | Portfolio Ready bar |\n|---|---|\n| Executive story | Clear 2-minute explanation of business problem, AI choice, system, evals, and risk |\n| Interview story | Shows product judgment, technical tradeoff, and cross-functional leadership |\n| Evidence | Points to portfolio artifacts without overwhelming the listener |\n| Seniority signal | Communicates decisions and tradeoffs, not just participation |\n\n---\n\n## Feedback Template\n\nUse this for written reviews.\n\n```text\nArtifact:\nCurrent level:\nStrongest signal:\nWeakest assumption:\nProduction risk:\nTechnical clarity:\nPortfolio improvement:\nNext action:\n```\n\n---\n\n## Final Review Scorecard\n\n| Item | Status |\n|---|---|\n| Strategy Memo submitted | |\n| AI PRD submitted | |\n| Workflow Prototype submitted | |\n| Eval Dataset and Rubric submitted | |\n| Technical Architecture Brief submitted | |\n| Production Readiness Review submitted | |\n| Executive Narrative submitted | |\n| Confidentiality reviewed | |\n| Public/private/anonymized labels added | |\n| Certificate criteria met | |\n\n---\n\n## Certificate Language\n\nSuggested certificate wording:\n\n```text\nThis certifies that [Learner Name] completed Production AI PM, an 8-week applied cohort focused on leading GenAI and agentic products from strategy to launch.\n\nThe learner completed applied work across AI product strategy, system design, agent/RAG workflows, evals, technical architecture, production readiness, and executive communication.\n```\n\nKeep the certificate honest. The stronger proof is the portfolio packet.\n"},{"file":"00_Capstone_Casebook.md","title":"Capstone And Casebook","body":"# Capstone And Casebook\n\n## Purpose\n\nThe capstone is the spine of Production AI PM. Every learner should leave with a portfolio packet that shows how they would lead one AI product from opportunity selection through launch readiness.\n\nThis casebook gives learners and instructors a shared structure.\n\n---\n\n## Capstone Rules\n\nEvery capstone must have:\n\n- a specific user;\n- a real workflow or decision;\n- a clear pain;\n- a non-AI alternative;\n- data or context requirements;\n- failure modes;\n- evals;\n- cost and latency assumptions;\n- launch gates.\n\nAvoid capstones that are:\n\n- generic chatbots;\n- tool demos without a user workflow;\n- \"AI for everything\" ideas;\n- ideas that require sensitive data the learner cannot safely discuss;\n- ideas where failure has no meaningful consequence.\n\n---\n\n## Capstone Tracks\n\n| Track | Best for | Example directions |\n|---|---|---|\n| Enterprise Copilot | B2B SaaS, internal tools, customer-facing expert workflows | Success copilot, sales account prep, support response assistant |\n| Agentic Workflow Product | Operations, routing, approvals, multi-step automation | Renewal risk workflow, research agent, claims triage |\n| Decision Support Product | Recommendations, summarization, ranking, trust | Travel planner, card recommendation, health content assistant |\n\n---\n\n## Shared Teaching Case\n\nUse this case throughout live teaching.\n\n### Customer Success Copilot For B2B SaaS\n\nTarget user:\n\n- Customer Success Manager managing mid-market and enterprise accounts.\n\nWorkflow:\n\n- Prepare for renewal or risk review.\n- Understand account health.\n- Identify risks and opportunities.\n- Draft next-best actions.\n- Escalate risky accounts.\n\nCurrent pain:\n\n- information is scattered across CRM, support tickets, product usage, call notes, and email;\n- CSMs spend too much time preparing and still miss important context;\n- risk signals are inconsistent;\n- recommendations vary by CSM quality and time available.\n\nWhy AI may help:\n\n- synthesize scattered context;\n- summarize account history;\n- highlight risks and evidence;\n- suggest playbooks;\n- draft internal and customer-facing next steps;\n- route high-risk cases for review.\n\nNon-AI alternative:\n\n- dashboard with health score;\n- checklist-driven account review;\n- manual CSM prep template;\n- rules-based risk alerts.\n\nPotential product outcome:\n\n- reduce prep time;\n- improve risk detection;\n- increase renewal quality;\n- improve consistency of CSM recommendations.\n\n---\n\n## Shared Case System Map\n\n```text\nCSM opens account review\n  -> system retrieves account context\n  -> AI summarizes evidence and risks\n  -> AI recommends playbook and next action\n  -> CSM reviews and edits\n  -> approved action is logged\n  -> risky accounts are escalated\n  -> traces and outcomes feed evals\n```\n\n---\n\n## Shared Case Data Sources\n\n| Source | Example fields | Risk |\n|---|---|---|\n| CRM | plan, renewal date, account owner, contract value | stale or incomplete fields |\n| Product usage | logins, feature adoption, seat utilization | misleading usage patterns |\n| Support tickets | issue severity, sentiment, open bugs | wrong account or outdated ticket |\n| Call notes | objections, stakeholders, commitments | unstructured and subjective |\n| Email summaries | follow-ups, commitments, blockers | privacy and permission boundaries |\n| Playbook library | recommended actions by scenario | outdated playbooks |\n\n---\n\n## Shared Case Failure Modes\n\n| Failure | Example | Launch implication |\n|---|---|---|\n| Unsupported claim | Says account is at risk without evidence | Require citations and evidence |\n| Wrong account context | Mixes data from another customer | Block launch until permissions and retrieval pass |\n| Bad recommendation | Suggests discount when issue is product adoption | Improve rubric and playbook mapping |\n| Unsafe action | Sends customer email without review | Require approval gate |\n| Missing escalation | Fails to flag high-risk renewal | Mark as launch-blocking eval row |\n| High-cost workflow | Calls model repeatedly for every account view | Add caching, routing, and usage limits |\n\n---\n\n## Public Example Contexts\n\nThese examples can be used for teaching and content.\n\n### Wasabi Travels\n\nPotential product angle:\n\n- AI-assisted travel planning and itinerary refinement.\n\nAI PM lessons:\n\n- uncertainty handling;\n- preference capture;\n- recommendation quality;\n- trust and user control;\n- cost of repeated planning loops.\n\nPossible capstone:\n\n- \"AI trip planning copilot for high-intent travelers who need itinerary confidence before booking.\"\n\n### Card Compass\n\nPotential product angle:\n\n- decision support and recommendation quality for financial products.\n\nAI PM lessons:\n\n- explainability;\n- ranking quality;\n- trust;\n- suitability;\n- evals for recommendation accuracy and user outcomes.\n\nPossible capstone:\n\n- \"AI card recommendation assistant that explains tradeoffs and avoids unsupported financial claims.\"\n\n### Valik Diary\n\nPotential product angle:\n\n- memory, reflection, personalization, and knowledge workflows.\n\nAI PM lessons:\n\n- long-term memory;\n- privacy boundaries;\n- personalization quality;\n- tone and user trust;\n- retrieval and summarization.\n\nPossible capstone:\n\n- \"AI reflection companion that turns user entries into safe, private, and useful personal insights.\"\n\n---\n\n## Capstone Selection Worksheet\n\nUse this in Week 1.\n\n| Question | Answer |\n|---|---|\n| Who is the user? | |\n| What workflow or decision is being improved? | |\n| How often does this happen? | |\n| What is painful, expensive, slow, risky, or inconsistent today? | |\n| What is the best non-AI alternative? | |\n| What data or context is available? | |\n| What could go wrong? | |\n| What would make this idea worth killing? | |\n| Which capstone track fits best? | |\n\n---\n\n## Capstone Review Gates\n\n| Week | Gate | Pass condition |\n|---|---|---|\n| 1 | Opportunity | User, workflow, pain, non-AI alternative, and risk are clear |\n| 2 | Strategy | Business outcome, moat, and first release are defensible |\n| 3 | System | AI behavior, context, tools, and approvals are mapped |\n| 4 | Workflow | Prototype shows workflow and autonomy boundaries |\n| 5 | Evals | Golden dataset and rubric catch meaningful failures |\n| 6 | Architecture | Engineering questions and tradeoffs are visible |\n| 7 | Launch | Cost, latency, risk, monitoring, and rollback are defined |\n| 8 | Story | Portfolio and interview narrative show senior judgment |\n\n---\n\n## Fallback Capstone Prompts\n\nUse these when learners cannot use work context.\n\n1. Customer Success Copilot for B2B SaaS renewal risk.\n2. AI Travel Planner for high-intent international travelers.\n3. Credit Card Recommendation Assistant for informed decision support.\n4. Internal Research Agent for a strategy team.\n5. Support Triage Assistant for high-volume tickets.\n6. Sales Account Prep Copilot for enterprise reps.\n7. Hiring Screening Workflow with strict human review.\n8. Compliance Policy Assistant with citations and refusal rules.\n\nLearners should choose one and adapt it into a specific user/workflow pair.\n"},{"file":"00_Prompt_And_Workflow_Library.md","title":"Prompt And Workflow Library","body":"# Prompt And Workflow Library\n\n## Purpose\n\nThis library gives learners reusable prompts and workflow patterns for the course.\n\nThe prompts are not the product. They are thinking scaffolds. Learners should adapt them to their capstone, user, workflow, and data context.\n\n---\n\n## How To Use These Prompts\n\nFor every prompt:\n\n1. Replace bracketed fields.\n2. Add your capstone context.\n3. Ask for assumptions and risks.\n4. Review the output critically.\n5. Convert the answer into your own product artifact.\n\nDo not paste private customer or company data into tools unless approved.\n\n---\n\n## Week 1: AI Opportunity Filter Prompt\n\n```text\nAct as a senior AI product advisor.\n\nI am evaluating this AI product idea:\n[describe idea]\n\nTarget user:\n[user]\n\nWorkflow:\n[workflow]\n\nScore the idea from 1 to 5 on:\n1. Pain\n2. Workflow leverage\n3. Available context/data\n4. Quality tolerance\n5. Economics\n6. Risk controllability\n\nFor each score, explain:\n- why you gave that score;\n- what assumption is weakest;\n- what evidence would make us kill or reshape the idea.\n\nEnd with a pursue / reshape / kill recommendation.\n```\n\n---\n\n## Week 2: Strategy Memo Critique Prompt\n\n```text\nAct as a critical senior AI PM reviewer.\n\nReview this AI product strategy memo:\n[paste memo or summary]\n\nEvaluate it for:\n- user and workflow specificity;\n- AI necessity vs non-AI alternative;\n- business outcome;\n- data or workflow advantage;\n- build / buy / partner logic;\n- first release scope;\n- kill criteria.\n\nReturn:\n1. strongest strategic signal;\n2. weakest assumption;\n3. missing evidence;\n4. one scope cut;\n5. one sharper version of the strategy.\n```\n\n---\n\n## Week 3: AI PRD Behavior Prompt\n\n```text\nAct as a PM writing an AI PRD for engineering.\n\nProduct concept:\n[concept]\n\nUser workflow:\n[workflow]\n\nDraft the system behavior section with:\n- inputs;\n- required context;\n- retrieval sources;\n- tools/actions;\n- output format;\n- human approval points;\n- refusal behavior;\n- escalation behavior;\n- logging requirements.\n\nThen list the top 8 failure modes with:\n- user impact;\n- detection method;\n- mitigation.\n```\n\n---\n\n## Week 4: Agent Workflow Prompt\n\n```text\nAct as an agentic workflow designer.\n\nWorkflow:\n[workflow]\n\nUser:\n[user]\n\nGoal:\n[goal]\n\nDesign a workflow with:\n- 4 to 7 steps;\n- AI role in each step;\n- human role in each step;\n- data or tool used;\n- approval requirement;\n- stop condition;\n- recovery path if the step fails.\n\nUse autonomy tiers from 0 to 4. Recommend the safest starting tier for launch.\n```\n\n---\n\n## Week 5: Eval Dataset Generator Prompt\n\n```text\nAct as an AI eval designer.\n\nProduct:\n[product]\n\nWorkflow:\n[workflow]\n\nKnown risks:\n[risks]\n\nGenerate 20 golden dataset rows with:\n- ID;\n- input;\n- context;\n- expected behavior;\n- failure category;\n- severity;\n- whether failure should block launch.\n\nInclude normal cases, edge cases, adversarial cases, missing-context cases, and unsafe-action cases.\n```\n\n---\n\n## Week 6: Engineering Review Prep Prompt\n\n```text\nAct as an AI/ML engineering lead reviewing a PM architecture brief.\n\nHere is my system map:\n[system map]\n\nHere is my AI PRD summary:\n[summary]\n\nIdentify:\n- unclear technical assumptions;\n- missing data or context requirements;\n- retrieval risks;\n- tool/action risks;\n- eval gaps;\n- observability gaps;\n- cost and latency questions.\n\nReturn the 10 most important engineering review questions I should be ready to answer.\n```\n\n---\n\n## Week 7: Launch Readiness Prompt\n\n```text\nAct as a production readiness reviewer for an AI product.\n\nProduct:\n[product]\n\nWorkflow:\n[workflow]\n\nArchitecture:\n[architecture]\n\nEval plan:\n[eval plan]\n\nReview for:\n- quality risks;\n- prompt injection;\n- data leakage;\n- excessive agency;\n- high-cost loops;\n- latency;\n- monitoring;\n- rollback;\n- human escalation.\n\nReturn:\n1. risk register;\n2. launch-blocking issues;\n3. beta criteria;\n4. GA criteria;\n5. rollback triggers.\n```\n\n---\n\n## Week 8: Interview Story Prompt\n\n```text\nAct as a senior AI PM interviewer.\n\nHere is my capstone:\n[summary]\n\nHelp me turn it into a 2-minute interview story using:\n1. Situation\n2. Product judgment\n3. Technical tradeoff\n4. Eval and quality bar\n5. Launch risk\n6. Cross-functional leadership\n7. Result or expected result\n\nThen ask me 8 hard follow-up questions a senior interviewer might ask.\n```\n\n---\n\n## Critique Prompt For Peer Review\n\n```text\nAct as a direct but constructive peer reviewer.\n\nArtifact:\n[paste artifact]\n\nReview it using this frame:\n- What is the strongest decision?\n- What is the weakest assumption?\n- What would fail in production?\n- What is too generic?\n- What should be cut?\n- What evidence is missing?\n- What is the next best improvement?\n\nKeep the critique specific and senior-level.\n```\n\n---\n\n## Workflow Pattern 1: Human-Approved Copilot\n\n```text\nUser requests help\n  -> AI gathers context\n  -> AI drafts recommendation\n  -> human reviews\n  -> human edits or approves\n  -> approved action is logged\n  -> outcome feeds evals\n```\n\nUse when:\n\n- quality matters;\n- user trust matters;\n- action risk is moderate;\n- human judgment should stay in the loop.\n\n---\n\n## Workflow Pattern 2: RAG Answer With Citations\n\n```text\nUser asks question\n  -> retrieve approved sources\n  -> rank and filter context\n  -> generate answer with citations\n  -> refuse if evidence is insufficient\n  -> log query, sources, answer, and feedback\n```\n\nUse when:\n\n- answers need grounding;\n- source trust matters;\n- users need evidence;\n- stale or wrong answers are risky.\n\n---\n\n## Workflow Pattern 3: Agentic Triage\n\n```text\nNew item arrives\n  -> AI classifies urgency and category\n  -> AI retrieves relevant context\n  -> AI recommends next step\n  -> low-risk items route automatically\n  -> high-risk items escalate\n  -> outcomes update the eval dataset\n```\n\nUse when:\n\n- many items need routing;\n- categories are clear;\n- mistakes can be detected;\n- escalation paths exist.\n\n---\n\n## Workflow Pattern 4: Decision Support Assistant\n\n```text\nUser describes goal\n  -> AI gathers preferences and constraints\n  -> AI ranks options\n  -> AI explains tradeoffs\n  -> user selects or asks follow-up\n  -> system logs decision and feedback\n```\n\nUse when:\n\n- the product helps users choose;\n- explainability matters;\n- the right answer depends on preferences;\n- trust is built through tradeoff clarity.\n\n---\n\n## Prompt Quality Checklist\n\n- [ ] The prompt names the user and workflow.\n- [ ] The prompt includes constraints and context.\n- [ ] The prompt asks for assumptions.\n- [ ] The prompt asks for failure modes.\n- [ ] The output format is structured.\n- [ ] The prompt includes refusal or escalation behavior when relevant.\n- [ ] The prompt does not include private data.\n- [ ] The output is reviewed against the product artifact, not accepted blindly.\n"},{"file":"00_Onboarding_Communications_And_Email_Templates.md","title":"Onboarding, Communications, And Email Templates","body":"# Onboarding, Communications, And Email Templates\n\n## Purpose\n\nUse these templates to run a polished cohort without writing every message from scratch.\n\nReplace bracketed fields before sending.\n\n---\n\n## Communication Cadence\n\n| Timing | Message |\n|---|---|\n| After enrollment | Welcome and expectations |\n| 7 days before Week 1 | Setup checklist |\n| 24 hours before each session | Session reminder |\n| Within 24 hours after each session | Recording, workbook, assignment |\n| Midweek | Submission nudge |\n| Before feedback checkpoints | Artifact reminder |\n| Week 8 | Final portfolio instructions |\n| After cohort | Completion, next steps, testimonial request |\n\n---\n\n## Enrollment Welcome\n\nSubject: Welcome to Production AI PM\n\n```text\nHi [Name],\n\nWelcome to Production AI PM.\n\nOver 8 weeks, you will build a Senior AI PM Portfolio Packet that shows how you would lead a GenAI or agentic product from strategy to launch.\n\nBefore Week 1, please:\n1. read the learner handbook;\n2. set up the core tools;\n3. choose one AI product idea from your work or domain;\n4. create a private folder for your portfolio artifacts.\n\nThis cohort assumes you already understand PM fundamentals. We will focus on AI-specific product judgment, system design, evals, production readiness, and executive communication.\n\nSee you in Week 1.\n```\n\n---\n\n## Setup Reminder\n\nSubject: Production AI PM setup checklist\n\n```text\nHi [Name],\n\nPlease complete these before our first live session:\n\n- Claude or ChatGPT access\n- Research tool access\n- Google Docs, Notion, or equivalent\n- Google Sheets, Airtable, or equivalent\n- n8n, Make, Zapier, or equivalent\n- Private folder for your portfolio packet\n- One AI product idea to evaluate\n\nIf you cannot use a real work problem, use the shared Customer Success Copilot case or one of the fallback capstones in the casebook.\n\nBring one idea you are willing to critique honestly. The goal in Week 1 is not to defend the idea. It is to test whether it deserves to exist.\n```\n\n---\n\n## 24-Hour Session Reminder\n\nSubject: Tomorrow: Session [Number] - [Session Title]\n\n```text\nHi [Name],\n\nTomorrow's session is [Session Title].\n\nPlease have open:\n- the learner workbook;\n- your current portfolio artifact;\n- your notes from the last session;\n- any sample inputs, outputs, or eval rows requested in the take-home.\n\nThe artifact for this session is:\n[Artifact]\n\nBring one decision you want critiqued.\n```\n\n---\n\n## Post-Session Follow-Up\n\nSubject: Session [Number] recap and assignment\n\n```text\nHi everyone,\n\nThanks for the work in Session [Number].\n\nLinks:\n- Recording: [link]\n- Workbook: [link]\n- Portfolio packet: [link]\n- Relevant companion doc: [link]\n\nYour take-home:\n[assignment]\n\nQuality bar:\n[quality bar]\n\nPlease submit by [deadline] so we can use your work in critique and feedback.\n```\n\n---\n\n## Midweek Submission Nudge\n\nSubject: Quick nudge: [Artifact] due [Date]\n\n```text\nHi [Name],\n\nQuick nudge that your [Artifact] is due [Date].\n\nDo not over-polish it. Submit a clear draft with:\n- the decision it supports;\n- the weakest assumption;\n- the main production risk;\n- one question you want feedback on.\n\nRough but specific is better than polished and generic.\n```\n\n---\n\n## Feedback Checkpoint Reminder\n\nSubject: Feedback checkpoint: [Artifact]\n\n```text\nHi [Name],\n\nThis week is a feedback checkpoint for [Artifact].\n\nBefore submitting, check:\n- Is the user and workflow specific?\n- Is the AI role justified?\n- Are failure modes visible?\n- Is the quality bar measurable?\n- Is the next decision clear?\n\nPlease submit by [deadline].\n```\n\n---\n\n## Falling Behind Message\n\nSubject: Getting you back on track\n\n```text\nHi [Name],\n\nI noticed a couple of artifacts are still pending.\n\nThe fastest path back:\n1. submit the current artifact first;\n2. do not rewrite older work yet;\n3. use the portfolio packet template;\n4. add only the minimum detail needed for critique.\n\nIf you are blocked, reply with the artifact name and the specific decision you are stuck on.\n```\n\n---\n\n## Final Portfolio Instructions\n\nSubject: Final portfolio packet instructions\n\n```text\nHi everyone,\n\nFor the final session, please assemble your Senior AI PM Portfolio Packet.\n\nIt should include:\n1. AI Product Strategy Memo\n2. AI PRD\n3. Agent/RAG Workflow Prototype\n4. Eval Dataset and Rubric\n5. Technical Architecture Brief\n6. Production Readiness Review\n7. Executive Narrative and Interview Story\n\nLabel each artifact:\n- public;\n- private;\n- anonymized;\n- interview-only.\n\nPrepare a 2-minute executive story. Focus on judgment, tradeoffs, evals, and launch readiness.\n```\n\n---\n\n## Completion Message\n\nSubject: Production AI PM completion and next steps\n\n```text\nHi [Name],\n\nCongratulations on completing Production AI PM.\n\nYour next step is to polish the portfolio packet for the context you care about most:\n- internal promotion;\n- AI PM interviews;\n- public portfolio;\n- consulting or advisory credibility;\n- stronger AI product leadership in your current role.\n\nRecommended 7-day polish:\nDay 1: tighten the strategy memo\nDay 2: clean the AI PRD\nDay 3: strengthen eval rows\nDay 4: sharpen the architecture brief\nDay 5: simplify the launch review\nDay 6: rehearse the 2-minute story\nDay 7: decide what is public, private, or interview-only\n\nYour portfolio should show one thing clearly: you can lead AI products beyond the demo.\n```\n\n---\n\n## Testimonial Request\n\nSubject: Quick feedback on Production AI PM\n\n```text\nHi [Name],\n\nIf the cohort was useful, I would appreciate a short testimonial.\n\nPrompt:\n\"Before Production AI PM, I struggled with ____. After the cohort, I can now ____. The most valuable part was ____.\"\n\nPlease avoid sharing confidential company details.\n\nThank you for being part of the cohort.\n```\n\n---\n\n## Community Guidelines Message\n\nSubject: Cohort norms\n\n```text\nHi everyone,\n\nA few norms for the cohort:\n\n- critique artifacts, not people;\n- protect confidential information;\n- do not share another learner's work outside the cohort;\n- bring specific decisions, not vague questions;\n- use AI tools, but do not outsource judgment;\n- give feedback that makes the work sharper.\n\nThe cohort works best when the room is honest, practical, and specific.\n```\n"},{"file":"00_Portfolio_Showcase_And_Career_Kit.md","title":"Portfolio Showcase And Career Kit","body":"# Portfolio Showcase And Career Kit\n\n## Purpose\n\nThis kit helps learners translate course work into a credible senior AI PM signal for interviews, internal mobility, public writing, or advisory positioning.\n\nThe goal is not to publish every artifact. The goal is to package the right evidence for the right audience.\n\n---\n\n## Portfolio Formats\n\n| Format | Best for | Notes |\n|---|---|---|\n| Private portfolio packet | Interviews and internal reviews | Can include anonymized detail and richer artifacts |\n| Public case study | Brand building and credibility | Must remove confidential details |\n| Interview-only appendix | Senior AI PM interviews | Short, evidence-rich, and easy to walk through |\n| Executive memo | Internal promotion or leadership buy-in | Focus on decisions, tradeoffs, and launch risk |\n| LinkedIn content series | Visibility and network building | Use lessons and frameworks, not private artifacts |\n\n---\n\n## Public/Private Decision Table\n\n| Artifact | Public? | Private? | Interview-only? | Notes |\n|---|---|---|---|---|\n| Strategy memo | Usually anonymized | Yes | Yes | Remove company strategy and numbers |\n| AI PRD | Usually private | Yes | Yes | Show structure, not sensitive system details |\n| Workflow prototype | Sometimes | Yes | Yes | Use synthetic data |\n| Eval dataset | Sometimes | Yes | Yes | Use synthetic or public examples |\n| Architecture brief | Usually private | Yes | Yes | Avoid internal architecture exposure |\n| Launch review | Usually private | Yes | Yes | Remove security and risk details |\n| Executive story | Yes, in summarized form | Yes | Yes | Keep it concise |\n\n---\n\n## Portfolio Case Study Structure\n\nUse this for public or semi-public versions.\n\n```text\nTitle:\nOne-line product thesis:\n\n1. Problem\nWho is the user?\nWhat workflow was painful?\nWhy did it matter?\n\n2. Why AI\nWhat could simple automation not solve?\nWhat context or reasoning was needed?\n\n3. Product approach\nWhat would the AI system do?\nWhere does human judgment stay?\n\n4. Evaluation\nWhat does good look like?\nWhat failure modes matter?\nHow would quality be measured?\n\n5. Production readiness\nWhat cost, latency, safety, and launch risks were considered?\n\n6. Tradeoffs\nWhat did you choose not to build?\nWhat would you validate next?\n\n7. Result or expected result\nWhat outcome would you measure?\n```\n\n---\n\n## 2-Minute Executive Story\n\nUse this in Week 8.\n\n```text\nThe business problem is [problem].\n\nThe user is [user], and the workflow is [workflow].\n\nAI is useful here because [reason AI is needed], but the non-AI alternative is [alternative].\n\nThe system I would build first is [first release].\n\nThe main technical tradeoff is [tradeoff].\n\nI would evaluate quality using [eval plan].\n\nThe biggest launch risks are [risks], so the launch gates are [gates].\n\nThe first measurable outcome is [metric].\n```\n\n---\n\n## Senior AI PM Interview Story\n\nUse this structure.\n\n| Part | Prompt |\n|---|---|\n| Situation | What product/workflow problem did you choose? |\n| Product judgment | Why was this worth pursuing or reshaping? |\n| Technical tradeoff | What did you choose around model, RAG, tools, autonomy, or build/buy/partner? |\n| Evals | How did you define quality? |\n| Launch risk | What could go wrong in production? |\n| Leadership | How would you work with engineering, design, data, legal, and GTM? |\n| Result | What outcome would prove the product worked? |\n\n---\n\n## Resume Bullets\n\nAdapt these honestly.\n\n```text\nBuilt a senior AI PM portfolio covering product strategy, AI PRD, GenAI workflow design, eval planning, architecture tradeoffs, and production readiness for a [domain] AI product.\n\nDesigned an AI product strategy for [workflow], including non-AI alternatives, data requirements, system behavior, failure modes, and launch gates.\n\nCreated an eval plan with [number] golden dataset rows, failure taxonomy, pass/fail rubric, and launch-blocking quality criteria.\n\nMapped an agentic/RAG workflow with human approval gates, tool boundaries, recovery paths, telemetry requirements, and cost/latency assumptions.\n```\n\n---\n\n## LinkedIn Positioning\n\nUse content that teaches a principle from the work without exposing private detail.\n\nPost ideas:\n\n1. \"The difference between an AI demo and an AI product is evals.\"\n2. \"A senior AI PM should ask these 7 questions before approving an agent.\"\n3. \"Why I now start AI PRDs with failure modes.\"\n4. \"The non-AI alternative is the most underrated AI product strategy tool.\"\n5. \"RAG is not a feature. It is a product trust system.\"\n6. \"Most agentic products should start at autonomy tier 1 or 2.\"\n7. \"Cost per successful workflow matters more than cost per model call.\"\n8. \"A good AI PM portfolio should show launch judgment, not prompt screenshots.\"\n\n---\n\n## Portfolio Review Checklist\n\n- [ ] The product idea has a specific user and workflow.\n- [ ] The AI rationale is clear.\n- [ ] The non-AI alternative is named.\n- [ ] The system map is understandable without code.\n- [ ] The eval plan has real failure cases.\n- [ ] The launch review includes cost, latency, safety, and rollback.\n- [ ] The story explains tradeoffs.\n- [ ] Confidential details are removed or anonymized.\n- [ ] The artifact can be explained in 2 minutes.\n- [ ] The learner can answer hard follow-up questions.\n\n---\n\n## Hard Interview Questions\n\nPractice these before using the portfolio.\n\n1. Why does this need AI?\n2. What is the best non-AI alternative?\n3. What would make you kill this idea?\n4. What failure would most damage user trust?\n5. What data do you need, and what happens if it is missing?\n6. Where would you keep a human in the loop?\n7. How would you measure quality before launch?\n8. Which eval failures block release?\n9. What would drive cost?\n10. What latency does the workflow tolerate?\n11. What would you ship first?\n12. What would you not build?\n13. How would you work with engineering on this?\n14. How would you explain the risk to executives?\n15. What would you monitor after launch?\n\n---\n\n## Final Portfolio Standard\n\nThe portfolio should prove:\n\n> I can lead AI product work through ambiguity, technical tradeoffs, quality evaluation, and production readiness.\n\nAnything that does not support that proof should be cut.\n"},{"file":"00_Marketing_Landing_Page_And_Positioning.md","title":"Marketing, Landing Page, And Positioning","body":"# Marketing, Landing Page, And Positioning\n\n## Purpose\n\nThis document gives the program owner ready-to-use positioning and landing page copy for Production AI PM.\n\nIt centers the course on senior PM outcomes, production credibility, and portfolio proof.\n\n---\n\n## Core Positioning\n\nProduction AI PM is a premium cohort for senior PMs who want to lead GenAI and agentic products from strategy to launch.\n\nIt teaches the work beyond the demo:\n\n- choosing AI opportunities;\n- designing GenAI and agentic workflows;\n- working with AI/ML engineering teams;\n- defining evals and quality bars;\n- reasoning about cost, latency, safety, and launch readiness;\n- building an interview-ready senior AI PM portfolio.\n\n---\n\n## One-Line Offer\n\nLead GenAI and agentic products from strategy to launch with the judgment, technical fluency, eval discipline, and portfolio proof expected of senior AI PMs.\n\n---\n\n## Short Landing Page Hero\n\n### Production AI PM\n\nLead GenAI and agentic products from strategy to launch.\n\nAn 8-week applied cohort for senior PMs who want to move beyond prompt demos and become credible AI product leaders: opportunity selection, system design, RAG and agents, evals, engineering tradeoffs, production readiness, and executive narrative.\n\nPrimary CTA:\n\nApply for the next cohort\n\nSecondary CTA:\n\nDownload the syllabus\n\n---\n\n## Who It Is For\n\nThis cohort is for:\n\n- senior PMs moving into AI PM or GenAI PM roles;\n- product leaders working with AI/ML engineering teams;\n- PMs targeting global or remote AI PM roles;\n- operators who need stronger AI product judgment;\n- PMs who want a portfolio that shows production thinking, not just tool usage.\n\n---\n\n## Who It Is Not For\n\nThis is not for:\n\n- entry-level PMs looking for PM basics;\n- engineers looking for heavy ML math;\n- learners who want a coding bootcamp;\n- people looking only for prompt templates;\n- learners who want AI inspiration without applied work.\n\n---\n\n## Outcome Promise\n\nBy the end, learners will produce a Senior AI PM Portfolio Packet with:\n\n1. AI Product Strategy Memo\n2. AI PRD\n3. Agent/RAG Workflow Prototype\n4. Eval Dataset and Rubric\n5. Technical Architecture Brief\n6. Production Readiness Review\n7. Executive Narrative and Interview Story\n\n---\n\n## Curriculum Section\n\n| Week | Focus | Walk-out artifact |\n|---|---|---|\n| 1 | AI Product Judgment | AI Opportunity One-Pager |\n| 2 | Strategy, Moats, Business Case | AI Product Strategy Memo |\n| 3 | GenAI System Design | AI PRD |\n| 4 | Agentic Product Design | Workflow Prototype + Autonomy Map |\n| 5 | Evals | Eval Dataset + Rubric |\n| 6 | AI/ML Engineering Collaboration | Technical Architecture Brief |\n| 7 | Production Readiness | Risk Register + Launch Review |\n| 8 | Portfolio And Interview Readiness | Final Portfolio Packet |\n\n---\n\n## Differentiators\n\n| Common AI PM course | Production AI PM |\n|---|---|\n| Tool demos | Product judgment and production decisions |\n| Prompt engineering | PRDs, workflows, evals, architecture, launch gates |\n| Strategy only | Strategy plus studio critique and artifacts |\n| Generic AI overview | GenAI, RAG, agents, evals, cost, latency, safety |\n| Certificate-heavy | Portfolio-heavy |\n| Beginner PM content | Built for senior PMs |\n\n---\n\n## Proof Points To Use\n\nUse these proof points once real cohort data exists.\n\n- number of learners;\n- completion rate;\n- portfolio artifacts produced;\n- before/after confidence survey;\n- role transitions or interview outcomes;\n- learner testimonials;\n- public artifact examples;\n- anonymized capstone examples.\n\nUntil then, use curriculum specificity as proof: artifacts, rubrics, evals, technical companion, and launch readiness.\n\n---\n\n## Objection Handling\n\n### \"I do not code. Can I still join?\"\n\nYes. The core path is no-code / low-code. You will learn enough technical fluency to work credibly with AI/ML teams, define evals, and reason about system tradeoffs. Optional advanced labs are available for learners who want API-level depth.\n\n### \"Is this just prompt engineering?\"\n\nNo. Prompts are treated as one part of product behavior. The program focuses on product strategy, system design, RAG and agent workflows, evals, cost, latency, safety, launch readiness, and executive communication.\n\n### \"I already know PM fundamentals.\"\n\nGood. The program assumes that. We spend little time on generic PM basics and focus on the AI-specific judgment senior PMs need.\n\n### \"Can I use a work problem?\"\n\nYes, if you can do so safely. The program includes confidentiality rules and encourages anonymized artifacts when needed.\n\n### \"Will I have something to show at the end?\"\n\nYes. The final output is a Senior AI PM Portfolio Packet with seven artifacts.\n\n---\n\n## Application Questions\n\nUse these to qualify learners.\n\n1. Current role and years in product or product-adjacent work.\n2. What kind of AI product work are you trying to lead?\n3. Are you targeting AI PM roles, internal AI leadership, or portfolio credibility?\n4. What is one AI product idea you may use as your capstone?\n5. Can you commit 2 hours live plus 2 to 4 hours of work weekly?\n6. Do you prefer core path, advanced technical path, or both?\n7. What would make this cohort successful for you?\n\n---\n\n## Sales Page FAQ\n\n### How technical is it?\n\nTechnical enough for senior AI PM credibility, but not a coding bootcamp. You will work with system maps, RAG, agents, evals, traces, cost, latency, and launch risk.\n\n### What tools are used?\n\nNamed tools may include Claude, ChatGPT, Perplexity, n8n, Sheets/Airtable, Figma/FigJam, Lovable/v0/Bolt, and optional eval/tracing tools. The course teaches durable principles so the learning survives tool changes.\n\n### What is the weekly workload?\n\n2 hours live plus 2 to 4 hours of assignment work. Optional advanced labs may add 1 to 2 hours.\n\n### What if I cannot share my company work?\n\nUse an anonymized version, a public-domain example, or the shared Customer Success Copilot case.\n\n### What is the final deliverable?\n\nA Senior AI PM Portfolio Packet and interview narrative.\n\n---\n\n## CTA Copy Options\n\n- Apply for the next cohort\n- Join the waitlist\n- Download the syllabus\n- Book a fit call\n- Get the portfolio checklist\n\n---\n\n## Short Social Copy\n\nProduction AI PM is for senior PMs who want to lead GenAI and agentic products beyond the demo.\n\nIn 8 weeks, learners build a portfolio across strategy, AI PRD, agent/RAG workflow, evals, architecture, launch readiness, and executive narrative.\n\nNot PM basics. Not prompt tricks. Not a coding bootcamp.\n\nThe goal is simple: become credible in the product, technical, and launch decisions that AI products actually require.\n"},{"file":"00_Premium_AddOns_Playbook.md","title":"Premium Add-Ons Playbook","body":"# Premium Add-Ons Playbook\n\n## Purpose\n\nThis playbook defines optional premium services that can sit above the core cohort.\n\nUse these to create higher-touch tiers without changing the main curriculum.\n\n---\n\n## Add-On Menu\n\n| Add-on | Best for | Format |\n|---|---|---|\n| 1:1 Capstone Review | Learners who want sharper portfolio artifacts | 45 or 60 minutes |\n| Mock AI PM Interview | Learners targeting AI PM roles | 60 minutes |\n| Resume, LinkedIn, Portfolio Review | Learners using the cohort for career transition | 60 minutes |\n| Advanced Technical Lab Review | Learners building deeper technical prototypes | 60 to 90 minutes |\n| Executive Narrative Coaching | Product leaders using the work internally | 45 minutes |\n\n---\n\n## 1:1 Capstone Review\n\n### Inputs\n\nLearner submits:\n\n- strategy memo;\n- AI PRD;\n- eval plan;\n- architecture brief;\n- launch readiness review;\n- specific question they want answered.\n\n### Session Flow\n\n| Time | Activity |\n|---|---|\n| 0-5 min | Clarify goal |\n| 5-20 min | Review strategy and AI necessity |\n| 20-35 min | Review system, evals, and launch risk |\n| 35-50 min | Portfolio positioning |\n| 50-60 min | Next actions |\n\n### Output\n\nShort written note:\n\n```text\nStrongest portfolio signal:\nWeakest assumption:\nMost important production risk:\nArtifact to improve first:\nNext three actions:\n```\n\n---\n\n## Mock AI PM Interview\n\n### Interview Areas\n\n- AI product strategy;\n- system design for PMs;\n- RAG and agent tradeoffs;\n- evals and quality;\n- cost and latency;\n- safety and launch readiness;\n- cross-functional leadership.\n\n### Question Bank\n\n1. Walk me through your AI product capstone.\n2. Why does this need AI?\n3. What would the non-AI version be?\n4. What data does the system need?\n5. Where would you use RAG?\n6. Where would you allow autonomy?\n7. What evals would block launch?\n8. What is the biggest production risk?\n9. How would you work with engineering?\n10. What would you ship first?\n\n### Feedback Output\n\n```text\nInterview readiness:\nBest answer:\nWeakest answer:\nTechnical clarity:\nProduct judgment:\nRecommended practice:\n```\n\n---\n\n## Resume, LinkedIn, Portfolio Review\n\n### Review Areas\n\n- role positioning;\n- AI PM keywords without exaggeration;\n- portfolio link strategy;\n- artifact selection;\n- public/private boundaries;\n- proof of seniority;\n- clarity of business impact.\n\n### Output\n\n```text\nPositioning headline:\nTop 3 resume edits:\nTop 3 LinkedIn edits:\nPortfolio artifact to feature:\nArtifact to keep private:\n30-day positioning plan:\n```\n\n---\n\n## Advanced Technical Lab Review\n\n### Suitable Learners\n\nLearners who built or directed:\n\n- n8n workflow;\n- RAG prototype;\n- tool-calling demo;\n- eval table;\n- tracing/eval setup;\n- lightweight API prototype.\n\n### Review Areas\n\n- workflow clarity;\n- data and context boundaries;\n- tool/action safety;\n- eval coverage;\n- trace quality;\n- cost and latency assumptions;\n- launch readiness.\n\n### Output\n\n```text\nTechnical credibility signal:\nMain architecture gap:\nEval gap:\nSafety or permission risk:\nPortfolio-ready explanation:\n```\n\n---\n\n## Executive Narrative Coaching\n\n### Suitable Learners\n\nProduct leaders using the program for internal influence, not only career transition.\n\n### Review Areas\n\n- business problem;\n- why AI;\n- first release;\n- risk controls;\n- investment ask;\n- resourcing ask;\n- executive objections.\n\n### Output\n\n```text\nExecutive thesis:\nDecision needed:\nRisk to address upfront:\nSlide or memo structure:\nTwo-minute narrative:\n```\n\n---\n\n## Tier Packaging Ideas\n\nUse neutral tier names.\n\n| Tier | Includes |\n|---|---|\n| Core Cohort | Live sessions, workbooks, decks, portfolio packet |\n| Portfolio Cohort | Core + 1:1 capstone review |\n| Career Cohort | Core + mock interview + resume/LinkedIn/portfolio review |\n| Technical Cohort | Core + advanced lab review |\n| Executive Cohort | Core + capstone review + executive narrative coaching |\n\nAvoid overloading the core cohort. Premium add-ons should create leverage, not operational chaos.\n\n---\n\n## Operational Rules\n\n- Schedule add-ons only after the relevant artifact exists.\n- Require pre-work at least 24 hours before the session.\n- Keep each add-on focused on one outcome.\n- Send a short written summary after the session.\n- Do not rewrite learner artifacts for them.\n- Keep confidentiality rules active.\n\n---\n\n## Add-On Booking Questions\n\n1. What artifact do you want reviewed?\n2. What decision are you stuck on?\n3. What is your target outcome?\n4. Is this for internal use, interview use, or public portfolio use?\n5. What must remain private?\n\n---\n\n## Success Bar\n\nA premium add-on is successful when the learner leaves with:\n\n- one sharper artifact;\n- one clearer story;\n- one visible technical or strategic tradeoff;\n- one next action they can execute within 48 hours.\n"},{"file":"00_Program_QA_And_Launch_Checklist.md","title":"Program QA And Launch Checklist","body":"# Program QA And Launch Checklist\n\n## Purpose\n\nUse this checklist before launching or running a cohort.\n\nIt is meant to catch missing docs, broken links, unclear operations, and weak learner expectations before the cohort starts.\n\n---\n\n## Package Completeness\n\n- [ ] `README.md` is current.\n- [ ] `00_Master_Index.md` is current.\n- [ ] Learner handbook exists.\n- [ ] Tool setup doc exists.\n- [ ] Advanced technical companion exists.\n- [ ] Instructor delivery playbook exists.\n- [ ] Assessment rubrics and certification criteria exist.\n- [ ] Capstone casebook exists.\n- [ ] Prompt and workflow library exists.\n- [ ] Onboarding and email templates exist.\n- [ ] Portfolio showcase and career kit exists.\n- [ ] Marketing and landing page copy exists.\n- [ ] Premium add-ons playbook exists.\n- [ ] Cohort tracker exists.\n- [ ] Local HTML navigator exists.\n\n---\n\n## Weekly Content QA\n\nFor each week:\n\n- [ ] Facilitator script exists.\n- [ ] Learner workbook exists.\n- [ ] Presenter deck exists.\n- [ ] Learner deck exists.\n- [ ] Presenter deck opens the matching learner deck.\n- [ ] Slide sync works.\n- [ ] Workbook assignment matches the portfolio artifact.\n- [ ] Facilitator script matches the 120-minute session format.\n- [ ] No old branding or unrelated platform references.\n- [ ] No unresolved placeholders.\n\n---\n\n## Learner Readiness\n\n- [ ] Application or screening form is ready.\n- [ ] Learner handbook is ready to send.\n- [ ] Tool setup instructions are ready.\n- [ ] Capstone selection instructions are ready.\n- [ ] Portfolio packet template is ready.\n- [ ] Confidentiality policy is communicated.\n- [ ] AI use policy is communicated.\n- [ ] Submission method is defined.\n- [ ] Feedback turnaround time is defined.\n\n---\n\n## Instructor Readiness\n\n- [ ] Instructor has reviewed all weekly scripts.\n- [ ] Shared Customer Success Copilot case is prepared.\n- [ ] Strong and weak sample artifacts are prepared.\n- [ ] Critique norms are clear.\n- [ ] Feedback template is ready.\n- [ ] Parking lot location is ready.\n- [ ] Attendance tracking is ready.\n- [ ] TA role is defined, if applicable.\n\n---\n\n## Tool Readiness\n\n- [ ] Video platform is selected.\n- [ ] Recording policy is defined.\n- [ ] Community channel is selected.\n- [ ] Submission folder or LMS space is ready.\n- [ ] Learner docs are shareable.\n- [ ] Spreadsheet templates are shareable.\n- [ ] n8n or workflow demo is ready.\n- [ ] Backup screenshots or fallback demo exists.\n\n---\n\n## Sales And Marketing Readiness\n\n- [ ] Landing page copy is customized.\n- [ ] Application questions are finalized.\n- [ ] Pricing and tiers are defined.\n- [ ] Premium add-ons are defined.\n- [ ] FAQ is ready.\n- [ ] Refund, deferral, and cancellation policy is ready.\n- [ ] Public examples are privacy-safe.\n- [ ] Testimonials are requested only after real learner outcomes exist.\n\n---\n\n## Launch Week Checklist\n\n- [ ] Send welcome email.\n- [ ] Send setup checklist.\n- [ ] Add learners to community.\n- [ ] Share calendar invites.\n- [ ] Share learner handbook.\n- [ ] Share tool setup doc.\n- [ ] Share portfolio packet template.\n- [ ] Confirm capstone idea prompt.\n- [ ] Test Week 1 decks.\n- [ ] Prepare Week 1 critique examples.\n\n---\n\n## Post-Cohort Checklist\n\n- [ ] Confirm completion criteria.\n- [ ] Send certificates, if applicable.\n- [ ] Send final portfolio polish plan.\n- [ ] Request testimonials.\n- [ ] Collect feedback survey.\n- [ ] Review attendance and completion data.\n- [ ] Identify weak sessions or artifacts.\n- [ ] Update curriculum before next cohort.\n\n---\n\n## Final QA Rule\n\nThe program is ready to run when a learner can answer these before Week 1:\n\n- What will I build?\n- What tools do I need?\n- What does good work look like?\n- How will I get feedback?\n- What will I leave with?\n\nAnd the instructor can answer:\n\n- What happens in every session?\n- What is the shared case?\n- What artifact is due each week?\n- How will work be assessed?\n- What does completion mean?\n"},{"file":"Week 01 - AI Product Judgment for Senior PMs/W01_Facilitator_Script.md","title":"Facilitator Script - AI Product Judgment for Senior PMs (Session 1 of 8)","body":"# Facilitator Script - AI Product Judgment for Senior PMs (Session 1 of 8)\n\n**Subtitle:** Decide which AI ideas deserve to be built and which should be killed early.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders building AI product judgment.  \n**Spine:** Judgment Reset -> Opportunity Filter -> Shared Case Critique -> Capstone Selection.  \n**Hands-on share:** ~45% (about 54 minutes of learner activity).  \n**Session artifact:** AI Opportunity One-Pager.  \n**Tools assumed available:** Claude or ChatGPT, Perplexity, shared workbook, portfolio packet template.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Send learner workbook and portfolio packet template.\n- [ ] Ask learners to bring one AI product idea from work or a domain they understand.\n- [ ] Prepare 3 example ideas: one strong AI product, one workflow automation, one weak AI wrapper.\n- [ ] Pre-load shared B2B SaaS Customer Success Copilot case.\n- [ ] Open parking lot doc and visible timer.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening And Promise (0:00-0:10)\n\n**Say:** \"Most AI product failures do not start with the model. They start with a PM choosing the wrong problem.\"\n\nAsk chat: \"In one phrase, where do AI ideas usually go wrong in your company?\"\n\nRead 5-6 answers. Bridge to the core promise:\n\n**Say:** \"Today is not about making every idea sound AI-ready. It is about building the judgment to reject weak ideas before they waste engineering time.\"\n\n## Block 1 - Strategy Lens: The AI Opportunity Filter (0:10-0:35)\n\nTeach the six-part filter:\n\n1. Pain: frequent, expensive, or high-stakes.\n2. Workflow: AI changes the work, not just the UI.\n3. Context: the system can access the information needed.\n4. Quality tolerance: the user can handle probabilistic output.\n5. Economics: value exceeds inference, review, and operational cost.\n6. Risk: failure modes are understandable and controllable.\n\n**Studio prompt:** \"Score your own idea from 1-5 on each dimension. Do not average the score yet. Circle the weakest dimension.\"\n\n## Block 2 - Applied Walkthrough: Three Ideas (0:35-0:55)\n\nShow 3 examples:\n\n- Customer Success Copilot for B2B SaaS.\n- \"AI dashboard summarizer\" with no workflow integration.\n- Automated refund approval agent.\n\nFor each, ask:\n\n- Is AI needed?\n- Is workflow automation enough?\n- What would make this unsafe?\n- What evidence would change our mind?\n\n## Hard Break (0:55-1:05)\n\nReal break. Keep the timer visible.\n\n## Block 3 - Studio Critique: Learner Ideas (1:05-1:40)\n\nPut learners in pairs or small groups.\n\nEach learner presents:\n\n1. User and workflow.\n2. Current pain.\n3. Why AI might help.\n4. Weakest part of the opportunity filter.\n5. One non-AI alternative.\n\nCritique rule: peers must improve the idea or kill it. No polite vagueness.\n\n## Block 4 - Artifact Build: Opportunity One-Pager (1:40-1:55)\n\nLearners draft:\n\n- Problem.\n- Target user.\n- Workflow.\n- Why AI.\n- Why not simple automation.\n- Key data/context.\n- Main risk.\n- Decision: pursue, reshape, or kill.\n\n## Block 5 - Close (1:55-2:00)\n\n**Say:** \"A senior AI PM is not the person with the most AI ideas. It is the person who knows which ideas deserve engineering time.\"\n\nAssignment: complete the AI Opportunity One-Pager before Session 2.\n\nNext: AI Strategy, Moats, and Business Case.\n\n---\n\n## Contingencies\n\n**If learners bring weak ideas:** use that as the lesson. Make the rewrite the artifact.  \n**If no one shares:** critique the 3 prepared examples in more depth.  \n**If tool access fails:** run the session entirely from workbook and shared doc.\n\n"},{"file":"Week 01 - AI Product Judgment for Senior PMs/W01_Learner_Workbook.md","title":"Production AI PM - Session 1 Workbook","body":"# Production AI PM - Session 1 Workbook\n\n## AI Product Judgment for Senior PMs\n\nToday you turn AI enthusiasm into product judgment.\n\nBy the end of this 120-minute session, you will have an **AI Opportunity One-Pager** for a product idea you may use as your capstone.\n\nOne rule for today: **Do not defend the AI idea. Test whether it deserves to exist.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Claude or ChatGPT open.\n- [ ] Portfolio packet template open.\n- [ ] One AI product idea from your work or domain.\n- [ ] Notes app or doc for your one-pager.\n\n---\n\n## Exercise 1: The AI Opportunity Filter\n\nScore your idea from 1 to 5.\n\n| Dimension | Question | Score |\n|---|---|---:|\n| Pain | Is the pain frequent, expensive, or high-stakes? | |\n| Workflow | Does AI change the work, not just the UI? | |\n| Context | Can the system access enough information to help? | |\n| Quality tolerance | Can users handle probabilistic output? | |\n| Economics | Is value likely to exceed cost and review effort? | |\n| Risk | Are failure modes understandable and controllable? | |\n\nWeakest dimension:\n\n---\n\n## Exercise 2: Non-AI Alternative\n\nBefore you choose AI, write the best non-AI version.\n\n- Rules/workflow version:\n- Human ops version:\n- Dashboard/reporting version:\n- Template/checklist version:\n\nWhat does AI add that these do not?\n\n---\n\n## Studio Critique Notes\n\nUse this while reviewing a peer's idea.\n\n| Question | Notes |\n|---|---|\n| What user pain is real? | |\n| What part sounds like AI theater? | |\n| What data/context is missing? | |\n| What failure would hurt trust? | |\n| Would you pursue, reshape, or kill it? | |\n\n---\n\n## Portfolio Artifact: AI Opportunity One-Pager\n\n### Product idea\n\n### Target user\n\n### Workflow being improved\n\n### Current pain\n\n### Why AI\n\n### Why not simple automation\n\n### Required data/context\n\n### Main risk\n\n### Decision\n\nChoose one: pursue / reshape / kill.\n\n### What I need to learn next\n\n---\n\n## Take-Home\n\nBefore Session 2, refine your one-pager and add one paragraph answering:\n\n1. What would make this idea strategically defensible?\n2. What evidence would make you kill it?\n\n"},{"file":"Week 02 - AI Strategy Moats and Business Case/W02_Facilitator_Script.md","title":"Facilitator Script - AI Strategy, Moats, and Business Case (Session 2 of 8)","body":"# Facilitator Script - AI Strategy, Moats, and Business Case (Session 2 of 8)\n\n**Subtitle:** Turn an AI idea into a defensible product strategy and business case.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** Strategy Lens -> Moat Map -> Business Case Critique -> Strategy Memo.  \n**Hands-on share:** ~45% (about 54 minutes).  \n**Session artifact:** AI Product Strategy Memo v1.  \n**Tools assumed available:** Claude or ChatGPT, Perplexity, shared case, portfolio packet.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Review 3-5 learner opportunity one-pagers.\n- [ ] Prepare shared case strategy memo outline.\n- [ ] Prepare examples of model moat, data moat, workflow moat, and distribution moat.\n- [ ] Open market research examples.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"Last week we asked whether an AI idea deserves to exist. Today we ask whether it deserves a roadmap.\"\n\nAsk chat: \"What makes an AI product hard to copy?\"\n\n## Block 1 - Strategy Lens: Moats Beyond The Model (0:10-0:35)\n\nTeach four defensibility layers:\n\n1. Workflow depth: the product sits inside repeated work.\n2. Data advantage: proprietary context improves outcomes.\n3. Distribution: the product reaches users at the moment of need.\n4. Learning loop: usage improves the system and roadmap.\n\nWarn against thin wrappers:\n\n**Say:** \"If the only hard part is calling a frontier model, you have a feature demo, not a product strategy.\"\n\n## Block 2 - Applied Walkthrough: Shared Case (0:35-0:55)\n\nUse Customer Success Copilot.\n\nWalk through:\n\n- Business outcome: reduce churn risk and improve expansion timing.\n- User workflow: CSM account review and next-best-action planning.\n- Data advantage: product usage, support tickets, CRM, call notes.\n- Risk: incorrect recommendations, account privacy, hallucinated customer claims.\n\n## Hard Break (0:55-1:05)\n\nReal break. Keep the timer visible.\n\n## Block 3 - Studio Critique: Learner Strategy (1:05-1:42)\n\nLearners revise their capstone idea using the strategy memo structure:\n\n1. Business outcome.\n2. User workflow.\n3. Advantage.\n4. Build / buy / partner.\n5. First 90 days.\n6. Kill criteria.\n\nCritique 2-3 examples live.\n\n## Block 4 - Artifact Build: Strategy Memo (1:42-1:55)\n\nLearners draft a one-page strategy memo.\n\nQuality bar:\n\n- Names a business outcome.\n- Names a workflow.\n- Names an advantage.\n- Names a risk.\n- Names a first release.\n\n## Block 5 - Close (1:55-2:00)\n\nAssignment: submit AI Product Strategy Memo v1 before Session 3.\n\nNext: GenAI System Design for PMs.\n\n---\n\n## Contingencies\n\n**If learner ideas are too broad:** force a narrower workflow.  \n**If learners over-index on model choice:** redirect to workflow, data, and distribution.  \n**If discussion becomes startup-pitch heavy:** bring it back to senior PM execution: roadmap, risk, and launch constraints.\n\n"},{"file":"Week 02 - AI Strategy Moats and Business Case/W02_Learner_Workbook.md","title":"Production AI PM - Session 2 Workbook","body":"# Production AI PM - Session 2 Workbook\n\n## AI Strategy, Moats, and Business Case\n\nToday you turn an AI opportunity into a strategy a senior product leader can defend.\n\nBy the end of this 120-minute session, you will have **AI Product Strategy Memo v1**.\n\nOne rule for today: **If the product has no workflow advantage, data advantage, or distribution advantage, keep digging.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Session 1 AI Opportunity One-Pager open.\n- [ ] Portfolio packet template open.\n- [ ] Access to a research tool.\n- [ ] Notes doc open.\n\n---\n\n## Exercise 1: Moat Map\n\n| Advantage type | Does your product have it? | Evidence |\n|---|---|---|\n| Workflow depth | | |\n| Proprietary data/context | | |\n| Distribution at moment of need | | |\n| Learning loop | | |\n| Switching cost | | |\n\nStrongest advantage:\n\nWeakest advantage:\n\n---\n\n## Exercise 2: Build / Buy / Partner / Wait\n\n| Option | When it makes sense | Your notes |\n|---|---|---|\n| Build | Differentiated workflow or data advantage | |\n| Buy | Commodity capability, speed matters | |\n| Partner | Need distribution, integration, or expertise | |\n| Wait | Risk or economics are not ready | |\n\nRecommendation:\n\n---\n\n## Strategy Memo Template\n\n### Product thesis\n\n### Target user and workflow\n\n### Business outcome\n\n### Why AI now\n\n### Defensibility\n\n### Build / buy / partner recommendation\n\n### First 90 days\n\n### Risks and kill criteria\n\n---\n\n## Studio Critique Notes\n\n| Question | Notes |\n|---|---|\n| Is the strategy specific enough? | |\n| Is the moat real or generic? | |\n| What would engineering challenge? | |\n| What would leadership challenge? | |\n| What should be cut from v1? | |\n\n---\n\n## Take-Home\n\nBefore Session 3, submit Strategy Memo v1 and add:\n\n1. the exact data/context the AI system will need;\n2. the first user workflow you would prototype.\n\n"},{"file":"Week 03 - GenAI System Design for PMs/W03_Facilitator_Script.md","title":"Facilitator Script - GenAI System Design for PMs (Session 3 of 8)","body":"# Facilitator Script - GenAI System Design for PMs (Session 3 of 8)\n\n**Subtitle:** Explain a GenAI system clearly enough to work credibly with engineering.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** System Map -> Context Decisions -> PRD Translation -> Architecture Critique.  \n**Hands-on share:** ~45% (about 54 minutes).  \n**Session artifact:** AI PRD v1.  \n**Tools assumed available:** Claude or ChatGPT, shared system map, portfolio packet, optional Figma/FigJam.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Prepare a plain-English GenAI system map.\n- [ ] Prepare examples of prompt-only, RAG, tool-use, workflow, and fine-tuning decisions.\n- [ ] Prepare shared Customer Success Copilot architecture.\n- [ ] Open learner strategy memos for reference.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"A senior AI PM does not need to write the system. But they must know what system they are asking engineering to build.\"\n\nAsk chat: \"Which part of GenAI architecture feels most fuzzy: prompts, RAG, tools, memory, model choice, evals, or telemetry?\"\n\n## Block 1 - Strategy Lens: The GenAI System Map (0:10-0:35)\n\nTeach the seven-part map:\n\n1. User surface.\n2. Instruction layer.\n3. Model.\n4. Context and retrieval.\n5. Tools/actions.\n6. Output and UX.\n7. Telemetry and evals.\n\nEmphasize the PM role:\n\n**Say:** \"Your job is to define behavior, constraints, quality bar, and tradeoffs. Engineering decides implementation details, but you must know what questions to ask.\"\n\n## Block 2 - Applied Walkthrough: Shared Case (0:35-0:55)\n\nMap Customer Success Copilot:\n\n- Inputs: account notes, CRM data, support tickets, usage trends.\n- Retrieval: account history and playbooks.\n- Tools: CRM update, ticket lookup, meeting summary.\n- Output: account risk summary and recommended next action.\n- Human control: CSM approval before external communication.\n\n## Hard Break (0:55-1:05)\n\nReal break.\n\n## Block 3 - Studio Critique: Capstone System Maps (1:05-1:42)\n\nLearners draft their own system map.\n\nCritique with five questions:\n\n1. What context must the model see?\n2. What should never enter the context?\n3. What tools can it use?\n4. What needs human approval?\n5. What telemetry proves quality?\n\nReview 2-3 learner maps live.\n\n## Block 4 - Artifact Build: AI PRD v1 (1:42-1:55)\n\nLearners draft PRD sections:\n\n- User journey.\n- System behavior.\n- Inputs and context.\n- Tools/actions.\n- Failure modes.\n- Acceptance criteria.\n\n## Block 5 - Close (1:55-2:00)\n\nAssignment: complete AI PRD v1 before Session 4.\n\nNext: Agentic Product Design.\n\n---\n\n## Contingencies\n\n**If learners get too technical:** return to behavior and tradeoffs.  \n**If learners stay too abstract:** force them to name inputs, context, tools, and approval points.  \n**If tool examples distract:** remind the room that tools are implementation choices; the PRD defines product behavior.\n\n"},{"file":"Week 03 - GenAI System Design for PMs/W03_Learner_Workbook.md","title":"Production AI PM - Session 3 Workbook","body":"# Production AI PM - Session 3 Workbook\n\n## GenAI System Design for PMs\n\nToday you convert strategy into system behavior.\n\nBy the end of this 120-minute session, you will have **AI PRD v1** for your capstone.\n\nOne rule for today: **If you cannot explain the system in plain English, you are not ready to ask engineering to build it.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Strategy Memo v1 open.\n- [ ] Portfolio packet open.\n- [ ] Notes doc or diagram tool open.\n\n---\n\n## Exercise 1: GenAI System Map\n\n| System component | Your capstone |\n|---|---|\n| User surface | |\n| Instruction layer | |\n| Model assumption | |\n| Context/RAG | |\n| Tools/actions | |\n| Output format | |\n| Telemetry/evals | |\n\n---\n\n## Exercise 2: Decision Table\n\n| Choice | Use when | Your decision |\n|---|---|---|\n| Prompt only | Task is narrow and context fits in prompt | |\n| RAG | Answers need private or changing knowledge | |\n| Workflow | Steps are known and predictable | |\n| Agent | Steps are dynamic and tool-driven | |\n| Fine-tuning | Behavior/style must be learned repeatedly | |\n| Rules | Determinism or compliance matters | |\n\n---\n\n## AI PRD v1 Template\n\n### User journey\n\n### System behavior\n\n### Inputs\n\n### Context required\n\n### Retrieval sources\n\n### Tools/actions\n\n### Output format\n\n### Human approval points\n\n### Failure modes\n\n| Failure | User impact | Detection | Mitigation |\n|---|---|---|---|\n| | | | |\n| | | | |\n| | | | |\n\n### Acceptance criteria\n\n- Must do:\n- Must not do:\n- Escalates when:\n- Refuses when:\n- Logs when:\n\n---\n\n## Studio Critique Notes\n\n| Question | Notes |\n|---|---|\n| What is underspecified? | |\n| What would engineering ask next? | |\n| What data source is risky? | |\n| What tool/action needs approval? | |\n| What should be measured? | |\n\n---\n\n## Take-Home\n\nBefore Session 4, refine AI PRD v1 and prepare a workflow sketch with:\n\n1. the steps the system should take;\n2. the points where human approval is required.\n\n"},{"file":"Week 04 - Agentic Product Design/W04_Facilitator_Script.md","title":"Facilitator Script - Agentic Product Design (Session 4 of 8)","body":"# Facilitator Script - Agentic Product Design (Session 4 of 8)\n\n**Subtitle:** Design safe autonomy: workflows, tools, approvals, and recovery paths.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** Workflows vs Agents -> Autonomy Levels -> Tool and Approval Design -> Prototype Review.  \n**Hands-on share:** ~50% (about 60 minutes).  \n**Session artifact:** Agent/RAG Workflow Prototype v1 and Autonomy Map.  \n**Tools assumed available:** n8n or workflow tool, AI PRD v1, shared workflow sketch, portfolio packet.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Prepare simple n8n workflow skeleton.\n- [ ] Prepare autonomy-level examples.\n- [ ] Prepare approval gate examples.\n- [ ] Prepare fallback static screenshots for tool failure.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"An agent is not a chatbot with ambition. It is a product surface that can decide, use tools, and sometimes act.\"\n\nAsk chat: \"What action would you never allow an AI system to take without approval?\"\n\n## Block 1 - Strategy Lens: Workflows Before Agents (0:10-0:35)\n\nTeach:\n\n1. Workflow: known steps, predictable path.\n2. Agent: dynamic steps, tool use, environmental feedback.\n3. Autonomy tiers: suggest, draft, prepare, execute with approval, execute autonomously.\n4. Tool boundaries: what it can read, write, change, or trigger.\n5. Guardrails outside the model: permissions, budgets, stop conditions, rollback.\n\n## Block 2 - Applied Walkthrough: Shared Case (0:35-0:55)\n\nCustomer Success Copilot workflow:\n\n1. Pull account data.\n2. Summarize risk.\n3. Retrieve playbook.\n4. Draft recommended action.\n5. Ask CSM for approval.\n6. Log decision.\n\nShow which steps are workflow, which are model calls, and which require human approval.\n\n## Hard Break (0:55-1:05)\n\nReal break.\n\n## Block 3 - Studio: Autonomy Map (1:05-1:35)\n\nLearners map their capstone:\n\n- Step.\n- AI role.\n- Human role.\n- Tool/data.\n- Approval needed.\n- Failure recovery.\n\nCritique for excessive agency.\n\n## Block 4 - Prototype Sketch Or Build (1:35-1:55)\n\nLearners either:\n\n- sketch the workflow in workbook/FigJam; or\n- build a minimal n8n workflow with mock data.\n\nQuality bar:\n\n- At least 4 steps.\n- At least 1 human approval gate.\n- At least 1 failure recovery path.\n- At least 1 telemetry event.\n\n## Block 5 - Close (1:55-2:00)\n\nAssignment: finish workflow prototype or sketch and autonomy map.\n\nNext: Evals as the New PRD.\n\n---\n\n## Contingencies\n\n**If n8n fails:** switch to workflow sketching in the workbook.  \n**If learners overbuild:** force the smallest workflow that demonstrates the core product behavior.  \n**If learners want full autonomy:** ask what failure would trigger rollback.\n\n"},{"file":"Week 04 - Agentic Product Design/W04_Learner_Workbook.md","title":"Production AI PM - Session 4 Workbook","body":"# Production AI PM - Session 4 Workbook\n\n## Agentic Product Design\n\nToday you design safe autonomy.\n\nBy the end of this 120-minute session, you will have an **Agent/RAG Workflow Prototype v1** or workflow sketch, plus an **Autonomy Map**.\n\nOne rule for today: **Start with workflow. Add autonomy only where it improves measurable outcomes.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] AI PRD v1 open.\n- [ ] n8n or diagram tool open.\n- [ ] Portfolio packet open.\n\n---\n\n## Exercise 1: Workflow vs Agent\n\n| Product step | Fixed workflow or agentic? | Why? |\n|---|---|---|\n| | | |\n| | | |\n| | | |\n| | | |\n\n---\n\n## Exercise 2: Autonomy Levels\n\n| Level | Meaning | Use in your capstone? |\n|---|---|---|\n| Suggest | AI recommends, human acts | |\n| Draft | AI drafts, human edits | |\n| Prepare | AI prepares action, human approves | |\n| Execute with approval | AI executes after approval | |\n| Execute autonomously | AI acts within strict scope | |\n\n---\n\n## Autonomy Map\n\n| Step | AI role | Human role | Tool/data used | Approval needed? | Recovery path |\n|---|---|---|---|---|---|\n| 1 | | | | | |\n| 2 | | | | | |\n| 3 | | | | | |\n| 4 | | | | | |\n\n---\n\n## Tool Design Checklist\n\nFor every tool/action:\n\n- What can the AI read?\n- What can the AI write?\n- What can the AI trigger?\n- What is out of scope?\n- What argument validation is needed?\n- What should be logged?\n\n---\n\n## Prototype Quality Bar\n\nYour prototype or sketch must show:\n\n- [ ] at least 4 workflow steps;\n- [ ] at least 1 model decision;\n- [ ] at least 1 tool/data dependency;\n- [ ] at least 1 human approval gate;\n- [ ] at least 1 failure recovery path;\n- [ ] at least 1 telemetry event.\n\n---\n\n## Take-Home\n\nBefore Session 5, produce 5-10 sample inputs/outputs from your workflow. These will become your first eval rows.\n\n"},{"file":"Week 05 - Evals as the New PRD/W05_Facilitator_Script.md","title":"Facilitator Script - Evals as the New PRD (Session 5 of 8)","body":"# Facilitator Script - Evals as the New PRD (Session 5 of 8)\n\n**Subtitle:** Define and measure AI quality before launch.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** Eval Mindset -> Trace Review -> Golden Dataset -> Rubric Critique.  \n**Hands-on share:** ~50% (about 60 minutes).  \n**Session artifact:** Eval Dataset, Eval Rubric, and Failure Mode Taxonomy.  \n**Tools assumed available:** Spreadsheet, sample outputs/traces, AI PRD, workflow prototype.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Prepare 6 sample traces: 2 good, 2 borderline, 2 bad.\n- [ ] Prepare spreadsheet eval template.\n- [ ] Prepare failure taxonomy examples.\n- [ ] Ask learners to bring sample inputs/outputs from their workflow.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"In normal software, a PRD can define expected behavior. In AI products, the PRD is not complete until it defines how quality will be judged.\"\n\nAsk chat: \"What would be a catastrophic wrong answer for your capstone?\"\n\n## Block 1 - Strategy Lens: Evals As Product Management (0:10-0:35)\n\nTeach:\n\n1. Happy-path demos are not evidence.\n2. Error analysis comes before dashboards.\n3. Golden datasets capture what the product must handle.\n4. Rubrics make judgment repeatable.\n5. LLM-as-judge is useful only after human alignment.\n6. Evals become roadmap and release gates.\n\n## Block 2 - Applied Walkthrough: Trace Review (0:35-0:55)\n\nShow sample traces for Customer Success Copilot.\n\nClassify failures:\n\n- unsupported claim;\n- wrong account context;\n- weak recommendation;\n- unsafe action;\n- missing escalation;\n- bad tone.\n\n## Hard Break (0:55-1:05)\n\nReal break.\n\n## Block 3 - Studio: Build Golden Dataset (1:05-1:38)\n\nLearners create 10 rows:\n\n- ID.\n- Input.\n- Context.\n- Expected behavior.\n- Failure category.\n- Severity.\n\nReview 2-3 learner rows live and improve specificity.\n\n## Block 4 - Rubric Critique (1:38-1:55)\n\nLearners draft pass/fail rubric criteria.\n\nQuality bar:\n\n- binary or clear thresholds;\n- tied to user/business risk;\n- includes grounding and escalation;\n- can catch regressions.\n\n## Block 5 - Close (1:55-2:00)\n\nAssignment: expand eval dataset to 20 rows and finalize rubric.\n\nNext: Working with AI/ML Engineering Teams.\n\n---\n\n## Contingencies\n\n**If learners write vague evals:** force a concrete input and expected behavior.  \n**If learners obsess over numeric scores:** redirect to failure categories and pass/fail judgment.  \n**If no traces exist:** use mocked outputs from the shared case.\n\n"},{"file":"Week 05 - Evals as the New PRD/W05_Learner_Workbook.md","title":"Production AI PM - Session 5 Workbook","body":"# Production AI PM - Session 5 Workbook\n\n## Evals as the New PRD\n\nToday you define what quality means before launch.\n\nBy the end of this 120-minute session, you will have an **Eval Dataset**, **Eval Rubric**, and **Failure Mode Taxonomy**.\n\nOne rule for today: **If your eval cannot catch a bad launch, it is not specific enough.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] AI PRD v1 open.\n- [ ] Workflow prototype or sketch open.\n- [ ] 5-10 sample inputs/outputs ready.\n- [ ] Spreadsheet open.\n\n---\n\n## Exercise 1: Failure Mode Taxonomy\n\n| Failure category | Meaning | Example from your capstone |\n|---|---|---|\n| Unsupported claim | AI says something not grounded in context | |\n| Wrong context | AI uses wrong user/account/data | |\n| Bad recommendation | Output is plausible but low quality | |\n| Unsafe action | AI suggests or triggers risky behavior | |\n| Missing escalation | AI should ask human but does not | |\n| UX/tone failure | Output damages trust or clarity | |\n\nAdd your own category:\n\n---\n\n## Exercise 2: Golden Dataset\n\n| ID | Input | Context | Expected behavior | Failure category | Severity |\n|---|---|---|---|---|---|\n| 001 | | | | | |\n| 002 | | | | | |\n| 003 | | | | | |\n| 004 | | | | | |\n| 005 | | | | | |\n\n---\n\n## Exercise 3: Eval Rubric\n\n| Criterion | Pass | Fail |\n|---|---|---|\n| Groundedness | | |\n| Task completion | | |\n| Action safety | | |\n| Escalation behavior | | |\n| User trust / tone | | |\n\n---\n\n## Trace Review Notes\n\n| Trace | What happened | Failure? | What should change? |\n|---|---|---|---|\n| | | | |\n| | | | |\n| | | | |\n\n---\n\n## Take-Home\n\nBefore Session 6:\n\n1. Expand your golden dataset to 20 rows.\n2. Mark the 5 rows that would block launch if they fail.\n3. Add your eval plan to the portfolio packet.\n\n"},{"file":"Week 06 - Working with AI ML Engineering Teams/W06_Facilitator_Script.md","title":"Facilitator Script - Working with AI/ML Engineering Teams (Session 6 of 8)","body":"# Facilitator Script - Working with AI/ML Engineering Teams (Session 6 of 8)\n\n**Subtitle:** Become technically credible without pretending to be the engineer.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** Technical Fluency -> Architecture Review -> Tradeoff Questions -> Brief Defense.  \n**Hands-on share:** ~45% (about 54 minutes).  \n**Session artifact:** Technical Architecture Brief for PMs.  \n**Tools assumed available:** AI PRD, eval plan, workflow map, model/vendor comparison examples.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Prepare architecture review checklist.\n- [ ] Prepare model/vendor comparison table.\n- [ ] Prepare example engineering questions.\n- [ ] Pick 2 learner capstones for live architecture critique if available.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"The goal is not to sound like an ML engineer. The goal is to be the PM engineering trusts in ambiguous technical decisions.\"\n\nAsk chat: \"What technical question do you wish you could ask more confidently?\"\n\n## Block 1 - Strategy Lens: PM Technical Fluency (0:10-0:35)\n\nTeach what senior PMs must understand:\n\n1. Model capability and limits.\n2. Context and retrieval constraints.\n3. Tool/action boundaries.\n4. Data contracts.\n5. Eval and telemetry contracts.\n6. Cost, latency, privacy, and lock-in tradeoffs.\n\n## Block 2 - Applied Walkthrough: Architecture Review (0:35-0:55)\n\nRun the shared case through an architecture review:\n\n- What context is required?\n- What model class is good enough?\n- What can be cached?\n- What actions require approval?\n- What telemetry is required?\n- What failure would trigger rollback?\n\n## Hard Break (0:55-1:05)\n\nReal break.\n\n## Block 3 - Studio: Learner Architecture Brief (1:05-1:42)\n\nLearners draft and defend:\n\n- system map;\n- model/vendor assumption;\n- context/RAG plan;\n- tool/action plan;\n- telemetry/eval plan;\n- unresolved engineering questions.\n\nPair critique: one learner acts as engineering lead and challenges assumptions.\n\n## Block 4 - Artifact Close (1:42-1:55)\n\nLearners finalize 5 engineering questions they would bring to an architecture review.\n\nQuality bar:\n\n- no vague \"is this feasible?\" questions;\n- questions must identify a tradeoff;\n- questions must connect to quality, risk, cost, or launch.\n\n## Block 5 - Close (1:55-2:00)\n\nAssignment: complete Technical Architecture Brief.\n\nNext: Production Readiness.\n\n---\n\n## Contingencies\n\n**If learners overuse jargon:** ask them to explain it to a CFO or CPO.  \n**If learners under-specify:** force exact context, tool, telemetry, and approval decisions.  \n**If model debate dominates:** redirect to product constraints and eval evidence.\n\n"},{"file":"Week 06 - Working with AI ML Engineering Teams/W06_Learner_Workbook.md","title":"Production AI PM - Session 6 Workbook","body":"# Production AI PM - Session 6 Workbook\n\n## Working with AI/ML Engineering Teams\n\nToday you build the technical fluency to lead an architecture discussion.\n\nBy the end of this 120-minute session, you will have a **Technical Architecture Brief for PMs**.\n\nOne rule for today: **Ask questions that expose tradeoffs, not questions that perform technical confidence.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] AI PRD open.\n- [ ] Eval plan open.\n- [ ] Workflow/autonomy map open.\n- [ ] Portfolio packet open.\n\n---\n\n## Exercise 1: Architecture Brief\n\n| Component | Decision | Open question |\n|---|---|---|\n| User surface | | |\n| Model | | |\n| Prompt/instruction layer | | |\n| Context/RAG | | |\n| Tools/actions | | |\n| Memory | | |\n| Telemetry/evals | | |\n| Human review | | |\n\n---\n\n## Exercise 2: Tradeoff Questions\n\nWrite five engineering-facing questions.\n\n| Area | Weak question | Stronger question |\n|---|---|---|\n| Model | Is this model good? | What eval evidence would justify using a smaller model for this workflow? |\n| RAG | Can we use RAG? | What retrieval failure would most damage user trust, and how will we detect it? |\n| Tools | Can the agent call this API? | What permissions and validation are required before the agent can trigger this action? |\n| Cost | Is this expensive? | What is the cost per successful workflow, and what can we cache or route? |\n| Launch | Is it ready? | Which eval failures block beta, and which can be monitored post-launch? |\n\nYour five questions:\n\n1.\n2.\n3.\n4.\n5.\n\n---\n\n## Exercise 3: Model / Vendor Decision\n\n| Factor | Notes |\n|---|---|\n| Capability needed | |\n| Latency target | |\n| Cost sensitivity | |\n| Privacy requirement | |\n| Integration complexity | |\n| Lock-in risk | |\n| Evaluation evidence needed | |\n\nRecommendation:\n\n---\n\n## Take-Home\n\nBefore Session 7:\n\n1. Complete the Technical Architecture Brief.\n2. Add the top 5 engineering questions.\n3. Mark the assumptions that must be validated before launch.\n\n"},{"file":"Week 07 - Production Readiness Cost Latency Safety and Launch/W07_Facilitator_Script.md","title":"Facilitator Script - Production Readiness: Cost, Latency, Safety, and Launch (Session 7 of 8)","body":"# Facilitator Script - Production Readiness: Cost, Latency, Safety, and Launch (Session 7 of 8)\n\n**Subtitle:** Decide what must be true before an AI product should ship.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** Launch Gates -> Cost/Latency -> Safety/Security -> Red-Team Review.  \n**Hands-on share:** ~50% (about 60 minutes).  \n**Session artifact:** Cost and Latency Model, Risk Register, and Launch Readiness Review.  \n**Tools assumed available:** Portfolio packet, eval plan, architecture brief, spreadsheet.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Prepare production readiness template.\n- [ ] Prepare cost-per-workflow example.\n- [ ] Prepare AI security risk examples.\n- [ ] Prepare red-team prompts for the shared case.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"The difference between an AI demo and an AI product is not the UI. It is what happens when the system is expensive, slow, wrong, attacked, or used by real customers.\"\n\nAsk chat: \"Which production risk worries you most: cost, latency, hallucination, security, privacy, or user overtrust?\"\n\n## Block 1 - Strategy Lens: Launch Gates (0:10-0:35)\n\nTeach five gates:\n\n1. Quality gate: eval pass/fail threshold.\n2. Cost gate: cost per successful workflow.\n3. Latency gate: acceptable wait by user context.\n4. Safety/security gate: permissions, injection, data leakage, excessive agency.\n5. Ops gate: monitoring, rollback, escalation, support ownership.\n\n## Block 2 - Applied Walkthrough: Shared Case Readiness (0:35-0:55)\n\nCustomer Success Copilot:\n\n- Cost: model calls per account review.\n- Latency: background account prep vs live response.\n- Security: tenant isolation and CRM permissions.\n- Safety: no external email without approval.\n- Observability: trace failed recommendations and escalation misses.\n\n## Hard Break (0:55-1:05)\n\nReal break.\n\n## Block 3 - Studio: Red-Team Learner Capstones (1:05-1:40)\n\nLearners exchange capstones and attack them:\n\n- Prompt injection.\n- Wrong data access.\n- Unsafe action.\n- High-cost loop.\n- Bad recommendation.\n- Missing escalation.\n\nEach learner records top 5 risks.\n\n## Block 4 - Artifact Build: Launch Readiness Review (1:40-1:55)\n\nLearners complete:\n\n- cost driver;\n- latency target;\n- risk register;\n- beta gate;\n- rollback trigger;\n- monitoring plan.\n\n## Block 5 - Close (1:55-2:00)\n\nAssignment: complete Production Readiness Review.\n\nNext: Executive Narrative, Portfolio, and AI PM Interview Readiness.\n\n---\n\n## Contingencies\n\n**If learners treat safety as compliance only:** bring it back to product launch gates.  \n**If learners cannot estimate cost:** use relative cost drivers: number of calls, context size, output size, review effort.  \n**If red-team feels negative:** frame it as the highest-leverage PM behavior before launch.\n\n"},{"file":"Week 07 - Production Readiness Cost Latency Safety and Launch/W07_Learner_Workbook.md","title":"Production AI PM - Session 7 Workbook","body":"# Production AI PM - Session 7 Workbook\n\n## Production Readiness: Cost, Latency, Safety, and Launch\n\nToday you decide what must be true before your AI product should ship.\n\nBy the end of this 120-minute session, you will have a **Cost and Latency Model**, **Risk Register**, and **Launch Readiness Review**.\n\nOne rule for today: **A product is not ready because the demo works. It is ready when the launch gates are clear.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Eval plan open.\n- [ ] Architecture brief open.\n- [ ] Workflow prototype or sketch open.\n- [ ] Spreadsheet open.\n\n---\n\n## Exercise 1: Cost And Latency Model\n\n| Driver | Notes |\n|---|---|\n| Number of model calls per workflow | |\n| Context size | |\n| Output size | |\n| Tool/API calls | |\n| Human review effort | |\n| Expected usage | |\n| Cost per successful workflow | |\n| Latency target | |\n\nOptimization ideas:\n\n- Cache:\n- Route:\n- Compress:\n- Batch/background:\n- Human review changes:\n\n---\n\n## Exercise 2: Risk Register\n\n| Risk | Likelihood | Impact | Mitigation | Launch gate |\n|---|---|---|---|---|\n| Prompt injection | | | | |\n| Sensitive data leakage | | | | |\n| Excessive agency | | | | |\n| Wrong recommendation | | | | |\n| High-cost loop | | | | |\n| Missing escalation | | | | |\n\n---\n\n## Exercise 3: Launch Readiness Review\n\n### Beta criteria\n\n### GA criteria\n\n### Rollback trigger\n\n### Monitoring plan\n\n### Human escalation plan\n\n### Post-launch learning loop\n\n---\n\n## Red-Team Notes\n\n| Attack / failure | What broke? | Fix before launch? |\n|---|---|---|\n| | | |\n| | | |\n| | | |\n\n---\n\n## Take-Home\n\nBefore Session 8:\n\n1. Complete your Launch Readiness Review.\n2. Choose the 3 most important portfolio artifacts to polish.\n3. Draft a 2-minute executive story for your capstone.\n\n"},{"file":"Week 08 - Executive Narrative Portfolio and AI PM Interview Readiness/W08_Facilitator_Script.md","title":"Facilitator Script - Executive Narrative, Portfolio, and AI PM Interview Readiness (Session 8 of 8)","body":"# Facilitator Script - Executive Narrative, Portfolio, and AI PM Interview Readiness (Session 8 of 8)\n\n**Subtitle:** Turn the portfolio into a credible senior AI PM signal.  \n**Duration:** 120 minutes. **Format:** Live virtual. **Audience:** Senior PMs and product leaders.  \n**Spine:** Portfolio Bar -> Executive Narrative -> Interview Story -> Final Critique.  \n**Hands-on share:** ~55% (about 66 minutes).  \n**Session artifact:** Final Senior AI PM Portfolio Packet and AI PM Interview Narrative.  \n**Tools assumed available:** Final portfolio packet, learner artifacts, optional public/private portfolio page.\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Ask learners to submit portfolio packet before class if possible.\n- [ ] Select 2-3 artifacts for anonymized live critique.\n- [ ] Prepare executive narrative example.\n- [ ] Prepare AI PM interview prompt set.\n\n---\n\n# The 120-Minute Blended Run Sheet\n\n## Block 0 - Opening (0:00-0:10)\n\n**Say:** \"The portfolio is not a folder of classwork. It is evidence that you can lead an AI product through ambiguity.\"\n\nAsk chat: \"What do you most want this portfolio to prove?\"\n\n## Block 1 - Strategy Lens: The Senior AI PM Story (0:10-0:30)\n\nTeach the narrative spine:\n\n1. Business problem.\n2. Why AI / why now.\n3. Product strategy.\n4. System design.\n5. Evals and quality bar.\n6. Production risk.\n7. Leadership tradeoffs.\n\n## Block 2 - Applied Walkthrough: Board Memo And Interview Story (0:30-0:55)\n\nShow the same capstone framed two ways:\n\n- Executive version: concise, outcome and risk focused.\n- Interview version: judgment, tradeoffs, engineering collaboration, evals.\n\nContrast weak vs strong storytelling:\n\n- Weak: \"I built an AI agent.\"\n- Strong: \"I identified a workflow where AI could reduce account review time, designed the approval-gated system, defined evals, and set launch gates for cost, risk, and quality.\"\n\n## Hard Break (0:55-1:05)\n\nReal break.\n\n## Block 3 - Studio: Portfolio Critique (1:05-1:38)\n\nLearners review each other's packet:\n\n- What proves senior judgment?\n- What sounds like tool usage?\n- What artifact is strongest?\n- What artifact needs evidence?\n- What should be public, private, or anonymized?\n\nReview 2 examples live.\n\n## Block 4 - Interview Narrative Rehearsal (1:38-1:55)\n\nLearners practice a 2-minute version:\n\n1. Problem.\n2. Strategy.\n3. System.\n4. Evals.\n5. Launch risk.\n6. Leadership.\n\nPeer gives one improvement.\n\n## Block 5 - Close (1:55-2:00)\n\nFinal instruction:\n\n- Complete final portfolio packet.\n- Decide public/private/anonymized version.\n- Use optional premium add-ons if purchased: 1:1 review, mock interview, resume/LinkedIn/portfolio review.\n\n---\n\n## Contingencies\n\n**If portfolios are incomplete:** focus on the story and next 7-day polish plan.  \n**If learners overemphasize tools:** ask what judgment the tool use proves.  \n**If learners are nervous about public artifacts:** help them create anonymized versions.\n\n"},{"file":"Week 08 - Executive Narrative Portfolio and AI PM Interview Readiness/W08_Learner_Workbook.md","title":"Production AI PM - Session 8 Workbook","body":"# Production AI PM - Session 8 Workbook\n\n## Executive Narrative, Portfolio, and AI PM Interview Readiness\n\nToday you turn your artifacts into a credible senior AI PM signal.\n\nBy the end of this 120-minute session, you will have a **Final Senior AI PM Portfolio Packet** and **AI PM Interview Narrative**.\n\nOne rule for today: **Do not describe tools. Explain judgment, tradeoffs, and leadership.**\n\n---\n\n## Pre-Class Checklist\n\n- [ ] Strategy memo open.\n- [ ] AI PRD open.\n- [ ] Workflow prototype or sketch open.\n- [ ] Eval plan open.\n- [ ] Architecture brief open.\n- [ ] Launch readiness review open.\n\n---\n\n## Exercise 1: Portfolio Audit\n\n| Artifact | Strong enough? | What to improve |\n|---|---|---|\n| Strategy memo | | |\n| AI PRD | | |\n| Prototype/workflow | | |\n| Eval dataset/rubric | | |\n| Architecture brief | | |\n| Launch readiness review | | |\n| Executive narrative | | |\n\n---\n\n## Exercise 2: Executive Narrative\n\nWrite a 2-minute version.\n\n### Business problem\n\n### Why AI / why now\n\n### Product strategy\n\n### System design\n\n### Eval and quality bar\n\n### Launch risk\n\n### Leadership tradeoff\n\n---\n\n## Exercise 3: Interview Narrative\n\nUse this structure:\n\n1. Situation:\n2. Product judgment:\n3. Technical tradeoff:\n4. Eval and quality bar:\n5. Launch risk:\n6. Cross-functional leadership:\n7. Result or expected result:\n\n---\n\n## Exercise 4: Public / Private / Anonymized\n\n| Artifact | Public | Private | Anonymized | Notes |\n|---|---|---|---|---|\n| Strategy memo | | | | |\n| AI PRD | | | | |\n| Prototype | | | | |\n| Eval dataset | | | | |\n| Architecture brief | | | | |\n| Launch review | | | | |\n\n---\n\n## Final 7-Day Polish Plan\n\n| Day | Action |\n|---|---|\n| Day 1 | |\n| Day 2 | |\n| Day 3 | |\n| Day 4 | |\n| Day 5 | |\n| Day 6 | |\n| Day 7 | |\n\n---\n\n## Optional Premium Add-Ons\n\nUse these if included in your cohort tier:\n\n- 1:1 capstone review.\n- Mock AI PM interview.\n- Resume, LinkedIn, and portfolio positioning review.\n\n"},{"file":"README.md","title":"Production AI PM Program","body":"# Production AI PM Program\n\n## Lead GenAI and Agentic Products from Strategy to Launch\n\nThis folder contains the full program package for **Production AI PM**, a premium cohort program for senior PMs who want to lead GenAI and agentic products with credible product, technical, and launch judgment.\n\nThe program is designed for senior PMs targeting global or remote AI PM roles, and for product leaders who need to work effectively with AI/ML engineering teams.\n\n---\n\n## Program Promise\n\nBy the end, learners will be able to lead an AI product from strategy to production:\n\n- choose AI opportunities worth pursuing;\n- write an AI PRD with behavior, failure modes, and eval criteria;\n- design a GenAI or agentic workflow with engineering;\n- build or direct a low-code prototype;\n- create a golden dataset and eval rubric;\n- reason about cost, latency, safety, security, and launch readiness;\n- present a senior AI PM portfolio and interview narrative.\n\n---\n\n## Format\n\n- **Duration:** 8 weeks.\n- **Live session:** 120 minutes per week.\n- **Session style:** blended strategy + studio / critique.\n- **Assignment load:** 2 to 4 hours per week.\n- **Optional advanced lab:** 60 to 90 minutes for learners who want more technical depth.\n- **Recommended cohort size:** 12 to 18 learners.\n\n---\n\n## Weekly Structure\n\n| Week | Session | Portfolio artifact |\n|---|---|---|\n| 1 | AI Product Judgment for Senior PMs | AI Opportunity One-Pager |\n| 2 | AI Strategy, Moats, and Business Case | AI Product Strategy Memo v1 |\n| 3 | GenAI System Design for PMs | AI PRD v1 |\n| 4 | Agentic Product Design | Agent/RAG Workflow Prototype v1 + Autonomy Map |\n| 5 | Evals as the New PRD | Eval Dataset + Rubric + Failure Taxonomy |\n| 6 | Working with AI/ML Engineering Teams | Technical Architecture Brief |\n| 7 | Production Readiness: Cost, Latency, Safety, and Launch | Risk Register + Launch Readiness Review |\n| 8 | Executive Narrative, Portfolio, and AI PM Interview Readiness | Final Portfolio Packet + Interview Narrative |\n\n---\n\n## Folder Map\n\n| File or folder | Purpose |\n|---|---|\n| `index.html` | Local clickable navigator for all course-level docs and weekly materials |\n| `md-viewer.html` | Local Markdown viewer used by the navigator for `.md` files |\n| `00_Master_Index.md` | Complete package map and recommended setup order |\n| `00_Cohort_Operating_Plan.md` | How to run the cohort week by week |\n| `00_Learner_Handbook.md` | Learner-facing guide to the cohort, artifacts, critique, confidentiality, and portfolio expectations |\n| `00_Instructor_Delivery_Playbook.md` | Instructor/TA guide for live delivery, critique, and session operations |\n| `00_Portfolio_Packet_Template.md` | Final portfolio structure learners fill through the program |\n| `00_Tool_Stack_and_Setup.md` | Required and optional tools |\n| `00_Advanced_Technical_Companion.md` | Optional deeper technical guide for AI PM architecture, RAG, agents, evals, tracing, cost, latency, and launch reviews |\n| `00_Capstone_Casebook.md` | Shared teaching case, capstone tracks, fallback prompts, and public example contexts |\n| `00_Assessment_Rubrics_And_Certification.md` | Artifact rubrics, completion criteria, certificate bar, and feedback templates |\n| `00_Prompt_And_Workflow_Library.md` | Reusable prompts and workflow patterns for each week |\n| `00_Onboarding_Communications_And_Email_Templates.md` | Welcome, reminder, nudge, completion, and community messages |\n| `00_Portfolio_Showcase_And_Career_Kit.md` | Portfolio packaging, interview narrative, resume, LinkedIn, and showcase guidance |\n| `00_Marketing_Landing_Page_And_Positioning.md` | Landing page copy, offer positioning, FAQ, objections, and application questions |\n| `00_Premium_AddOns_Playbook.md` | Optional capstone review, mock interview, portfolio review, and advanced lab playbooks |\n| `00_Program_QA_And_Launch_Checklist.md` | Pre-launch, weekly, learner, instructor, tool, sales, and post-cohort QA checklist |\n| `00_Cohort_Tracker.csv` | Lightweight attendance, submission, eval-row, completion, and add-on tracker |\n| `Week 01 - .../W01_Facilitator_Script.md` | Live run sheet for Week 01 |\n| `Week 01 - .../W01_Learner_Workbook.md` | Learner workbook for Week 01 |\n| `Week 01 - .../W01_Presenter_Deck.html` | Synced presenter deck for Week 01 |\n| `Week 01 - .../W01_Learner_Deck.html` | Synced learner deck for Week 01 |\n| `Week 02 - .../W02_Facilitator_Script.md` | Live run sheet for Week 02, and same pattern through Week 08 |\n| `Week 02 - .../W02_Learner_Workbook.md` | Learner workbook for Week 02, and same pattern through Week 08 |\n| `Week 02 - .../W02_Presenter_Deck.html` | Synced presenter deck for Week 02, and same pattern through Week 08 |\n| `Week 02 - .../W02_Learner_Deck.html` | Synced learner deck for Week 02, and same pattern through Week 08 |\n| `build_synced_decks.mjs` | Rebuilds all 16 HTML deck files from the cleaned templates |\n\nThe reusable source templates live in the root `templates/` folder.\n\n---\n\n## Capstone Tracks\n\nLearners choose one track:\n\n1. **Enterprise Copilot** - best for B2B SaaS and internal AI products.\n2. **Agentic Workflow Product** - best for operations, automation, and multi-step agents.\n3. **Decision Support Product** - best for recommendations, personalization, trust, and evaluation.\n\nThe shared teaching case should use **Customer Success Copilot for B2B SaaS**, while learner assignments adapt the frameworks to their own company/product context when possible.\n"}]</script>
+  <script>
+    const docs = JSON.parse(document.getElementById("doc-data").textContent);
+    const byFile = new Map(docs.map(doc => [doc.file, doc]));
+    const docList = document.getElementById("docList");
+    const article = document.getElementById("article");
+    const search = document.getElementById("search");
+    const pathLabel = document.getElementById("pathLabel");
+    const rawLink = document.getElementById("rawLink");
+    const highlightStatus = document.getElementById("highlightStatus");
+    const highlightPrev = document.getElementById("highlightPrev");
+    const highlightNext = document.getElementById("highlightNext");
+    const clearHighlights = document.getElementById("clearHighlights");
+    const highlightAction = document.getElementById("highlightAction");
+    const highlightMenu = document.getElementById("highlightMenu");
+    const selectHighlightAction = document.getElementById("selectHighlightAction");
+    const commentHighlightAction = document.getElementById("commentHighlightAction");
+    const deleteHighlightAction = document.getElementById("deleteHighlightAction");
+    const highlightCommentPanel = document.getElementById("highlightCommentPanel");
+    const highlightCommentText = document.getElementById("highlightCommentText");
+    const saveHighlightComment = document.getElementById("saveHighlightComment");
+    const cancelHighlightComment = document.getElementById("cancelHighlightComment");
+    const STORAGE_PREFIX = "production-ai-pm-md-highlights:v1:";
+    let activeDoc = null;
+    let activeHighlightId = null;
+    let pendingHighlight = null;
+    let pendingDeleteId = null;
+    let selectionFrame = 0;
+    let suppressSelectionToolbar = false;
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function inlineMarkdown(text) {
+      let out = escapeHtml(text);
+      out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+      out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+      out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      return out;
+    }
+
+    function parseTable(lines, start) {
+      const header = splitTableRow(lines[start]);
+      const separator = splitTableRow(lines[start + 1] || "");
+      if (!header.length || !separator.length || !separator.every(cell => /^:?-{3,}:?$/.test(cell.trim()))) return null;
+      const rows = [];
+      let i = start + 2;
+      while (i < lines.length && /^\s*\|/.test(lines[i])) {
+        rows.push(splitTableRow(lines[i]));
+        i++;
+      }
+      const head = header.map(cell => '<th>' + inlineMarkdown(cell.trim()) + '</th>').join("");
+      const body = rows.map(row => '<tr>' + header.map((_, idx) => '<td>' + inlineMarkdown((row[idx] || "").trim()) + '</td>').join("") + '</tr>').join("");
+      return {
+        html: '<div class="table-wrap"><table><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>',
+        next: i
+      };
+    }
+
+    function splitTableRow(line) {
+      return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|");
+    }
+
+    function renderMarkdown(markdown) {
+      const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+      const html = [];
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
+        if (!line.trim()) {
+          i++;
+          continue;
+        }
+        if (line.startsWith("```")) {
+          const code = [];
+          i++;
+          while (i < lines.length && !lines[i].startsWith("```")) {
+            code.push(lines[i]);
+            i++;
+          }
+          i++;
+          html.push('<pre><code>' + escapeHtml(code.join("\n")) + '</code></pre>');
+          continue;
+        }
+        const table = parseTable(lines, i);
+        if (table) {
+          html.push(table.html);
+          i = table.next;
+          continue;
+        }
+        const heading = line.match(/^(#{1,4})\s+(.+)$/);
+        if (heading) {
+          const level = heading[1].length;
+          html.push('<h' + level + '>' + inlineMarkdown(heading[2]) + '</h' + level + '>');
+          i++;
+          continue;
+        }
+        if (/^>\s?/.test(line)) {
+          const quote = [];
+          while (i < lines.length && /^>\s?/.test(lines[i])) {
+            quote.push(lines[i].replace(/^>\s?/, ""));
+            i++;
+          }
+          html.push('<blockquote>' + quote.map(inlineMarkdown).join("<br>") + '</blockquote>');
+          continue;
+        }
+        if (/^\s*[-*]\s+/.test(line)) {
+          const items = [];
+          while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+            items.push(lines[i].replace(/^\s*[-*]\s+/, ""));
+            i++;
+          }
+          html.push('<ul>' + items.map(item => '<li>' + inlineMarkdown(item) + '</li>').join("") + '</ul>');
+          continue;
+        }
+        if (/^\s*\d+\.\s+/.test(line)) {
+          const items = [];
+          while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+            items.push(lines[i].replace(/^\s*\d+\.\s+/, ""));
+            i++;
+          }
+          html.push('<ol>' + items.map(item => '<li>' + inlineMarkdown(item) + '</li>').join("") + '</ol>');
+          continue;
+        }
+        if (/^---+$/.test(line.trim())) {
+          html.push("<hr>");
+          i++;
+          continue;
+        }
+        const paragraph = [line.trim()];
+        i++;
+        while (
+          i < lines.length &&
+          lines[i].trim() &&
+          !/^(#{1,4})\s+/.test(lines[i]) &&
+          !lines[i].startsWith("```") &&
+          !/^\s*[-*]\s+/.test(lines[i]) &&
+          !/^\s*\d+\.\s+/.test(lines[i]) &&
+          !/^\s*\|/.test(lines[i]) &&
+          !/^>\s?/.test(lines[i]) &&
+          !/^---+$/.test(lines[i].trim())
+        ) {
+          paragraph.push(lines[i].trim());
+          i++;
+        }
+        html.push('<p>' + inlineMarkdown(paragraph.join(" ")) + '</p>');
+      }
+      return html.join("\n");
+    }
+
+    function storageKey(file) {
+      return STORAGE_PREFIX + file;
+    }
+
+    function readHighlights(file) {
+      try {
+        const value = localStorage.getItem(storageKey(file));
+        if (!value) return [];
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .filter(item => item && Number.isFinite(item.start) && Number.isFinite(item.end) && item.end > item.start && typeof item.text === "string" && typeof item.id === "string")
+          .map(item => ({
+            id: item.id,
+            start: item.start,
+            end: item.end,
+            text: item.text,
+            comment: typeof item.comment === "string" ? item.comment : ""
+          }))
+          .sort((a, b) => a.start - b.start || a.end - b.end);
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function writeHighlights(file, highlights) {
+      try {
+        if (!highlights.length) {
+          localStorage.removeItem(storageKey(file));
+          return;
+        }
+        localStorage.setItem(storageKey(file), JSON.stringify(highlights));
+      } catch (error) {
+        highlightStatus.textContent = "Highlights could not be saved in this browser.";
+      }
+    }
+
+    function normalizeHighlights(doc) {
+      const text = article.textContent || "";
+      const stored = readHighlights(doc.file);
+      const valid = [];
+      let lastEnd = -1;
+      for (const item of stored) {
+        if (item.start < lastEnd) continue;
+        if (item.start < 0 || item.end > text.length) continue;
+        if (text.slice(item.start, item.end) !== item.text) continue;
+        valid.push(item);
+        lastEnd = item.end;
+      }
+      if (valid.length !== stored.length) {
+        writeHighlights(doc.file, valid);
+      }
+      return valid;
+    }
+
+    function wrapTextRange(root, start, end, highlight) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const segments = [];
+      let current = 0;
+      let node = walker.nextNode();
+      while (node) {
+        const value = node.nodeValue || "";
+        const next = current + value.length;
+        const segmentStart = Math.max(start, current);
+        const segmentEnd = Math.min(end, next);
+        if (segmentStart < segmentEnd) {
+          segments.push({
+            node: node,
+            start: segmentStart - current,
+            end: segmentEnd - current
+          });
+        }
+        current = next;
+        if (current >= end) break;
+        node = walker.nextNode();
+      }
+      for (let i = segments.length - 1; i >= 0; i--) {
+        const segment = segments[i];
+        const range = document.createRange();
+        range.setStart(segment.node, segment.start);
+        range.setEnd(segment.node, segment.end);
+        const mark = document.createElement("mark");
+        mark.className = "md-highlight";
+        if (highlight.comment) {
+          mark.classList.add("has-comment");
+          mark.title = highlight.comment;
+        }
+        mark.dataset.highlightId = highlight.id;
+        mark.appendChild(range.extractContents());
+        range.insertNode(mark);
+      }
+    }
+
+    function applyStoredHighlights(doc) {
+      const highlights = normalizeHighlights(doc);
+      for (const item of highlights) {
+        wrapTextRange(article, item.start, item.end, item);
+      }
+      if (!highlights.some(item => item.id === activeHighlightId)) {
+        activeHighlightId = null;
+      }
+      setActiveHighlight(activeHighlightId, false);
+      updateHighlightUi(highlights);
+    }
+
+    function updateHighlightUi(highlights) {
+      const count = highlights.length;
+      if (!activeDoc) {
+        highlightStatus.textContent = "No highlights";
+        clearHighlights.disabled = true;
+        highlightPrev.disabled = true;
+        highlightNext.disabled = true;
+        return;
+      }
+      if (count === 0) {
+        highlightStatus.textContent = "No highlights";
+        clearHighlights.disabled = true;
+        highlightPrev.disabled = true;
+        highlightNext.disabled = true;
+        return;
+      }
+      const commentCount = highlights.filter(item => item.comment).length;
+      const index = activeHighlightId ? highlights.findIndex(item => item.id === activeHighlightId) : -1;
+      const countLabel = count === 1 ? "1 highlight" : count + " highlights";
+      const commentLabel = commentCount === 1 ? "1 comment" : commentCount + " comments";
+      highlightStatus.textContent = index >= 0 ? (index + 1) + " / " + count + " highlights - " + commentLabel : countLabel + " - " + commentLabel;
+      clearHighlights.disabled = count === 0;
+      highlightPrev.disabled = count === 0;
+      highlightNext.disabled = count === 0;
+    }
+
+    function hideFloatingActions() {
+      highlightAction.classList.remove("is-visible");
+      highlightMenu.classList.remove("is-visible");
+      deleteHighlightAction.classList.remove("is-visible");
+      pendingDeleteId = null;
+    }
+
+    function hideCommentPanel() {
+      highlightCommentPanel.classList.remove("is-visible");
+    }
+
+    function positionFloatingAction(button, rect) {
+      button.classList.add("is-visible");
+      const width = button.offsetWidth || 140;
+      const height = button.offsetHeight || 36;
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
+      const preferredTop = rect.top - height - 8;
+      const fallbackTop = rect.bottom + 8;
+      const top = preferredTop >= 8 ? preferredTop : Math.min(fallbackTop, window.innerHeight - height - 8);
+      button.style.left = left + "px";
+      button.style.top = top + "px";
+    }
+
+    function marksForHighlight(id) {
+      if (!id) return [];
+      return Array.from(article.querySelectorAll("mark.md-highlight")).filter(mark => mark.dataset.highlightId === id);
+    }
+
+    function setActiveHighlight(id, updateStatus = true) {
+      activeHighlightId = id || null;
+      for (const mark of article.querySelectorAll("mark.md-highlight.active")) {
+        mark.classList.remove("active");
+      }
+      for (const mark of marksForHighlight(activeHighlightId)) {
+        mark.classList.add("active");
+      }
+      if (updateStatus && activeDoc) {
+        updateHighlightUi(normalizeHighlights(activeDoc));
+      }
+    }
+
+    function scrollToHighlight(id) {
+      const mark = marksForHighlight(id)[0];
+      if (!mark) return;
+      mark.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+
+    function navigateHighlight(direction) {
+      if (!activeDoc) return;
+      const highlights = normalizeHighlights(activeDoc);
+      if (!highlights.length) return;
+      let index = highlights.findIndex(item => item.id === activeHighlightId);
+      if (index < 0) {
+        index = direction > 0 ? -1 : 0;
+      }
+      const nextIndex = (index + direction + highlights.length) % highlights.length;
+      setActiveHighlight(highlights[nextIndex].id);
+      hideFloatingActions();
+      hideCommentPanel();
+      scrollToHighlight(activeHighlightId);
+    }
+
+    function selectActiveHighlight() {
+      const marks = marksForHighlight(activeHighlightId);
+      if (!marks.length) return;
+      const range = document.createRange();
+      range.setStartBefore(marks[0]);
+      range.setEndAfter(marks[marks.length - 1]);
+      const selection = window.getSelection();
+      if (!selection) return;
+      suppressSelectionToolbar = true;
+      selection.removeAllRanges();
+      selection.addRange(range);
+      scrollToHighlight(activeHighlightId);
+      hideFloatingActions();
+    }
+
+    function openCommentPanel() {
+      if (!activeDoc || !activeHighlightId) return;
+      const highlight = readHighlights(activeDoc.file).find(item => item.id === activeHighlightId);
+      const mark = marksForHighlight(activeHighlightId)[0];
+      if (!highlight || !mark) return;
+      highlightCommentText.value = highlight.comment || "";
+      positionFloatingAction(highlightCommentPanel, mark.getBoundingClientRect());
+      highlightCommentText.focus();
+      hideFloatingActions();
+    }
+
+    function saveActiveHighlightComment() {
+      if (!activeDoc || !activeHighlightId) return;
+      const highlights = readHighlights(activeDoc.file).map(item => {
+        if (item.id !== activeHighlightId) return item;
+        return {
+          id: item.id,
+          start: item.start,
+          end: item.end,
+          text: item.text,
+          comment: highlightCommentText.value.trim()
+        };
+      });
+      writeHighlights(activeDoc.file, highlights);
+      hideCommentPanel();
+      refreshArticle();
+      scrollToHighlight(activeHighlightId);
+    }
+
+    function textOffsetFor(node, offset) {
+      const range = document.createRange();
+      range.selectNodeContents(article);
+      range.setEnd(node, offset);
+      return range.toString().length;
+    }
+
+    function selectedHighlightCandidate() {
+      const selection = window.getSelection();
+      if (!activeDoc || !selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+      const range = selection.getRangeAt(0).cloneRange();
+      if (!article.contains(range.startContainer) || !article.contains(range.endContainer)) return null;
+      let start = textOffsetFor(range.startContainer, range.startOffset);
+      let end = textOffsetFor(range.endContainer, range.endOffset);
+      if (start > end) {
+        const nextStart = end;
+        end = start;
+        start = nextStart;
+      }
+      const fullText = article.textContent || "";
+      const selectedText = fullText.slice(start, end);
+      const leading = (selectedText.match(/^\s*/) || [""])[0].length;
+      const trailing = (selectedText.match(/\s*$/) || [""])[0].length;
+      start += leading;
+      end -= trailing;
+      if (start >= end) return null;
+      const rects = range.getClientRects();
+      const rect = rects.length ? rects[0] : range.getBoundingClientRect();
+      return {
+        start: start,
+        end: end,
+        text: fullText.slice(start, end),
+        rect: rect
+      };
+    }
+
+    function refreshArticle() {
+      if (!activeDoc) return;
+      const top = window.scrollY;
+      article.innerHTML = renderMarkdown(activeDoc.body);
+      applyStoredHighlights(activeDoc);
+      window.scrollTo({ top: top });
+    }
+
+    function savePendingHighlight() {
+      if (!activeDoc || !pendingHighlight) return;
+      const highlights = readHighlights(activeDoc.file);
+      const overlaps = highlights.some(item => pendingHighlight.start < item.end && pendingHighlight.end > item.start);
+      if (overlaps) {
+        highlightStatus.textContent = "Selection overlaps an existing highlight.";
+        hideFloatingActions();
+        return;
+      }
+      highlights.push({
+        id: "hl-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+        start: pendingHighlight.start,
+        end: pendingHighlight.end,
+        text: pendingHighlight.text,
+        comment: ""
+      });
+      highlights.sort((a, b) => a.start - b.start || a.end - b.end);
+      writeHighlights(activeDoc.file, highlights);
+      activeHighlightId = highlights.find(item => item.start === pendingHighlight.start && item.end === pendingHighlight.end && item.text === pendingHighlight.text)?.id || null;
+      window.getSelection()?.removeAllRanges();
+      pendingHighlight = null;
+      hideFloatingActions();
+      refreshArticle();
+    }
+
+    function deletePendingHighlight() {
+      const targetId = pendingDeleteId || activeHighlightId;
+      if (!activeDoc || !targetId) return;
+      const highlights = readHighlights(activeDoc.file).filter(item => item.id !== targetId);
+      writeHighlights(activeDoc.file, highlights);
+      activeHighlightId = null;
+      pendingDeleteId = null;
+      hideFloatingActions();
+      hideCommentPanel();
+      refreshArticle();
+    }
+
+    function clearCurrentHighlights() {
+      if (!activeDoc) return;
+      writeHighlights(activeDoc.file, []);
+      activeHighlightId = null;
+      pendingDeleteId = null;
+      hideFloatingActions();
+      hideCommentPanel();
+      refreshArticle();
+    }
+
+    function setActive(file) {
+      const doc = byFile.get(file) || docs[0];
+      if (!doc) return;
+      activeDoc = doc;
+      activeHighlightId = null;
+      pendingHighlight = null;
+      hideFloatingActions();
+      hideCommentPanel();
+      document.title = doc.title + " · Markdown Viewer";
+      pathLabel.textContent = doc.file;
+      rawLink.href = doc.file;
+      article.innerHTML = renderMarkdown(doc.body);
+      applyStoredHighlights(doc);
+      for (const link of docList.querySelectorAll(".doc-link")) {
+        link.classList.toggle("active", link.dataset.file === doc.file);
+      }
+      const url = new URL(location.href);
+      url.searchParams.set("file", doc.file);
+      history.replaceState(null, "", url);
+    }
+
+    function renderList(filter = "") {
+      const term = filter.trim().toLowerCase();
+      const matches = docs.filter(doc => {
+        if (!term) return true;
+        return doc.title.toLowerCase().includes(term) || doc.file.toLowerCase().includes(term) || doc.body.toLowerCase().includes(term);
+      });
+      docList.innerHTML = matches.map(doc => {
+        return '<a class="doc-link" data-file="' + escapeHtml(doc.file) + '" href="?file=' + encodeURIComponent(doc.file) + '">' +
+          '<span class="doc-title">' + escapeHtml(doc.title) + '</span>' +
+          '<span class="doc-path">' + escapeHtml(doc.file) + '</span>' +
+        '</a>';
+      }).join("");
+      if (!matches.length) {
+        docList.innerHTML = '<div class="empty">No documents match that search.</div>';
+      }
+    }
+
+    docList.addEventListener("click", event => {
+      const link = event.target.closest(".doc-link");
+      if (!link) return;
+      event.preventDefault();
+      setActive(link.dataset.file);
+    });
+
+    search.addEventListener("input", () => {
+      const current = new URL(location.href).searchParams.get("file");
+      renderList(search.value);
+      if (current) {
+        for (const link of docList.querySelectorAll(".doc-link")) {
+          link.classList.toggle("active", link.dataset.file === current);
+        }
+      }
+    });
+
+    for (const control of [highlightAction, selectHighlightAction, commentHighlightAction, deleteHighlightAction, saveHighlightComment, cancelHighlightComment]) {
+      control.addEventListener("mousedown", event => {
+        event.preventDefault();
+      });
+    }
+
+    highlightCommentPanel.addEventListener("mousedown", event => {
+      event.stopPropagation();
+    });
+
+    highlightMenu.addEventListener("mousedown", event => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+
+    highlightAction.addEventListener("click", savePendingHighlight);
+    deleteHighlightAction.addEventListener("click", deletePendingHighlight);
+    selectHighlightAction.addEventListener("click", selectActiveHighlight);
+    commentHighlightAction.addEventListener("click", openCommentPanel);
+    saveHighlightComment.addEventListener("click", saveActiveHighlightComment);
+    cancelHighlightComment.addEventListener("click", hideCommentPanel);
+    clearHighlights.addEventListener("click", clearCurrentHighlights);
+    highlightPrev.addEventListener("click", () => navigateHighlight(-1));
+    highlightNext.addEventListener("click", () => navigateHighlight(1));
+
+    article.addEventListener("click", event => {
+      const mark = event.target.closest("mark.md-highlight");
+      if (!mark || !article.contains(mark)) return;
+      setActiveHighlight(mark.dataset.highlightId);
+      pendingDeleteId = activeHighlightId;
+      pendingHighlight = null;
+      highlightAction.classList.remove("is-visible");
+      hideCommentPanel();
+      positionFloatingAction(highlightMenu, mark.getBoundingClientRect());
+      event.stopPropagation();
+    });
+
+    document.addEventListener("selectionchange", () => {
+      if (selectionFrame) {
+        cancelAnimationFrame(selectionFrame);
+      }
+      selectionFrame = requestAnimationFrame(() => {
+        if (suppressSelectionToolbar) {
+          suppressSelectionToolbar = false;
+          pendingHighlight = null;
+          highlightAction.classList.remove("is-visible");
+          return;
+        }
+        const candidate = selectedHighlightCandidate();
+        if (!candidate) {
+          pendingHighlight = null;
+          highlightAction.classList.remove("is-visible");
+          return;
+        }
+        pendingHighlight = candidate;
+        pendingDeleteId = null;
+        highlightMenu.classList.remove("is-visible");
+        hideCommentPanel();
+        positionFloatingAction(highlightAction, candidate.rect);
+      });
+    });
+
+    document.addEventListener("click", event => {
+      if (highlightMenu.contains(event.target) || highlightCommentPanel.contains(event.target)) return;
+      if (event.target.closest("mark.md-highlight")) return;
+      hideFloatingActions();
+    });
+
+    window.addEventListener("resize", hideFloatingActions);
+    window.addEventListener("scroll", hideFloatingActions, { passive: true });
+
+    renderList();
+    const initial = new URL(location.href).searchParams.get("file");
+    setActive(initial && byFile.has(initial) ? initial : docs[0]?.file);
+  </script>
+</body>
+</html>

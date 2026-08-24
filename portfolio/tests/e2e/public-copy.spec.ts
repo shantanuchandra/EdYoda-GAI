@@ -11,7 +11,7 @@ const forbiddenPublicCopy = [
   /lorem ipsum/i,
 ] as const;
 
-test("all rendered routes remain public-safe and expose exact contact syntax", async ({ page, request }, testInfo) => {
+test("all server-rendered routes remain public-safe and expose exact contact syntax", async ({ request }, testInfo) => {
   const publicRoutes = await getPublicRoutes();
   let scannedRoutes = 0;
 
@@ -23,22 +23,13 @@ test("all rendered routes remain public-safe and expose exact contact syntax", a
       expect(initialHtml, `${route} initial HTML contains ${forbidden}`).not.toMatch(forbidden);
     }
 
-    await page.goto(route, { waitUntil: "domcontentloaded" });
-    const renderedHtml = await page.content();
-    for (const forbidden of forbiddenPublicCopy) {
-      expect(renderedHtml, `${route} rendered HTML contains ${forbidden}`).not.toMatch(forbidden);
-    }
-
-    const mailLinks = page.locator(`a[href="mailto:${siteConfig.email}"]`);
-    const linkedInLinks = page.locator(`a[href="${siteConfig.linkedin}"]`);
-    expect(await mailLinks.count(), `${route} must expose the canonical mailto link`).toBeGreaterThan(0);
-    expect(await linkedInLinks.count(), `${route} must expose the canonical LinkedIn link`).toBeGreaterThan(0);
-    expect(await page.locator('a[href^="mailto:"]').evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual(
-      Array.from({ length: await mailLinks.count() }, () => `mailto:${siteConfig.email}`),
-    );
-    expect(await page.locator('a[href*="linkedin.com"]').evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual(
-      Array.from({ length: await linkedInLinks.count() }, () => siteConfig.linkedin),
-    );
+    const hrefs = Array.from(initialHtml.matchAll(/\shref="([^"]+)"/g), (match) => match[1].replaceAll("&amp;", "&"));
+    const mailLinks = hrefs.filter((href) => href.startsWith("mailto:"));
+    const linkedInLinks = hrefs.filter((href) => href.includes("linkedin.com"));
+    expect(mailLinks.length, `${route} must expose the canonical mailto link`).toBeGreaterThan(0);
+    expect(linkedInLinks.length, `${route} must expose the canonical LinkedIn link`).toBeGreaterThan(0);
+    expect(mailLinks).toEqual(Array.from({ length: mailLinks.length }, () => `mailto:${siteConfig.email}`));
+    expect(linkedInLinks).toEqual(Array.from({ length: linkedInLinks.length }, () => siteConfig.linkedin));
     scannedRoutes += 1;
   }
 

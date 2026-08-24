@@ -54,8 +54,9 @@ test("Learning details extend the approved visual language across the complete p
     const body = document.querySelector<HTMLElement>("[data-learning-detail-body]");
     const modules = document.querySelector<HTMLElement>("#launch-modules + ul");
     const teaching = document.querySelector<HTMLElement>("#how-i-teach-it + p");
+    const curriculum = document.querySelector<HTMLElement>("[data-learning-curriculum]");
     const navigation = document.querySelector<HTMLElement>("[data-learning-path-navigation]");
-    if (!canvas || !visual || !body || !modules || !teaching || !navigation) {
+    if (!canvas || !visual || !body || !modules || !teaching || !curriculum || !navigation) {
       throw new Error("Learning detail is missing the full-width path structure");
     }
     const box = (element: HTMLElement) => {
@@ -70,6 +71,13 @@ test("Learning details extend the approved visual language across the complete p
       moduleColumns: getComputedStyle(modules).gridTemplateColumns.split(" ").length,
       modules: [...modules.querySelectorAll<HTMLElement>("li")].map(box),
       teaching: box(teaching),
+      curriculum: box(curriculum),
+      curriculumModules: curriculum.querySelectorAll("details").length,
+      openModules: curriculum.querySelectorAll("details[open]").length,
+      materialLinks: curriculum.querySelectorAll(".learning-curriculum__materials a").length,
+      visibleMaterialLinks: [...curriculum.querySelectorAll<HTMLElement>(".learning-curriculum__materials a")]
+        .filter((link) => link.getClientRects().length > 0).length,
+      demoLinks: curriculum.querySelectorAll('[aria-label="Connected demos"] a').length,
       links: [...navigation.querySelectorAll<HTMLAnchorElement>("a")].map((link) => ({
         href: link.getAttribute("href"),
         minHeight: Number.parseFloat(getComputedStyle(link).minHeight),
@@ -87,6 +95,12 @@ test("Learning details extend the approved visual language across the complete p
   expect(geometry.modules).toHaveLength(4);
   for (const module of geometry.modules) expect(module.height).toBeGreaterThanOrEqual(110);
   expect(geometry.teaching.width).toBeGreaterThanOrEqual(760);
+  expect(geometry.curriculum.width).toBeGreaterThanOrEqual(1180);
+  expect(geometry.curriculumModules).toBe(8);
+  expect(geometry.openModules).toBe(1);
+  expect(geometry.materialLinks).toBe(27);
+  expect(geometry.visibleMaterialLinks).toBe(3);
+  expect(geometry.demoLinks).toBe(2);
   expect(geometry.links).toEqual([
     expect.objectContaining({ href: "/learning", minHeight: 44, text: expect.stringContaining("All learning paths") }),
     expect.objectContaining({ href: "/learning/ai-product-transformation", minHeight: 44, text: expect.stringContaining("AI product transformation") }),

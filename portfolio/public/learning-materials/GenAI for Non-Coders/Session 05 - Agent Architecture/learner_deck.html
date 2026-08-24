@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI for Non-Coders — Session 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===================== EDITORIAL DESIGN TOKENS ===================== */
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --ink-blue-soft: rgba(30, 58, 95, 0.08);
+
+    --warn:         #a16207;
+    --warn-soft:    rgba(161, 98, 7, 0.10);
+    --danger:       #991b1b;
+    --danger-soft:  rgba(153, 27, 27, 0.08);
+    --calm:         #14532d;
+    --calm-soft:    rgba(20, 83, 45, 0.08);
+
+    --s-1: 0.5rem;  --s-2: 1rem;  --s-3: 1.5rem;  --s-4: 2rem;
+    --s-5: 3rem;    --s-6: 4.5rem; --s-7: 6rem;    --s-8: 9rem;
+
+    /* TYPE SCALE — bumped up for readability (S5 feedback) */
+    --t-eyebrow: 0.85rem;
+    --t-meta:    0.92rem;
+    --t-body:    1.28rem;
+    --t-body-sm: 1.08rem;
+    --t-lede:    1.7rem;
+    --t-h3:      1.85rem;
+    --t-h2:      3rem;
+    --t-h1:      clamp(3.2rem, 5.6vw, 5.2rem);
+    --t-display: clamp(3.8rem, 7vw, 6.6rem);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur:  480ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%; width: 100%; overflow: hidden;
+    background: var(--paper); color: var(--ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.45; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(26, 24, 20, 0.08) 100%);
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; z-index: 2; }
+
+  .slide {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; padding: 3.4vh 4.6vw 4vh;
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  .slide.active { display: flex; opacity: 1; }
+
+  .running-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: var(--s-2); border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .running-head .left { display: flex; gap: 1.4em; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+  .running-head .left .topic { color: var(--ink-soft); }
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.05rem; letter-spacing: 0.02em;
+    text-transform: none; color: var(--ink); font-weight: 400;
+  }
+
+  .slide-body {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: var(--s-3) 0; max-width: 1320px; margin: 0 auto; width: 100%;
+  }
+  /* Thin concept slides: start content higher and let the larger content fill downward,
+     instead of floating in a centered band with big top/bottom margins. */
+  .slide-body.fill-top { justify-content: flex-start; padding-top: var(--s-4); }
+
+  .folio {
+    position: absolute; bottom: 1rem; right: 4.6vw;
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 7rem; line-height: 0.8; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums; letter-spacing: -0.04em;
+    pointer-events: none; user-select: none; z-index: 0; opacity: 0.5;
+  }
+  .folio sup {
+    font-size: 0.32em; vertical-align: top; margin-left: 0.15em;
+    color: var(--ink-mute); font-weight: 400;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--terra); font-weight: 500;
+    margin-bottom: var(--s-2); position: relative; padding-left: 1.8em;
+  }
+  .eyebrow::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: 1.2em; height: 1px; background: var(--terra);
+  }
+  .eyebrow.cool { color: var(--ink-blue); }
+  .eyebrow.cool::before { background: var(--ink-blue); }
+
+  h1, h2, h3, .display { font-family: 'Fraunces', serif; color: var(--ink); letter-spacing: -0.02em; }
+  h1 {
+    font-size: var(--t-h1); font-weight: 400; line-height: 1.02;
+    font-variation-settings: 'opsz' 120, 'SOFT' 30; margin-bottom: var(--s-3);
+  }
+  h2 {
+    font-size: var(--t-h2); font-weight: 400; line-height: 1.08;
+    font-variation-settings: 'opsz' 80; margin-bottom: var(--s-2);
+  }
+  h3 { font-size: var(--t-h3); font-weight: 500; line-height: 1.2; color: var(--ink); margin-bottom: var(--s-1); }
+  .display {
+    font-size: var(--t-display); font-weight: 300; line-height: 1.04;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1; max-width: 18ch;
+  }
+  p, li { font-size: var(--t-body); line-height: 1.55; color: var(--ink-soft); }
+  .lede {
+    font-family: 'Fraunces', serif; font-size: var(--t-lede);
+    font-weight: 300; font-style: italic; line-height: 1.4;
+    color: var(--ink-soft); max-width: 52ch;
+    font-variation-settings: 'opsz' 36;
+  }
+  .terra { color: var(--terra); }
+  .blue  { color: var(--ink-blue); }
+  .marked { background: linear-gradient(180deg, transparent 58%, var(--terra-soft) 58%); padding: 0 0.05em; }
+
+  .rule { height: 1px; background: var(--rule); margin: var(--s-3) 0; }
+
+  .prompt {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink); padding: var(--s-2) var(--s-3);
+    font-family: 'Geist Mono', monospace; font-size: 1rem;
+    line-height: 1.65; color: var(--ink); white-space: pre-wrap; position: relative;
+  }
+  .prompt::before {
+    content: 'PROMPT'; position: absolute; top: -0.6em; left: var(--s-3);
+    background: var(--paper); padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.2em; color: var(--ink-mute); font-weight: 500;
+  }
+  .prompt-copy {
+    position: absolute; top: -0.7em; right: var(--s-2);
+    background: var(--terra); color: var(--paper); border: none;
+    font-family: 'Geist Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;
+    padding: 0.35em 0.8em; border-radius: 4px; cursor: pointer;
+    transition: background 200ms var(--ease);
+  }
+  .prompt-copy:hover { background: #9e3a17; }
+  .prompt-copy.copied { background: var(--calm); }
+
+  .grid { display: grid; gap: var(--s-3); }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+  .g-4 { grid-template-columns: repeat(4, 1fr); }
+  .mt-2 { margin-top: var(--s-2); }
+  .mt-3 { margin-top: var(--s-3); }
+  .mt-4 { margin-top: var(--s-4); }
+
+  /* Cover */
+  .cover { display: grid; grid-template-columns: auto 1fr; gap: var(--s-6); align-items: end; height: 100%; padding: var(--s-5) 0 var(--s-3); }
+  .cover .vol {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: 'Geist Mono', monospace; font-size: 0.85rem;
+    letter-spacing: 0.4em; text-transform: uppercase; color: var(--ink-mute);
+    align-self: stretch; border-right: 1px solid var(--rule); padding-right: var(--s-2);
+  }
+  .cover .cover-main h1.cover-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.8rem, 7.4vw, 7rem); font-weight: 300;
+    line-height: 0.94; letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; max-width: 15ch;
+  }
+  .cover .cover-byline {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.55rem; color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-3); max-width: 48ch; line-height: 1.4;
+  }
+  .cover .cover-foot {
+    margin-top: var(--s-5); display: flex; justify-content: space-between;
+    align-items: baseline; padding-top: var(--s-2); border-top: 1px solid var(--ink);
+    font-family: 'Geist Mono', monospace; font-size: 0.85rem;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-mute);
+  }
+
+  /* Exercise slide */
+  .exercise-slide .slide-body { display: grid; grid-template-columns: auto 1fr; gap: var(--s-5); align-items: center; }
+  .exercise-slide .ex-letter {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(12rem, 24vw, 20rem); line-height: 0.85;
+    color: var(--terra);
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; letter-spacing: -0.04em;
+  }
+  .exercise-slide .ex-meta {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-meta);
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: var(--s-2);
+  }
+  .exercise-slide .ex-timer {
+    position: absolute; bottom: 1.3rem; right: 4.6vw;
+    font-family: 'Fraunces', serif; font-weight: 300; font-size: 3.4rem;
+    color: var(--ink-mute); font-variant-numeric: tabular-nums oldstyle-nums; z-index: 3;
+  }
+  .exercise-slide .folio { left: 4.6vw; right: auto; }
+
+  /* Nav */
+  .nav {
+    position: fixed; bottom: 1.1rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.4rem; z-index: 100;
+    background: rgba(245, 239, 230, 0.85); backdrop-filter: blur(8px);
+    padding: 4px; border-radius: 999px; border: 1px solid var(--rule);
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  body:hover .nav { opacity: 0.5; }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: transparent; border: none; color: var(--ink-soft);
+    cursor: pointer; font-size: 0.9rem; padding: 5px 12px;
+    border-radius: 999px; font-family: 'Geist Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.08em; transition: background var(--dur) var(--ease);
+  }
+  .nav button:hover { background: var(--paper-warm); color: var(--ink); }
+
+  .progress-thread { position: fixed; top: 0; left: 0; height: 2px; background: var(--terra); z-index: 200; transition: width var(--dur) var(--ease); }
+
+  /* Break slide */
+  .break-slide { align-items: center; justify-content: center; text-align: center; }
+  .break-slide .slide-body { align-items: center; justify-content: center; text-align: center; }
+  .break-clock {
+    font-family: 'Fraunces', serif; font-size: clamp(7rem, 16vw, 14rem);
+    font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em; color: var(--ink); font-variation-settings: 'opsz' 144; margin: var(--s-3) 0;
+  }
+  .break-clock.warn { color: var(--warn); }
+  .break-clock.danger { color: var(--danger); }
+  .break-label { font-family: 'Geist Mono', monospace; font-size: 0.9rem; letter-spacing: 0.42em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: var(--s-2); }
+
+  /* ============================================================
+     VISUAL COMPONENTS — drawn diagrams, not text strips
+     ============================================================ */
+
+  /* --- HUB & SPOKE (anatomy, tools) — real SVG radial --- */
+  .radial-wrap { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--s-4); align-items: center; margin-top: var(--s-2); }
+  .radial { position: relative; width: 100%; aspect-ratio: 1.35/1; }
+  .radial svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .radial .r-core, .radial .r-node {
+    position: absolute; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; border-radius: 50%; background: var(--paper-cream);
+  }
+  .radial .r-core {
+    width: 27%; aspect-ratio: 1; border: 3px solid var(--terra); background: var(--terra-soft);
+    z-index: 2;
+  }
+  .radial .r-core .r-title { font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 500; color: var(--terra); line-height: 1; }
+  .radial .r-core .r-sub { font-family: 'Geist Mono', monospace; font-size: 0.72rem; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.25em; }
+  .radial .r-node {
+    width: 21%; aspect-ratio: 1; border: 2px solid var(--ink-blue); z-index: 2;
+  }
+  .radial .r-node.calm { border-color: var(--calm); }
+  .radial .r-node.warn { border-color: var(--warn); }
+  .radial .r-node.mute { border-color: var(--ink-mute); }
+  .radial .r-node.danger { border-color: var(--danger); border-style: dashed; background: var(--danger-soft); }
+  .radial .r-node .r-n-title { font-family: 'Geist Mono', monospace; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); line-height: 1.1; }
+  .radial .r-node .r-n-sub { font-size: 0.66rem; color: var(--ink-mute); margin-top: 0.2em; line-height: 1.15; }
+  .radial .r-node.danger .r-n-title { color: var(--danger); }
+  .radial .r-node.danger .r-n-sub { color: var(--danger); }
+
+  .radial-side { display: flex; flex-direction: column; gap: var(--s-2); }
+  .rs-item { display: flex; gap: 0.7em; align-items: baseline; padding: 0.45em 0; border-bottom: 1px solid var(--rule-soft); }
+  .rs-item .rs-k { font-family: 'Geist Mono', monospace; font-size: 0.82rem; font-weight: 600; color: var(--terra); min-width: 6.5em; text-transform: uppercase; letter-spacing: 0.06em; }
+  .rs-item .rs-arrow { color: var(--ink-faint); }
+  .rs-item .rs-v { font-size: 1.02rem; color: var(--ink-soft); line-height: 1.35; }
+  .rs-item.bug .rs-k { color: var(--danger); }
+  .rs-item.bug .rs-v { color: var(--danger); }
+
+  /* --- THE LOOP — actual ring with arrows --- */
+  .loop-wrap { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: var(--s-4); align-items: center; margin-top: var(--s-2); }
+  .loop-ring { position: relative; width: 100%; aspect-ratio: 1/1; max-width: 480px; margin: 0 auto; }
+  .loop-ring svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .loop-ring .lr-center {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .loop-ring .lr-center .lc-big { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 500; color: var(--ink); line-height: 1; }
+  .loop-ring .lr-center .lc-sub { font-family: 'Geist Mono', monospace; font-size: 0.7rem; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.14em; font-style: normal; margin-top: 0.3em; }
+  .loop-ring .lr-node {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 5.4rem; height: 5.4rem; border-radius: 50%;
+    background: var(--paper-cream); border: 2px solid var(--terra);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  }
+  .loop-ring .lr-node .ln-n { font-family: 'Geist Mono', monospace; font-size: 0.62rem; color: var(--terra); font-weight: 600; letter-spacing: 0.1em; }
+  .loop-ring .lr-node .ln-name { font-family: 'Fraunces', serif; font-size: 0.98rem; font-weight: 500; color: var(--ink); line-height: 1; margin-top: 0.1em; }
+  .loop-legend { display: flex; flex-direction: column; gap: var(--s-1); }
+  .ll-item { display: flex; gap: 0.8em; align-items: baseline; padding: 0.5em 0; border-bottom: 1px solid var(--rule-soft); }
+  .ll-item .ll-n { font-family: 'Geist Mono', monospace; font-size: 0.78rem; color: var(--terra); font-weight: 600; min-width: 7.5em; text-transform: uppercase; letter-spacing: 0.08em; }
+  .ll-item .ll-v { font-size: 1.05rem; color: var(--ink-soft); line-height: 1.4; }
+
+  /* --- LOOP TRACE FLOW (horizontal w/ replan arc) --- */
+  .trace-flow { position: relative; margin-top: var(--s-3); }
+  .trace-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.6rem; position: relative; z-index: 2; }
+  .trace-cell {
+    background: var(--paper-cream); border: 1px solid var(--rule); border-top: 3px solid var(--terra);
+    padding: 0.8rem 0.7rem; display: flex; flex-direction: column; gap: 0.3em;
+  }
+  .trace-cell.warn { border-top-color: var(--warn); }
+  .trace-cell.calm { border-top-color: var(--calm); }
+  .trace-cell.dead { border-top-color: var(--danger); border-style: dashed; background: var(--danger-soft); opacity: 0.85; }
+  .trace-cell .tc-n { font-family: 'Geist Mono', monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--terra); }
+  .trace-cell.warn .tc-n { color: var(--warn); }
+  .trace-cell.calm .tc-n { color: var(--calm); }
+  .trace-cell.dead .tc-n { color: var(--danger); }
+  .trace-cell .tc-name { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 500; color: var(--ink); line-height: 1.1; }
+  .trace-cell .tc-body { font-size: 0.84rem; color: var(--ink-soft); line-height: 1.35; }
+  .trace-cell.dead .tc-name { text-decoration: line-through; color: var(--ink-faint); }
+  .trace-cell.dead .tc-miss { font-size: 0.8rem; color: var(--danger); font-style: italic; line-height: 1.3; }
+  .replan-arc {
+    margin-top: 0.4rem; display: flex; align-items: center; gap: 0.6em; justify-content: center;
+    font-family: 'Geist Mono', monospace; font-size: 0.8rem; color: var(--ink-blue); letter-spacing: 0.06em;
+  }
+  .replan-arc .arc-line { flex: 1; height: 2px; background: repeating-linear-gradient(90deg, var(--ink-blue) 0 8px, transparent 8px 14px); max-width: 40%; }
+  .trace-row-2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; max-width: 62%; margin-top: 0.4rem; }
+
+  /* --- MEMORY CARDS w/ drawn icons --- */
+  .mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-2); margin-top: var(--s-3); }
+  .mem-card { border: 1px solid var(--rule); background: var(--paper-cream); padding: var(--s-2) var(--s-2) var(--s-3); display: flex; flex-direction: column; }
+  .mem-card.active { border-color: var(--terra); border-width: 2px; }
+  .mem-icon { height: 4.5rem; display: flex; align-items: flex-end; justify-content: center; margin-bottom: var(--s-2); }
+  .mem-icon svg { height: 100%; width: auto; overflow: visible; }
+  .mem-card .mc-analogy { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 400; color: var(--terra); line-height: 1; margin-bottom: 0.15em; font-variation-settings: 'opsz' 80, 'SOFT' 30; }
+  .mem-card .mc-name { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; margin-bottom: 0.5em; }
+  .mem-card .mc-use { font-size: 0.95rem; color: var(--ink-soft); line-height: 1.4; }
+  .mem-card .mc-ex { font-size: 0.92rem; color: var(--ink); line-height: 1.4; margin-top: 0.6em; padding-top: 0.5em; border-top: 1px dotted var(--rule-soft); }
+  .mem-card .mc-ex .ex-lbl { display:block; font-family: 'Geist Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 0.2em; }
+  .mem-card .mc-tag { font-size: 0.82rem; color: var(--terra); font-style: italic; margin-top: 0.5em; }
+
+  /* --- TOOL QUADRANT (uses .radial) — sublabels --- */
+  .tool-q-label { display: flex; flex-direction: column; }
+
+  /* --- PLANNING mini-flows --- */
+  .plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-top: var(--s-4); }
+  .plan-card { border: 1px solid var(--rule); border-top: 4px solid var(--rule); background: var(--paper-cream); padding: var(--s-3) var(--s-3) var(--s-3); display: flex; flex-direction: column; }
+  .plan-card.react { border-top-color: var(--terra); }
+  .plan-card.cot { border-top-color: var(--ink-blue); }
+  .plan-card.reflect { border-top-color: var(--calm); }
+  .plan-card .pc-name { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; line-height: 1; }
+  .plan-card .pc-tag { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 0.6rem; }
+  .plan-diagram { height: 12rem; margin: 0.6rem 0 1rem; display: flex; align-items: center; justify-content: center; }
+  .plan-diagram svg { max-height: 100%; width: 100%; overflow: visible; }
+  .plan-card .pc-best { font-size: 1.12rem; color: var(--ink-soft); line-height: 1.45; }
+  .plan-card .pc-eg { margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px dotted var(--rule); font-size: 1rem; color: var(--ink); line-height: 1.45; }
+  .plan-card .pc-eg .eg-lbl { display: block; font-family: 'Geist Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); margin-bottom: 0.3em; }
+  .plan-card .pc-eg .eg-lbl.cool { color: var(--ink-blue); }
+  .plan-card .pc-eg .eg-lbl.calm { color: var(--calm); }
+
+  /* --- MULTI-AGENT topologies --- */
+  .ma-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-top: var(--s-4); }
+  .ma-card { border: 1px solid var(--rule); background: var(--paper-cream); padding: var(--s-3); display: flex; flex-direction: column; }
+  .ma-card .ma-name { font-family: 'Fraunces', serif; font-size: 1.75rem; font-weight: 500; color: var(--ink); margin-bottom: 0.1em; line-height: 1; }
+  .ma-card .ma-analogy { font-family: 'Geist Mono', monospace; font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: var(--s-2); }
+  .ma-diagram { height: 13rem; margin-bottom: var(--s-2); display: flex; align-items: center; justify-content: center; }
+  .ma-diagram svg { max-height: 100%; width: 100%; overflow: visible; }
+  .ma-card .ma-best { font-size: 1.08rem; color: var(--ink-soft); line-height: 1.45; }
+  .ma-card .ma-eg { margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px dotted var(--rule); font-size: 1rem; color: var(--ink); line-height: 1.45; }
+  .ma-card .ma-eg .eg-lbl { display: block; font-family: 'Geist Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); margin-bottom: 0.3em; }
+
+  /* --- DUOTONE PHOTO --- */
+  .photo-duo { position: relative; border: 1px solid var(--rule); overflow: hidden; }
+  .photo-duo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: grayscale(1) contrast(1.05) brightness(1.05);
+  }
+  .photo-duo::after {
+    content: ''; position: absolute; inset: 0;
+    background: var(--terra); mix-blend-mode: multiply; opacity: 0.42;
+  }
+  .photo-duo::before {
+    content: ''; position: absolute; inset: 0; z-index: 2;
+    background: var(--ink-blue); mix-blend-mode: screen; opacity: 0.18;
+  }
+  .photo-caption {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+    background: linear-gradient(0deg, rgba(26,24,20,0.82), transparent);
+    color: var(--paper); padding: 1.4rem 1rem 0.7rem;
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .photo-caption .pc-strong { color: #fff; font-weight: 600; }
+
+  /* Story table */
+  .story-table { width: 100%; border-collapse: collapse; margin-top: var(--s-3); }
+  .story-table th { font-family: 'Geist Mono', monospace; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; padding: 0.5em var(--s-2) 0.5em 0; border-bottom: 1px solid var(--rule); text-align: left; }
+  .story-table td { padding: 0.75em var(--s-2) 0.75em 0; border-bottom: 1px solid var(--rule-soft); font-size: 1.08rem; color: var(--ink-soft); vertical-align: top; line-height: 1.4; }
+  .story-table tr.today td { color: var(--ink); font-weight: 500; }
+  .story-table tr.today td:first-child { color: var(--terra); }
+  .story-table td:first-child { font-family: 'Geist Mono', monospace; font-size: 0.92rem; color: var(--terra); font-weight: 600; }
+
+  /* Manifest table */
+  .manifest-table { width: 100%; border-collapse: collapse; margin-top: var(--s-3); font-size: 1rem; }
+  .manifest-table th { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); font-weight: 600; padding: 0.5em var(--s-2) 0.5em 0; border-bottom: 2px solid var(--terra); text-align: left; }
+  .manifest-table td { padding: 0.7em var(--s-2) 0.7em 0; border-bottom: 1px solid var(--rule-soft); color: var(--ink-soft); vertical-align: top; line-height: 1.4; }
+  .manifest-table td:first-child { font-weight: 600; color: var(--ink); }
+  .manifest-table td .perm { font-family: 'Geist Mono', monospace; font-size: 0.84rem; color: var(--ink-blue); }
+
+  /* Architecture card summary */
+  .arch-card { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); margin-top: var(--s-3); }
+  .arch-section { border: 1px solid var(--rule); padding: var(--s-3); border-top: 3px solid var(--terra); }
+  .arch-section .as-num { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: 0.4em; }
+  .arch-section .as-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 500; color: var(--ink); margin-bottom: 0.5em; }
+  .arch-section .as-body { font-size: 1rem; color: var(--ink-soft); line-height: 1.45; }
+  .arch-section .as-eg {
+    margin-top: var(--s-2); background: var(--paper-cream); border-left: 3px solid var(--terra);
+    padding: 0.7em 0.85em; font-family: 'Geist Mono', monospace; font-size: 0.8rem;
+    line-height: 1.5; color: var(--ink); white-space: pre-wrap;
+  }
+  .arch-section .as-eg .eg-h { display: block; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 0.4em; }
+  .arch-section .as-bridge { margin-top: var(--s-2); padding-top: var(--s-1); border-top: 1px dotted var(--rule-soft); font-size: 0.92rem; color: var(--ink-mute); font-style: italic; }
+
+  .callout { background: var(--terra-soft); border-left: 3px solid var(--terra); padding: var(--s-2) var(--s-3); margin-top: var(--s-3); font-size: 1.12rem; color: var(--ink); line-height: 1.5; }
+  .callout strong { color: var(--terra); }
+  .callout.calm { background: var(--calm-soft); border-left-color: var(--calm); }
+  .callout.calm strong { color: var(--calm); }
+
+  .pull-quote { border-left: 3px solid var(--terra); padding-left: var(--s-3); font-family: 'Fraunces', serif; font-style: italic; font-size: 1.7rem; color: var(--ink); line-height: 1.32; font-variation-settings: 'opsz' 60; }
+
+  /* Colophon */
+  .colophon { margin-top: var(--s-4); padding-top: var(--s-2); border-top: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s-3); }
+  .colophon .by { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; }
+  .colophon .by .name { display: block; font-family: 'Fraunces', serif; font-style: italic; font-size: 1.4rem; color: var(--ink); letter-spacing: -0.01em; margin-top: 0.3em; font-weight: 400; text-transform: none; font-variation-settings: 'opsz' 96, 'SOFT' 30; }
+  .colophon .by .linkedin { display: block; font-family: 'Geist Mono', monospace; font-size: 0.8rem; letter-spacing: 0.12em; color: var(--terra); margin-top: 0.3em; text-transform: none; font-weight: 500; }
+  .colophon .course-mark { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); text-align: right; line-height: 1.7; }
+  .colophon .course-mark .terra { color: var(--terra); }
+
+  /* --- COMPONENT-DETAIL SLIDE (one per part of the 5) --- */
+  .comp-wrap { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: var(--s-5); align-items: center; margin-top: var(--s-2); }
+  .comp-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .comp-badge .cb-num {
+    font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(8rem, 16vw, 13rem);
+    line-height: 0.8; color: var(--terra); font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    letter-spacing: -0.05em;
+  }
+  .comp-badge .cb-of { font-family: 'Geist Mono', monospace; font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-top: 0.4em; }
+  .comp-badge .cb-icon { margin-top: var(--s-3); height: 4.5rem; }
+  .comp-badge .cb-icon svg { height: 100%; width: auto; overflow: visible; }
+  .comp-detail .cd-name { font-family: 'Fraunces', serif; font-size: clamp(2.6rem, 4.6vw, 3.8rem); font-weight: 400; color: var(--ink); line-height: 1; font-variation-settings: 'opsz' 120, 'SOFT' 30; }
+  .comp-detail .cd-tag { font-family: 'Geist Mono', monospace; font-size: 0.92rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--terra); margin: 0.5em 0 var(--s-3); }
+  .comp-detail .cd-line { display: flex; gap: 0.8em; align-items: baseline; padding: 0.6em 0; border-bottom: 1px solid var(--rule-soft); }
+  .comp-detail .cd-k { font-family: 'Geist Mono', monospace; font-size: 0.82rem; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.08em; min-width: 7.5em; }
+  .comp-detail .cd-v { font-size: 1.18rem; color: var(--ink-soft); line-height: 1.4; }
+  .comp-detail .cd-v strong { color: var(--ink); font-weight: 600; }
+  .comp-detail .cd-v .terra { color: var(--terra); }
+
+  /* --- RECOVERY TIMELINE (improved replan visual) --- */
+  .recovery { margin-top: var(--s-3); position: relative; }
+  .rcv-track { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.55rem; position: relative; }
+  .rcv-step { display: flex; flex-direction: column; align-items: stretch; }
+  .rcv-dot-row { display: flex; align-items: center; margin-bottom: 0.5rem; }
+  .rcv-dot { width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--terra); flex-shrink: 0; z-index: 2; }
+  .rcv-step.warn .rcv-dot { background: var(--warn); }
+  .rcv-step.calm .rcv-dot { background: var(--calm); }
+  .rcv-step .rcv-bar { height: 2px; background: var(--rule); flex: 1; }
+  .rcv-step:last-child .rcv-bar { display: none; }
+  .rcv-label { font-family: 'Geist Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; }
+  .rcv-step.warn .rcv-label { color: var(--warn); }
+  .rcv-step.calm .rcv-label { color: var(--calm); }
+  .rcv-text { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.2em; }
+  .rcv-text strong { color: var(--ink); font-weight: 600; }
+  .rcv-return {
+    margin-top: 0.7rem; display: flex; align-items: center; gap: 0.7em;
+    background: var(--calm-soft); border-left: 3px solid var(--calm);
+    padding: 0.7em 1em; font-size: 1.02rem; color: var(--ink);
+  }
+  .rcv-return .rcv-loop { font-family: 'Geist Mono', monospace; font-weight: 600; color: var(--calm); }
+  .rcv-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-2); }
+  .rcv-outcome { padding: 0.8em 1em; border: 1px solid var(--rule); }
+  .rcv-outcome.bad { border-left: 3px solid var(--danger); background: var(--danger-soft); }
+  .rcv-outcome.good { border-left: 3px solid var(--calm); background: var(--calm-soft); }
+  .rcv-outcome .ro-h { font-family: 'Geist Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.3em; }
+  .rcv-outcome.bad .ro-h { color: var(--danger); }
+  .rcv-outcome.good .ro-h { color: var(--calm); }
+  .rcv-outcome .ro-b { font-size: 1.02rem; color: var(--ink-soft); line-height: 1.4; }
+
+  /* --- EXERCISE CALLOUT STRIP (when to do / what it teaches) --- */
+  .ex-callout { margin-top: var(--s-3); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+  .ex-co-cell { border-top: 2px solid var(--terra); padding-top: 0.6em; }
+  .ex-co-cell .eco-h { font-family: 'Geist Mono', monospace; font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: 0.3em; }
+  .ex-co-cell .eco-b { font-size: 1.08rem; color: var(--ink-soft); line-height: 1.4; }
+
+  /* --- PRE-CLASS COUNTDOWN (cover slide only) — customizable, facilitator-run --- */
+  .preclass-timer {
+    margin-top: var(--s-4); padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+    display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
+  }
+  .preclass-timer .pt-clock {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(3.4rem, 7vw, 5.4rem); line-height: 0.9;
+    color: var(--terra); font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.03em; font-variation-settings: 'opsz' 144, 'SOFT' 40;
+    min-width: 4.5ch;
+  }
+  .preclass-timer .pt-clock.warn { color: var(--warn); }
+  .preclass-timer .pt-clock.danger { color: var(--danger); }
+  .preclass-timer .pt-label {
+    font-family: 'Geist Mono', monospace; font-size: 0.74rem;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute);
+    display: block; margin-bottom: 0.3em;
+  }
+  .preclass-timer .pt-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .preclass-timer button {
+    font-family: 'Geist Mono', monospace; font-size: 0.82rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    color: var(--ink-soft); padding: 0.5em 0.9em; border-radius: 4px;
+    cursor: pointer; transition: all 200ms var(--ease);
+  }
+  .preclass-timer button:hover { border-color: var(--terra); color: var(--terra); background: var(--terra-soft); }
+  .preclass-timer button.pt-primary { background: var(--terra); border-color: var(--terra); color: var(--paper); }
+  .preclass-timer button.pt-primary:hover { background: #9e3a17; color: #fff; }
+  .preclass-timer .pt-adjust { font-size: 1rem; min-width: 2.4em; padding: 0.4em 0; text-align: center; }
+  .preclass-timer .pt-hint { font-size: 0.92rem; color: var(--ink-mute); font-style: italic; }
+
+  /* ===================== PRINT / PDF ===================== */
+  @media print {
+    @page { size: 13.333in 7.5in; margin: 0; }
+    html, body { width: 13.333in; height: auto; background: var(--paper) !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+    .deck { width: 13.333in; height: auto; position: static; }
+    .slide { position: relative !important; inset: auto !important; width: 13.333in !important; height: 7.5in !important; display: flex !important; opacity: 1 !important; page-break-after: always; page-break-inside: avoid; break-after: page; break-inside: avoid; overflow: hidden; padding: 0.34in 0.5in 0.4in !important; }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    .nav, .progress-thread, .preclass-timer, .prompt-copy { display: none !important; }
+    body::before { background-image: none !important; opacity: 0 !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread" style="width: 0%"></div>
+
+<div class="deck">
+
+  <!-- ============ SLIDE 1 — COVER ============ -->
+  <section class="slide">
+    <div class="cover">
+      <div class="vol">Session 5 of 8 · Shantanu Chandra Learning Lab · GenAI for Non-Coders</div>
+      <div class="cover-main">
+        <div class="eyebrow">Agent Architecture</div>
+        <h1 class="cover-title">How Agents Think, Remember &amp; Act.</h1>
+        <p class="cover-byline">Open the hood. By the end you'll trace any agent's reasoning loop, design its memory and tools, choose its coordination pattern — and walk out with the Architecture Card for an agent you'd deploy at work.</p>
+        <div class="preclass-timer" id="preclassTimer">
+          <div>
+            <span class="pt-label">We begin in</span>
+            <div class="pt-clock" id="preclassClock">05:00</div>
+          </div>
+          <div class="pt-controls">
+            <button class="pt-adjust" onclick="preclassAdjust(-60)" title="minus 1 minute">−</button>
+            <button class="pt-primary" id="preclassStartBtn" onclick="preclassToggle()">Start</button>
+            <button class="pt-adjust" onclick="preclassAdjust(60)" title="plus 1 minute">+</button>
+            <button onclick="preclassReset()">Reset</button>
+          </div>
+          <span class="pt-hint">Set it, hit Start before you go live. ± adjusts by a minute.</span>
+        </div>
+        <div class="cover-foot">
+          <span>Session 5 · Agent Architecture</span>
+          <span>A Field Guide to Generative AI</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 2 — COURSE STORY ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">The Story So Far</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">5 sessions · one arc</div>
+      <h1>Every session made a promise.<br>You built the proof.</h1>
+      <table class="story-table">
+        <thead><tr><th>Session</th><th>The promise</th><th>What you built</th></tr></thead>
+        <tbody>
+          <tr><td>S1</td><td>LLMs can generate — but can't act</td><td>Watched a chatbot fail 4 of 6 campaign steps</td></tr>
+          <tr><td>S2</td><td>An agent does what a chatbot can't</td><td>HR Candidate Screener: search → skills → score</td></tr>
+          <tr><td>S3</td><td>The right prompt makes it reliable</td><td>System prompts for tone, format, refusal</td></tr>
+          <tr><td>S4</td><td>Ground it in your own documents</td><td>Lumière Knowledge Agent — cited, refused gaps</td></tr>
+          <tr class="today"><td>S5</td><td>Open the hood — WHY they work, break, scale</td><td>Your Agent Architecture Card</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="folio">2<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 3 — THE BUG (hook) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Opening</span><span class="dot">·</span><span class="topic">The Bug We'll Explain</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Remember Session 2?</div>
+      <h1 class="display">Your HR Screener invented LinkedIn URLs that didn't exist.</h1>
+      <p class="lede mt-3">When its candidate search came back empty, it didn't stop. It didn't say "I found nothing." It <span class="terra">made up</span> profiles to fill the gap.</p>
+      <div class="callout mt-3"><strong>That wasn't an AI problem. It was an architecture problem.</strong> A missing piece in how the agent was built. Today you name that piece — and learn to build it right.</div>
+    </div>
+    <div class="folio">3<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 4 — ANATOMY (hub & spoke) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Anatomy</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">5 components · one machine</div>
+      <h2>Every agent is 5 parts around one brain.</h2>
+      <div class="radial-wrap">
+        <div class="radial">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+            <line x1="200" y1="150" x2="200" y2="48"  stroke="#1e3a5f" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="340" y2="150" stroke="#14532d" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="200" y2="252" stroke="#a16207" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="60"  y2="150" stroke="#8a8478" stroke-width="1.5"/>
+          </svg>
+          <div class="r-core" style="left:50%;top:50%"><div class="r-title">LLM</div><div class="r-sub">brain</div></div>
+          <div class="r-node" style="left:50%;top:16%"><div class="r-n-title">Memory</div><div class="r-n-sub">what it knows</div></div>
+          <div class="r-node calm" style="left:85%;top:50%"><div class="r-n-title">Tools</div><div class="r-n-sub">what it does</div></div>
+          <div class="r-node warn" style="left:50%;top:84%"><div class="r-n-title">Executor</div><div class="r-n-sub">runs the plan</div></div>
+          <div class="r-node mute" style="left:15%;top:50%"><div class="r-n-title">Planner</div><div class="r-n-sub">what's next</div></div>
+        </div>
+        <div class="radial-side">
+          <p style="font-size:1.05rem;color:var(--ink-soft);margin-bottom:0.3em">Remove any one — it breaks in a predictable way:</p>
+          <div class="rs-item"><span class="rs-k">No memory</span><span class="rs-arrow">→</span><span class="rs-v">forgets, or invents</span></div>
+          <div class="rs-item"><span class="rs-k">No tools</span><span class="rs-arrow">→</span><span class="rs-v">can only talk</span></div>
+          <div class="rs-item"><span class="rs-k">No planner</span><span class="rs-arrow">→</span><span class="rs-v">stuck on hard tasks</span></div>
+          <div class="rs-item"><span class="rs-k">No executor</span><span class="rs-arrow">→</span><span class="rs-v">plans never run</span></div>
+          <div class="rs-item"><span class="rs-k">No LLM</span><span class="rs-arrow">→</span><span class="rs-v">no thinking at all</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">4<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 1 of 5 — LLM ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 1 of 5 — LLM</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">1</div>
+          <div class="cb-of">of 5 · the brain</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="24" fill="none" stroke="#b8431b" stroke-width="2.5"/><circle cx="35" cy="35" r="13" fill="none" stroke="#b8431b" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="35" cy="35" r="3" fill="#b8431b"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">LLM</div>
+          <div class="cd-tag">The brain — reasons and decides</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Reads the request, weighs the options, picks the next move. It is the only part that <strong>thinks</strong>.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The model that reads a customer's WhatsApp message and works out what they're actually asking for.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">No reasoning at all</span> — you're left with a fixed script, not an agent.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">5<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 2 of 5 — MEMORY ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 2 of 5 — Memory</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">2</div>
+          <div class="cb-of">of 5 · what it knows</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><rect x="14" y="14" width="42" height="42" rx="2" fill="none" stroke="#b8431b" stroke-width="2.5"/><line x1="14" y1="28" x2="56" y2="28" stroke="#b8431b" stroke-width="1.5"/><line x1="14" y1="42" x2="56" y2="42" stroke="#b8431b" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Memory</div>
+          <div class="cd-tag">What it knows — and recalls</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Holds the current chat, recalls past orders, and stores what it has already done so it doesn't repeat itself.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The order history that lets the agent say "your usual red-velvet, like last month?" — and the log that stops a monitor re-alerting on a rule it saw yesterday.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Forgets every session</span> — starts from zero each time you talk to it.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">6<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 3 of 5 — TOOLS ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 3 of 5 — Tools</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">3</div>
+          <div class="cb-of">of 5 · what it can do</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><path d="M22 14 L34 26 L26 34 L14 22 Z" fill="none" stroke="#b8431b" stroke-width="2.5"/><line x1="30" y1="30" x2="54" y2="54" stroke="#b8431b" stroke-width="3"/><circle cx="52" cy="52" r="5" fill="none" stroke="#b8431b" stroke-width="2.5"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Tools</div>
+          <div class="cd-tag">What it can do — the hands</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Reaches outside the model — searches, queries a database, books a slot, sends an email. <strong>The only way an agent changes the world.</strong></span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The slot-booker that reserves a production time; the confirmation-sender that messages the customer.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Can only talk</span> — it can describe booking a cake, but never actually books one.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">7<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 4 of 5 — PLANNER ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 4 of 5 — Planner</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">4</div>
+          <div class="cb-of">of 5 · what's next</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><circle cx="18" cy="20" r="4" fill="#b8431b"/><circle cx="18" cy="50" r="4" fill="#b8431b"/><circle cx="52" cy="35" r="4" fill="#b8431b"/><line x1="22" y1="20" x2="48" y2="33" stroke="#b8431b" stroke-width="1.8"/><line x1="22" y1="50" x2="48" y2="37" stroke="#b8431b" stroke-width="1.8"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Planner</div>
+          <div class="cd-tag">What to do, and in what order</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Breaks a goal into steps and sequences them — first this, then that, then send.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">For an order: <em>check the spec → confirm lead time → book the slot → send confirmation</em> — in that order, not jumbled.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Stuck on anything complex</span> — it doesn't know what to do first.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">8<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ COMPONENT 5 of 5 — EXECUTOR ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">Part 5 of 5 — Executor</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="comp-wrap">
+        <div class="comp-badge">
+          <div class="cb-num">5</div>
+          <div class="cb-of">of 5 · runs the plan</div>
+          <div class="cb-icon">
+            <svg viewBox="0 0 70 70"><polygon points="24,16 24,54 54,35" fill="none" stroke="#b8431b" stroke-width="2.5" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="comp-detail">
+          <div class="cd-name">Executor</div>
+          <div class="cd-tag">The part that actually runs it</div>
+          <div class="cd-line"><span class="cd-k">Does</span><span class="cd-v">Takes the planner's steps and fires the tools in order — and feeds each result back to the brain.</span></div>
+          <div class="cd-line"><span class="cd-k">At Lumière</span><span class="cd-v">The engine that calls the slot-booker, waits for the booking ID, then triggers the confirmation — and stops if a step fails.</span></div>
+          <div class="cd-line"><span class="cd-k">Remove it</span><span class="cd-v"><span class="terra">Plans that never run</span> — the agent knows what to do and never does it.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">9<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 5 — ANATOMY: the bug located ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 1</span><span class="dot">·</span><span class="topic">The Bug, Located</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Your HR Screener · the part that couldn't do the job</div>
+      <h2>The broken part was the Tool.</h2>
+      <div class="radial-wrap">
+        <div class="radial">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+            <line x1="200" y1="150" x2="200" y2="48"  stroke="#8a8478" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="340" y2="150" stroke="#991b1b" stroke-width="2" stroke-dasharray="5 4"/>
+            <line x1="200" y1="150" x2="200" y2="252" stroke="#a16207" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="60"  y2="150" stroke="#8a8478" stroke-width="1.5"/>
+          </svg>
+          <div class="r-core" style="left:50%;top:50%"><div class="r-title">LLM</div><div class="r-sub">Claude</div></div>
+          <div class="r-node mute" style="left:50%;top:16%"><div class="r-n-title">Memory</div><div class="r-n-sub">none set</div></div>
+          <div class="r-node danger" style="left:85%;top:50%"><div class="r-n-title">Tools</div><div class="r-n-sub">✕ can't reach LinkedIn</div></div>
+          <div class="r-node warn" style="left:50%;top:84%"><div class="r-n-title">Executor</div><div class="r-n-sub">pipeline</div></div>
+          <div class="r-node mute" style="left:15%;top:50%"><div class="r-n-title">Planner</div><div class="r-n-sub">3 steps</div></div>
+        </div>
+        <div class="radial-side">
+          <div class="rs-item"><span class="rs-k">LLM</span><span class="rs-arrow">✓</span><span class="rs-v">Claude reasoned fine</span></div>
+          <div class="rs-item bug"><span class="rs-k">Tools</span><span class="rs-arrow">✕</span><span class="rs-v">a generic web search <strong>cannot</strong> fetch real LinkedIn profiles — LinkedIn allows no scraping, no public API, no MCP</span></div>
+          <div class="rs-item"><span class="rs-k">Planner</span><span class="rs-arrow">✓</span><span class="rs-v">your 3-step sequence</span></div>
+          <div class="rs-item"><span class="rs-k">Executor</span><span class="rs-arrow">✓</span><span class="rs-v">the Builder runner</span></div>
+          <div class="rs-item"><span class="rs-k">Memory</span><span class="rs-arrow">~</span><span class="rs-v">none set — but that's not what broke it</span></div>
+        </div>
+      </div>
+      <div class="callout"><strong>It was a Tool problem — Gap #3.</strong> The job needed verified LinkedIn profiles, but no tool can legally get them. With no working tool <em>and</em> no guardrail, the model filled the hole with plausible fake URLs. The fix that was missing wasn't memory — it was a refusal guardrail that says <span class="terra">"I can't verify these"</span> instead of inventing.</div>
+    </div>
+    <div class="folio">10<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 6 — THE LOOP (actual ring) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 2</span><span class="dot">·</span><span class="topic">The Reasoning Loop</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">6 stages · until the goal is met</div>
+      <h2>A chatbot answers once. An agent loops.</h2>
+      <div class="loop-wrap">
+        <div class="loop-ring">
+          <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="#b8431b" stroke-width="1.6"/>
+              </marker>
+            </defs>
+            <!-- ring path, 6 arcs clockwise between the 6 nodes at 90,30,-30,-90,-150,150 deg -->
+            <circle cx="150" cy="150" r="108" fill="none" stroke="#d4ccba" stroke-width="1" stroke-dasharray="3 5"/>
+            <!-- arc segments with arrowheads, drawn as short curved strokes between node angles -->
+            <path d="M 197 53 A 108 108 0 0 1 251 137"  fill="none" stroke="#b8431b" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M 250 165 A 108 108 0 0 1 196 248"  fill="none" stroke="#b8431b" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M 169 256 A 108 108 0 0 1 76 214"   fill="none" stroke="#b8431b" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M 50 165 A 108 108 0 0 1 50 137"    fill="none" stroke="#b8431b" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M 76 86 A 108 108 0 0 1 131 45"     fill="none" stroke="#b8431b" stroke-width="2" marker-end="url(#arrow)"/>
+            <!-- reflect -> reason loopback (the big return) -->
+          </svg>
+          <div class="lr-center"><div class="lc-big">Loop</div><div class="lc-sub">until done</div></div>
+          <div class="lr-node" style="left:50%;top:6%"><div class="ln-n">01</div><div class="ln-name">Perceive</div></div>
+          <div class="lr-node" style="left:88%;top:28%"><div class="ln-n">02</div><div class="ln-name">Reason</div></div>
+          <div class="lr-node" style="left:88%;top:72%"><div class="ln-n">03</div><div class="ln-name">Plan</div></div>
+          <div class="lr-node" style="left:50%;top:94%"><div class="ln-n">04</div><div class="ln-name">Act</div></div>
+          <div class="lr-node" style="left:12%;top:72%"><div class="ln-n">05</div><div class="ln-name">Observe</div></div>
+          <div class="lr-node" style="left:12%;top:28%"><div class="ln-n">06</div><div class="ln-name">Reflect</div></div>
+        </div>
+        <div class="loop-legend">
+          <div class="ll-item"><span class="ll-n">Perceive</span><span class="ll-v">take in the input</span></div>
+          <div class="ll-item"><span class="ll-n">Reason</span><span class="ll-v">interpret it, using memory + tools</span></div>
+          <div class="ll-item"><span class="ll-n">Plan</span><span class="ll-v">decide the sequence of actions</span></div>
+          <div class="ll-item"><span class="ll-n">Act</span><span class="ll-v">do the first action</span></div>
+          <div class="ll-item"><span class="ll-n">Observe</span><span class="ll-v">see what came back</span></div>
+          <div class="ll-item"><span class="ll-n">Reflect</span><span class="ll-v">goal met? if not — loop back</span></div>
+        </div>
+      </div>
+      <div class="pull-quote mt-2">A great consultant doesn't quit when the first call fails — they try the next contact. The loop is that instinct, built in.</div>
+    </div>
+    <div class="folio">11<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 7 — LOOP TRACE: invoice (replan) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 2</span><span class="dot">·</span><span class="topic">The Loop Recovers</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Overdue-invoice agent · one email bounces</div>
+      <h2>When a step fails, the loop doesn't quit — it tries another way.</h2>
+      <p class="mt-2" style="font-size:1.12rem;max-width:64ch">A chatbot would send the batch, hit the bounce, and stop with "1 failed." The agent treats the bounce as <strong>new information</strong>, loops back, and finds another route. Follow the dots:</p>
+      <div class="recovery">
+        <div class="rcv-track">
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Perceive</div><div class="rcv-text">8 a.m. trigger fires: <strong>"run the overdue check"</strong></div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Plan</div><div class="rcv-text">Pull the list, draft a reminder, send each — <strong>14 invoices</strong></div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Act</div><div class="rcv-text">Sends all 14 reminder emails</div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Observe</div><div class="rcv-text"><strong>13 delivered, 1 bounced</strong> — that address is dead</div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Reflect</div><div class="rcv-text">"Goal not met for one. The email on file is stale."</div></div>
+          <div class="rcv-step calm"><div class="rcv-dot-row"><span class="rcv-dot"></span></div><div class="rcv-label">Done</div><div class="rcv-text"><strong>14 / 14 delivered</strong></div></div>
+        </div>
+        <div class="rcv-return"><span class="rcv-loop">↺ loop back</span><span>Instead of stopping, it re-plans: <strong>look up a current contact in the CRM</strong> → re-send to the new address → check again. The bounce became the trigger for a better plan, not a dead end.</span></div>
+      </div>
+      <div class="callout calm"><strong>But a loop needs a stop sign.</strong> Three exit conditions, all required: <strong>goal achieved</strong> · <strong>max tries reached</strong> · <strong>human escalation</strong>. Without them, an agent that can't recover just loops forever and burns money.</div>
+    </div>
+    <div class="folio">12<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 8 — LOOP TRACE: HR screener (gap) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 2</span><span class="dot">·</span><span class="topic">The Gap, Drawn</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Your HR Screener · the same loop, no stop sign at Reflect</div>
+      <h2>The tool came up empty. With no guardrail, the loop bluffed.</h2>
+      <p class="mt-2" style="font-size:1.12rem;max-width:64ch">Same six stages as the invoice agent — but here the tool <em>can't</em> succeed (no way to reach real LinkedIn data), and there's no refusal rule at Reflect. Watch where the two agents diverge at the final stage:</p>
+      <div class="recovery">
+        <div class="rcv-track">
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Perceive</div><div class="rcv-text">Job params: title, location, years</div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Plan</div><div class="rcv-text">"Get 5 matching profiles via search"</div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Act</div><div class="rcv-text">Web search runs — <strong>but can't reach LinkedIn</strong></div></div>
+          <div class="rcv-step warn"><div class="rcv-dot-row"><span class="rcv-dot"></span><span class="rcv-bar"></span></div><div class="rcv-label">Observe</div><div class="rcv-text">Nothing valid comes back</div></div>
+          <div class="rcv-step"><div class="rcv-dot-row"><span class="rcv-dot" style="background:var(--ink-faint)"></span></div><div class="rcv-label" style="color:var(--ink-mute)">Reflect?</div><div class="rcv-text" style="color:var(--ink-mute)">no rule here to decide what to do with an empty result</div></div>
+        </div>
+        <div class="rcv-split">
+          <div class="rcv-outcome bad">
+            <div class="ro-h">✕ What the screener did (no guardrail)</div>
+            <div class="ro-b">Reached the gap, found nothing, and <strong>filled it with plausible fake LinkedIn URLs</strong>. The loop ran to the end — it just had nothing true to end with.</div>
+          </div>
+          <div class="rcv-outcome good">
+            <div class="ro-h">✓ What a guardrail would have done</div>
+            <div class="ro-b">A refusal rule at Reflect: <strong>"if no verified profiles, say so and escalate to a recruiter — never invent."</strong> Same loop, honest ending.</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout"><strong>Root cause: the tool (Gap #3)</strong> — there's no legal way to fetch real LinkedIn profiles. <strong>The missing safeguard: a refusal guardrail</strong> — so the gap ends in "I can't verify these," not invention. Tool failed; guardrail was absent; hallucination was the result.</div>
+    </div>
+    <div class="folio">13<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 9 — MEMORY (icons) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 3</span><span class="dot">·</span><span class="topic">Memory</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">4 types · one office</div>
+      <h2>Agents remember in layers.</h2>
+      <div class="mem-grid">
+        <div class="mem-card">
+          <div class="mem-icon">
+            <svg viewBox="0 0 80 70"><rect x="8" y="38" width="64" height="6" fill="#b8431b"/><rect x="12" y="44" width="5" height="20" fill="#b8431b"/><rect x="63" y="44" width="5" height="20" fill="#b8431b"/><rect x="22" y="26" width="16" height="12" fill="none" stroke="#1a1814" stroke-width="2"/><rect x="44" y="30" width="14" height="8" fill="none" stroke="#8a8478" stroke-width="2"/></svg>
+          </div>
+          <div class="mc-analogy">Desk</div>
+          <div class="mc-name">Short-term</div>
+          <div class="mc-use">What's happening right now in this chat.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>"Earlier you said the cake's for Saturday" — it holds the running order details across a few messages.</div>
+          <div class="mc-tag">Cleared when the chat closes.</div>
+        </div>
+        <div class="mem-card">
+          <div class="mem-icon">
+            <svg viewBox="0 0 80 70"><rect x="20" y="10" width="40" height="54" rx="2" fill="none" stroke="#1a1814" stroke-width="2"/><line x1="20" y1="22" x2="60" y2="22" stroke="#8a8478" stroke-width="1.5"/><line x1="28" y1="32" x2="52" y2="32" stroke="#8a8478" stroke-width="1.5"/><line x1="28" y1="40" x2="52" y2="40" stroke="#8a8478" stroke-width="1.5"/><line x1="28" y1="48" x2="44" y2="48" stroke="#8a8478" stroke-width="1.5"/><line x1="20" y1="10" x2="20" y2="64" stroke="#b8431b" stroke-width="3"/></svg>
+          </div>
+          <div class="mc-analogy">Notebook</div>
+          <div class="mc-name">Long-term</div>
+          <div class="mc-use">Facts that persist across sessions.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>"Welcome back, Priya — your usual eggless red velvet?" It remembers a returning customer weeks later.</div>
+          <div class="mc-tag">Knows you next week.</div>
+        </div>
+        <div class="mem-card">
+          <div class="mem-icon">
+            <svg viewBox="0 0 80 70"><rect x="14" y="44" width="52" height="14" rx="1" fill="none" stroke="#1a1814" stroke-width="2"/><rect x="18" y="30" width="44" height="14" rx="1" fill="none" stroke="#8a8478" stroke-width="2"/><rect x="22" y="16" width="36" height="14" rx="1" fill="none" stroke="#b8b1a3" stroke-width="2"/><circle cx="40" cy="51" r="2.5" fill="#b8431b"/></svg>
+          </div>
+          <div class="mc-analogy">Archive</div>
+          <div class="mc-name">Episodic</div>
+          <div class="mc-use">A log of past events &amp; outcomes.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>The FSSAI monitor's record: "already alerted on the May labelling rule" — so it never re-flags the same one twice.</div>
+          <div class="mc-tag">"Last time, this happened."</div>
+        </div>
+        <div class="mem-card active">
+          <div class="mem-icon">
+            <svg viewBox="0 0 80 70"><rect x="14" y="14" width="52" height="50" rx="1" fill="none" stroke="#1a1814" stroke-width="2"/><rect x="20" y="20" width="6" height="38" fill="#b8431b"/><rect x="28" y="20" width="6" height="38" fill="#8a8478"/><rect x="36" y="20" width="6" height="38" fill="#b8431b"/><rect x="44" y="20" width="6" height="38" fill="#8a8478"/><rect x="52" y="20" width="6" height="38" fill="#b8431b"/></svg>
+          </div>
+          <div class="mc-analogy">Library</div>
+          <div class="mc-name">Semantic</div>
+          <div class="mc-use">A body of documents to answer from.</div>
+          <div class="mc-ex"><span class="ex-lbl">Lumière example</span>The Lumiere_KB.md you grounded in S4 — lead times, allergens, the new branch coupons. Ask, and it answers from the doc.</div>
+          <div class="mc-tag">You built this in S4.</div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">14<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 10 — MEMORY side-by-side ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 3</span><span class="dot">·</span><span class="topic">What Each Agent Was Missing</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Both agents · had vs. missing</div>
+      <h2>You've used 2 of the 4 already.</h2>
+      <div class="grid g-2 mt-2">
+        <div style="border:1px solid var(--rule);background:var(--paper-cream);padding:var(--s-3)">
+          <h3 style="font-size:1.4rem">HR Screener <span style="font-size:0.9rem;color:var(--ink-mute)">· S2</span></h3>
+          <div class="rs-item"><span class="rs-k" style="color:var(--calm)">Had</span><span class="rs-arrow">✓</span><span class="rs-v">Desk (short-term)</span></div>
+          <div class="rs-item bug"><span class="rs-k">Missing</span><span class="rs-arrow">✕</span><span class="rs-v">Archive (episodic) — no log of the empty search → invented URLs</span></div>
+        </div>
+        <div style="border:1px solid var(--rule);background:var(--paper-cream);padding:var(--s-3)">
+          <h3 style="font-size:1.4rem">Lumière Agent <span style="font-size:0.9rem;color:var(--ink-mute)">· S4</span></h3>
+          <div class="rs-item"><span class="rs-k" style="color:var(--calm)">Had</span><span class="rs-arrow">✓</span><span class="rs-v">Library (semantic) — the RAG docs</span></div>
+          <div class="rs-item"><span class="rs-k" style="color:var(--warn)">Missing</span><span class="rs-arrow">~</span><span class="rs-v">Archive + Notebook — knows the policies, forgets every chat</span></div>
+        </div>
+      </div>
+      <div class="pull-quote mt-3">Every office has a desk, a notebook, an archive, and a library. Agents do too — they just don't come with all four installed.</div>
+    </div>
+    <div class="folio">15<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 11 — EXERCISE A ============ -->
+  <section class="slide exercise-slide">
+    <div class="running-head"><div class="left"><span>Exercise A</span><span class="dot">·</span><span class="topic">Loop Trace · 13 min</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="ex-letter">A</div>
+      <div>
+        <div class="ex-meta">Exercise A · Loop Trace · 13 minutes</div>
+        <h3>Read your agent's mind — 6 stages.</h3>
+        <p class="mt-2" style="font-size:1.12rem">Open your Lumière agent (re-upload the latest <code>Lumiere_KB.md</code> first — it now has branch coupons). Paste the loop-trace instruction <em>above</em> the messy customer message. Fill the 6 boxes in your workbook.</p>
+        <div class="prompt mt-3" style="font-size:0.9rem"><button class="prompt-copy" data-prompt="A" onclick="copyPrompt(this)">Copy</button>Before answering, trace your reasoning step by step:
+PERCEIVE · REASON · PLAN · ACT · OBSERVE · REFLECT
+
+[then the customer message that mistypes "BANDRA 10",
+asks if POWAI10 works at Bandra, + Gurgaon delivery + nut-allergy]</div>
+        <div class="ex-callout">
+          <div class="ex-co-cell"><div class="eco-h">Do this now</div><div class="eco-b">Right after the memory concepts, before the break. Workbook → Exercise A.</div></div>
+          <div class="ex-co-cell"><div class="eco-h">What it teaches</div><div class="eco-b">To <strong>read a loop stage by stage</strong> — and spot a strong agent <strong>correct, redirect (the right coupon for the branch), flag, and refuse</strong> instead of bluffing.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ex-timer">13:00</div>
+    <div class="folio">16<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 12 — BREAK ============ -->
+  <section class="slide break-slide">
+    <div class="slide-body">
+      <div class="break-label">Break · 10 minutes</div>
+      <div class="break-clock" id="breakClock">10:00</div>
+      <p class="lede" style="max-width:34ch">Cameras off. Mics off. Step away.<br>Back when the clock runs out.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13 — TOOLS (radial) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 4</span><span class="dot">·</span><span class="topic">Tools</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">4 families · the agent's hands</div>
+      <h2>The brain picks the hand. The executor moves it.</h2>
+      <div class="radial-wrap">
+        <div class="radial">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+            <line x1="200" y1="150" x2="92"  y2="60"  stroke="#1e3a5f" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="308" y2="60"  stroke="#b8431b" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="92"  y2="240" stroke="#14532d" stroke-width="1.5"/>
+            <line x1="200" y1="150" x2="308" y2="240" stroke="#a16207" stroke-width="1.5"/>
+          </svg>
+          <div class="r-core" style="left:50%;top:50%"><div class="r-title">LLM</div><div class="r-sub">decides</div></div>
+          <div class="r-node" style="left:18%;top:18%"><div class="r-n-title">Information</div><div class="r-n-sub">search · weather</div></div>
+          <div class="r-node" style="left:82%;top:18%;border-color:var(--terra)"><div class="r-n-title">Action</div><div class="r-n-sub">write · send</div></div>
+          <div class="r-node calm" style="left:18%;top:82%"><div class="r-n-title">Comms</div><div class="r-n-sub">notify · post</div></div>
+          <div class="r-node warn" style="left:82%;top:82%"><div class="r-n-title">Compute</div><div class="r-n-sub">calc · transform</div></div>
+        </div>
+        <div class="radial-side">
+          <div class="rs-item"><span class="rs-k" style="color:var(--ink-blue)">Search tool</span><span class="rs-arrow">·</span><span class="rs-v">looks up what the model can't know — live web results</span></div>
+          <div class="rs-item"><span class="rs-k" style="color:var(--ink-blue)">Weather tool</span><span class="rs-arrow">·</span><span class="rs-v">today's temperature for a place — a fact no model has on its own</span></div>
+          <div class="rs-item"><span class="rs-k">Action</span><span class="rs-arrow">·</span><span class="rs-v">email sender, CRM updater, slot booker</span></div>
+          <div class="rs-item"><span class="rs-k" style="color:var(--warn)">Compute</span><span class="rs-arrow">·</span><span class="rs-v">calculator, transformer — does the math the brain shouldn't eyeball</span></div>
+        </div>
+      </div>
+      <div class="callout"><strong>The model doesn't know today's weather or the live web — a tool does.</strong> Lumière example: "will my ice cake survive the trip?" needs the <span class="blue">weather tool</span> for the real temperature, then a <span class="terra">calculation</span> for the safe window — never a guess. <em>(Worked through in your workbook.)</em></div>
+    </div>
+    <div class="folio">18<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 14 — TOOL MANIFEST ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 4</span><span class="dot">·</span><span class="topic">The Manifest</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Recruitment agent · a real manifest</div>
+      <h2>Every tool has a boundary it cannot cross.</h2>
+      <table class="manifest-table">
+        <thead><tr><th>Tool</th><th>What it does</th><th>Scope — its limit</th><th>Permission</th></tr></thead>
+        <tbody>
+          <tr><td>Resume Reader</td><td>Reads candidate CVs</td><td>Uploaded files only</td><td><span class="perm">read-only</span></td></tr>
+          <tr><td>Calendar API</td><td>Books interviews</td><td>Recruiter's calendar only</td><td><span class="perm">read + write</span></td></tr>
+          <tr><td>Email Sender</td><td>Contacts candidates</td><td>Approved templates — no free text</td><td><span class="perm">send</span></td></tr>
+          <tr><td>ATS Writer</td><td>Logs interview stages</td><td>Candidate records only · logged</td><td><span class="perm">write (audited)</span></td></tr>
+          <tr><td>Slack Notifier</td><td>Flags hiring managers</td><td>#hiring-ops channel only</td><td><span class="perm">post</span></td></tr>
+        </tbody>
+      </table>
+      <div class="pull-quote mt-3">A tool manifest is the employment contract for each of the agent's hands. Can't say what it's <em>not</em> allowed to do? You haven't scoped it.</div>
+    </div>
+    <div class="folio">19<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 15 — PLANNING (mini-flows) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 5</span><span class="dot">·</span><span class="topic">Planning</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body fill-top">
+      <div class="eyebrow">3 strategies · same task, different shapes</div>
+      <h2>3 ways an agent can think.</h2>
+      <div class="plan-grid">
+        <div class="plan-card react">
+          <div class="pc-name">ReAct</div>
+          <div class="pc-tag">Best for: tool-heavy, live-data tasks</div>
+          <div class="plan-diagram">
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet">
+              <rect x="10" y="10" width="78" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="49" y="30" font-family="monospace" font-size="14" fill="#1a1814" text-anchor="middle">think</text>
+              <rect x="112" y="45" width="78" height="30" rx="3" fill="#b8431b" stroke="#b8431b"/><text x="151" y="65" font-family="monospace" font-size="14" fill="#fff" text-anchor="middle">act</text>
+              <rect x="10" y="80" width="78" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="49" y="100" font-family="monospace" font-size="14" fill="#1a1814" text-anchor="middle">think</text>
+              <path d="M 88 25 L 112 53" stroke="#8a8478" stroke-width="2" fill="none"/><path d="M 112 67 L 88 92" stroke="#8a8478" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+          <div class="pc-best">Think, do, see, think again — improvises with live data as each result lands.</div>
+          <div class="pc-eg"><span class="eg-lbl">Lumière</span>"Should we run a delivery promo this weekend?" → checks the weather tool, then the order backlog, then decides.</div>
+        </div>
+        <div class="plan-card cot">
+          <div class="pc-name">Chain-of-Thought</div>
+          <div class="pc-tag">Best for: analysis from known facts</div>
+          <div class="plan-diagram">
+            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+              <rect x="50" y="6" width="100" height="24" rx="3" fill="none" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="22" font-family="monospace" font-size="13" fill="#1e3a5f" text-anchor="middle">step 1</text>
+              <rect x="50" y="38" width="100" height="24" rx="3" fill="none" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="54" font-family="monospace" font-size="13" fill="#1e3a5f" text-anchor="middle">step 2</text>
+              <rect x="50" y="70" width="100" height="24" rx="3" fill="none" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="86" font-family="monospace" font-size="13" fill="#1e3a5f" text-anchor="middle">step 3</text>
+              <rect x="50" y="102" width="100" height="26" rx="3" fill="#1e3a5f" stroke="#1e3a5f"/><text x="100" y="119" font-family="monospace" font-size="13" fill="#fff" text-anchor="middle">answer</text>
+              <line x1="100" y1="30" x2="100" y2="38" stroke="#8a8478" stroke-width="2"/><line x1="100" y1="62" x2="100" y2="70" stroke="#8a8478" stroke-width="2"/><line x1="100" y1="94" x2="100" y2="102" stroke="#8a8478" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="pc-best">A pure reasoning chain — no tools, just careful step-by-step thinking.</div>
+          <div class="pc-eg"><span class="eg-lbl cool">Lumière</span>"Which 3 cakes should we feature this month?" → weighs margin, prep time, and season, then recommends.</div>
+        </div>
+        <div class="plan-card reflect">
+          <div class="pc-name">Self-Reflection</div>
+          <div class="pc-tag">Best for: high-stakes writing</div>
+          <div class="plan-diagram">
+            <svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+              <rect x="18" y="22" width="76" height="28" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="56" y="41" font-family="monospace" font-size="13" fill="#1a1814" text-anchor="middle">draft</text>
+              <rect x="110" y="22" width="76" height="28" rx="3" fill="#a16207" stroke="#a16207"/><text x="148" y="41" font-family="monospace" font-size="13" fill="#fff" text-anchor="middle">critique</text>
+              <rect x="62" y="84" width="76" height="28" rx="3" fill="#14532d" stroke="#14532d"/><text x="100" y="103" font-family="monospace" font-size="13" fill="#fff" text-anchor="middle">redraft</text>
+              <path d="M 94 36 L 110 36" stroke="#8a8478" stroke-width="2" marker-end="url(#pa)"/>
+              <path d="M 148 50 Q 148 98 138 98" stroke="#8a8478" stroke-width="2" fill="none"/>
+              <path d="M 62 98 Q 36 98 36 50 Q 36 36 48 36" stroke="#8a8478" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
+              <defs><marker id="pa" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#8a8478" stroke-width="2"/></marker></defs>
+            </svg>
+          </div>
+          <div class="pc-best">Draft, critique its own draft, redraft — until it's good enough to send.</div>
+          <div class="pc-eg"><span class="eg-lbl calm">Lumière</span>An apology message to a customer whose cake was late → drafts, critiques the tone, rewrites before sending.</div>
+        </div>
+      </div>
+      <div class="callout mt-3"><strong>Pick by 3 questions:</strong> how complex is the task · does it need live tools · how high are the stakes. Answer those and the right strategy picks itself.</div>
+    </div>
+    <div class="folio">20<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 16 — EXERCISE B ============ -->
+  <section class="slide exercise-slide">
+    <div class="running-head"><div class="left"><span>Exercise B</span><span class="dot">·</span><span class="topic">Tool Manifest · 17 min</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="ex-letter">B</div>
+      <div>
+        <div class="ex-meta">Exercise B · Tool Manifest · 17 minutes</div>
+        <h3>Write the contract for the bakery's new agents.</h3>
+        <p class="mt-2" style="font-size:1.12rem">Two manifests in your workbook: the <strong>Lumière Order Assistant</strong> (≈7 min) and the harder <strong>FSSAI Regulation Monitor</strong> (≈10 min). Draft each in RCTFC, then narrow every scope and permission.</p>
+        <div class="prompt mt-3" style="font-size:0.9rem"><button class="prompt-copy" data-prompt="B" onclick="copyPrompt(this)">Copy both</button>List the 5 tools each agent needs. For each, in RCTFC:
+ROLE · CONTEXT · TASK · FORMAT · CONSTRAINTS (scope + min permission)
+— and what breaks if it's removed.</div>
+        <div class="ex-callout">
+          <div class="ex-co-cell"><div class="eco-h">Do this now</div><div class="eco-b">After the Tools + Planning concepts. Workbook → Exercise B, both parts.</div></div>
+          <div class="ex-co-cell"><div class="eco-h">What it teaches</div><div class="eco-b"><strong>Scope &amp; permission</strong> — and the governance line: the monitor <strong>auto-applies trivial updates but escalates every allergen/safety rule to a human.</strong></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ex-timer">17:00</div>
+    <div class="folio">21<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 17 — MULTI-AGENT topologies ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 6</span><span class="dot">·</span><span class="topic">Multi-Agent</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body fill-top">
+      <div class="eyebrow">3 patterns · when one agent isn't enough</div>
+      <h2>Split the work 3 ways.</h2>
+      <div class="ma-grid">
+        <div class="ma-card">
+          <div class="ma-name">Orchestrator-Worker</div>
+          <div class="ma-analogy">The manager</div>
+          <div class="ma-diagram">
+            <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet">
+              <rect x="68" y="6" width="64" height="28" rx="3" fill="#1a1814"/><text x="100" y="24" font-family="monospace" font-size="11" fill="#fff" text-anchor="middle">MANAGER</text>
+              <line x1="100" y1="34" x2="40" y2="66" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="34" x2="100" y2="66" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="34" x2="160" y2="66" stroke="#b8431b" stroke-width="2"/>
+              <rect x="12" y="66" width="56" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="40" y="83" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">worker</text>
+              <rect x="72" y="66" width="56" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="100" y="83" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">worker</text>
+              <rect x="132" y="66" width="56" height="26" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="160" y="83" font-family="monospace" font-size="10" fill="#1a1814" text-anchor="middle">worker</text>
+              <line x1="40" y1="92" x2="100" y2="114" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="100" y1="92" x2="100" y2="114" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="160" y1="92" x2="100" y2="114" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <rect x="62" y="114" width="76" height="24" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="130" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">synthesis</text>
+            </svg>
+          </div>
+          <div class="ma-best">Complex jobs where each part needs different expertise.</div>
+          <div class="ma-eg"><span class="eg-lbl">Lumière</span>A festival-week plan: one worker forecasts demand, one prices the menu, one drafts the social posts — the manager combines them.</div>
+        </div>
+        <div class="ma-card">
+          <div class="ma-name">Parallel Agents</div>
+          <div class="ma-analogy">The assembly line</div>
+          <div class="ma-diagram">
+            <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid meet">
+              <rect x="58" y="6" width="84" height="26" rx="3" fill="#1a1814"/><text x="100" y="23" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">200 reviews</text>
+              <line x1="100" y1="32" x2="32" y2="62" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="32" x2="77" y2="62" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="32" x2="123" y2="62" stroke="#b8431b" stroke-width="2"/><line x1="100" y1="32" x2="168" y2="62" stroke="#b8431b" stroke-width="2"/>
+              <rect x="14" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/><rect x="59" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/><rect x="105" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/><rect x="150" y="62" width="36" height="24" rx="3" fill="none" stroke="#1a1814" stroke-width="1.6"/>
+              <line x1="32" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="77" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="123" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="168" y1="86" x2="100" y2="112" stroke="#8a8478" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <rect x="62" y="112" width="76" height="24" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="128" font-family="monospace" font-size="10" fill="#1e3a5f" text-anchor="middle">merge</text>
+            </svg>
+          </div>
+          <div class="ma-best">Lots of independent items where speed matters.</div>
+          <div class="ma-eg"><span class="eg-lbl">Lumière</span>200 Google reviews to triage overnight: split across 4 agents, each tags 50 as praise / complaint / question, then merge.</div>
+        </div>
+        <div class="ma-card">
+          <div class="ma-name">Specialist Handoffs</div>
+          <div class="ma-analogy">The relay race</div>
+          <div class="ma-diagram">
+            <svg viewBox="-6 0 212 140" preserveAspectRatio="xMidYMid meet">
+              <rect x="10" y="34" width="48" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="34" y="53" font-family="monospace" font-size="9" fill="#1a1814" text-anchor="middle">classify</text>
+              <rect x="76" y="34" width="48" height="30" rx="3" fill="none" stroke="#1a1814" stroke-width="2"/><text x="100" y="53" font-family="monospace" font-size="9" fill="#1a1814" text-anchor="middle">resolve</text>
+              <rect x="142" y="34" width="48" height="30" rx="3" fill="#b8431b"/><text x="166" y="53" font-family="monospace" font-size="9" fill="#fff" text-anchor="middle">escalate</text>
+              <path d="M 58 49 L 76 49" stroke="#b8431b" stroke-width="2.5" marker-end="url(#ma1)"/>
+              <path d="M 124 49 L 142 49" stroke="#b8431b" stroke-width="2.5" marker-end="url(#ma1)"/>
+              <rect x="76" y="96" width="48" height="26" rx="3" fill="#5eaedb" fill-opacity="0.25" stroke="#1e3a5f" stroke-width="2"/><text x="100" y="113" font-family="monospace" font-size="9" fill="#1e3a5f" text-anchor="middle">close</text>
+              <path d="M 166 64 Q 166 109 124 109" stroke="#8a8478" stroke-width="1.6" fill="none" stroke-dasharray="3 3"/>
+              <defs><marker id="ma1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#b8431b" stroke-width="2"/></marker></defs>
+            </svg>
+          </div>
+          <div class="ma-best">Distinct sequential phases, each needing a different skill.</div>
+          <div class="ma-eg"><span class="eg-lbl">Lumière</span>Your S2 HR Screener — and a customer order: take it → check stock → book the slot → hand a refund case to a human.</div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">22<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 18 — MULTI-AGENT analogies (photos) ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 6</span><span class="dot">·</span><span class="topic">The Analogies, For Real</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">2 patterns you can picture</div>
+      <h2>A relay race and an assembly line.</h2>
+      <div class="grid g-2 mt-2" style="gap:var(--s-3)">
+        <div>
+          <div class="photo-duo" style="aspect-ratio:16/7">
+            <img src="img_relay.jpg" alt="A 4x100m relay race baton exchange">
+            <div class="photo-caption"><span class="pc-strong">Specialist Handoffs</span> — each runner runs one leg, then passes the baton</div>
+          </div>
+          <p class="mt-2" style="font-size:1.05rem">Your <span class="terra">HR Screener</span> ran this pattern: search → extract skills → score. Three specialists, one baton.</p>
+        </div>
+        <div>
+          <div class="photo-duo" style="aspect-ratio:16/9">
+            <img src="img_assembly.jpg" alt="Parts moving along a factory assembly line conveyor">
+            <div class="photo-caption"><span class="pc-strong">Parallel Agents</span> — many identical items move through at once</div>
+          </div>
+          <p class="mt-2" style="font-size:1.05rem">Split 500 résumés across four agents, run them at once, merge the results. Speed is the win.</p>
+        </div>
+      </div>
+    </div>
+    <div class="folio">23<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 19 — HR SCREENER revealed ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Concept 6</span><span class="dot">·</span><span class="topic">The Reveal</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Your S2 HR Screener · named at last</div>
+      <h1>You built a multi-agent system in Session 2 — without the name for it.</h1>
+      <div style="margin-top:var(--s-3);padding:var(--s-4);background:var(--paper-cream);border:1px solid var(--rule);border-top:3px solid var(--terra)">
+        <div style="font-family:'Geist Mono',monospace;font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:var(--s-3)">Pattern: Specialist Handoffs</div>
+        <div style="display:flex;align-items:center;gap:var(--s-3);flex-wrap:wrap;justify-content:center">
+          <div style="text-align:center"><div style="background:var(--ink);color:var(--paper);padding:0.7em 1.3em;font-family:'Geist Mono',monospace;font-size:0.88rem;font-weight:600">Step 1</div><div style="font-size:0.95rem;color:var(--ink-soft);margin-top:0.6em">Search<br>candidates</div></div>
+          <div style="font-size:2.4rem;color:var(--terra)">→</div>
+          <div style="text-align:center"><div style="background:var(--ink);color:var(--paper);padding:0.7em 1.3em;font-family:'Geist Mono',monospace;font-size:0.88rem;font-weight:600">Step 2</div><div style="font-size:0.95rem;color:var(--ink-soft);margin-top:0.6em">Extract<br>top skills</div></div>
+          <div style="font-size:2.4rem;color:var(--terra)">→</div>
+          <div style="text-align:center"><div style="background:var(--terra);color:var(--paper);padding:0.7em 1.3em;font-family:'Geist Mono',monospace;font-size:0.88rem;font-weight:600">Step 3</div><div style="font-size:0.95rem;color:var(--ink-soft);margin-top:0.6em">Score &amp;<br>rank</div></div>
+        </div>
+      </div>
+      <p class="lede mt-3">Three specialists. Three phases. Each handing to the next. Now you know what to call it.</p>
+    </div>
+    <div class="folio">24<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 20 — EXERCISE C ============ -->
+  <section class="slide exercise-slide">
+    <div class="running-head"><div class="left"><span>Exercise C</span><span class="dot">·</span><span class="topic">Pattern Choice · 8 min</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="ex-letter">C</div>
+      <div>
+        <div class="ex-meta">Exercise C · Pattern Choice · 8 minutes</div>
+        <h3>Lumière opens a London branch. Now what?</h3>
+        <p class="mt-2" style="font-size:1.12rem">A new country means a new regulator (FSA, not FSSAI). One monitor isn't enough. Ask Claude which of the 3 patterns fits — then push back if it over-automates.</p>
+        <div class="prompt mt-3" style="font-size:0.9rem"><button class="prompt-copy" data-prompt="C" onclick="copyPrompt(this)">Copy</button>Keeping multiple branches compliant across DIFFERENT regulators —
+Orchestrator-Worker, Parallel Agents, or Specialist Handoffs?
+Why? What breaks if I pick wrong? Where must a human stay?</div>
+        <div class="ex-callout">
+          <div class="ex-co-cell"><div class="eco-h">Do this now</div><div class="eco-b">Right after the multi-agent patterns + the HR-screener reveal. Workbook → Exercise C.</div></div>
+          <div class="ex-co-cell"><div class="eco-h">What it teaches</div><div class="eco-b"><strong>When one agent isn't enough</strong> — and how to split work (one monitor per regulator, an orchestrator that only routes, a human gate everywhere).</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ex-timer">8:00</div>
+    <div class="folio">25<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 21 — ARCHITECTURE CARD ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">Card Complete</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body fill-top">
+      <div class="eyebrow">3 sections · one blueprint</div>
+      <h2>This isn't a classroom exercise. It's a blueprint.</h2>
+      <div class="arch-card">
+        <div class="arch-section">
+          <div class="as-num">Section 1</div>
+          <div class="as-title">Loop Trace</div>
+          <div class="as-body">You traced a real agent's 6 reasoning stages and found the weak one.</div>
+          <div class="as-eg"><span class="eg-h">What yours looks like</span>PERCEIVE: 5 customer asks
+ACT: cited "Coupons → Branch Codes"
+REFLECT: refused POWAI10, gave BANDRA10</div>
+          <div class="as-bridge">→ becomes your system prompt + step sequence in S6.</div>
+        </div>
+        <div class="arch-section">
+          <div class="as-num">Section 2</div>
+          <div class="as-title">Tool Manifest</div>
+          <div class="as-body">You scoped 5 tools, set minimum permissions, flagged the risky one.</div>
+          <div class="as-eg"><span class="eg-h">What yours looks like</span>Slot Booker · production calendar only · read+write
+Weather tool · read-only
+⚠ Confirmation Sender · needs human gate</div>
+          <div class="as-bridge">→ becomes your configured tools + knowledge in S6.</div>
+        </div>
+        <div class="arch-section">
+          <div class="as-num">Section 3</div>
+          <div class="as-title">Pattern Choice</div>
+          <div class="as-body">You chose one agent or several, and can defend it in a sentence.</div>
+          <div class="as-eg"><span class="eg-h">What yours looks like</span>"Specialist Handoffs — one FSSAI monitor per
+country, an orchestrator routes by branch,
+human gate on every safety rule."</div>
+          <div class="as-bridge">→ decides single pipeline vs. multi-step build in S6.</div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">26<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 22 — SYNTHESIS ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">Synthesis</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Where we started · where you are</div>
+      <h1 class="display">Architecture is a design decision. Which means you can make it.</h1>
+      <p class="lede mt-3">The HR Screener hallucinated because of three gaps — no episodic memory, no reflect step, no exit condition. Not bugs in the model. Choices in the build. You now know how to make those choices.</p>
+    </div>
+    <div class="folio">27<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 23 — QUICK REFERENCE ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">Carry This</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">The whole session · one card</div>
+      <h2>6 ideas to keep.</h2>
+      <div class="grid g-2 mt-2" style="gap:var(--s-2) var(--s-4)">
+        <div class="rs-item"><span class="rs-k" style="min-width:9em">5 components</span><span class="rs-v">LLM · Memory · Tools · Planner · Executor</span></div>
+        <div class="rs-item"><span class="rs-k" style="min-width:9em">6 loop stages</span><span class="rs-v">Perceive → Reason → Plan → Act → Observe → Reflect</span></div>
+        <div class="rs-item"><span class="rs-k" style="min-width:9em">3 exit rules</span><span class="rs-v">goal met · max tries · human escalation</span></div>
+        <div class="rs-item"><span class="rs-k" style="min-width:9em">4 memory types</span><span class="rs-v">desk · notebook · archive · library</span></div>
+        <div class="rs-item"><span class="rs-k" style="min-width:9em">3 strategies</span><span class="rs-v">ReAct · Chain-of-Thought · Self-Reflection</span></div>
+        <div class="rs-item"><span class="rs-k" style="min-width:9em">3 patterns</span><span class="rs-v">manager · assembly line · relay race</span></div>
+      </div>
+      <div class="callout mt-3"><strong>The diagnostic:</strong> any agent that doesn't record what happened when something fails will eventually invent a result. That's the memory gap, every time.</div>
+    </div>
+    <div class="folio">28<sup>/29</sup></div>
+  </section>
+
+  <!-- ============ SLIDE 24 — CLOSE ============ -->
+  <section class="slide">
+    <div class="running-head"><div class="left"><span>Session 5</span><span class="dot">·</span><span class="topic">What's Next</span></div><span class="pub-title">A Field Guide to Generative AI</span></div>
+    <div class="slide-body">
+      <div class="eyebrow">Session 6 of 8</div>
+      <h1>Shantanu Chandra Learning Lab Agent Builder —<br>Build &amp; Host Your First Agent.</h1>
+      <p class="lede mt-3">Bring the Architecture Card. Loop Trace → system prompt. Tool Manifest → configured tools. Pattern Choice → single agent or pipeline. The card becomes the agent.</p>
+      <div class="rule mt-4"></div>
+      <div class="colophon">
+        <div class="by">Written &amp; facilitated by<span class="name">Shantanu Chandra</span><span class="linkedin">linkedin.com/in/chandrashantanu</span></div>
+        <div class="course-mark">Shantanu Chandra Learning Lab · GenAI &amp; AI Agents for Non-Coders<br><span class="terra">Session 5 of 8 · Agent Architecture</span></div>
+      </div>
+    </div>
+    <div class="folio">29<sup>/29</sup></div>
+  </section>
+
+</div><!-- /.deck -->
+
+<div class="nav">
+  <button onclick="prev()">Prev</button>
+  <button onclick="next()">Next</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const MASTER_KEY = 'genai_s5_slide_master';
+  let current = 0;
+
+  function show(index) {
+    current = Math.max(0, Math.min(totalSlides - 1, index));
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+    try { localStorage.setItem('genai_s5_learner_slide', String(current)); } catch (e) {}
+    if (slides[current] && slides[current].classList.contains('break-slide')) { startBreakClock(); }
+    else { stopBreakClock(); }
+  }
+  function next() { if (current < totalSlides - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(totalSlides - 1);
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+  function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+
+  let breakInterval = null;
+  function startBreakClock() {
+    stopBreakClock();
+    let total = 10 * 60;
+    const el = document.getElementById('breakClock');
+    if (!el) return;
+    function tick() {
+      const m = Math.floor(total / 60), s = total % 60;
+      el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      el.classList.toggle('warn', total <= 120 && total > 30);
+      el.classList.toggle('danger', total <= 30);
+      total--;
+      if (total < 0) { stopBreakClock(); el.textContent = '00:00'; }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function stopBreakClock() {
+    if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+    const el = document.getElementById('breakClock');
+    if (el) el.classList.remove('warn', 'danger');
+  }
+
+  // Pre-class countdown — customizable "we begin in N min" timer on the cover.
+  // Facilitator-run (does NOT auto-start). Default 5 min; ± adjusts by 1 min.
+  // Independent of the break clock. Amber under 1 min, red under 15s.
+  let preclassTotal = 5 * 60, preclassRemaining = 5 * 60, preclassInterval = null, preclassRunning = false;
+  function preclassRender() {
+    const el = document.getElementById('preclassClock');
+    if (!el) return;
+    const m = Math.floor(preclassRemaining / 60), s = preclassRemaining % 60;
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('warn', preclassRemaining <= 60 && preclassRemaining > 15);
+    el.classList.toggle('danger', preclassRemaining <= 15);
+  }
+  function preclassToggle() {
+    const btn = document.getElementById('preclassStartBtn');
+    if (preclassRunning) {
+      clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+      if (btn) btn.textContent = 'Resume';
+      return;
+    }
+    preclassRunning = true;
+    if (btn) btn.textContent = 'Pause';
+    preclassInterval = setInterval(() => {
+      preclassRemaining--;
+      if (preclassRemaining <= 0) {
+        preclassRemaining = 0; preclassRender();
+        clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+        if (btn) btn.textContent = 'Start';
+        return;
+      }
+      preclassRender();
+    }, 1000);
+  }
+  function preclassAdjust(delta) {
+    preclassTotal = Math.max(60, Math.min(60 * 60, preclassTotal + delta));
+    if (!preclassRunning) { preclassRemaining = preclassTotal; preclassRender(); }
+    else { preclassRemaining = Math.max(0, preclassRemaining + delta); preclassRender(); }
+  }
+  function preclassReset() {
+    clearInterval(preclassInterval); preclassInterval = null; preclassRunning = false;
+    preclassRemaining = preclassTotal;
+    const btn = document.getElementById('preclassStartBtn'); if (btn) btn.textContent = 'Start';
+    preclassRender();
+  }
+  preclassRender();
+
+  // Copy-to-clipboard for prompt boxes. Each button copies the FULL workbook
+  // version of that exercise's prompt (the slide shows a trimmed version).
+  const WORKBOOK_PROMPTS = {
+    A: `For this answer, show your reasoning one stage at a time, using exactly
+these six labels in order:
+
+PERCEIVE — list every separate request in the message.
+REASON — for each request, can the Lumière document answer it: YES,
+         NO (not in the document), or PARTIAL (document covers the topic
+         but not this exact detail)?
+PLAN — what order will you handle them in?
+ACT — quote the exact section heading(s) you used.
+OBSERVE — which requests did you fully answer? Which not?
+REFLECT — for anything you couldn't fully answer, what will you do
+          instead of guessing?
+
+Then write the customer-facing reply.
+
+[Then paste the customer message:]
+Hi! I want a 2kg eggless chocolate cake for pickup at your Bandra branch
+this Saturday. Can I use the "BANDRA 10" code on it — or my friend said
+"POWAI10" gives a better deal, does that work at Bandra? Also, can you
+deliver it to Sector 90, Gurgaon, and is it safe for my child with a
+severe nut allergy?`,
+    B: `PART 1 — Lumière Order Assistant:
+Help me design the TOOL MANIFEST for a Lumière Bakery Order Assistant — an
+agent that takes a customer cake order end to end: checks the cake spec
+against Lumière's rules, confirms the lead time, books the production slot,
+and sends a confirmation.
+List 5 tools. Write EACH in RCTFC form:
+- ROLE: what the tool is
+- CONTEXT: where its data lives (e.g. Lumiere_KB.md, the production calendar)
+- TASK: the one action it performs
+- FORMAT: what it returns
+- CONSTRAINTS: the narrowest scope (what it must NOT touch) + the minimum
+  permission (read / read+write / send / execute)
+Then one line: what breaks if this tool is removed.
+
+PART 2 — FSSAI Regulation Monitor:
+Help me design the TOOL MANIFEST for a Lumière FSSAI Regulation Monitor —
+an agent that watches for new FSSAI food-safety rules and keeps the bakery
+compliant. It MUST reflect:
+- TWO triggers: an automatic nightly schedule AND a manual "check now" button.
+- A risk rule: AUTO-APPLY + LOG only cosmetic/procedural updates (renamed
+  forms, changed URLs, new deadlines). ESCALATE anything about allergens,
+  ingredients, or safety to a human — never apply it itself.
+- A memory of rules already seen, so it never re-alerts on the same one twice.
+List the 4–5 tools it needs in RCTFC form, and for the trigger tool and the
+escalation tool, spell out the exact CONSTRAINTS that enforce the rules above.`,
+    C: `I want to build an agent that keeps Lumière's branches compliant.
+Lumière is opening a branch overseas (London), where the food-safety
+regulator is the FSA, not India's FSSAI. The current Regulation Monitor only
+knows FSSAI. I have three patterns:
+- Orchestrator-Worker: a manager agent routes each branch's compliance work
+  to a specialist worker agent.
+- Parallel Agents: identical agents each take a share of one big queue.
+- Specialist Handoffs: each agent does one phase, then passes to the next.
+Which fits keeping multiple branches compliant across DIFFERENT regulators,
+and why? What breaks if I pick wrong? Where must a human stay in the loop?`
+  };
+  function copyPrompt(btn) {
+    const key = btn.getAttribute('data-prompt');
+    const text = WORKBOOK_PROMPTS[key];
+    if (!text) return;
+    const done = () => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else { fallbackCopy(text, done); }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  const PRINT_KEY = 'genai_s5_print_request';
+  let lastPrintStamp = '';
+  window.addEventListener('storage', (e) => {
+    if (e.key === MASTER_KEY) {
+      const v = parseInt(e.newValue, 10);
+      if (isNaN(v)) return;
+      const target = Math.min(v, totalSlides - 1);
+      if (target !== current) show(target);
+      return;
+    }
+    if (e.key === PRINT_KEY && e.newValue && e.newValue !== lastPrintStamp) {
+      lastPrintStamp = e.newValue;
+      printAsPdf();
+    }
+  });
+
+  const PDF_FILENAME = 'Session 5 - Agent Architecture: How Agents Think, Remember & Act';
+  const ORIGINAL_TITLE = document.title;
+
+  function fitSlidesForPrint() {
+    const slides = document.querySelectorAll('.slide');
+    const SLIDE_W = 1280, SLIDE_H = 720, PAD_TOP = 32.6, PAD_X = 48, PAD_BOTTOM = 38.4;
+    const CONTENT_H = SLIDE_H - PAD_TOP - PAD_BOTTOM;
+    const snapshots = [];
+    slides.forEach(slide => {
+      snapshots.push({ el: slide, cssText: slide.style.cssText });
+      slide.style.cssText = `position:absolute !important;left:-10000px !important;top:0 !important;width:${SLIDE_W}px !important;height:${SLIDE_H}px !important;padding:${PAD_TOP}px ${PAD_X}px ${PAD_BOTTOM}px !important;display:flex !important;opacity:1 !important;overflow:visible !important;transform:none !important;`;
+    });
+    void document.body.offsetHeight;
+    slides.forEach(slide => {
+      const body = slide.querySelector('.slide-body');
+      if (!body) return;
+      body.style.transform = ''; body.style.transformOrigin = ''; body.style.width = '';
+      const naturalHeight = body.scrollHeight;
+      if (naturalHeight > CONTENT_H) {
+        const scale = CONTENT_H / naturalHeight;
+        body.style.transformOrigin = 'top left';
+        body.style.transform = `scale(${scale.toFixed(4)})`;
+        body.style.width = `${(100 / scale).toFixed(2)}%`;
+      }
+    });
+    snapshots.forEach(s => { s.el.style.cssText = s.cssText; });
+  }
+  function resetSlideFit() {
+    document.querySelectorAll('.slide-body').forEach(body => { body.style.transform=''; body.style.transformOrigin=''; body.style.width=''; });
+  }
+  function printAsPdf() { document.title = PDF_FILENAME; fitSlidesForPrint(); setTimeout(() => { window.print(); }, 150); }
+  window.addEventListener('beforeprint', () => { document.title = PDF_FILENAME; fitSlidesForPrint(); });
+  window.addEventListener('afterprint', () => { document.title = ORIGINAL_TITLE; resetSlideFit(); });
+
+  (function init() {
+    try {
+      const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
+      if (!isNaN(master) && master >= 0) { show(Math.min(master, totalSlides - 1)); return; }
+      const saved = parseInt(localStorage.getItem('genai_s5_learner_slide') || '0', 10);
+      if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
+    } catch (e) {}
+    show(0);
+  })();
+</script>
+</body>
+</html>

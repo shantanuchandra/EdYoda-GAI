@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Founder's Guide to Agents — Build Handbook</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+:root{--paper:#f5efe6;--cream:#fcf9f2;--ink:#1b1915;--soft:#60594e;--rule:#d9cebb;--blue:#123e70;--terra:#b44721;--mint:#0b6a53;--code:#102437}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 Manrope,sans-serif}.bar{position:sticky;top:0;z-index:5;background:rgba(245,239,230,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);padding:13px 4vw;display:flex;justify-content:space-between;font:500 11px DM Mono,monospace;letter-spacing:.13em;text-transform:uppercase}.bar a{text-decoration:none;color:var(--ink)}.shell{display:grid;grid-template-columns:240px minmax(0,1fr);gap:clamp(28px,7vw,120px);padding:0 4vw 90px}.nav{position:sticky;top:49px;align-self:start;padding:38px 0}.nav b{display:block;font:400 1.35rem Fraunces,serif;margin-bottom:16px}.nav a{display:block;color:var(--soft);text-decoration:none;font-size:.88rem;padding:6px 0}.nav a:hover{color:var(--terra)}main{max-width:1080px}.hero{min-height:61vh;display:flex;flex-direction:column;justify-content:center;border-bottom:4px double var(--ink)}.eyebrow,.stepno{font:500 11px DM Mono,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--terra)}h1,h2,h3{font-family:Fraunces,Georgia,serif;letter-spacing:-.035em;line-height:1.05}h1{font-size:clamp(4rem,8vw,8.4rem);font-weight:400;margin:18px 0;max-width:10ch}h2{font-size:clamp(2.35rem,4vw,4.3rem);font-weight:400;margin:0 0 16px}h3{font-size:1.5rem;margin:0 0 8px}.lede{font:400 1.34rem/1.45 Fraunces,serif;color:var(--soft);max-width:56ch}section{padding:75px 0;border-bottom:1px solid var(--rule)}.head{display:grid;grid-template-columns:115px 1fr;gap:24px;margin-bottom:30px}.num{font:500 11px DM Mono,monospace;color:var(--terra);letter-spacing:.12em;padding-top:7px}.copy{max-width:770px;color:var(--soft)}.test{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);margin-top:25px}.test div{padding:18px;border-right:1px solid var(--rule)}.test b{display:block;color:var(--blue);font:500 11px DM Mono,monospace;letter-spacing:.11em}.flow{border:1px solid var(--rule);background:var(--cream);padding:23px;margin:20px 0}.flow h3{font-size:1.45rem}.step{display:grid;grid-template-columns:54px 1fr;gap:19px;padding:25px 0;border-bottom:1px solid var(--rule)}.step:last-child{border-bottom:0}.stepno{font-size:1.15rem;padding-top:4px}.step p,.step li{color:var(--soft)}.step ul{padding-left:20px;margin:8px 0}.prompt{position:relative;background:var(--code);color:#eaf2f5;padding:17px 62px 17px 18px;margin:14px 0;font:13px/1.55 DM Mono,monospace;white-space:pre-wrap}.copybtn{position:absolute;top:9px;right:9px;border:1px solid #7891a6;background:transparent;color:#eaf2f5;padding:6px 8px;font:500 10px DM Mono,monospace;cursor:pointer}.copybtn:hover{background:#eaf2f5;color:var(--code)}.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin:11px 0;color:var(--soft)}.check input{accent-color:var(--mint);width:18px;height:18px;margin-top:4px}.notice{border-left:4px solid var(--terra);background:rgba(180,71,33,.08);padding:18px 20px;margin:20px 0;color:var(--soft)}details{border-bottom:1px solid var(--rule)}summary{cursor:pointer;list-style:none;padding:18px 37px 18px 0;position:relative;font-weight:700}summary::after{content:'+';position:absolute;right:3px;top:8px;color:var(--terra);font:28px Fraunces,serif}details[open] summary::after{content:'–'}.answer{padding:0 0 19px;color:var(--soft)}table{width:100%;border-collapse:collapse;background:var(--cream);min-width:720px}th,td{text-align:left;vertical-align:top;padding:13px;border-bottom:1px solid var(--rule)}th{font:500 10px DM Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--blue)}.table{overflow:auto;border:1px solid var(--rule)}@media(max-width:780px){.shell{display:block;padding:0 22px 60px}.nav{position:static;padding:20px 0;display:flex;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--rule)}.nav b{width:100%;margin:0}.nav a{padding:0}.head,.step{grid-template-columns:1fr;gap:8px}.test{grid-template-columns:1fr}.test div{border-right:0;border-bottom:1px solid var(--rule)}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* ── Pipeline diagrams ── */
+.pipeline{margin:28px 0;overflow-x:auto}
+.pipeline-row{display:flex;align-items:center;gap:0;flex-wrap:nowrap;min-width:max-content}
+.pipe-node{display:flex;flex-direction:column;align-items:center;min-width:108px;max-width:128px}
+.pipe-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:7px;position:relative;flex-shrink:0}
+.pipe-icon.violet{background:linear-gradient(135deg,#4f46e5,#818cf8);box-shadow:0 4px 18px rgba(79,70,229,.35)}
+.pipe-icon.emerald{background:linear-gradient(135deg,#065f46,#34d399);box-shadow:0 4px 18px rgba(5,150,105,.35)}
+.pipe-icon.slate{background:linear-gradient(135deg,#334155,#64748b);box-shadow:0 4px 12px rgba(51,65,85,.3)}
+.pipe-icon.amber{background:linear-gradient(135deg,#92400e,#fbbf24);box-shadow:0 4px 14px rgba(146,64,14,.3)}
+.pipe-icon.blue{background:linear-gradient(135deg,#1e3a8a,#60a5fa);box-shadow:0 4px 14px rgba(30,58,138,.35)}
+.pipe-icon.rose{background:linear-gradient(135deg,#881337,#f43f5e);box-shadow:0 4px 14px rgba(136,19,55,.3)}
+.pipe-label{font:600 11px DM\ Mono,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);text-align:center;line-height:1.3}
+.pipe-sub{font:400 11px Manrope,sans-serif;color:var(--soft);text-align:center;margin-top:3px;max-width:110px;line-height:1.35}
+.pipe-arrow{display:flex;align-items:center;padding:0 6px;color:var(--terra);font-size:18px;flex-shrink:0;margin-top:-18px}
+.pipe-arrow.down{transform:rotate(90deg)}
+.pipe-section-label{font:500 10px DM\ Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--terra);text-align:center;margin-bottom:14px}
+.pipeline-wrap{background:var(--cream);border:1px solid var(--rule);border-radius:10px;padding:22px 24px 20px;margin:20px 0}
+.pipeline-title{font:600 11px DM\ Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.pipeline-desc{font:400 12px Manrope,sans-serif;color:var(--soft);margin-bottom:18px;max-width:600px}
+.pipe-badge{display:inline-block;font:600 9px DM\ Mono,monospace;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:99px;margin-bottom:4px}
+.pipe-badge.human{background:rgba(11,106,83,.12);color:var(--mint)}
+.pipe-badge.auto{background:rgba(18,62,112,.1);color:var(--blue)}
+.pipe-guard{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;background:rgba(180,71,33,.07);border:1px solid rgba(180,71,33,.2);border-radius:7px;font:400 11px Manrope,sans-serif;color:var(--terra)}
+/* ── RCA section ── */
+.rca-block{border-left:3px solid var(--terra);background:rgba(180,71,33,.05);border-radius:0 8px 8px 0;padding:16px 20px;margin:18px 0}
+.rca-block h4{font:600 12px DM\ Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--terra);margin-bottom:6px}
+.rca-block p{font-size:.9rem;color:var(--soft);margin:4px 0}
+.fix-block{border-left:3px solid var(--mint);background:rgba(11,106,83,.05);border-radius:0 8px 8px 0;padding:16px 20px;margin:18px 0}
+.fix-block h4{font:600 12px DM\ Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mint);margin-bottom:6px}
+.fix-block p{font-size:.9rem;color:var(--soft);margin:4px 0}
+</style></head><body><header class="bar"><a href="/">Founder's Guide to Agents</a><span>Founder build handbook</span></header><div class="shell"><nav class="nav"><b>Build, step by step</b><a href="#test">The agent test</a><a href="#digest">Build 01 · Digest</a><a href="#outreach">Build 02 · Outreach</a><a href="#templates">Prompt templates</a><a href="#fallback">Fallback investors</a><a href="#dashboard">Dashboard</a><a href="#rca">Rate-limit fix</a><a href="#recover">Recovery guide</a></nav><main><header class="hero"><p class="eyebrow">Use this while you build</p><h1>Two agents. Real inputs. Real outcomes.</h1><p class="lede">Follow the steps in order. Do not jump to the final prompt until the data and permission checks directly above it are working.</p></header>
+<section id="test"><div class="head"><div class="num">01 / Decide</div><div><p class="eyebrow">The agent test</p><h2>Know what you are building.</h2><p class="copy">A prompt can be useful. An agent becomes useful on its own terms when it gets fresh information, changes something outside the chat, and can run again without you recreating the request.</p></div></div><div class="test"><div><b>Live data</b>It pulls a repository, web result, inbox, or other system you did not paste in.</div><div><b>External action</b>It writes, updates, drafts, or notifies somewhere beyond the chat.</div><div><b>Trigger</b>It can run from a schedule, webhook, or event—not only from a fresh manual prompt.</div></div></section>
+<section id="digest"><div class="head"><div class="num">02 / Build</div><div><p class="eyebrow">Build 01 · Weekly Repo/Product Digest</p><h2>Translate shipped work into a readable update.</h2><p class="copy">Your done state: Hermes has read real recent repository activity and created a short, ordinary-language summary that a non-technical co-founder can use.</p></div></div>
+
+<div class="pipeline-wrap">
+<div class="pipeline-title">Agent 01 — Drishti · How data flows</div>
+<div class="pipeline-desc">Every Monday cron fires the chain below. Nothing runs on your laptop in the background; the schedule lives inside Hermes and Hermes calls GitHub directly.</div>
+<div class="pipeline">
+<div class="pipeline-row">
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon violet">⏰</div>
+    <div class="pipe-label">Cron trigger</div>
+    <div class="pipe-sub">Monday 9 am, set once in Hermes</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon slate">📄</div>
+    <div class="pipe-label">SOUL.md parse</div>
+    <div class="pipe-sub">Standing instructions loaded into system prompt</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon blue">🐙</div>
+    <div class="pipe-label">GitHub API</div>
+    <div class="pipe-sub">Fetches commits last 7 days via fine-grained token</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon violet">🧠</div>
+    <div class="pipe-label">LLM digest</div>
+    <div class="pipe-sub">GPT-4o groups commits → plain-English story</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon emerald">📱</div>
+    <div class="pipe-label">Telegram delivery</div>
+    <div class="pipe-sub">Summary pushed to your Hermes chat thread</div>
+  </div>
+</div>
+</div>
+<div class="pipe-guard">⚠ Token scope check is mandatory before the first run — GITHUB_TOKEN must be read-only Contents + Metadata. Write scope means Hermes could theoretically push code.</div>
+</div>
+
+<article class="flow"><h3>Before you begin</h3><p>Choose one repository with commits from the last seven days. If your repo is quiet, use the facilitator’s fallback repo; this is a rehearsal of the pattern, not a score of your velocity.</p></article><div class="step"><div class="stepno">01</div><div><h3>Create least-privilege access</h3><p>In GitHub, create a fine-grained personal access token limited to the repository you selected. Grant <strong>read-only Contents</strong> and <strong>Metadata</strong>. Save it in <code>~/.hermes/.env</code> as <code>GITHUB_TOKEN</code>, then restart Hermes if it is already open.</p><div class="notice">Do not paste the token into a chat. The only place it belongs is your local Hermes environment file.</div></div></div><div class="step"><div class="stepno">02</div><div><h3>Check that the repository is reachable</h3><p>Ask for raw recent activity first. A generic answer is not success—look for real commit messages, dates, or changed files.</p><div class="prompt"><button class="copybtn" data-copy>Copy</button>Look at the last 7 days of commits on &lt;github-owner/repository&gt;. Return the commit date, commit message, and a short description of the files or area changed for each item.</div><label class="check"><input type="checkbox" data-check="digest-data"><span>I can see real repository activity in the response.</span></label></div></div><div class="step"><div class="stepno">03</div><div><h3>Turn the activity into a product digest</h3><p>Only after Step 2 works, send the transformation prompt. If it reads like a changelog, change the audience and ask for a rewrite.</p><div class="prompt"><button class="copybtn" data-copy>Copy</button>Using only the repository activity you just retrieved, write a 3–5 sentence weekly product digest for a non-technical co-founder. Group related commits into one story. Explain what changed and why it matters when the evidence supports it. No git jargon, no invented outcomes.</div><div class="prompt"><button class="copybtn" data-copy>Copy</button>Rewrite the digest for &lt;investors / customers / internal team&gt;. Keep it under &lt;number&gt; words. Remove implementation detail and retain only evidence-supported product impact.</div></div></div><div class="step"><div class="stepno">04</div><div><h3>Make the delivery repeatable (stretch)</h3><p>Once the manual run works, ask Hermes how its current scheduler is configured and create a weekly Monday 9am job. Verify the schedule in Hermes before relying on it.</p><div class="prompt"><button class="copybtn" data-copy>Copy</button>Show me the supported way to schedule a weekly task in this Hermes installation. If scheduling is available, create a Monday 9am task that reads the previous 7 days of commits for &lt;repo&gt;, writes the approved digest format, and delivers it here. Confirm the schedule after creating it.</div></div></div></section>
+<section id="outreach"><div class="head"><div class="num">03 / Build</div><div><p class="eyebrow">Build 02 · Investor Qualification + Outreach</p><h2>Research fit, then create drafts for review.</h2><p class="copy">Your done state: at least one evidence-backed fit score and one personalised <strong>unsent</strong> Gmail draft. The founder remains the decision-maker at every step. Two agents run in sequence: <strong>Pragya</strong> (प्रज्ञा, <em>intelligence</em>) handles search and scoring; <strong>Varta</strong> (वार्ता, <em>communication</em>) drafts and saves.</p></div></div>
+
+<div class="pipeline-wrap">
+<div class="pipeline-title">Agent 02 — Pragya + Varta · How data flows (verified against Build Recipes)</div>
+<div class="pipeline-desc">You send one Telegram command. Pragya runs two web searches, deduplicates, scores each investor across 4 criteria, filters by threshold, then hands qualifying investors to Varta. Varta drafts a sourced email per investor, saves each to Gmail Drafts, and confirms back to Telegram. You review and send on your own timeline — nothing is ever sent automatically. <strong>Live-tested finding:</strong> if your round facts are incomplete or ambiguous, Hermes pauses and asks — it will not invent traction numbers to fill a gap. That clarify step is shown below as a real branch, not an edge case.</div>
+
+<div class="pipe-section-label">↓ Input</div>
+<div class="pipeline">
+<div class="pipeline-row">
+  <div class="pipe-node">
+    <span class="pipe-badge human">human</span>
+    <div class="pipe-icon violet">💬</div>
+    <div class="pipe-label">Telegram trigger</div>
+    <div class="pipe-sub">Input: "get my &lt;APP&gt; a &lt;STAGE&gt; investor from &lt;REGION&gt; with checks ~&lt;CHECK&gt;"</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon slate">🔎</div>
+    <div class="pipe-label">Param extract</div>
+    <div class="pipe-sub">Output: APP · STAGE · REGION · CHECK confirmed in one line</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge human">human · if needed</span>
+    <div class="pipe-icon rose">❓</div>
+    <div class="pipe-label">Clarify</div>
+    <div class="pipe-sub">Asks for missing round facts (traction, revenue, incorporation) in ONE message. Skipped when all four params are already clear.</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon blue">🔍</div>
+    <div class="pipe-label">Pragya — Pass 1</div>
+    <div class="pipe-sub">Input: params → Output: 5–8 investors, source link + check + stage + geo each</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon blue">📅</div>
+    <div class="pipe-label">Pragya — Pass 2</div>
+    <div class="pipe-sub">Input: same params → Output: new names active last 12–18 months, same format</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon slate">🗂</div>
+    <div class="pipe-label">Dedup</div>
+    <div class="pipe-sub">Input: Pass 1 + Pass 2 → Output: combined list, no duplicate fund names</div>
+  </div>
+</div>
+</div>
+
+<div class="pipe-section-label">↓ Scoring + filter</div>
+<div class="pipeline">
+<div class="pipeline-row">
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon amber">📊</div>
+    <div class="pipe-label">Fit scoring</div>
+    <div class="pipe-sub">Input: each investor → Output: Stage/Sector/Geo/Check each HIGH·MED·LOW·UNKNOWN + overall 1/2/3</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon rose">🚦</div>
+    <div class="pipe-label">Threshold filter</div>
+    <div class="pipe-sub">Pass: score ≥2 with no LOW on Stage or Geo. Drop: score 1, or any LOW on Stage/Geo</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon violet">✍️</div>
+    <div class="pipe-label">Varta — Draft</div>
+    <div class="pipe-sub">Input: qualifying investor + round facts → Output: email ≤150 words, sourced opening fact, single ask</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon emerald">📬</div>
+    <div class="pipe-label">Gmail save</div>
+    <div class="pipe-sub">Input: draft text → Output: draft_id via <code>drafts().create()</code> only</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon slate">📱</div>
+    <div class="pipe-label">Telegram reply</div>
+    <div class="pipe-sub">Output: N found · M qualified · scores · 1 verify note per draft</div>
+  </div>
+</div>
+</div>
+
+<div class="pipe-section-label">↓ Execution branch (observed, not in SOUL.md spec)</div>
+<div class="pipeline">
+<div class="pipeline-row">
+  <div class="pipe-node">
+    <span class="pipe-badge human">human · choose</span>
+    <div class="pipe-icon rose">🔀</div>
+    <div class="pipe-label">Path menu</div>
+    <div class="pipe-sub">Pragya presents 4 options once research is ready — outreach batches, partnership proof, or deck-first. You pick, nothing is submitted until you do.</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon amber">📽</div>
+    <div class="pipe-label">Deck build</div>
+    <div class="pipe-sub">If chosen: generates a .pptx from verified round facts only. Not part of Pragya→Varta spec — a broader capability the same trigger can reach.</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon violet">✍️</div>
+    <div class="pipe-label">Varta — Draft</div>
+    <div class="pipe-sub">If an outreach path is chosen instead: proceeds to Fit scoring → email draft as originally specified</div>
+  </div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-node">
+    <span class="pipe-badge auto">auto</span>
+    <div class="pipe-icon emerald">📤</div>
+    <div class="pipe-label">Submit routing</div>
+    <div class="pipe-sub">Per investor: email-reachable → gmail_draft_standalone.py only. Form-only → manual packet, nothing sent.</div>
+  </div>
+</div>
+</div>
+
+<div class="pipe-section-label">↓ Your turn</div>
+<div class="pipeline">
+<div class="pipeline-row">
+  <div class="pipe-node">
+    <span class="pipe-badge human">human</span>
+    <div class="pipe-icon rose">👁</div>
+    <div class="pipe-label">Review + send</div>
+    <div class="pipe-sub">Open Gmail Drafts or the delivered file → edit → send/share when you're ready. Agent never touches send.</div>
+  </div>
+</div>
+</div>
+
+<div class="pipe-guard">⚠ Recency search covers last 12–18 months (not 90 days). Scoring uses HIGH/MED/LOW/UNKNOWN — UNKNOWN is correct when evidence is missing; the pipeline never guesses. <code>drafts().create()</code> only — <code>messages.send()</code> and <code>drafts.send()</code> are never called.</div>
+<div class="fix-block" style="margin-top:14px"><h4>Clarify is a feature, not a stall</h4><p>Live-tested on 2026-07-18: a real Telegram run for a pre-launch app paused at the Clarify node and asked for monthly visitors, conversions, revenue, and incorporation status before drafting anything. It explicitly offered to "present it honestly" if the numbers were zero. This is the pipeline doing its job — asking a relevant question beats fabricating a number. Answer in one message with real figures (or "pre-launch / zero" where true) and the run resumes automatically from where it paused.</p></div>
+<div class="rca-block" style="margin-top:14px"><h4>Live-tested: the trigger reaches more than Pragya→Varta</h4><p>Same test run, 2026-07-18: after scoring investors, Hermes offered a 4-option menu — three were outreach batches, the fourth was "turn the deck outline into a polished investor deck first." Choosing it produced a real 10-slide <code>.pptx</code> delivered as a Telegram file attachment, built only from the verified beta metrics supplied earlier (no invented traction). SOUL.md's Pragya→Varta block does not mention deck generation — this confirms the short-command trigger is an entry point into a broader fundraising capability, not a narrowly-scoped pipeline. Worth deciding deliberately whether to document deck-build as a third named stage or keep it as an undocumented adjacent skill.</p></div>
+<div class="rca-block" style="margin-top:14px"><h4>Live-tested: "submit priority 1" reached for the wrong email tool</h4><p>Same session, continuing from the deck path: the founder replied "submit priority 1" to send the deck to First Cheque, Titan Capital, India Quotient, and Indian Angel Network. First Cheque and IAN correctly blocked on a web-form requirement (no email applicable there). But for Titan Capital and India Quotient — both email-reachable — Hermes reached for the <strong>Himalaya email skill</strong> instead of the pipeline's own <code>gmail_draft_standalone.py</code>, found Himalaya unconfigured, and reported "no email client configured" even though Gmail OAuth was already working. Root cause: the "submit/apply" request never went through the Pragya→Varta trigger, so it had no standing instructions telling it which email tool to use — it improvised and picked wrong.</p></div>
+<div class="fix-block" style="margin-top:14px"><h4>Fix applied — SOUL.md now covers submit/apply for any trigger</h4><p>Added a new SOUL.md block that applies regardless of how the request arrives (short-command trigger, deck-review follow-up, or ad-hoc): investor email always goes through <code>gmail_draft_standalone.py</code>, Himalaya is explicitly forbidden for outreach, and "only Himalaya looks available" must be treated as "no email tool available" — never a silent fallback. Mixed batches (some investors need email, others need a form) now split correctly instead of blocking the whole batch. Restart Hermes after editing SOUL.md for the fix to take effect.</p></div>
+</div>
+
+<article class="flow"><h3>Before you begin</h3><p>This build has a one-time setup cost the digest agent didn't: Google OAuth. Steps 1–2 are setup-only; they do not need repeating once done. Do not jump to the search prompts until the test draft (Step 2) is confirmed in Gmail Drafts. Skipping ahead is the single most common cause of workshop time loss.</p></article>
+
+<div class="step"><div class="stepno">01</div><div><h3>Set up Google OAuth — every click, in order</h3>
+<p><strong>A. Create OAuth credentials in Google Cloud Console</strong></p>
+<p>Open <a href="https://console.cloud.google.com" target="_blank" rel="noopener">console.cloud.google.com</a>. Select or create a project (name does not matter). Then:</p>
+<ul>
+<li>Left sidebar → <strong>APIs &amp; Services → Library</strong> → search <em>Gmail API</em> → click the Gmail API result → click <strong>Enable</strong>.</li>
+<li>Left sidebar → <strong>APIs &amp; Services → OAuth consent screen</strong> → choose <strong>External</strong> → fill App name (anything) → Save. Then click <strong>Test users → Add users</strong> → enter the Gmail address you will authenticate with → Save.</li>
+<li>Left sidebar → <strong>APIs &amp; Services → Credentials → Create Credentials → OAuth client ID</strong> → Application type: <strong>Desktop app</strong> → Create → <strong>Download JSON</strong>.</li>
+</ul>
+<p>Move the downloaded file to <code>~/.hermes/google_client_secret.json</code>. In Terminal:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>mv ~/Downloads/client_secret_*.json ~/.hermes/google_client_secret.json</div>
+<p>Verify it landed:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>ls -lh ~/.hermes/google_client_secret.json</div>
+<p>Expected output: a line showing the file, roughly 400–500 bytes, dated today. If you see <code>No such file or directory</code>, check the filename — Google sometimes saves it with a long numeric prefix.</p>
+
+<p><strong>B. Run the OAuth flow</strong></p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>cd ~/.hermes/hermes-agent/skills/productivity/google-workspace/scripts
+python3 setup.py --client-secret ~/.hermes/google_client_secret.json</div>
+<p>Expected output: a URL starting with <code>https://accounts.google.com/o/oauth2/auth?...</code> printed to the terminal, then a prompt waiting for input.</p>
+<p>Copy that entire URL, paste it into a browser, sign in with the Gmail address you added as a test user, click <strong>Allow</strong>. The browser shows a code — copy it. Return to Terminal immediately and paste:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>python3 setup.py --auth-code &lt;paste-code-here&gt;</div>
+<p>Expected output: <code>Token saved</code> or similar confirmation line. If you see <code>invalid_grant</code> or <code>Token has been expired</code>, the code expired — re-run the setup line to get a fresh URL and complete the browser flow within 5 minutes.</p>
+<p><strong>C. Verify the scope</strong></p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>python3 setup.py --check</div>
+<p>Expected output: <code>AUTHENTICATED</code> and a list of scopes. Look for <code>gmail.modify</code> in that list.</p>
+<div class="notice"><strong>Scope check — do not skip.</strong> You need <code>gmail.modify</code>, not <code>gmail.compose</code>. <code>gmail.compose</code> includes "send emails" capability — wrong for a draft-only pipeline. If <code>gmail.compose</code> appears instead, do not use <code>setup.py</code> for this build. Use the standalone script in your Hermes Build Recipe Part 2 appendix (<code>gmail_draft_standalone.py</code>), which explicitly requests <code>gmail.modify</code> and stores its token separately at <code>~/.hermes/gmail_modify_token.json</code>.</div>
+<label class="check"><input type="checkbox" data-check="oauth-authenticated"><span><code>setup.py --check</code> (or the standalone auth) shows <code>AUTHENTICATED</code> with <code>gmail.modify</code> in scope.</span></label></div></div>
+
+<div class="step"><div class="stepno">02</div><div><h3>Prove the action boundary with a test draft</h3>
+<p>Hermes's built-in Google tools cover send and read, not create-draft. The helper script handles drafts. Run this exact command — replace <code>your.email@gmail.com</code> with the Gmail address you authenticated with:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>python3 ~/.hermes/scripts/gmail_draft_standalone.py \
+  --to your.email@gmail.com \
+  --subject "Hermes test draft" \
+  --body "This confirms Gmail draft creation is working. Do not send."</div>
+<p>Expected output in the terminal: a JSON object containing a <code>draft_id</code> field — something like <code>{"id": "r-55083932...", "message": {...}}</code>. That ID confirms the draft was created.</p>
+<p>Then open Gmail in a browser. Go to <strong>Drafts</strong> (left sidebar). You should see a message with subject "Hermes test draft". If it's in Sent instead — stop. Something called a send endpoint instead of the draft endpoint. Re-check the script source.</p>
+<p>If you see a Python error instead of JSON, common causes:</p>
+<ul>
+<li><code>FileNotFoundError: google_client_secret.json</code> — file not at <code>~/.hermes/google_client_secret.json</code>. Re-check Step 1A.</li>
+<li><code>HttpError 403</code> — Gmail API not enabled. Go back to Cloud Console → APIs &amp; Services → Library → enable Gmail API.</li>
+<li><code>Token file not found</code> — auth flow not completed. Re-run Step 1B.</li>
+</ul>
+<label class="check"><input type="checkbox" data-check="gmail-draft"><span>Test message appears in Gmail <strong>Drafts</strong> (not Sent) and terminal shows a draft_id.</span></label></div></div>
+
+<div class="step"><div class="stepno">03</div><div><h3>Trigger Pragya — two ways</h3>
+<p>Once setup is confirmed, you trigger the Pragya → Varta pipeline in whichever way fits your workflow.</p>
+
+<p><strong>Option A — Short Telegram command (fastest)</strong></p>
+<p>Send this to your Hermes Telegram bot. Replace the bracketed values with your actual details:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>get my &lt;app-name&gt; app a &lt;stage&gt; investor from &lt;region&gt; region with checks around &lt;check-size&gt;</div>
+<p>Real examples:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>get my CardCompass app a pre-seed investor from Dubai region with checks around $500K</div>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>get my Buildwise app a seed investor from India region with checks around $1M–$2M</div>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>get my FleetOps app a Series A investor from Southeast Asia region with checks around $3M</div>
+<p>Hermes extracts four parameters from that one line — app name, stage, region, check size — and immediately runs Pragya's two-pass search without asking for more information. The app name is used in both the search query and the outreach draft subject line.</p>
+<p>Expected reply from Hermes on Telegram within 2–3 minutes: a message naming the top matches with scores, and confirming how many drafts were saved to Gmail Drafts.</p>
+
+<p><strong>Option B — Long-form chat (more control)</strong></p>
+<p>Paste this into the Hermes chat window, then follow Steps 4–6 manually for search, scoring, and draft:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>I am raising a &lt;stage&gt; round for &lt;app-name&gt;, which operates in &lt;sector&gt;. We are based in &lt;geography&gt; and looking for approximately &lt;check size&gt; checks. Context that matters: &lt;traction, business model, thesis, or restrictions&gt;.</div></div></div>
+
+<div class="step"><div class="stepno">04</div><div><h3>Pragya — run two searches, not one</h3>
+<p>A single broad query consistently returns the same 5–6 widely-covered names. Run both prompts before moving to scoring. Do not score after only one search.</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>Search for active &lt;stage&gt; investors in &lt;sector&gt; investing in &lt;geography&gt;-based startups, check sizes around &lt;target&gt;. List 5–8 real, currently active funds. For each: name, a direct source link (fund website or dated press article — not a Crunchbase or Tracxn listicle), check size, stage focus, geography. Exclude any result without a direct source link.</div>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>Now search again with a recency filter: funds that made investments in &lt;sector&gt; in the last 12 months, or announced a new fund targeting &lt;geography&gt; in the last 18 months. Add any new names not already on your list. Same format — name, direct source link, check size, stage, geography.</div>
+<p>After both searches complete: ask Hermes to deduplicate and give you the full combined list before proceeding.</p>
+<p>If the response links to aggregators only, or gives vague dates like "active investor" without a citation — stop and use the fallback investor list in the next section of this handbook as your input data.</p></div></div>
+
+<div class="step"><div class="stepno">05</div><div><h3>Pragya — score each criterion separately</h3>
+<p>Separate scoring prevents a strong stage fit from masking a geography dealbreaker. Each criterion is rated before the overall.</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>For each investor on the combined list, score these four criteria independently as HIGH / MED / LOW / UNKNOWN, then give an overall fit rating (1 weak · 2 moderate · 3 strong):
+1. Stage fit — does their typical stage match &lt;my stage&gt;?
+2. Sector fit — active portfolio evidence in my sector?
+3. Geography — invest in &lt;geography&gt;-based companies without requiring a flip?
+4. Check size — my target check &lt;check size&gt; within their stated range?
+Cite the specific source evidence for each criterion. Mark UNKNOWN if evidence is missing — do not guess.</div>
+<p>Expected output: a table or list with all four criteria rated for each investor, plus a score 1–3. Review the scores before moving to drafts. Pass only investors with overall score 3, or score 2 with no LOW on Stage or Geography, to Varta. Discard the rest — do not draft speculative outreach for weak matches.</p>
+<p>If any investor has UNKNOWN on Stage or Geography — ask Hermes to do a targeted search for that investor specifically before accepting an overall score. Those two criteria are dealbreakers and should not stay UNKNOWN.</p></div></div>
+
+<div class="step"><div class="stepno">06</div><div><h3>Varta — draft and save, never send</h3>
+<p>Varta drafts only for investors who passed the scoring threshold. The email opens with one specific sourced fact — not a generic sector claim. Under 150 words. Single ask.</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>For &lt;investor/fund name&gt;, draft an outreach email for &lt;app-name&gt; under 150 words. Requirements: open with one specific sourced fact about this investor (name a portfolio company, a deal they recently made, or quote their exact thesis statement — not a generic claim like "you invest in fintech"); state my round in one sentence (&lt;app-name&gt; is &lt;one-line description&gt; — we are raising a &lt;stage&gt; round, targeting &lt;check size&gt; checks); single ask — a 20-minute call. No "I hope this finds you well," no superlatives. Save it as a Gmail draft. Do not send it. After saving, confirm the draft ID and tell me one specific thing I should verify before sending.</div>
+<p>Expected output: the draft text, a confirmation that it was saved (Varta runs <code>gmail_draft_standalone.py</code>), a draft ID, and one concrete verification item (e.g. "Confirm their Fund III is still deploying — last press was Oct 2024").</p>
+<p>Open Gmail Drafts to confirm it is there. The draft recipient should be a placeholder — your own email — until you manually add the investor's real address before sending.</p>
+<div class="notice"><strong>NEVER send from here.</strong> Drafts go to your Gmail Drafts folder. You read, edit, and send manually. Hermes does not and cannot send from this pipeline — that boundary is deliberate.</div>
+<label class="check"><input type="checkbox" data-check="outreach-draft"><span>At least one personalised email is in Gmail Drafts (not Sent). Draft ID confirmed in terminal output.</span></label></div></div></section>
+<section id="templates"><div class="head"><div class="num">04 / Reuse</div><div><p class="eyebrow">Prompt templates</p><h2>Copy, replace the brackets, and run.</h2><p class="copy">These templates keep the safe parts of the workflow intact: evidence before claims, draft before send, and a clear boundary between fact and inference.</p></div></div><div class="prompt"><button class="copybtn" data-copy>Copy</button>I want to automate this recurring founder-ops task: &lt;task&gt;. Design a small first version with: trigger, live data source, reasoning step, external action, human approval point, required permissions, and one read-only test. Do not assume it should auto-send, auto-delete, or make irreversible changes.</div><div class="prompt"><button class="copybtn" data-copy>Copy</button>This agent step failed: &lt;error or symptom&gt;. Diagnose in this order: trigger, live-data access, permissions, provider/model connection, then action boundary. Give one read-only check at a time. Do not change credentials or disable security checks.</div><div class="prompt"><button class="copybtn" data-copy>Copy</button>Live search was thin. Use the fallback investor rows below as my input data. Score them against my round facts. Do not claim any detail that is not in the supplied rows or a cited current source.</div></section>
+<section id="fallback"><div class="head"><div class="num">05 / Fallback</div><div><p class="eyebrow">Fallback investor inputs</p><h2>Continue the exercise when search is weak.</h2><p class="copy">Use these as workshop inputs, then score them against the founder’s facts. Recheck current details before real outreach.</p></div></div><div class="table"><table><thead><tr><th>Fund</th><th>Typical cheque</th><th>Stage / focus</th><th>Note</th></tr></thead><tbody><tr><td>Blume Ventures</td><td>$1M–$3M</td><td>Seed, pre-Series A</td><td>India</td></tr><tr><td>India Quotient</td><td>$150K–$2.5M</td><td>Pre-seed, seed</td><td>India</td></tr><tr><td>Titan Capital</td><td>$300K–$500K</td><td>Seed</td><td>Often first institutional cheque</td></tr><tr><td>Antler India</td><td>~₹4 Cr</td><td>Pre-seed</td><td>Bangalore residency</td></tr><tr><td>pi Ventures</td><td>$250K–$3M</td><td>Seed, Series A</td><td>AI/ML, deep tech</td></tr><tr><td>Speciale Invest</td><td>~$500K–$1M</td><td>Pre-seed, seed</td><td>Deep tech</td></tr><tr><td>Fireside Ventures</td><td>$1M–$12M</td><td>Early-stage</td><td>Consumer/D2C</td></tr><tr><td>Village Global Velocity</td><td>Up to $1M</td><td>Pre-seed, seed</td><td>Geography-agnostic</td></tr><tr><td>Y Combinator</td><td>$500K standard</td><td>Pre-seed</td><td>Eligible incorporation required</td></tr></tbody></table></div></section>
+<section id="dashboard"><div class="head"><div class="num">07 / Monitor</div><div><p class="eyebrow">Hermes Dashboard</p><h2>Watch agents, trigger manually, read history.</h2><p class="copy">The dashboard is a local web app that runs alongside Hermes. It shows both agents' status, lets you trigger them without typing commands, and keeps a log of every run so you can compare inputs and outcomes over time.</p></div></div>
+
+<article class="flow"><h3>Start the dashboard</h3><p>Run this once in a terminal. Leave it running throughout the session — it does not need to be restarted between agent triggers.</p><div class="prompt"><button class="copybtn" data-copy>Copy</button>python3 ~/.hermes/session/hermes_dashboard.py</div><p>Then open <code>http://localhost:7890</code> in a browser. You should see two agent cards — <strong>Drishti</strong> (left) and <strong>Pragya + Varta</strong> (right) — with status badges and a Run History table at the bottom.</p></article>
+
+<div class="step"><div class="stepno">01</div><div><h3>Drishti card — repo list and digest trigger</h3><p>Type your GitHub username, click <strong>List My Repos</strong>. All repos visible to your <code>GITHUB_TOKEN</code> appear as chips. Hover any chip to see last-updated date and commit count over the past 7 days.</p><p>Click a chip to select a repo — its name flows automatically into the App Name field on the Pragya card. Then click <strong>Run Digest Now</strong> to fire Drishti immediately without waiting for the Monday cron.</p><p>Expand <strong>Terminal Output</strong> under the card to see the live Hermes command and result.</p><label class="check"><input type="checkbox" data-check="dash-drishti"><span>Repos load, a chip click sets the Pragya app name, Run Digest Now fires without error.</span></label></div></div>
+
+<div class="step"><div class="stepno">02</div><div><h3>Pragya + Varta card — Telegram command builder</h3><p>Fill in App Name, Round Stage, Region, and Check Size. The <strong>Generated Telegram command</strong> box updates live as you type — it shows the exact string Hermes expects.</p><p>Click <strong>Copy command → paste into Telegram</strong>. Open your Hermes Telegram bot, paste, and send. Pragya runs the two-pass search and scoring; Varta drafts and saves to Gmail Drafts. The full output from Hermes arrives in Telegram within 2–3 minutes.</p><label class="check"><input type="checkbox" data-check="dash-pragya"><span>Command preview updates on input, copy button works, command is correct before sending.</span></label></div></div>
+
+<div class="step"><div class="stepno">03</div><div><h3>Run History — memory across the session</h3><p>Every trigger (Drishti run, Pragya command copy) is logged automatically to <code>~/.hermes/run_log.json</code>. The Run History table at the bottom of the dashboard shows every entry: when it ran, which agent, what inputs were used, and the outcome.</p><p>Two things you can do with history:</p><ul><li><strong>Add notes</strong> — click the Notes field on any row and type what you observed (e.g. "3 strong matches, Varta saved 2 drafts"). The note saves immediately.</li><li><strong>Re-run with tweaks</strong> — click <strong>↺ Re-run</strong> on any row. The form pre-fills with that run's inputs so you can adjust one variable (region, check size, stage) and fire again. This is how you iterate without retyping everything.</li></ul><label class="check"><input type="checkbox" data-check="dash-history"><span>Run History table shows at least one entry after triggering an agent. Notes save. Re-run pre-fills the form.</span></label></div></div>
+
+<div class="step"><div class="stepno">04</div><div><h3>VC Evaluation panel — scores, drafts, and form links</h3><p>Below the Run History table, the dashboard shows the results of the most recent Pragya + Varta run as a VC evaluation table. For each fund evaluated you can see the four scoring criteria (Stage, Sector, Geography, Check Size), an overall score out of 3, and the outreach route — <strong>Email</strong> (Gmail draft saved) or <strong>Form</strong> (manual submission required).</p><p>Click <strong>View Draft</strong> on any email-route fund to open a right-side drawer with the full scoring breakdown and the exact draft text that was saved to Gmail. The draft is displayed for review — nothing is sent from the dashboard.</p><p>For form-only funds, the table shows a highlighted <strong>Open Form</strong> link that takes you directly to the fund's application page. Use the submission packet at <code>~/Wasabi_Travels_Fundraising/PRIORITY_1_SUBMISSION_PACKET.md</code> to fill the form manually.</p><label class="check"><input type="checkbox" data-check="dash-vc"><span>VC table loads with scores and route indicators. "View Draft" opens the drawer with full email text. Form links open the correct application page.</span></label></div></div>
+
+<div class="step"><div class="stepno">05</div><div>
+  <h3>VakilDiary test run — pipeline validation (2026-07-18)</h3>
+  <p>On 2026-07-18 the full Pragya→Varta pipeline was run end-to-end using <strong>VakilDiary</strong> as the test case — an AI-powered legal practice management SaaS for UAE/Dubai law firms — to verify the pipeline works across geographies beyond India. Results confirmed the pipeline is geography-agnostic.</p>
+  <p><strong>Run summary:</strong> 24 agents, 564K subagent tokens, 284 seconds. 14 VCs evaluated, 13 qualified (score 2+), 4 email drafts created, 9 form/programme routes identified, 1 disqualified (MEVP — Stage LOW).</p>
+  <p><strong>Email drafts created (Gmail Drafts, shantanu.msp@gmail.com):</strong></p>
+  <ul style="margin:8px 0 8px 20px;line-height:1.8">
+    <li><strong>TA Ventures</strong> — Draft ID <code>r1081684019003708418</code> · info@taventures.vc · Score 2/3 · Opening fact: Qanooni $2M UAE legaltech co-investment, June 2025</li>
+    <li><strong>Nuwa Capital</strong> — Draft ID <code>r6602756412192891445</code> · hello@nuwacapital.io · Score 2/3 · Opening fact: Nafes AI procurement SaaS in portfolio</li>
+    <li><strong>Wamda Capital</strong> — Draft ID <code>r2554042097995219939</code> · connect@wamda.com · Score 2/3 · Opening fact: Tarjama $15M Series A participation, May 2025</li>
+    <li><strong>VentureSouq</strong> — Draft ID <code>r-6043997022286703510</code> · info@venturesouq.com · Score 2/3 · Opening fact: FinTech Fund II close, September 2025</li>
+  </ul>
+  <p><strong>Standout finding:</strong> Oryx Fund (Salica Investments) and Village Global both score 3/3 — the highest possible. Village Global <em>led</em> Qanooni's $2M UAE legaltech pre-seed in June 2025 — the closest comparable round to VakilDiary. Apply via Village Global Velocity program: <a href="https://www.villageglobal.com/velocity" target="_blank" rel="noopener">villageglobal.com/velocity</a>. Oryx Fund has no public contact form — manual outreach required via salicainvestments.com.</p>
+  <p><strong>What to do before sending:</strong> Open each draft in Gmail. Edit the subject line to add your name (e.g. "— Shantanu, VakilDiary"). Verify the opening fact is still current. Hit send yourself — the agent never sends automatically.</p>
+  <p>The dashboard at <code>localhost:7890</code> shows the full VakilDiary evaluation table below the Wasabi Travels run. Click <strong>View Draft</strong> on any email-route fund to open the drawer with scoring breakdown, full draft text, and Gmail Draft ID.</p>
+  <label class="check"><input type="checkbox" data-check="dash-vd-test"><span>VakilDiary section visible in dashboard. Drawers open with correct draft text and Draft IDs. Form links verified working.</span></label>
+  <label class="check"><input type="checkbox" data-check="dash-vd-drafts"><span>All 4 Gmail drafts visible in shantanu.msp@gmail.com Drafts folder with correct subject lines.</span></label>
+</div></div>
+
+</section>
+
+<section id="rca"><div class="head"><div class="num">08 / Fix</div><div><p class="eyebrow">Rate-limit RCA + fixes</p><h2>Why quota errors happen and how to resolve them permanently.</h2><p class="copy">Three independent root causes compound during a Pragya+Varta run. Each must be fixed separately — fixing one may still leave the other two active.</p></div></div>
+
+<div class="rca-block">
+<h4>Root cause 1 — Tier-restricted model</h4>
+<p>The default Hermes config uses <code>gpt-5.6-sol</code>. This model is Tier 4/5 restricted on OpenAI. Having credits on your account does not give tier access — tier access comes from account age and cumulative spend history, not balance. A new account with $100 loaded is still Tier 1.</p>
+<p>The error reads: <em>"You exceeded your current quota"</em> or <em>"No response from provider for 90s (non-streaming, model: gpt-5.6-sol)"</em>.</p>
+</div>
+<div class="fix-block">
+<h4>Fix 1 — Keep gpt-5.6-sol; add gpt-5.5 as the rate-limit fallback</h4>
+<p>Do not change the default model. Instead, add a fallback that Hermes uses automatically when the primary hits a quota error:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>nano ~/.hermes/config.yaml</div>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>model:
+  default: gpt-5.6-sol
+  fallback: gpt-5.5
+  fallback_on_errors:
+    - rate_limit_exceeded
+    - quota_exceeded
+    - provider_timeout</div>
+<p>Save and restart Hermes. With this in place, every call tries <code>gpt-5.6-sol</code> first. On a quota or timeout error, Hermes retries the same call on <code>gpt-5.5</code> automatically — you stay on the better model unless the tier wall forces a switch. Once your OpenAI account reaches Tier 4 reliably, you can remove the fallback lines.</p>
+</div>
+
+<div class="rca-block">
+<h4>Root cause 2 — Aggressive context compression</h4>
+<p>The default compression threshold is <code>0.5</code>, which fires at 50% context fill. Compression uses the same model, so it makes a second simultaneous API call mid-conversation — doubling rate-limit pressure exactly when Pragya is running a multi-step search. This is the mechanism that turns a single near-limit event into a hard abort.</p>
+</div>
+<div class="fix-block">
+<h4>Fix 2 — Raise the compression threshold</h4>
+<p>In the same <code>~/.hermes/config.yaml</code>:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button># Change this line:
+compression:
+  threshold: 0.5
+
+# To this:
+compression:
+  threshold: 0.85</div>
+<p>This delays compression until 85% context fill. For a Pragya run (~15–20 turns) compression will no longer fire mid-flow.</p>
+</div>
+
+<div class="rca-block">
+<h4>Root cause 3 — Missing SOUL.md pipeline block</h4>
+<p>The standing instructions in <code>~/.hermes/SOUL.md</code> should contain a Pragya→Varta block that tells Hermes exactly what to do when asked to research investors. Without it, Hermes improvises: it asks follow-up questions about traction, incorporation, and founder details, burning through context in multiple turns instead of one structured pass. This causes compression to fire earlier, compounding Root Cause 2.</p>
+<p>Check your current SOUL.md:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>cat ~/.hermes/SOUL.md | grep -i "pragya\|varta\|investor"</div>
+<p>If this returns nothing, the pipeline block is missing.</p>
+</div>
+<div class="fix-block">
+<h4>Fix 3 — Add the pipeline block to SOUL.md</h4>
+<p>Open the Hermes Build Recipes doc (session folder → <code>03_Hermes_Build_Recipes.md</code>). Find the block under <strong>Part 2, Section 4: SOUL.md update</strong>. Copy the full block and append it to your SOUL.md:</p>
+<div class="prompt"><button class="copybtn" data-copy>Copy</button>nano ~/.hermes/SOUL.md</div>
+<p>Paste the block at the end of the file. It should begin with a heading like <code>## Investor Research (Pragya → Varta)</code> and contain the full structured pipeline instructions. Save. Restart Hermes.</p>
+<p>With the block in place, Hermes runs the full pipeline in one structured pass without iterative questioning — reducing total turns by ~60% and eliminating the early compression trigger.</p>
+</div>
+
+<div class="notice"><strong>Apply all three fixes, not just one.</strong> Root Cause 1 (wrong model tier) is the primary cause. Root Cause 2 (compression timing) turns near-misses into hard aborts. Root Cause 3 (missing SOUL.md block) makes conversations longer than they need to be, increasing exposure to both. Fix them in order: model → compression threshold → SOUL.md.</div>
+
+<label class="check"><input type="checkbox" data-check="rca-model"><span>Changed <code>model.default</code> to <code>gpt-4o</code> in config.yaml.</span></label>
+<label class="check"><input type="checkbox" data-check="rca-compression"><span>Changed <code>compression.threshold</code> to <code>0.85</code> in config.yaml.</span></label>
+<label class="check"><input type="checkbox" data-check="rca-soul"><span>SOUL.md Pragya→Varta block verified present (<code>grep -i pragya ~/.hermes/SOUL.md</code> returns a result).</span></label>
+<label class="check"><input type="checkbox" data-check="rca-restart"><span>Hermes restarted after all config changes. Ran one Pragya test — no quota error.</span></label>
+</section>
+
+<section id="recover"><div class="head"><div class="num">09 / Recover</div><div><p class="eyebrow">Recovery guide</p><h2>Find the broken boundary.</h2></div></div><details><summary>Hermes is not responding</summary><div class="answer">Confirm the gateway is still running and check <code>hermes status</code> for the selected provider and model.</div></details><details><summary>The repo response is generic</summary><div class="answer">Return to Digest Step 2. Check the repository name, token scope, and whether the response contains real commit data before asking for a summary.</div></details><details><summary>Gmail did not create a draft</summary><div class="answer">Stop before research — don't assume a successful-looking response means the draft actually landed. Match the exact error: "Access blocked … has not completed verification" means your email is missing from OAuth consent screen → Test users. <code>HttpError 403 — Gmail API has not been used</code> means the API itself isn't enabled in APIs &amp; Services → Library. <code>setup.py --check</code> returning <code>NOT AUTHENTICATED</code> means re-run <code>setup.py --client-secret</code> for a fresh auth URL — the auth session expires in ~5 minutes, so complete the browser flow promptly. Then repeat the Step 2 test-draft command and confirm it in Gmail Drafts.</div></details><details><summary>SSL certificate verification fails</summary><div class="answer">Do not disable certificate verification. This commonly points to a managed network inspecting HTTPS; use an unrestricted network or follow your organisation’s approved CA-certificate process.</div></details></section><footer style="padding:60px 0"><button onclick="window.print()">Print this handbook</button></footer></main></div><script>const k='founders-handbook-steps';const s=JSON.parse(localStorage.getItem(k)||'{}');document.querySelectorAll('[data-check]').forEach(x=>{x.checked=!!s[x.dataset.check];x.addEventListener('change',()=>{s[x.dataset.check]=x.checked;localStorage.setItem(k,JSON.stringify(s))})});document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async()=>{const text=b.parentElement.childNodes[b.parentElement.childNodes.length-1].textContent.trim();try{await navigator.clipboard.writeText(text);b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1200)}catch{b.textContent='Select text'}}));</script></body></html>

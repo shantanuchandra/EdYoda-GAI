@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder's Guide to Agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --ink-blue-soft: rgba(30, 58, 95, 0.08);
+
+    --warn:         #a16207;
+    --warn-soft:    rgba(161, 98, 7, 0.10);
+    --danger:       #991b1b;
+    --danger-soft:  rgba(153, 27, 27, 0.08);
+    --calm:         #14532d;
+    --calm-soft:    rgba(20, 83, 45, 0.08);
+
+    --s-1: 0.5rem;  --s-2: 1rem;  --s-3: 1.5rem;  --s-4: 2rem;
+    --s-5: 3rem;    --s-6: 4.5rem; --s-7: 6rem;    --s-8: 9rem;
+
+    --t-eyebrow: 0.72rem;
+    --t-meta:    0.78rem;
+    --t-body:    1.05rem;
+    --t-lede:    1.35rem;
+    --t-h3:      1.5rem;
+    --t-h2:      2.5rem;
+    --t-h1:      clamp(2.8rem, 5.2vw, 4.8rem);
+    --t-display: clamp(3.4rem, 6.6vw, 6.2rem);
+    --t-mega:    clamp(5rem, 11vw, 11rem);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur:  480ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%; width: 100%; overflow: hidden;
+    background: var(--paper); color: var(--ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.45; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(26, 24, 20, 0.08) 100%);
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; z-index: 2; }
+
+  .slide {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; padding: 3.6vh 5vw 4.2vh;
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  .slide.active { display: flex; opacity: 1; }
+
+  .running-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: var(--s-2); border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  .running-head .left { display: flex; gap: 1.4em; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+  .running-head .left .topic { color: var(--ink-soft); }
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 0.9rem; letter-spacing: 0.02em;
+    text-transform: none; color: var(--ink); font-weight: 400;
+  }
+
+  .slide-body {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: var(--s-4) 0; max-width: 1300px; margin: 0 auto; width: 100%;
+  }
+
+  .folio {
+    position: absolute; bottom: 1.2rem; right: 5vw;
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 8.5rem; line-height: 0.8; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums; letter-spacing: -0.04em;
+    pointer-events: none; user-select: none; z-index: 0; opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em; vertical-align: top; margin-left: 0.15em;
+    color: var(--ink-mute); font-weight: 400;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--terra); font-weight: 500;
+    margin-bottom: var(--s-3); position: relative; padding-left: 1.8em;
+  }
+  .eyebrow::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: 1.2em; height: 1px; background: var(--terra);
+  }
+  .eyebrow.cool { color: var(--ink-blue); }
+  .eyebrow.cool::before { background: var(--ink-blue); }
+  .eyebrow.warn { color: var(--warn); }
+  .eyebrow.warn::before { background: var(--warn); }
+
+  h1, h2, h3, .display, .mega {
+    font-family: 'Fraunces', serif; color: var(--ink); letter-spacing: -0.02em;
+  }
+  h1 {
+    font-size: var(--t-h1); font-weight: 400; line-height: 1.02;
+    font-variation-settings: 'opsz' 120, 'SOFT' 30; margin-bottom: var(--s-4);
+  }
+  h2 {
+    font-size: var(--t-h2); font-weight: 400; line-height: 1.1;
+    font-variation-settings: 'opsz' 80; margin-bottom: var(--s-3);
+  }
+  h3 {
+    font-size: var(--t-h3); font-weight: 500; line-height: 1.2;
+    color: var(--ink); margin-bottom: var(--s-1);
+  }
+  .display {
+    font-size: var(--t-display); font-weight: 300; line-height: 1.05;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1; max-width: 18ch;
+  }
+  p, li { font-size: var(--t-body); line-height: 1.6; color: var(--ink-soft); }
+  .lede {
+    font-family: 'Fraunces', serif; font-size: var(--t-lede);
+    font-weight: 300; font-style: italic; line-height: 1.45;
+    color: var(--ink-soft); max-width: 56ch;
+    font-variation-settings: 'opsz' 36;
+  }
+  .terra { color: var(--terra); }
+  .blue  { color: var(--ink-blue); }
+  .marked       { background: linear-gradient(180deg, transparent 60%, var(--terra-soft) 60%); padding: 0 0.05em; }
+
+  .rule { height: 1px; background: var(--rule); margin: var(--s-3) 0; }
+  .rule-double { height: 4px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: var(--s-3) 0; }
+
+  .prompt {
+    background: var(--paper-cream); border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink); padding: var(--s-3) var(--s-3);
+    font-family: 'Geist Mono', monospace; font-size: 0.95rem;
+    line-height: 1.7; color: var(--ink); white-space: pre-wrap; position: relative;
+  }
+  .slide-question {
+    margin-top: var(--s-3); max-width: 58ch;
+    display: flex; gap: var(--s-2); align-items: flex-start;
+    background: var(--ink-blue-soft); border: 1px solid rgba(30, 58, 95, 0.22);
+    border-left: 3px solid var(--ink-blue); padding: var(--s-2) var(--s-3);
+    position: relative; z-index: 1;
+  }
+  .slide-question .q-label {
+    flex: 0 0 auto; font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-blue); font-weight: 600;
+  }
+  .slide-question p { color: var(--ink-blue); line-height: 1.45; font-weight: 500; }
+  .prompt::before {
+    content: 'PROMPT'; position: absolute; top: -0.6em; left: var(--s-3);
+    background: var(--paper); padding: 0 0.6em;
+    font-family: 'Geist Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.2em; color: var(--ink-mute); font-weight: 500;
+  }
+
+  .grid { display: grid; gap: var(--s-3); }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+  .g-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .mt-3 { margin-top: var(--s-3); }
+  .mt-4 { margin-top: var(--s-4); }
+
+  /* 2x2 matrix (mental model) */
+  .matrix {
+    display: grid; grid-template-columns: auto 1fr 1fr; grid-template-rows: auto 1fr 1fr;
+    gap: 2px; background: var(--ink); border: 2px solid var(--ink); max-width: 900px;
+  }
+  .matrix .cell { background: var(--paper-cream); padding: var(--s-3); display: flex; flex-direction: column; justify-content: center; }
+  .matrix .axis-label {
+    background: var(--paper); display: flex; align-items: center; justify-content: center;
+    font-family: 'Geist Mono', monospace; font-size: 0.7rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-mute); text-align: center; padding: var(--s-2);
+  }
+  .matrix .cell h3 { font-size: 1.1rem; color: var(--terra); margin-bottom: 0.3em; }
+  .matrix .cell p { font-size: 0.92rem; margin: 0; }
+  .matrix .cell.build { background: var(--terra-soft); border-left: 3px solid var(--terra); border-top: 3px solid var(--terra); }
+  .matrix .cell.build h3 { color: var(--terra); }
+
+  /* Numbered test list */
+  .test-list { display: flex; flex-direction: column; gap: var(--s-3); margin-top: var(--s-3); }
+  .test-item { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); align-items: start; }
+  .test-num {
+    font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 300; color: var(--terra);
+    line-height: 1; font-variation-settings: 'opsz' 144;
+  }
+  .test-item h3 { margin-bottom: 0.2em; }
+  .test-item p { margin: 0; }
+
+  /* Pipeline diagram */
+  .pipeline { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-4); }
+  .pipeline .stage {
+    background: var(--paper-cream); border: 1px solid var(--rule); border-radius: 8px;
+    padding: var(--s-2) var(--s-3); font-family: 'Geist Mono', monospace; font-size: 0.85rem;
+    color: var(--ink); text-align: center; min-width: 140px;
+  }
+  .pipeline .stage .label {
+    display: block; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--terra); margin-bottom: 0.3em;
+  }
+  .pipeline .arrow { color: var(--ink-faint); font-size: 1.4rem; }
+
+  /* Cover */
+  .cover {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: var(--s-6); align-items: end;
+    height: 100%; padding: var(--s-5) 0 var(--s-3);
+  }
+  .cover .vol {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.4em; text-transform: uppercase; color: var(--ink-mute);
+    align-self: stretch; border-right: 1px solid var(--rule); padding-right: var(--s-2);
+  }
+  .cover .cover-main h1.cover-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.5rem, 7vw, 6.4rem); font-weight: 300;
+    line-height: 0.94; letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; max-width: 16ch;
+  }
+  .cover .cover-byline {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 1.4rem; color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+    margin-top: var(--s-3); max-width: 50ch; line-height: 1.4;
+  }
+  .cover .cover-foot {
+    margin-top: var(--s-5); display: flex; justify-content: space-between;
+    align-items: baseline; padding-top: var(--s-2); border-top: 1px solid var(--ink);
+    font-family: 'Geist Mono', monospace; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-mute);
+  }
+  .byline {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-eyebrow);
+    color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.16em;
+  }
+
+  /* Exercise slide variant */
+  .exercise-slide .slide-body {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: var(--s-5); align-items: start;
+  }
+  .exercise-slide .ex-letter {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(8rem, 18vw, 14rem); line-height: 0.85;
+    color: var(--terra);
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    letter-spacing: -0.04em;
+  }
+  .exercise-slide .ex-meta {
+    font-family: 'Geist Mono', monospace; font-size: var(--t-meta);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-mute); margin-bottom: var(--s-2);
+  }
+  .exercise-slide .folio { left: 5vw; right: auto; }
+
+  /* Nav */
+  .nav {
+    position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.4rem; z-index: 100;
+    background: rgba(245, 239, 230, 0.85); backdrop-filter: blur(8px);
+    padding: 4px; border-radius: 999px; border: 1px solid var(--rule);
+    opacity: 0; transition: opacity var(--dur) var(--ease);
+  }
+  body:hover .nav { opacity: 0.5; }
+  .nav:hover { opacity: 1; }
+  .nav button {
+    background: transparent; border: none; color: var(--ink-soft);
+    cursor: pointer; font-size: 0.84rem; padding: 5px 12px;
+    border-radius: 999px; font-family: 'Geist Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    transition: background var(--dur) var(--ease);
+  }
+  .nav button:hover { background: var(--paper-warm); color: var(--ink); }
+
+  .progress-thread {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--terra); z-index: 200;
+    transition: width var(--dur) var(--ease);
+  }
+
+.break-slide { align-items: center; justify-content: center; text-align: center; }
+  .break-slide .slide-body { align-items: center; justify-content: center; text-align: center; }
+  .break-clock {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(7rem, 16vw, 14rem);
+    font-weight: 300;
+    line-height: 1;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144;
+    margin: var(--s-3) 0;
+  }
+  .break-clock.warn { color: var(--warn); }
+  .break-clock.danger { color: var(--danger); }
+  .break-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: var(--s-2);
+  }
+
+  /* ── Motion graphics ── */
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+  @keyframes drawLine { from { stroke-dashoffset: var(--dash-len,200); } to { stroke-dashoffset: 0; } }
+  @keyframes popIn    { 0%{opacity:0;transform:scale(0.88);} 60%{transform:scale(1.04);} 100%{opacity:1;transform:scale(1);} }
+  @keyframes inkPulse { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+  @keyframes flowDot  { 0%{offset-distance:0%;opacity:0;} 10%{opacity:1;} 90%{opacity:1;} 100%{offset-distance:100%;opacity:0;} }
+
+  .anim-cell { opacity:0; animation: fadeUp 0.42s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-cell:nth-child(1){animation-delay:0.05s}
+  .anim-cell:nth-child(2){animation-delay:0.15s}
+  .anim-cell:nth-child(3){animation-delay:0.25s}
+  .anim-cell:nth-child(4){animation-delay:0.35s}
+  .anim-node { opacity:0; animation: popIn 0.38s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-node:nth-child(1){animation-delay:0.1s}
+  .anim-node:nth-child(2){animation-delay:0.28s}
+  .anim-node:nth-child(3){animation-delay:0.46s}
+  .anim-node:nth-child(4){animation-delay:0.64s}
+  .anim-line { animation: drawLine 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-line:nth-of-type(1){animation-delay:0.22s}
+  .anim-line:nth-of-type(2){animation-delay:0.40s}
+  .anim-line:nth-of-type(3){animation-delay:0.58s}
+  .svg-pipeline { width:100%; height:auto; max-height:120px; margin-top:2rem; display:block; overflow:visible; }
+  .svg-matrix   { width:100%; height:auto; max-height:320px; margin-top:1.5rem; display:block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .nav, .progress-thread { transition: none !important; }
+    .anim-cell, .anim-node, .anim-line { animation: none !important; opacity: 1 !important; }
+  }
+  @media (max-width: 900px) {
+    .g-3, .g-4 { grid-template-columns: 1fr 1fr; }
+    .cover { grid-template-columns: 1fr; }
+    .cover .vol { display: none; }
+  }
+
+  @media print {
+    @page { size: 13.333in 7.5in; margin: 0; }
+    html, body {
+      width: 13.333in; height: auto;
+      background: var(--paper) !important;
+      overflow: visible !important; margin: 0 !important; padding: 0 !important;
+    }
+    .deck { width: 13.333in; height: auto; position: static; }
+    .slide {
+      position: relative !important; inset: auto !important;
+      width: 13.333in !important; height: 7.5in !important;
+      display: flex !important; opacity: 1 !important;
+      page-break-after: always; page-break-inside: avoid;
+      break-after: page; break-inside: avoid;
+      overflow: hidden; padding: 0.4in 0.6in 0.5in !important;
+    }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    .nav, .progress-thread { display: none !important; }
+    body::before { background-image: none !important; opacity: 0 !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-thread" id="progressThread" style="width: 0%"></div>
+
+<div class="deck" id="deck">
+
+  <!-- 01 — COVER -->
+  <div class="slide active">
+    <div class="cover">
+      <div class="vol">Founder's Guide to Agents · Four Hours · Live</div>
+      <div class="cover-main">
+        <div class="byline" style="margin-bottom: var(--s-4); color: var(--terra);">— Starting Shortly —</div>
+        <h1 class="cover-title">Build two working <em style="font-style: italic; color: var(--terra);">agents</em> for your startup ops before lunch.</h1>
+        <p class="cover-byline">
+          Not your product. The ops around it — the repetitive stuff that isn't your core work but won't leave you alone.
+        </p>
+        <p class="cover-byline" style="margin-top: var(--s-3); font-size: 1rem; font-style: normal; color: var(--ink-mute);">Open your recipe doc. You build today — not watch.</p>
+        <div class="cover-foot">
+          <span>GrowthX · Hands-On Build Session</span>
+          <span>GrowthX · In-Person · 4 Hours</span>
+        </div>
+      </div>
+    </div>
+    <div class="folio">1<sup>/16</sup></div>
+  </div>
+
+  <!-- 02 — ROUND ROBIN OPENER -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Opening</span><span class="dot">·</span><span class="topic">Frame</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Before we start</span>
+      <p style="font-family:'Geist Mono',monospace; font-size:0.82rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--terra); margin-bottom:var(--s-2);">30 seconds · say it aloud</p>
+      <h1>Your one-line pitch. And the one ops task <em class="terra" style="font-style:italic;">eating your week</em>.</h1>
+      <p class="lede mt-3">Not your product roadmap — the annoying, repetitive thing that isn't your product but won't leave you alone.</p>
+      <div class="rule mt-4"></div>
+      <p class="mt-3">Sales &amp; outreach · Hiring &amp; talent · Investor relations · Marketing &amp; content · Product feedback · Finance &amp; legal ops</p>
+    </div>
+    <div class="folio">2<sup>/16</sup></div>
+  </div>
+
+  <!-- 03 — MENTAL MODEL 2x2 -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Frame</span><span class="dot">·</span><span class="topic">The Mental Model</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">The one framework to keep</span>
+      <h1>Frequency and judgment decide <em class="terra" style="font-style:italic;">everything</em>.</h1>
+      <div class="matrix mt-4">
+        <div class="axis-label"></div>
+        <div class="axis-label">Low Judgment</div>
+        <div class="axis-label">High Judgment</div>
+        <div class="axis-label">Occasional</div>
+        <div class="cell anim-cell"><h3>Buy a Tool</h3><p>Off-the-shelf software solves this. Don't build.</p></div>
+        <div class="cell anim-cell"><h3>Hire / Consult</h3><p>Rare and high-stakes — get a human expert.</p></div>
+        <div class="axis-label">Daily</div>
+        <div class="cell build anim-cell"><h3>Build an Agent ↗</h3><p>This is today's territory. Repetitive and mechanical.</p></div>
+        <div class="cell anim-cell"><h3>Augment Yourself</h3><p>Use AI to move faster — don't automate your own judgment away.</p></div>
+      </div>
+    </div>
+    <div class="folio">3<sup>/16</sup></div>
+  </div>
+
+  <!-- 04 — AGENT VS PROMPT TEST -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Frame</span><span class="dot">·</span><span class="topic">Agent vs. Prompt</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">The real test</span>
+      <h1>A prompt with a costume on is <em class="terra" style="font-style:italic;">not</em> an agent.</h1>
+      <div class="slide-question" style="margin-bottom: var(--s-3);">
+        <span class="q-label">Question</span>
+        <p>Which of the three tests does your current AI workflow fail?</p>
+      </div>
+      <div class="test-list">
+  <div class="test-item">
+    <div class="test-num">1</div>
+    <div>
+      <h3>Acts on live data
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:8px;opacity:0.7"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </h3>
+      <p>Not just what you typed — something it pulls itself: your repo, a live web search, your inbox.</p>
+    </div>
+  </div>
+  <div class="test-item">
+    <div class="test-num">2</div>
+    <div>
+      <h3>Takes real action in another system
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:8px;opacity:0.7"><polyline points="5 12 12 5 19 12"/><polyline points="5 19 12 12 19 19"/></svg>
+      </h3>
+      <p>Sends the email, writes the file, updates the record. Doesn't just hand you text.</p>
+    </div>
+  </div>
+  <div class="test-item">
+    <div class="test-num">3</div>
+    <div>
+      <h3>Doesn't wait to be re-prompted
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:8px;opacity:0.7"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </h3>
+      <p>Runs on a trigger — a schedule, a webhook, an event.</p>
+    </div>
+  </div>
+</div>
+    </div>
+    <div class="folio">4<sup>/16</sup></div>
+  </div>
+
+  <!-- 05 — PROMISE + ROADMAP -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Frame</span><span class="dot">·</span><span class="topic">Today's Roadmap</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">The promise</span>
+      <h1>By 2pm, two agents. <em class="terra" style="font-style:italic;">Actually running.</em></h1>
+      <p class="lede mt-3">Not a demo. Not a template you'll never open again. Something you leave running Monday morning.</p>
+      <svg class="svg-pipeline" viewBox="0 0 800 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="arr5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#d4ccba"/>
+    </marker>
+  </defs>
+  <!-- connector lines -->
+  <line class="anim-line" x1="168" y1="45" x2="218" y2="45" stroke="#d4ccba" stroke-width="1.5" marker-end="url(#arr5)" stroke-dasharray="200" style="--dash-len:200"/>
+  <line class="anim-line" x1="368" y1="45" x2="418" y2="45" stroke="#d4ccba" stroke-width="1.5" marker-end="url(#arr5)" stroke-dasharray="200" style="--dash-len:200"/>
+  <line class="anim-line" x1="568" y1="45" x2="618" y2="45" stroke="#d4ccba" stroke-width="1.5" marker-end="url(#arr5)" stroke-dasharray="200" style="--dash-len:200"/>
+  <!-- node boxes -->
+  <g class="anim-node">
+    <rect x="4" y="16" width="160" height="58" rx="6" fill="#faf6ef" stroke="#d4ccba" stroke-width="1.2"/>
+    <text x="84" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#b8431b" letter-spacing="1">BUILD A · 45 MIN</text>
+    <text x="84" y="55" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#1a1814">Repo Digest</text>
+  </g>
+  <g class="anim-node">
+    <rect x="222" y="16" width="142" height="58" rx="6" fill="#faf6ef" stroke="#d4ccba" stroke-width="1.2" stroke-dasharray="5 3"/>
+    <text x="293" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#8a8478" letter-spacing="1">BREAK · 15 MIN</text>
+    <text x="293" y="55" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#4a463e">Coffee &amp; Stretch</text>
+  </g>
+  <g class="anim-node">
+    <rect x="422" y="16" width="142" height="58" rx="6" fill="#faf6ef" stroke="#d4ccba" stroke-width="1.2"/>
+    <text x="493" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#b8431b" letter-spacing="1">BUILD B · 40 MIN</text>
+    <text x="493" y="55" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#1a1814">Investor Outreach</text>
+  </g>
+  <g class="anim-node">
+    <rect x="622" y="16" width="174" height="58" rx="6" fill="#faf6ef" stroke="#d4ccba" stroke-width="1.2"/>
+    <text x="709" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#1e3a5f" letter-spacing="1">GENERALIZE · 20 MIN</text>
+    <text x="709" y="55" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#1a1814">Your Domain</text>
+  </g>
+</svg>
+    </div>
+    <div class="folio">5<sup>/16</sup></div>
+  </div>
+
+  <!-- 06 — BUILD A INTRO -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Build A</span><span class="dot">·</span><span class="topic">Repo Digest Agent</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Agent 1</span>
+      <h1>It watches your repo. It tells you <em class="terra" style="font-style:italic;">what shipped</em>.</h1>
+      <p class="lede mt-3">In plain English, not git-speak. Useful for your own memory, a non-technical co-founder, or an investor update.</p>
+      <svg class="svg-pipeline" viewBox="0 0 820 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="arr6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#b8431b" opacity="0.5"/>
+    </marker>
+  </defs>
+  <line class="anim-line" x1="175" y1="48" x2="215" y2="48" stroke="#b8431b" stroke-width="1.4" stroke-opacity="0.4" marker-end="url(#arr6)" stroke-dasharray="200" style="--dash-len:200"/>
+  <line class="anim-line" x1="370" y1="48" x2="410" y2="48" stroke="#b8431b" stroke-width="1.4" stroke-opacity="0.4" marker-end="url(#arr6)" stroke-dasharray="200" style="--dash-len:200"/>
+  <line class="anim-line" x1="565" y1="48" x2="605" y2="48" stroke="#b8431b" stroke-width="1.4" stroke-opacity="0.4" marker-end="url(#arr6)" stroke-dasharray="200" style="--dash-len:200"/>
+  <g class="anim-node">
+    <rect x="4" y="12" width="168" height="72" rx="7" fill="#faf6ef" stroke="rgba(184,67,27,0.3)" stroke-width="1.4"/>
+    <text x="88" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#b8431b" letter-spacing="1.2">TRIGGER</text>
+    <text x="88" y="56" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#1a1814">New commits</text>
+    <text x="88" y="73" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#8a8478">Monday 9 am · cron</text>
+  </g>
+  <g class="anim-node">
+    <rect x="218" y="12" width="149" height="72" rx="7" fill="#faf6ef" stroke="rgba(184,67,27,0.3)" stroke-width="1.4"/>
+    <text x="292" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#b8431b" letter-spacing="1.2">LIVE DATA</text>
+    <text x="292" y="56" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#1a1814">Reads the diff</text>
+    <text x="292" y="73" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#8a8478">GitHub API · 7 days</text>
+  </g>
+  <g class="anim-node">
+    <rect x="413" y="12" width="149" height="72" rx="7" fill="#faf6ef" stroke="rgba(184,67,27,0.3)" stroke-width="1.4"/>
+    <text x="487" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#b8431b" letter-spacing="1.2">REASONING</text>
+    <text x="487" y="54" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1a1814">Plain-language</text>
+    <text x="487" y="71" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1a1814">summary</text>
+  </g>
+  <g class="anim-node">
+    <rect x="608" y="12" width="208" height="72" rx="7" fill="rgba(184,67,27,0.06)" stroke="rgba(184,67,27,0.45)" stroke-width="1.6"/>
+    <text x="712" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#b8431b" letter-spacing="1.2">ACTION</text>
+    <text x="712" y="56" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#b8431b">Telegram message</text>
+    <text x="712" y="73" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#8a8478">drafted · not auto-sent</text>
+  </g>
+</svg>
+    </div>
+    <div class="folio">6<sup>/16</sup></div>
+  </div>
+
+  <!-- 07 — BUILD STEP A -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build A</span><span class="dot">·</span><span class="topic">Hands-On</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter" style="animation: popIn 0.55s cubic-bezier(0.22,1,0.36,1) both 0.1s; display:block;">A</div>
+      <div>
+        <div class="ex-meta">Build Step · 45 minutes</div>
+        <h1>Point it at your repo. Write the digest prompt.</h1>
+        <p class="lede mt-3">Follow Part 1 of your Hermes Build Recipe. Flag your facilitator the second something breaks.</p>
+        <p style="font-family:'Geist Mono',monospace; font-size:0.78rem; color:var(--ink-mute); letter-spacing:0.08em; margin-bottom:0.5em; margin-top:var(--s-4);">Replace &lt;repo&gt; with your actual GitHub <strong>username/repo-name</strong></p>
+        <div class="prompt">"You just read the commits on &lt;repo&gt;. Now write a 3-5 sentence summary of what shipped this week, in plain English. No git jargon — explain it like you're telling a co-founder who doesn't read code what's new."</div>
+      </div>
+    </div>
+    <div class="folio">7<sup>/16</sup></div>
+  </div>
+
+  <!-- 08 — BUILD A DEBRIEF -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Build A</span><span class="dot">·</span><span class="topic">Debrief</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <p style="font-family:'Geist Mono',monospace; font-size:0.74rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--terra); margin-bottom:var(--s-3);">Could a non-technical co-founder understand what changed?</p>
+      <p class="display"><span style="float:left; font-family:'Fraunces',serif; font-size:5.2em; line-height:0.82; font-weight:400; color:var(--terra); padding:0.05em 0.12em 0 0; font-variation-settings:'opsz' 144, 'WONK' 1;">T</span>hat agent read something live, took action no static prompt could take, and <span class="marked">will do this again next week without you touching it.</span></p>
+    </div>
+    <div class="folio">8<sup>/16</sup></div>
+  </div>
+
+  <!-- 09 — BREAK -->
+  <div class="slide break-slide">
+    <div class="running-head">
+      <div class="left"><span>Intermission</span><span class="dot">·</span><span class="topic">— Break —</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <div class="break-label">— Break —</div>
+      <div class="break-clock" id="breakClock">15:00</div>
+      <p class="lede center mt-5" style="font-size: 1.6rem;">Stand up. Coffee. Stretch.</p>
+    </div>
+    <div class="folio">9<sup>/16</sup></div>
+  </div>
+
+  <!-- 10 — BUILD B INTRO -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Build B</span><span class="dot">·</span><span class="topic">Investor Agent</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Agent 2</span>
+      <h1>Finds the right investors. Drafts the outreach. <em class="terra" style="font-style:italic;">You send it.</em></h1>
+      <p class="lede mt-3">This one touches your actual fundraise. The human-in-the-loop gate is deliberate — you are always the last check before anything reaches an investor's inbox.</p>
+      <svg class="svg-pipeline" viewBox="0 0 820 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <marker id="arr10" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#1e3a5f" opacity="0.4"/>
+    </marker>
+  </defs>
+  <line class="anim-line" x1="178" y1="48" x2="218" y2="48" stroke="#1e3a5f" stroke-width="1.4" stroke-opacity="0.35" marker-end="url(#arr10)" stroke-dasharray="200" style="--dash-len:200"/>
+  <line class="anim-line" x1="373" y1="48" x2="413" y2="48" stroke="#1e3a5f" stroke-width="1.4" stroke-opacity="0.35" marker-end="url(#arr10)" stroke-dasharray="200" style="--dash-len:200"/>
+  <line class="anim-line" x1="568" y1="48" x2="608" y2="48" stroke="#1e3a5f" stroke-width="1.4" stroke-opacity="0.35" marker-end="url(#arr10)" stroke-dasharray="200" style="--dash-len:200"/>
+  <g class="anim-node">
+    <rect x="4" y="12" width="171" height="72" rx="7" fill="#faf6ef" stroke="rgba(30,58,95,0.28)" stroke-width="1.4"/>
+    <text x="90" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#1e3a5f" letter-spacing="1.2">TRIGGER</text>
+    <text x="90" y="55" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#1a1814">Round described</text>
+    <text x="90" y="72" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#8a8478">Telegram command</text>
+  </g>
+  <g class="anim-node">
+    <rect x="222" y="12" width="148" height="72" rx="7" fill="#faf6ef" stroke="rgba(30,58,95,0.28)" stroke-width="1.4"/>
+    <text x="296" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#1e3a5f" letter-spacing="1.2">LIVE DATA</text>
+    <text x="296" y="54" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1a1814">Web search</text>
+    <text x="296" y="71" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1a1814">for fits</text>
+  </g>
+  <g class="anim-node">
+    <rect x="416" y="12" width="149" height="72" rx="7" fill="#faf6ef" stroke="rgba(30,58,95,0.28)" stroke-width="1.4"/>
+    <text x="490" y="34" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#1e3a5f" letter-spacing="1.2">REASONING</text>
+    <text x="490" y="54" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1a1814">Score +</text>
+    <text x="490" y="71" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1a1814">personalize</text>
+  </g>
+  <g class="anim-node">
+    <rect x="611" y="12" width="205" height="72" rx="7" fill="rgba(30,58,95,0.05)" stroke="rgba(30,58,95,0.45)" stroke-width="1.6"/>
+    <text x="713" y="32" text-anchor="middle" font-family="Geist Mono,monospace" font-size="9" fill="#1e3a5f" letter-spacing="1.2">ACTION</text>
+    <text x="713" y="52" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#1e3a5f">Gmail draft</text>
+    <text x="713" y="68" text-anchor="middle" font-family="Fraunces,serif" font-size="13" fill="#1e3a5f" font-style="italic">never auto-sent</text>
+    <!-- lock icon hint -->
+    <text x="713" y="83" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#8a8478">you review · you send</text>
+  </g>
+</svg>
+      <p style="margin-top:var(--s-3); font-family:'Geist Mono',monospace; font-size:0.82rem; color:var(--ink-mute); letter-spacing:0.06em; border-left: 2px solid var(--rule); padding-left:var(--s-2);">This agent creates drafts only. Nothing reaches an investor's inbox without you reviewing and sending it manually.</p>
+    </div>
+    <div class="folio">10<sup>/16</sup></div>
+  </div>
+
+  <!-- 11 — ROUND DESCRIPTION -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Build B</span><span class="dot">·</span><span class="topic">Your Round</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">First, describe your round</span>
+      <h1>Stage. Sector. Geography. Check size.</h1>
+      <p class="lede mt-3">Pre-fundraise and not sure yet? Fill in your best guess for your next planned round — this is a rehearsal, not a live submission.</p>
+      <div class="prompt mt-4">"I'm raising a [stage] round in [sector], based in [geography], looking for [check size] checks. Here's anything else that matters: [your notes]."</div>
+    </div>
+    <div class="folio">11<sup>/16</sup></div>
+  </div>
+
+  <!-- 12 — BUILD STEP B -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Build B</span><span class="dot">·</span><span class="topic">Hands-On</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter" style="animation: popIn 0.55s cubic-bezier(0.22,1,0.36,1) both 0.1s; display:block;">B</div>
+      <div>
+        <div class="ex-meta">Build Step · 40 minutes</div>
+        <h1>Search. Score. Draft. Never auto-send.</h1>
+        <p class="lede mt-3">Follow Part 2 of your Hermes Build Recipe.</p>
+        <div class="prompt mt-4">"Search for active [stage] investors in [sector] who invest in [geography]-based startups, with check sizes around [target]. Give me 5-8 real, currently active funds with typical check size, stage focus, and a source link."</div>
+      </div>
+    </div>
+    <div class="folio">12<sup>/16</sup></div>
+  </div>
+
+  <!-- 13 — BUILD B DEBRIEF -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Build B</span><span class="dot">·</span><span class="topic">Debrief</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <p class="display"><span style="float:left; font-family:'Fraunces',serif; font-size:5.2em; line-height:0.82; font-weight:400; color:var(--terra); padding:0.05em 0.12em 0 0; font-variation-settings:'opsz' 144, 'WONK' 1;">T</span>wo agents built. Both pass the same three-part test. <span class="marked">Everything else is just — which tools, which data.</span></p>
+    </div>
+    <div class="folio">14<sup>/16</sup></div>
+  </div>
+
+  <!-- 15 — GENERALIZE INTRO -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">The Catalog</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Same pattern. Any domain.</span>
+      <h1>51 real agent ideas across six ops domains.</h1>
+      <p class="lede mt-3">Sales · Hiring · Investor relations · Marketing · Product feedback · Finance. Each one is a trigger, a live data source, and an action in another system.</p>
+      <div class="rule mt-4"></div>
+      <p class="mt-3">Browse the catalog. Find the shape that fits your bottleneck. You're not building this one today — you're sketching it.</p>
+    </div>
+    <div class="folio">15<sup>/19</sup></div>
+  </div>
+
+  <!-- 16 — SKETCH -->
+  <div class="slide exercise-slide">
+    <div class="running-head">
+      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">Your Own Domain</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <div class="ex-letter" style="animation: popIn 0.55s cubic-bezier(0.22,1,0.36,1) both 0.1s; display:block;">C</div>
+      <div>
+        <div class="ex-meta">Sketch · 20 minutes</div>
+        <h1>Same pattern. Your bottleneck.</h1>
+        <p class="lede mt-3">You named it this morning. Now sketch it: trigger, live data, reasoning, action. Browse the 51-idea catalog for a starting shape.</p>
+        <div style="margin-top:var(--s-4); background:var(--ink-blue-soft); border:1px solid rgba(30,58,95,0.2); border-left:3px solid var(--ink-blue); padding:var(--s-3); font-family:'Geist Mono',monospace; font-size:0.9rem; color:var(--ink-blue); letter-spacing:0.04em; position:relative;">
+  <span style="position:absolute; top:-0.6em; left:var(--s-3); background:var(--paper); padding:0 0.6em; font-size:0.62rem; letter-spacing:0.2em; color:var(--ink-blue); font-weight:500;">THE PATTERN — sketch this, don't paste it into Hermes</span>
+  TRIGGER → LIVE DATA → LLM REASONING → ACTION
+</div>
+      </div>
+    </div>
+    <div class="folio">16<sup>/19</sup></div>
+  </div>
+
+  <!-- 17 — PEER SHARE-OUTS -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Generalize</span><span class="dot">·</span><span class="topic">Share-Outs</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow cool">Peer share-out</span>
+      <h1>Trigger. Data. Action. <em class="terra" style="font-style:italic;">30 seconds each.</em></h1>
+      <p class="lede mt-3">Not the whole design — just: what starts the agent, what it reads, and what it does. One sentence is enough.</p>
+    </div>
+    <div class="folio">17<sup>/19</sup></div>
+  </div>
+
+  <!-- 19 — CLOSE -->
+  <div class="slide">
+    <div class="running-head">
+      <div class="left"><span>Close</span><span class="dot">·</span><span class="topic">— End —</span></div>
+      <span class="pub-title">Founder's Guide to Agents</span>
+    </div>
+    <div class="slide-body">
+      <span class="eyebrow">Before you go</span>
+      <h1>Two agents running. A third <em class="terra" style="font-style:italic;">sketched</em>.</h1>
+      <p class="lede mt-3">One thing to do this week: run your Repo Digest agent for real, on a real schedule, and actually read what it tells you. That's the whole test of whether today was worth your Saturday.</p>
+      <div class="rule-double mt-4"></div>
+      <p class="mt-3">Thank you for building with us today.</p>
+      <div class="rule mt-4"></div>
+      <p style="font-family:'Geist Mono',monospace; font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-mute); margin-top:var(--s-2);">
+        Shantanu Chandra · <a href="https://linkedin.com/in/chandrashantanu" style="color:var(--terra); text-decoration:none; letter-spacing:0.08em;">linkedin.com/in/chandrashantanu</a>
+      </p>
+    </div>
+    <div class="folio">19<sup>/19</sup></div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">Prev</button>
+  <button onclick="next()">Next</button>
+</div>
+
+<script>
+  const slideQuestions = [
+    // 0: Cover
+    "What would make today worth four hours of your time?",
+    // 1: Round-Robin Opener
+    "Which repetitive operational task would you happily stop doing yourself?",
+    // 2: Mental Model 2x2
+    "Where does that task sit on frequency and judgment — and is an agent actually the right answer?",
+    // 3: Agent vs. Prompt (inlined — skipped by JS below)
+    "Which of the three agent tests does your current AI workflow fail?",
+    // 4: Today's Roadmap
+    "What proof will you have by 2pm that an agent is genuinely working?",
+    // 5: Build A Intro
+    "Who needs this digest, and what decision should it make easier?",
+    // 6: Build Step A
+    "Can you show one live source, one output, and one successful run?",
+    // 7: Build A Debrief (inlined — skipped by JS below)
+    "Could a non-technical co-founder understand what changed from this output?",
+    // 8: Break
+    "What single blocker should you clear before Build B begins?",
+    // 9: Build B Intro
+    "Where is your human approval gate — and what must never auto-send?",
+    // 10: Your Round
+    "What facts would make an investor a credible fit rather than a search result?",
+    // 11: Build Step B
+    "Can every recommendation be traced to a current source before a draft is created?",
+    // 12: Build B Debrief
+    "Would you be comfortable reviewing this draft, and can you explain its personalization?",
+    // 13: Generalize Intro
+    "Which of your ops bottlenecks has enough frequency and structure to earn a one-week experiment?",
+    // 14: Sketch exercise
+    "What is the smallest safe version of your next agent you could test for one week?",
+    // 15: Peer Share-Outs
+    "What would make this agent useful next Monday rather than merely impressive today?",
+    // 16: Close
+    "What scheduled run or review will you set up before the week ends?"
+  ];
+
+  document.querySelectorAll('.slide').forEach((slide, index) => {
+    const body = slide.querySelector('.slide-body');
+    const question = slideQuestions[index];
+    if (!body || !question) return;
+    if (index === 3) return; // question is inlined on this slide
+    if (index === 7) return; // question is inlined on this slide
+    const card = document.createElement('aside');
+    card.className = 'slide-question';
+    card.setAttribute('aria-label', 'Question to answer');
+    card.innerHTML = `<span class="q-label">Question</span><p>${question}</p>`;
+    body.appendChild(card);
+  });
+
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const MASTER_KEY = 'founders_guide_agents_slide_master';
+  document.querySelectorAll('.folio').forEach((folio, index) => {
+    folio.innerHTML = `${index + 1}<sup>/${totalSlides}</sup>`;
+  });
+  let current = 0;
+
+  function show(index) {
+    current = Math.max(0, Math.min(totalSlides - 1, index));
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    document.getElementById('progressThread').style.width = `${((current + 1) / totalSlides) * 100}%`;
+    try { localStorage.setItem('founders_guide_agents_learner_slide', String(current)); } catch (e) {}
+
+    if (slides[current] && slides[current].classList.contains('break-slide')) {
+      startBreakClock();
+    } else {
+      stopBreakClock();
+    }
+  }
+
+  function next() { if (current < totalSlides - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(totalSlides - 1);
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  // Break-clock — 15-min countdown (this session uses a longer in-person break than the 10-min virtual default)
+  let breakInterval = null;
+  function startBreakClock() {
+    stopBreakClock();
+    let total = 15 * 60;
+    const el = document.getElementById('breakClock');
+    if (!el) return;
+    function tick() {
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      el.classList.toggle('warn', total <= 120 && total > 30);
+      el.classList.toggle('danger', total <= 30);
+      total--;
+      if (total < 0) { stopBreakClock(); el.textContent = '00:00'; }
+    }
+    tick();
+    breakInterval = setInterval(tick, 1000);
+  }
+  function stopBreakClock() {
+    if (breakInterval) { clearInterval(breakInterval); breakInterval = null; }
+    const el = document.getElementById('breakClock');
+    if (el) el.classList.remove('warn', 'danger');
+  }
+
+
+  const PRINT_KEY = 'founders_guide_agents_print_request';
+  let lastPrintStamp = '';
+  window.addEventListener('storage', (e) => {
+    if (e.key === MASTER_KEY) {
+      const target = parseInt(e.newValue, 10);
+      if (isNaN(target) || target < 0 || target >= totalSlides) return;
+      if (target !== current) show(target);
+      return;
+    }
+    if (e.key === PRINT_KEY && e.newValue && e.newValue !== lastPrintStamp) {
+      lastPrintStamp = e.newValue;
+      printAsPdf();
+    }
+  });
+
+  const PDF_FILENAME = "Founder's Guide to Agents";
+  const ORIGINAL_TITLE = document.title;
+
+  function fitSlidesForPrint() {
+    const slides = document.querySelectorAll('.slide');
+    const SLIDE_W = 1280;
+    const SLIDE_H = 720;
+    const PAD_TOP = 38.4;
+    const PAD_X = 57.6;
+    const PAD_BOTTOM = 48;
+    const CONTENT_H = SLIDE_H - PAD_TOP - PAD_BOTTOM;
+
+    const snapshots = [];
+    slides.forEach(slide => {
+      snapshots.push({ el: slide, cssText: slide.style.cssText });
+      slide.style.cssText = `
+        position: absolute !important;
+        left: -10000px !important;
+        top: 0 !important;
+        width: ${SLIDE_W}px !important;
+        height: ${SLIDE_H}px !important;
+        padding: ${PAD_TOP}px ${PAD_X}px ${PAD_BOTTOM}px !important;
+        display: flex !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        transform: none !important;
+      `;
+    });
+    void document.body.offsetHeight;
+
+    slides.forEach(slide => {
+      const body = slide.querySelector('.slide-body');
+      if (!body) return;
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+      const naturalHeight = body.scrollHeight;
+      if (naturalHeight > CONTENT_H) {
+        const scale = CONTENT_H / naturalHeight;
+        body.style.transformOrigin = 'top left';
+        body.style.transform = `scale(${scale.toFixed(4)})`;
+        body.style.width = `${(100 / scale).toFixed(2)}%`;
+      }
+    });
+
+    snapshots.forEach(s => { s.el.style.cssText = s.cssText; });
+  }
+
+  function resetSlideFit() {
+    document.querySelectorAll('.slide-body').forEach(body => {
+      body.style.transform = '';
+      body.style.transformOrigin = '';
+      body.style.width = '';
+    });
+  }
+
+  function printAsPdf() {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+    setTimeout(() => { window.print(); }, 150);
+  }
+
+  window.addEventListener('beforeprint', () => {
+    document.title = PDF_FILENAME;
+    fitSlidesForPrint();
+  });
+  window.addEventListener('afterprint',  () => {
+    document.title = ORIGINAL_TITLE;
+    resetSlideFit();
+  });
+
+  (function init() {
+    try {
+      const master = parseInt(localStorage.getItem(MASTER_KEY) || '', 10);
+      if (!isNaN(master) && master >= 0 && master < totalSlides) { show(master); return; }
+      const saved = parseInt(localStorage.getItem('founders_guide_agents_learner_slide') || '0', 10);
+      if (!isNaN(saved) && saved >= 0 && saved < totalSlides) { show(saved); return; }
+    } catch (e) {}
+    show(0);
+  })();
+</script>
+</body>
+</html>

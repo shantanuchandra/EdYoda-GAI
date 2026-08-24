@@ -19,6 +19,7 @@ function decodeHtmlAttribute(value: string): string {
     .replaceAll("&amp;", "&")
     .replaceAll("&quot;", '"')
     .replaceAll("&#39;", "'")
+    .replace(/&#x27;/gi, "'")
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 }

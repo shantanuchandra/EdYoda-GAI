@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<!--
+================================================================
+LinkedIn Carousel Template — A Field Guide series
+================================================================
+
+BEFORE YOU OPEN THE FIRST SLIDE:
+  1. Read [[linkedin_carousel_hook_research]] in memory. The cover is the
+     only KPI that matters; do not draft it without re-reading the four
+     hook archetypes and the under-200-char / specificity rules.
+  2. Read [[feedback_slide_geometry_clipping]] in memory. The cover
+     layout's SVG-margin-not-parent-padding rule is load-bearing — if you
+     break it, the cover footer disappears.
+  3. Pick exactly ONE hook archetype for the cover: contrarian, research,
+     story/confession, or specific-stakes. Match it to the carousel content.
+
+USE OF PLACEHOLDERS:
+  {{PLACEHOLDER}} = required, fill in.
+  {{PLACEHOLDER — guidance}} = required with author guidance.
+  <!-- COMPONENT: foo --> = an unused component palette block below the
+     active slide; copy into a slide body and customise. Don't ship a
+     carousel with COMPONENT blocks visible.
+
+SLIDE STRUCTURE (10 slides, 1080×1080, paper-editorial aesthetic):
+  01 — Cover (hook + pipeline/visual + sub-caption + headline + subhead)
+  02 — Thesis (the fundamental, stated once, big pull-quote)
+  03 — Mechanism (numbered steps showing why)
+  04 — Proof (a real case, compressed onto one slide)
+  05 — Receipt (expected-vs-actual side-by-side)
+  06 — Generalise (beyond the specific case)
+  07–09 — Toolkit / Defences (one numbered defence per slide, with
+          copy-ready snippets)
+  10 — CTA close (workshop offer + secondary "cheat sheet" DM offer)
+
+This is the canonical shape; deviate only with good reason.
+
+COMPONENT PALETTE (all CSS is in <style> below):
+  .pipeline                  — N-node horizontal flow
+  .node-detail               — single node with inputs/output
+  .vs-cards                  — expected vs actual side-by-side
+  .platforms                 — platform-access matrix
+  .mechanism                 — numbered step list (one highlight in danger)
+  .snippet-block             — dark code-card with copy-ready prompt
+  .defence-num               — giant background numeral
+  .hallucination-receipt     — receipt-style code block for failure proof
+  .build-card                — compressed N-node build summary
+  .tip-list                  — large-numeral tip list (defences, takeaways)
+  .pull-quote / .quote-sub   — big italic pull-quote with terra glyph
+  .stat-strip                — N-cell stat row with citation slots
+  .change-divider            — chatbot-vs-agent two-column with arrow
+  .funnel + .funnel-row      — decision-funnel row stack
+  .word-chips, .takehome, .chat-cue  (learner-deck shared components)
+
+REGENERATE PDF (after edits):
+  /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+    --headless=new --disable-gpu --no-sandbox --no-pdf-header-footer \
+    --virtual-time-budget=12000 \
+    --print-to-pdf="linkedin_carousel.pdf" \
+    "file:///path/to/linkedin_carousel.html"
+
+================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Carousel — My AI posted to Instagram for weeks. An eval showed me it was failing. · A Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #f5efe6;
+    --paper-warm:   #ede4d3;
+    --paper-cream:  #faf6ef;
+    --ink:          #1a1814;
+    --ink-soft:     #4a463e;
+    --ink-mute:     #8a8478;
+    --ink-faint:    #b8b1a3;
+    --rule:         #d4ccba;
+    --rule-soft:    #e3dccb;
+
+    --terra:        #b8431b;
+    --terra-soft:   rgba(184, 67, 27, 0.10);
+    --ink-blue:     #1e3a5f;
+    --warn:         #a16207;
+    --danger:       #991b1b;
+    --calm:         #14532d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #2a2724;
+    font-family: 'Geist', sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px;
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .square {
+    width: 1080px;
+    height: 1080px;
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .square::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.45;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  .square::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(26, 24, 20, 0.10) 100%);
+  }
+
+  .square-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 80px 90px;
+  }
+
+  .running-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-mute);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .running-head .pub-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .running-head .left { display: flex; gap: 24px; align-items: baseline; }
+  .running-head .left .dot { color: var(--ink-faint); }
+
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  .folio {
+    position: absolute;
+    bottom: 30px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 140px;
+    line-height: 0.8;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    letter-spacing: -0.04em;
+    z-index: 0;
+    opacity: 0.55;
+  }
+  .folio sup {
+    font-size: 0.32em;
+    vertical-align: top;
+    margin-left: 0.15em;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  .swipe {
+    position: absolute;
+    bottom: 38px;
+    left: 80px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terra);
+    z-index: 5;
+    font-weight: 500;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: 36px;
+    position: relative;
+    padding-left: 2em;
+  }
+  .eyebrow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1.5em;
+    height: 1px;
+    background: var(--terra);
+  }
+
+  h1, .display, .mega {
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    font-weight: 300;
+  }
+
+  h1 {
+    font-size: 78px;
+    line-height: 1.02;
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+  }
+
+  .display {
+    font-size: 104px;
+    line-height: 0.98;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+  }
+
+  .mega {
+    font-size: 132px;
+    line-height: 0.92;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  em.terra-em { font-style: italic; color: var(--terra); }
+  em.blue-em { font-style: italic; color: var(--ink-blue); }
+  em.danger-em { font-style: italic; color: var(--danger); }
+  em.calm-em { font-style: italic; color: var(--calm); }
+
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 22ch;
+    font-variation-settings: 'opsz' 60;
+  }
+
+  .lede-block {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 30ch;
+    margin-top: 36px;
+    font-variation-settings: 'opsz' 60;
+  }
+  .lede-block strong { color: var(--ink); font-weight: 400; }
+  .lede-block em { font-style: italic; color: var(--terra); }
+
+  .drop {
+    float: left;
+    font-family: 'Fraunces', serif;
+    font-size: 5.6em;
+    line-height: 0.82;
+    font-weight: 400;
+    color: var(--terra);
+    padding: 0.05em 0.12em 0 0;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+  }
+
+  .rule-double { height: 6px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: 32px 0; }
+
+  /* ===================== CHANGE CARDS (2–6) ===================== */
+  .change-num {
+    font-family: 'Fraunces', serif;
+    font-size: 280px;
+    line-height: 0.85;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    position: absolute;
+    right: 80px;
+    top: 140px;
+    opacity: 0.10;
+    z-index: 0;
+  }
+
+  .change-divider {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 0;
+    margin-top: 48px;
+    align-items: stretch;
+  }
+  .change-divider .col .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 22px;
+    font-weight: 500;
+  }
+  .change-divider .col.after .label { color: var(--terra); }
+  .change-divider .col .head {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 14px;
+    font-variation-settings: 'opsz' 60;
+  }
+  .change-divider .col .desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    font-variation-settings: 'opsz' 30;
+  }
+  .change-divider .vdiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .change-divider .vdiv .arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    color: var(--terra);
+    line-height: 1;
+  }
+  .change-divider .vdiv .vline {
+    width: 1px;
+    flex: 1;
+    background: linear-gradient(180deg, transparent 0%, var(--rule) 20%, var(--rule) 80%, transparent 100%);
+  }
+
+  /* ===================== LOOP DIAGRAM (Card 6) ===================== */
+  .loop-diagram {
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .loop-diagram svg { overflow: visible; }
+
+  /* ===================== FUNNEL (Card 7) ===================== */
+  .funnel {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 2px solid var(--ink);
+  }
+  .funnel-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 28px;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .funnel-row .q-num {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+  }
+  .funnel-row .q-text {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 60;
+  }
+  .funnel-row .q-text em {
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 16px;
+    display: block;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+  .funnel-row .q-answer {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 10px 18px;
+    font-weight: 600;
+  }
+  .funnel-row .q-answer.terra { background: var(--terra); }
+  .funnel-foot {
+    margin-top: 28px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 36;
+  }
+  .funnel-foot strong { color: var(--terra); font-weight: 500; font-style: normal; }
+
+  /* ===================== QUOTE CARD (Card 8) =====================
+     The .pull-quote uses a decorative ::before quote glyph.
+     RCA fix: previously the glyph was positioned `left: -0.6em` outside
+     the quote's box, which bled past the slide's padding edge whenever
+     the parent font-size was overridden upward (slide 2 uses 82px).
+     New approach: indent the quote text via padding-left so the glyph
+     sits INSIDE the quote's bounding box, not outside it. Glyph
+     position is now expressed in absolute px tied to the indent. */
+  .pull-quote {
+    font-family: 'Fraunces', serif;
+    font-size: 76px;
+    line-height: 1.05;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
+    font-style: italic;
+    margin: 36px 0 28px;
+    position: relative;
+    padding-left: 1.1em;
+  }
+  .pull-quote::before {
+    content: '\201C';
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    font-size: 1.4em;
+    color: var(--terra);
+    font-style: normal;
+    line-height: 1;
+    opacity: 0.55;
+  }
+  .pull-quote em { color: var(--terra); font-style: italic; }
+  .quote-sub {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    max-width: 38ch;
+    font-variation-settings: 'opsz' 36;
+  }
+  .quote-sub strong {
+    color: var(--ink);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .quote-attrib {
+    margin-top: 22px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+  }
+
+  /* ===================== STAT STRIP (Card 9) ===================== */
+  .stat-strip {
+    margin-top: 40px;
+    padding-top: 26px;
+    border-top: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .stat-strip .cell {
+    padding: 0 18px;
+    border-right: 1px dotted var(--rule);
+    text-align: center;
+  }
+  .stat-strip .cell:last-child { border-right: none; }
+  .stat-strip .cell .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .stat-strip .cell .val {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'opsz' 144;
+  }
+  .stat-strip .cell .val .unit {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-left: 3px;
+    font-variation-settings: 'opsz' 30;
+  }
+  .stat-strip .cell .note {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-top: 6px;
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 24;
+  }
+
+  .track-list {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 36px;
+  }
+  .track-list .track {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 14px;
+    align-items: baseline;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .track-list .track .n {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--terra);
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .track-list .track .t {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 36;
+  }
+  .track-list .track .t em {
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 14px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ===================== CTA CARD (Card 10) ===================== */
+  .closing .body {
+    justify-content: space-between !important;
+    padding: 40px 0 0 !important;
+  }
+  .closing-stamp {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+    margin-bottom: 28px;
+  }
+  .ask-primary { margin-bottom: 32px; }
+  .ask-primary .ask-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 72px;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144, 'SOFT' 40, 'WONK' 1;
+    max-width: 14ch;
+  }
+  .ask-primary .ask-headline em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .ask-primary .ask-action {
+    margin-top: 28px;
+    display: inline-block;
+    padding: 14px 28px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .ask-primary .ask-action span.kw { color: var(--terra); font-weight: 600; }
+  .ask-primary .ask-help {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-mute);
+    margin-top: 18px;
+    line-height: 1.45;
+    max-width: 32ch;
+    font-variation-settings: 'opsz' 30;
+  }
+  .ask-secondary {
+    padding: 24px 0;
+    border-top: 1px dotted var(--rule);
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+  .ask-secondary .a-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--terra);
+    line-height: 1;
+    font-variant-numeric: oldstyle-nums;
+    flex-shrink: 0;
+  }
+  .ask-secondary .a-text {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-variation-settings: 'opsz' 36;
+  }
+  .ask-secondary .a-text em {
+    font-style: italic;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .sig-block {
+    padding-top: 32px;
+    border-top: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+    padding-bottom: 6px;
+  }
+  .sig-block .sig-name {
+    font-family: 'Fraunces', serif;
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    font-variation-settings: 'opsz' 80;
+  }
+  .sig-block .sig-role {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-mute);
+    margin-top: 12px;
+    font-variation-settings: 'opsz' 24;
+    max-width: 32ch;
+    line-height: 1.4;
+  }
+  .sig-block .sig-li {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .sig-block .sig-li .li-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .sig-block .sig-li .li-url {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .sig-block .sig-li .li-url .handle { color: var(--terra); }
+  .sig-block .sig-li .li-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+
+  /* ===================== COVER (Card 1) ===================== */
+  .cover-slide .body {
+    justify-content: flex-end;
+    padding-bottom: 0;
+  }
+  .cover-byline {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .cover-footer {
+    margin-top: 32px;
+    padding-top: 22px;
+    border-top: 1px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+  .cover-footer .terra { color: var(--terra); }
+
+  /* ===================== CASE-STUDY COMPONENT STYLES ===================== */
+
+  /* Three-node pipeline diagram (slide 2, also reused on cover) */
+  .pipeline {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  .pipeline .node {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--terra);
+    padding: 28px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pipeline .node .n-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 500;
+  }
+  .pipeline .node .n-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+    font-variation-settings: 'opsz' 60;
+  }
+  .pipeline .node .n-job {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 30;
+    margin-top: auto;
+  }
+  .pipeline .arrow {
+    align-self: center;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    color: var(--terra);
+    line-height: 1;
+  }
+
+  /* Single-node detail card (slides 3, 4, 5) */
+  .node-detail {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  .node-detail .side {
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    padding: 30px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .node-detail .side.in { border-left: 3px solid var(--ink-mute); }
+  .node-detail .side.out { border-left: 3px solid var(--terra); }
+  .node-detail .side .io-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .node-detail .side.out .io-label { color: var(--terra); }
+  .node-detail .side .io-content {
+    font-family: 'Geist Mono', monospace;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  .node-detail .side .io-content .field {
+    display: block;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .node-detail .side .io-content .field:last-child { border-bottom: none; }
+  .node-detail .side .io-content .field .k {
+    color: var(--ink-mute);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+  .node-detail .side .io-content .field .v {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .node-detail .arrow-col {
+    align-self: center;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    color: var(--terra);
+    line-height: 1;
+  }
+  .node-detail .arrow-col .arrow-label {
+    display: block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-top: 8px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  /* Big number badge for "Node N" mast (top-right of slides 3-5) */
+  .node-badge {
+    position: absolute;
+    top: 140px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-size: 260px;
+    line-height: 0.85;
+    color: var(--terra);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    opacity: 0.10;
+    z-index: 0;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+
+  /* Expected vs Actual (slide 6 — the failure) */
+  .vs-cards {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .vs-card {
+    padding: 26px 28px;
+    border: 1px solid var(--rule);
+    background: var(--paper-cream);
+  }
+  .vs-card.expected { border-left: 3px solid var(--calm); }
+  .vs-card.actual {
+    border-left: 3px solid var(--danger);
+    background: rgba(153, 27, 27, 0.04);
+  }
+  .vs-card .vs-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .vs-card.expected .vs-label { color: var(--calm); }
+  .vs-card.actual .vs-label { color: var(--danger); }
+  .vs-card .vs-head {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 18px;
+    font-variation-settings: 'opsz' 60;
+  }
+  .vs-card .vs-list {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .vs-card .vs-list .row {
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: block;
+  }
+  .vs-card .vs-list .row:last-child { border-bottom: none; }
+  .vs-card .vs-list .row .glitch {
+    color: var(--danger);
+    text-decoration: line-through;
+    text-decoration-color: rgba(153, 27, 27, 0.5);
+  }
+  .vs-card .vs-foot {
+    margin-top: 16px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 24;
+  }
+  .vs-card.actual .vs-foot { color: var(--danger); }
+
+  /* Platform-access matrix (slide 7) */
+  .platforms {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 28px;
+  }
+  .platform {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .platform:nth-child(-n+2) { border-top: 2px solid var(--ink); }
+  .platform .p-icon {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--ink);
+    font-weight: 500;
+    text-align: center;
+  }
+  .platform .p-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.2;
+    font-variation-settings: 'opsz' 60;
+  }
+  .platform .p-name em {
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 13px;
+    display: block;
+    margin-top: 3px;
+    font-weight: 300;
+  }
+  .platform .p-status {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .platform .p-status.blocked { background: var(--danger); color: var(--paper); }
+  .platform .p-status.paid { background: var(--warn); color: var(--paper); }
+  .platform .p-status.open { background: var(--calm); color: var(--paper); }
+  .platform .p-status.tos { background: var(--ink-mute); color: var(--paper); }
+
+  /* Numbered tip list (slide 9 — what you do instead) */
+  .tip-list {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .tip {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    padding: 22px 0;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .tip:last-child { border-bottom: 1px solid var(--rule); }
+  .tip .t-num {
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--terra);
+    font-variant-numeric: tabular-nums oldstyle-nums;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+  }
+  .tip .t-body .t-head {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    color: var(--ink);
+    line-height: 1.25;
+    font-variation-settings: 'opsz' 60;
+    margin-bottom: 6px;
+  }
+  .tip .t-body .t-head em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .tip .t-body .t-desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    font-variation-settings: 'opsz' 30;
+  }
+
+  /* Defence-slide layout (slides 7, 8, 9 in new arc) */
+  .defence-num {
+    position: absolute;
+    top: 130px;
+    right: 80px;
+    font-family: 'Fraunces', serif;
+    font-size: 240px;
+    line-height: 0.85;
+    color: var(--terra);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    opacity: 0.10;
+    z-index: 0;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .defence-num .of {
+    font-size: 0.35em;
+    color: var(--ink-mute);
+    opacity: 0.6;
+    margin-left: 0.1em;
+  }
+
+  .snippet-block {
+    margin-top: 28px;
+    padding: 26px 30px;
+    background: var(--ink);
+    color: var(--paper);
+    border-left: 4px solid var(--terra);
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    line-height: 1.7;
+    position: relative;
+  }
+  .snippet-block .s-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .snippet-block .s-code {
+    white-space: pre-wrap;
+    color: var(--paper);
+  }
+  .snippet-block .s-code em {
+    color: #f5c69a;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .snippet-block .s-foot {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(245, 239, 230, 0.18);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: rgba(245, 239, 230, 0.75);
+    line-height: 1.45;
+    font-variation-settings: 'opsz' 30;
+  }
+
+  /* Mechanism diagram — slide 3 ("why agents fill the gap") */
+  .mechanism {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .mechanism .step {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 22px 28px;
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+  }
+  .mechanism .step.failure {
+    border-left-color: var(--danger);
+    background: rgba(153, 27, 27, 0.05);
+  }
+  .mechanism .step .m-num {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--ink-mute);
+    font-weight: 300;
+    font-variant-numeric: tabular-nums oldstyle-nums;
+  }
+  .mechanism .step.failure .m-num { color: var(--danger); }
+  .mechanism .step .m-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 60;
+  }
+  .mechanism .step .m-text em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .mechanism .step.failure .m-text em { color: var(--danger); }
+  .mechanism .step .m-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .mechanism .step.failure .m-tag {
+    color: var(--paper);
+    background: var(--danger);
+    padding: 5px 10px;
+    font-weight: 600;
+  }
+
+  /* Compressed HR-proof slide (slide 4 — the build, on one slide) */
+  .build-card {
+    margin-top: 36px;
+    padding: 32px;
+    background: var(--paper-cream);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--ink);
+  }
+  .build-card .bc-head {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .build-card .bc-pipeline {
+    display: grid;
+    grid-template-columns: 1fr 24px 1fr 24px 1fr;
+    gap: 0;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .build-card .bc-node {
+    padding: 16px 18px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--terra);
+    text-align: center;
+  }
+  .build-card .bc-node .bcn-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--terra);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .build-card .bc-node .bcn-name {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.15;
+    font-variation-settings: 'opsz' 60;
+  }
+  .build-card .bc-arrow {
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    color: var(--terra);
+    line-height: 1;
+  }
+  .build-card .bc-flow {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    text-align: center;
+    font-variation-settings: 'opsz' 30;
+    border-top: 1px dotted var(--rule);
+    padding-top: 18px;
+  }
+  .build-card .bc-flow strong {
+    color: var(--ink);
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  /* "URL pattern" code block — slide 8 hallucination receipt */
+  .hallucination-receipt {
+    margin: 28px 0;
+    padding: 22px 26px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--danger);
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  .hallucination-receipt .r-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--danger);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .hallucination-receipt .url {
+    color: var(--ink);
+  }
+  .hallucination-receipt .url .fake {
+    color: var(--danger);
+    background: rgba(153, 27, 27, 0.08);
+    padding: 1px 4px;
+  }
+
+  /* ===================== TOOLBAR / PRINT ===================== */
+  @media print {
+    @page {
+      size: 11.25in 11.25in;
+      margin: 0;
+    }
+    html, body {
+      background: white !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 11.25in;
+    }
+    .stage {
+      gap: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+    }
+    .square {
+      width: 11.25in !important;
+      height: 11.25in !important;
+      box-shadow: none !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .square:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    .toolbar { display: none !important; }
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    .square::before {
+      background-image: none !important;
+      opacity: 0 !important;
+    }
+    .square::after {
+      opacity: 1 !important;
+    }
+  }
+
+  .toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(245, 239, 230, 0.96);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 10px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .toolbar button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background 200ms ease;
+  }
+  .toolbar button:hover { background: var(--terra); }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>10 slides · 1080 × 1080</span>
+  <button onclick="window.print()">⤓ Export PDF</button>
+</div>
+
+<div class="stage">
+
+  <!-- ====================================================== -->
+  <!-- 01 — COVER : the only KPI is the swipe.
+       Before drafting: re-read [[linkedin_carousel_hook_research]] in memory.
+       Pick ONE archetype: contrarian, research, story/confession, specific-stakes.
+       Headline ≤ 80 chars on the rendered slide, ONE terra-italic accent word.
+       Subhead carries the specificity (numbers, names, mechanism), ≤ 150 chars.
+       SVG sub-caption narrates the visual, does NOT echo the headline. -->
+  <!-- ====================================================== -->
+  <div class="square cover-slide">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Field Notes</span><span class="dot">·</span><span>No. 03</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+
+      <!-- Hero illustration.
+           LOAD-BEARING LAYOUT (do not change without re-reading
+           [[feedback_slide_geometry_clipping]] memory note):
+             - Flex slot has padding:0 so its full height goes to the SVG.
+             - SVG dimensions are deliberately SMALLER than the viewBox
+               (width 640, height 440 inside a 720×500 viewBox) so the
+               headline + cover-footer below have room.
+             - margin-top:40px on the SVG itself (NOT the parent) pushes
+               the overflow:visible arc apex clear of the running-head.
+           If you swap the inner SVG content, keep these wrappers identical. -->
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 0;">
+        <svg viewBox="0 0 720 500" width="640" height="440" style="overflow: visible; margin-top: 40px;">
+          <defs>
+            <filter id="cover-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+              <feOffset dx="0" dy="4"/>
+              <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+              <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#991b1b" stroke-width="1" opacity="0.35"/>
+            </pattern>
+          </defs>
+
+          <!-- Top arc label (semicircle, chord 540 / radius 270 → apex at y=-40).
+               This works ONLY because the SVG has overflow:visible AND the SVG
+               itself has margin-top:40px. Don't shrink the radius — the
+               half-circle look is intentional. -->
+          <path id="arc-top-c" d="M 90 230 A 270 270 0 0 1 630 230" fill="none"/>
+          <text font-family="Geist Mono, monospace" font-size="20" letter-spacing="8" fill="#a8a092" font-weight="500">
+            <textPath href="#arc-top-c" startOffset="50%" text-anchor="middle">LOOKED FINE BY EYE · FAILED BY EVAL</textPath>
+          </text>
+
+          <!-- ==== HERO DIAGRAM (replace this <g> with your topic's visual) ====
+               This worked example shows a 3-stage failure chain
+               (Source → Agent → Output). For other topics, common shapes:
+                 - Before/After two boxes
+                 - 4-quadrant matrix
+                 - Process loop with feedback arrow
+                 - Stacked layered architecture
+               Keep within y:170-310 to leave room for the sub-caption at y:380. -->
+          <g filter="url(#cover-shadow)">
+            <!-- Replace the three rects + arrows below with your diagram -->
+            <rect x="60" y="200" width="160" height="100" rx="6" fill="#faf6ef" stroke="#1a1814" stroke-width="2"/>
+            <line x1="60" y1="206" x2="220" y2="206" stroke="#b8431b" stroke-width="3"/>
+            <text x="140" y="232" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="3" fill="#b8431b" font-weight="600">THE AGENT</text>
+            <text x="140" y="258" text-anchor="middle" font-family="Fraunces, serif" font-size="18" fill="#1a1814">generates</text>
+            <text x="140" y="280" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#8a8478">— a reel a night —</text>
+
+            <text x="245" y="260" text-anchor="middle" font-family="Fraunces, serif" font-size="34" fill="#b8431b">→</text>
+
+            <rect x="270" y="200" width="180" height="100" rx="6" fill="#faf6ef" stroke="#1a1814" stroke-width="2"/>
+            <text x="360" y="234" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="3" fill="#8a8478" font-weight="600">I WATCHED IT</text>
+            <text x="360" y="262" text-anchor="middle" font-family="Fraunces, serif" font-size="20" fill="#1a1814" font-weight="400">"looks fine"</text>
+            <text x="360" y="282" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="12" fill="#8a8478">for weeks</text>
+
+            <text x="475" y="260" text-anchor="middle" font-family="Fraunces, serif" font-size="34" fill="#b8431b">→</text>
+
+            <g transform="translate(500, 200)">
+              <rect x="0" y="0" width="160" height="100" rx="6" fill="#faf6ef" stroke="#991b1b" stroke-width="2"/>
+              <rect x="0" y="0" width="160" height="100" rx="6" fill="url(#hatch)"/>
+              <text x="80" y="32" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" letter-spacing="3" fill="#991b1b" font-weight="600">THE EVAL</text>
+              <text x="80" y="58" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="18" fill="#991b1b">hook 1 / 5</text>
+              <text x="80" y="82" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#8a8478">on all 5 reels</text>
+            </g>
+          </g>
+
+          <!-- Sub-caption: narrates the visual, NEVER echoes the headline.
+               Format: process-flow ("X → Y → Z") or short tag, all-caps mono. -->
+          <text x="360" y="380" text-anchor="middle" font-family="Geist Mono, monospace" font-size="14" letter-spacing="5" fill="#b8431b" font-weight="600">GENERATE → EYEBALL → SCORE</text>
+        </svg>
+      </div>
+
+      <!-- Headline + meta block.
+           HOOK_HEADLINE: under ~80 chars rendered; ONE terra-italic accent word;
+           pick an archetype (see [[linkedin_carousel_hook_research]]). Examples:
+             • Story / confession: "I shipped an AI agent that <em>invented</em> its own facts."
+             • Contrarian:         "Your AI agent isn't <em>broken</em>. It's working as designed."
+             • Specific receipt:   "My AI scored 5/5 on quality. It still <em>failed</em> every user."
+             • Question + spoiler: "What happens when an AI agent's source returns <em>nothing</em>?"
+           HOOK_SUBHEAD: under ~150 chars; carry the SPECIFICITY (numbers, names,
+           mechanism). Promise both the universal teach AND the toolkit. -->
+      <div style="flex-shrink: 0;">
+        <div class="cover-byline">Field Notes · No. 03 · A Generative AI Field Guide</div>
+        <h1 style="font-size: 58px; line-height: 1.04; max-width: 24ch;">
+          My AI posted to Instagram for weeks. I thought it was <em class="terra-em">fine.</em>
+        </h1>
+        <p style="font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: var(--ink-mute); margin-top: 20px; max-width: 38ch; line-height: 1.4; font-variation-settings: 'opsz' 36;">Then I ran an eval. The hook scored 1 out of 5 — on all 5 reels. Here's the 5-part playbook PMs use to catch what their own eyes miss.</p>
+        <div class="cover-footer">
+          <span>A Field Guide to Generative AI · No. 03</span>
+          <span class="terra">01 / 10 · Swipe →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 02 — THE THESIS : the one-line universal claim that the rest of the
+       carousel proves. State it once, big. Two italic terra accents max.
+       quote-sub is the "this is not X, it is Y" reframe that makes the
+       thesis stickier. quote-attrib is the framing label.
+       NOTE: .pull-quote has padding-left:1.1em to fit the ::before quote
+       glyph inside the box. If you override font-size upward, do not also
+       override padding. See [[feedback_slide_geometry_clipping]] bug #2. -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The fundamental</span><span class="dot">·</span><span>One line</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body" style="justify-content: center;">
+        <span class="eyebrow">The thesis</span>
+        <p class="pull-quote" style="font-size: 82px; line-height: 1.04;">
+          You can't tell if an AI feature is good by <em>looking</em> at it.
+        </p>
+        <p class="quote-sub" style="max-width: 44ch; margin-top: 36px;">
+          A demo is a handshake. An eval is a background check. The whole job is building the background check — before you ship, not after a customer finds the bug.
+        </p>
+        <div class="quote-attrib">— the case for evals, in one line</div>
+      </div>
+      <div class="swipe">02 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">2<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 03 — THE MECHANISM : a numbered step list that shows WHY the thesis
+       on slide 2 is true. Exactly one .step.failure (highlighted in danger
+       red) marks the moment things go wrong. Closing .lede-block reframes
+       the mechanism in one honest sentence. -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The mechanism</span><span class="dot">·</span><span>5 words</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">How an eval actually works</span>
+        <h1>Every eval is built from <em class="terra-em">five</em> words.</h1>
+
+        <div class="mechanism">
+          <div class="step">
+            <div class="m-num">01</div>
+            <div class="m-text">A <em>golden set</em> — 10 inputs you already know the right answer to. Written before you ship.</div>
+            <div class="m-tag">the test</div>
+          </div>
+          <div class="step">
+            <div class="m-num">02</div>
+            <div class="m-text">A <em>metric</em> and a <em>judge</em> — what you score, and who scores it: a human, code, or an LLM.</div>
+            <div class="m-tag">score it</div>
+          </div>
+          <div class="step failure">
+            <div class="m-num">03</div>
+            <div class="m-text">Skip the <em>pass bar</em> — the line you set beforehand — and you ship on a vibe, not a number.</div>
+            <div class="m-tag">the trap</div>
+          </div>
+          <div class="step">
+            <div class="m-num">04</div>
+            <div class="m-text">Name the <em>failure modes</em> — the specific ways it breaks. You can't test for what you haven't named.</div>
+            <div class="m-tag">watch list</div>
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 28px; max-width: 46ch;">
+          The golden set is the exam. The metric is the grading scheme. The judge is the examiner. The pass bar is the cutoff. Miss any one and the eval lies to you.
+        </p>
+      </div>
+      <div class="swipe">03 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">3<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 04 — THE PROOF : a real case, COMPRESSED ONTO ONE SLIDE. This is
+       the audience-bridge — proves the thesis with concrete specifics
+       (named pipeline, named inputs, named outputs). Keep the build-card
+       to 3-5 nodes; if you need more, you have too much for a carousel.
+       The lede-block under the card pivots to the failure ("on paper X,
+       in production Y") to set up slide 5. -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>A real case</span><span class="dot">·</span><span>Proof</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">The agent I built</span>
+        <h1 style="font-size: 60px;">One agent. <em class="terra-em">Three</em> modalities. No human in the loop.</h1>
+
+        <div class="build-card">
+          <div class="bc-head">— A nightly reel generator · text + audio + video, fully automated —</div>
+          <div class="bc-pipeline">
+            <div class="bc-node">
+              <div class="bcn-num">Text</div>
+              <div class="bcn-name">writes the script + caption</div>
+            </div>
+            <div class="bc-arrow">→</div>
+            <div class="bc-node">
+              <div class="bcn-num">Audio</div>
+              <div class="bcn-name">voices it over</div>
+            </div>
+            <div class="bc-arrow">→</div>
+            <div class="bc-node">
+              <div class="bcn-num">Video</div>
+              <div class="bcn-name">picks frames + cuts</div>
+            </div>
+          </div>
+          <div class="bc-flow">
+            Every night it turns a <strong>backlog idea</strong> into a <strong>finished reel</strong> — script, voiceover, images, captions — and posts. I never touched it.
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 28px; max-width: 48ch;">
+          On paper: a content machine. In production: a confident one. Looked great every morning — which is exactly the trap.
+        </p>
+      </div>
+      <div class="swipe">04 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">4<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 05 — THE RECEIPT : expected-vs-actual, the screenshot-worthy slide.
+       This is the slide LinkedIn rewards most because it shows specific,
+       falsifiable detail. Use REAL examples (5 rows recommended). Strikethrough
+       on the actual side via <span class="glitch"> shows the lie visually.
+       The lede-block at the bottom names the human cost ("a senior X would
+       have wasted a week"). -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The receipt</span><span class="dot">·</span><span>Side by side</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">What the eval actually found</span>
+        <h1>The parts scored <span class="terra-em">great.</span> The hook scored <span class="danger-em">1 / 5.</span></h1>
+
+        <div class="vs-cards">
+          <div class="vs-card expected">
+            <div class="vs-label">— What I assumed —</div>
+            <div class="vs-head">"The reels are fine."</div>
+            <div class="vs-list">
+              <span class="row">Audio timing: clean</span>
+              <span class="row">Composition: strong</span>
+              <span class="row">Style: on-brand</span>
+              <span class="row">Hooks: good enough</span>
+              <span class="row">Ship it nightly</span>
+            </div>
+            <div class="vs-foot">Eyeballed for weeks.</div>
+          </div>
+          <div class="vs-card actual">
+            <div class="vs-label">— What the eval scored —</div>
+            <div class="vs-head">Audio 0.98. Hook 1/5.</div>
+            <div class="vs-list">
+              <span class="row">Audio timing <strong>0.98</strong> ✓ <span class="bench">‹STAT-2026-06-11›</span></span>
+              <span class="row">Composition <strong>4–5/5</strong> ✓</span>
+              <span class="row">Style <strong>4/5</strong> ✓</span>
+              <span class="row"><span class="glitch">Hook 1/5 — reel 1</span></span>
+              <span class="row"><span class="glitch">Hook 1/5 — all 5 reels</span></span>
+            </div>
+            <div class="vs-foot">The good parts can't save the hook.</div>
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 24px; max-width: 50ch;">
+          The opening 3 seconds decide whether anyone watches. Mine were failing on every single reel — and I'd shipped weeks of them, blind.
+        </p>
+      </div>
+      <div class="swipe">05 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">5<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 06 — GENERALISE : zoom out from the specific case (slide 4-5) to the
+       universal principle that applies to any reader. Use a matrix or grid
+       to make the universality visible (one row per category, with a
+       short status tag). Status colours: .blocked (danger red) / .paid
+       (warn amber) / .open (calm green) / .tos (ink-mute grey).
+       Swap the matrix for any other "look how broad this is" pattern if
+       your topic doesn't fit a platform-access lens. -->
+  <!-- ====================================================== -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>Generalise</span><span class="dot">·</span><span>Any modality</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="body">
+        <span class="eyebrow">It's not just video</span>
+        <h1>Every modality has a metric — and a <em class="terra-em">blind spot.</em></h1>
+
+        <div class="platforms">
+          <div class="platform">
+            <div class="p-icon">✍️</div>
+            <div class="p-name">Text <em>faithfulness — claims trace to a source</em></div>
+            <div class="p-status open">grounded?</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">🔊</div>
+            <div class="p-name">Audio <em>WER — but it ignores meaning</em></div>
+            <div class="p-status paid">heard ≠ sense</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">🖼️</div>
+            <div class="p-name">Image <em>CLIPScore — misses wrong brand style</em></div>
+            <div class="p-status paid">on-brand?</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">🎬</div>
+            <div class="p-name">Video <em>A/V sync, temporal coherence</em></div>
+            <div class="p-status paid">does it flow?</div>
+          </div>
+          <div class="platform">
+            <div class="p-icon">🧩</div>
+            <div class="p-name">Multimodal <em>cross-modal coherence — the parts agree?</em></div>
+            <div class="p-status blocked">weakest link</div>
+          </div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 28px; max-width: 50ch;">
+          The column that matters is <em class="terra-em">what each metric misses.</em> A 6% word-error rate means nothing if the sentence was nonsense. Match the eval to the modality.
+        </p>
+      </div>
+      <div class="swipe">06 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">6<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 07 — DEFENCE #1 : Force null-handling -->
+  <!-- ====================================================== -->
+  <!-- 07 — DEFENCE / TOOLKIT slide #1.
+       Pattern: big terra background numeral (.defence-num) + headline +
+       one copy-ready snippet (.snippet-block, dark code-card) + one-line
+       takeaway. The snippet is what gets screenshot/saved. Use <em>…</em>
+       inside .s-code for highlighted keywords (rendered in highlight amber).
+       Cap each defence slide to ONE snippet to keep it screenshot-able. -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The playbook</span><span class="dot">·</span><span>One of four</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="defence-num">01<span class="of">/04</span></div>
+      <div class="body">
+        <span class="eyebrow">Move 01 · Triage first</span>
+        <h1>Don't eval <em class="terra-em">everything.</em></h1>
+
+        <div class="snippet-block">
+          <span class="s-label">— The 4-question qualifier · 2+ yes = build it —</span>
+          <div class="s-code">Is it <em>user-facing</em>?            ▢ yes  ▢ no
+Is being wrong <em>expensive</em>?     ▢ yes  ▢ no
+Is the output <em>open-ended</em>?     ▢ yes  ▢ no
+Will it <em>scale past you</em>?       ▢ yes  ▢ no</div>
+          <div class="s-foot">Two or more yes → it earns an eval. One or none → just look at it.</div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 24px; max-width: 48ch;">
+          The qualifier stops you <em class="terra-em">both</em> ways: over-engineering the trivial, and shipping the high-stakes blind.
+        </p>
+      </div>
+      <div class="swipe">07 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">7<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 08 — DEFENCE #2 : Constrain the source -->
+  <!-- ====================================================== -->
+  <!-- 08 — DEFENCE / TOOLKIT slide #2.
+       Same pattern as slide 7. Especially good for WEAK vs STRONG snippet
+       comparisons (use two <em>WEAK:</em> / <em>STRONG:</em> blocks in
+       the same .s-code). -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The playbook</span><span class="dot">·</span><span>Two of four</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="defence-num">02<span class="of">/04</span></div>
+      <div class="body">
+        <span class="eyebrow">Move 02 · Three metrics, not one</span>
+        <h1>"Accuracy" is a <em class="terra-em">trap.</em></h1>
+
+        <div class="snippet-block">
+          <span class="s-label">— Always carry one of each —</span>
+          <div class="s-code"><em>WEAK:</em>   accuracy = 98%
+         (98% of <em>what</em>? the easy cases?)
+
+<em>STRONG:</em> correctness — did it answer?
+        quality     — was it on-brand? (1–5)
+        safety      — did it leak PII? (zero-tolerance)</div>
+          <div class="s-foot">One number on an open-ended output almost always hides the failure that matters.</div>
+        </div>
+
+        <p class="lede-block" style="margin-top: 24px; max-width: 48ch;">
+          Three metrics — correctness, quality, <em class="terra-em">safety</em> — or you're measuring the easy 80% and ignoring the 20% that breaks you.
+        </p>
+      </div>
+      <div class="swipe">08 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">8<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 09 — DEFENCES #3 + #4 : Validator + Reliable upstream -->
+  <!-- ====================================================== -->
+  <!-- 09 — DEFENCE / TOOLKIT slide #3+4 (compressed).
+       Two-defences-on-one-slide pattern. Use when the last two defences
+       are less novel or one of them is a principle without a copyable
+       snippet. Top half = snippet defence; horizontal divider; bottom
+       half = principle-only defence. Drop the divider+second-defence
+       block if you have a 4th separate slide instead. -->
+  <div class="square">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>The playbook</span><span class="dot">·</span><span>Three &amp; four</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+      <div class="defence-num">03<span class="of">/04</span></div>
+      <div class="body">
+        <span class="eyebrow">Move 03 · Calibrate the judge</span>
+        <h1 style="font-size: 56px;">Don't trust the <em class="terra-em">robot</em> reviewer.</h1>
+
+        <div class="snippet-block" style="margin-top: 20px;">
+          <span class="s-label">— If an LLM scores your outputs, check it against a human —</span>
+          <div class="s-code">every run:
+  re-score your <em>hand-graded</em> set with the LLM
+  if it disagrees with the human by &gt; 1 point
+  → <em>flag the judge</em>, don't trust the numbers</div>
+        </div>
+
+        <div style="margin-top: 32px; padding-top: 26px; border-top: 1px solid var(--rule);">
+          <span class="eyebrow" style="margin-bottom: 18px;">Move 04 · Different bars</span>
+          <p class="lede-block" style="margin-top: 0; max-width: 50ch;">
+            Set the pass bar <strong>before</strong> you measure — and use a different one per metric. <strong>Safety is zero-tolerance.</strong> Quality is good-enough. "We'll ship when it's better" is not a bar.
+          </p>
+        </div>
+      </div>
+      <div class="swipe">09 / 10 · Swipe →</div>
+    </div>
+    <div class="folio">9<sup>/10</sup></div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- 10 — CTA close.
+       Two-CTA pattern (primary action + secondary action).
+       PRIMARY = the thing you actually want them to do (workshop seat, sales
+       call, free trial). Single visible button-style action.
+       SECONDARY = lower-commitment value-give (cheat sheet, template, audit)
+       to capture people not ready for the primary. Both use DM-keyword
+       pattern because DMs land in your inbox AND signal LinkedIn algo
+       this content drove a relationship action.
+       sig-block at the bottom carries your name + LinkedIn handle. -->
+  <!-- ====================================================== -->
+  <div class="square closing">
+    <div class="square-content">
+      <div class="running-head">
+        <div class="left"><span>End Notes</span><span class="dot">·</span><span>No. 10</span></div>
+        <span class="pub-title">A Field Guide to Generative AI</span>
+      </div>
+
+      <div class="body">
+
+        <div>
+          <div class="closing-stamp">— The 1-page eval plan that fixes this —</div>
+          <div class="ask-primary">
+            <h1 class="ask-headline">Stop shipping AI on <em>vibes.</em></h1>
+            <p class="ask-help">I run a 4-hour AI Evals workshop for product teams — you leave having designed a real eval for an agent you own, and learned to tear apart any eval report someone hands you.</p>
+            <div class="ask-action">DM <span class="kw">"EVALS"</span> to bring it to your team</div>
+          </div>
+
+          <div class="ask-secondary">
+            <span class="a-mark">&</span>
+            <span class="a-text">Or DM <em>"PLAN"</em> for the free 1-page Eval Plan template — the exact sheet from the workshop.</span>
+          </div>
+        </div>
+
+        <div class="sig-block">
+          <div>
+            <div class="sig-name">Shantanu Chandra</div>
+            <div class="sig-role">I help product teams ship AI features they can actually trust.</div>
+          </div>
+          <div class="sig-li">
+            <div class="li-label">— Connect —</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="li-icon">in</div>
+              <div class="li-url">linkedin.com/in/<span class="handle">chandrashantanu</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

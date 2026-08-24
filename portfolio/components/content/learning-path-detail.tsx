@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Breadcrumbs } from "@/components/content/breadcrumbs";
+import { LearningCurriculum } from "@/components/content/learning-curriculum";
 import type { ContentItem } from "@/lib/content/schema";
+import { getLearningProgram } from "@/lib/learning-programs";
 
 type LearningPathDetailProps = {
   children: ReactNode;
@@ -23,6 +25,7 @@ export function LearningPathDetail({ children, item }: LearningPathDetailProps) 
   const nextPath = learningPaths[(pathIndex + 1) % learningPaths.length];
   const subject = metadata.industry[1] ?? "Learning Lab";
   const pathNumber = String(pathIndex + 1).padStart(2, "0");
+  const program = getLearningProgram(metadata.slug);
 
   return (
     <article className="learning-detail" data-learning-detail data-portfolio-template>
@@ -71,6 +74,8 @@ export function LearningPathDetail({ children, item }: LearningPathDetailProps) 
       <section className="learning-detail__content">
         <div className="learning-detail__body learning-path-detail__body" data-learning-detail-body>{children}</div>
       </section>
+
+      {program ? <LearningCurriculum program={program} title={metadata.title} /> : null}
 
       <nav aria-label="Learning path navigation" className="learning-detail__navigation" data-learning-path-navigation>
         <Link className="learning-detail__navigation-card" href="/learning">
