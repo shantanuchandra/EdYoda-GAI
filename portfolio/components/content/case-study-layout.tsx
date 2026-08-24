@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize imports used by JSX or TypeScript. */
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { BarChart3, FileText, Layers3 } from "lucide-react";
+import { ArrowRight, BarChart3, FileText, Layers3 } from "lucide-react";
 import { CaseStudyArtwork } from "@/components/case-studies/case-study-artwork";
 import { Breadcrumbs } from "@/components/content/breadcrumbs";
 import { OutcomeList } from "@/components/content/outcome-list";
@@ -79,16 +79,37 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
           <div className="case-study-layout__story" data-case-study-story>
             <div className="reading-measure case-study__body case-study-layout__body text-[1.05rem] leading-8">{children}</div>
           </div>
-          {nextItem ? (
-            <nav aria-label="Next case study" className="case-study-layout__next mt-14 border-t border-line pt-8">
-              <p className="m-0 text-xs font-extrabold tracking-[0.1em] text-teal uppercase">Continue reading</p>
-              <Link className="mt-3 inline-block font-display text-[clamp(1.8rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02] text-teal-dark underline decoration-teal underline-offset-8" href={`/work/${nextItem.metadata.slug}`}>
-                Next case study: {nextItem.metadata.title} <span aria-hidden="true">→</span>
-              </Link>
-            </nav>
-          ) : null}
         </div>
       </div>
+      {nextItem ? (
+        <nav aria-label="Next case study" className="container case-study-layout__next">
+          <div className="case-study-layout__next-heading">
+            <p>Continue reading</p>
+            <Link href="/case-studies">View all case studies</Link>
+          </div>
+          <div className="case-study-layout__next-card" data-next-case-study-card>
+            <Link className="case-study-layout__next-card-link" href={`/work/${nextItem.metadata.slug}`}>
+              <div className="case-study-layout__next-media">
+                <CaseStudyArtwork
+                  company={nextItem.metadata.company}
+                  industry={nextItem.metadata.industry.join(" · ")}
+                  kind="employer"
+                  slug={nextItem.metadata.slug}
+                />
+              </div>
+              <div className="case-study-layout__next-copy">
+                <div className="case-study-layout__next-tags">
+                  {nextItem.metadata.industry.map((industry) => <span key={industry}>{industry}</span>)}
+                </div>
+                <p className="case-study-layout__next-label">Next employer transformation</p>
+                <h2>{nextItem.metadata.title}</h2>
+                <p className="case-study-layout__next-description">{nextItem.metadata.description}</p>
+                <span className="case-study-layout__next-action">Read case study <ArrowRight aria-hidden="true" size={16} strokeWidth={1.8} /></span>
+              </div>
+            </Link>
+          </div>
+        </nav>
+      ) : null}
     </article>
   );
 }

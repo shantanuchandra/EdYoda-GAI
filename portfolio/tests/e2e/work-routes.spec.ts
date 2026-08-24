@@ -174,6 +174,40 @@ test("the enlarged case-study card keeps the reference's compact action footer",
   }
 });
 
+test("the closing fold previews the next employer story as a full-width reference card", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
+
+  const nextNavigation = page.getByRole("navigation", { name: "Next case study" });
+  const nextCard = nextNavigation.locator("[data-next-case-study-card]");
+  const nextLink = nextCard.getByRole("link", { name: /Responsible AI operations for digital lending/ });
+  const artwork = nextCard.locator("[data-case-study-media]");
+
+  await expect(nextNavigation.getByRole("link", { name: "View all case studies" })).toHaveAttribute("href", "/case-studies");
+  await expect(nextLink).toHaveAttribute("href", "/work/iifl-digital-lending");
+  await expect(nextCard.getByRole("heading", { level: 2, name: "Responsible AI operations for digital lending" })).toBeVisible();
+  await expect(artwork.locator("img")).toBeVisible();
+
+  const layout = await nextCard.evaluate((card) => {
+    const media = card.querySelector<HTMLElement>("[data-case-study-media]");
+    const link = card.querySelector<HTMLElement>("a");
+    if (!media || !link) throw new Error("Next-story preview card is incomplete");
+    return {
+      width: Math.round(card.getBoundingClientRect().width),
+      columns: getComputedStyle(link).gridTemplateColumns.split(" ").length,
+      radius: Number.parseFloat(getComputedStyle(card).borderRadius),
+      mediaHeight: Math.round(media.getBoundingClientRect().height),
+      linkHeight: Math.round(link.getBoundingClientRect().height),
+    };
+  });
+
+  expect(layout.width).toBeGreaterThan(1100);
+  expect(layout.columns).toBe(2);
+  expect(layout.radius).toBe(12);
+  expect(layout.mediaHeight).toBeGreaterThanOrEqual(230);
+  expect(layout.linkHeight).toBeGreaterThanOrEqual(230);
+});
+
 for (const caseStudy of caseStudies) {
   test(`renders the evidence-led ${caseStudy.slug} route`, async ({ page }) => {
     const response = await page.goto(`/work/${caseStudy.slug}`);
@@ -181,7 +215,7 @@ for (const caseStudy of caseStudies) {
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1, name: caseStudy.title })).toBeVisible();
     await expect(page.getByText(caseStudy.qualifiedOutcome)).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "Next case study" }).getByRole("link")).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Next case study" }).locator("[data-next-case-study-card]").getByRole("link")).toBeVisible();
 
     await expect(page.locator(".case-study__body h2")).toHaveText(narrativeHeadings);
     await expect(page.getByRole("navigation", { name: "On this page" }).getByRole("link")).toHaveText(narrativeHeadings);

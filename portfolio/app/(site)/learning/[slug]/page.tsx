@@ -9,6 +9,8 @@ import { buildLearningJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return (await getPublicSlugs("learning")).map((slug) => ({ slug }));
 }

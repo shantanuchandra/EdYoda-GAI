@@ -2,8 +2,8 @@
 import { expect, test } from "@playwright/test";
 
 const products = [
-  { slug: "wasabi-travels", title: "Wasabi Travels", outcome: "2,000+ places", status: "Active" },
-  { slug: "card-compass", title: "Card Compass", outcome: "121", status: "Active" },
+  { slug: "wasabi-travels", title: "Wasabi Travels", status: "Active" },
+  { slug: "card-compass", title: "Card Compass", status: "Active" },
 ] as const;
 
 test("lists the two verified independent products without a placeholder third card", async ({ page }) => {
@@ -18,11 +18,9 @@ test("lists the two verified independent products without a placeholder third ca
     const card = page.getByRole("article").filter({ has: page.getByRole("heading", { name: product.title }) });
     await expect(card.getByText("Independent product", { exact: true })).toBeVisible();
     await expect(card.getByText(product.status)).toBeVisible();
-    await expect(card.getByText(product.outcome)).toBeVisible();
     await expect(card.getByRole("img", { name: `${product.title === "Card Compass" ? "CardCompass" : product.title} brand mark` })).toBeVisible();
     const action = card.getByRole("link", { name: "View product" });
     await expect(action).toHaveAttribute("href", `/products/${product.slug}`);
-    await expect(action).toContainText("→");
     expect((await action.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   }
 });

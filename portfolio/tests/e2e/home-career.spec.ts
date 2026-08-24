@@ -70,14 +70,17 @@ test("desktop career fold matches the reference marquee proportions and placemen
   expect(secondTransform).not.toBe(firstTransform);
 
   const pause = section.getByRole("button", { name: "Pause career motion" });
-  await pause.click();
-  await expect(section.getByRole("button", { name: "Resume career motion" })).toBeVisible();
+  await pause.focus();
+  await pause.press("Enter");
+  const resume = section.getByRole("button", { name: "Resume career motion" });
+  await expect(resume).toBeVisible();
   await page.waitForTimeout(32);
   const pausedTransform = await track.evaluate((element) => getComputedStyle(element).transform);
   await page.waitForTimeout(240);
   expect(await track.evaluate((element) => getComputedStyle(element).transform)).toBe(pausedTransform);
 
-  await section.getByRole("button", { name: "Resume career motion" }).click();
+  await resume.focus();
+  await resume.press("Enter");
   await expect(section.getByRole("button", { name: "Pause career motion" })).toBeVisible();
   const viewport = section.locator("[data-career-viewport]");
   const viewportBox = await viewport.boundingBox();
