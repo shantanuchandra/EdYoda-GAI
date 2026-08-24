@@ -21,12 +21,12 @@ export default async function CaseStudiesPage() {
       <div className="case-studies-page__canvas">
         <header className="case-studies-intro" data-case-studies-intro data-testid="case-studies-intro">
           <h1>Case Studies</h1>
-          <p>Transformation work, product systems and independent builds.</p>
+          <p>Explore transformation work and independent builds through the systems, decisions and outcomes behind them.</p>
           <span className="sr-only" id="employer-transformations">Employer transformations</span>
           <span className="sr-only" id="independent-products">Independent products</span>
         </header>
         <div className="case-studies-page__content">
-          <CaseStudyFilters counts={{ all: items.length, employer: employerItems.length, product: productItems.length }}>
+          <CaseStudyFilters items={items}>
             {items.map((item) => <CaseStudyCard item={item} key={item.id} />)}
           </CaseStudyFilters>
         </div>

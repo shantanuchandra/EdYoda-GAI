@@ -12,6 +12,7 @@ export function CaseStudyCard({ item }: { item: CaseStudySummary }) {
       className="case-study-card"
       data-case-study-card
       data-case-study-kind={item.kind}
+      data-case-study-tags={tags.map((tag) => tag.toLowerCase().replaceAll(" ", "-")).join(" ")}
     >
       <div className="case-study-card__wash" aria-hidden="true" />
       <div className="case-study-card__body">

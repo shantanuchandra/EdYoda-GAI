@@ -3,7 +3,7 @@ import { getPublicContent } from "@/lib/content/loader";
 import type { ContentItem } from "@/lib/content/schema";
 
 export type CaseStudyKind = "employer" | "product";
-export type CaseStudyFilter = "all" | CaseStudyKind;
+export type CaseStudyFilter = "all" | "employer" | "product" | "retail" | "financial-services" | "adtech" | "saas";
 
 export type CaseStudySummary = {
   id: string;

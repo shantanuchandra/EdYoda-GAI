@@ -29,8 +29,11 @@ test("case studies opens with the reference full-width centered introduction and
   expect(geometry.heading.fontSize).toBeLessThanOrEqual(50);
   expect(geometry.heading.textAlign).toBe("center");
   expect(geometry.description.width).toBeLessThanOrEqual(680);
+  expect(geometry.description.height).toBeGreaterThanOrEqual(50);
   expect(geometry.description.left).toBeGreaterThanOrEqual(300);
-  expect(geometry.filters.top).toBeGreaterThan(geometry.description.top + geometry.description.height + 40);
+  expect(geometry.filters.top).toBeGreaterThanOrEqual(340);
+  expect(geometry.filters.height).toBeGreaterThanOrEqual(150);
+  expect(geometry.filters.height).toBeLessThanOrEqual(170);
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
@@ -46,6 +49,7 @@ test("the desktop employer row uses the reference three-card media rhythm", asyn
     return {
       gridColumns: getComputedStyle(grid).gridTemplateColumns.split(" ").length,
       gridGap: Number.parseFloat(getComputedStyle(grid).columnGap),
+      gridTop: grid.getBoundingClientRect().top,
       cards: cards.map((card) => {
         const media = card.querySelector<HTMLElement>("[data-case-study-media]");
         const title = card.querySelector<HTMLElement>("h3");
@@ -57,6 +61,8 @@ test("the desktop employer row uses the reference three-card media rhythm", asyn
 
   expect(geometry.gridColumns).toBe(3);
   expect(geometry.gridGap).toBeCloseTo(32, 0);
+  expect(geometry.gridTop).toBeGreaterThanOrEqual(560);
+  expect(geometry.gridTop).toBeLessThanOrEqual(575);
   for (const card of geometry.cards) {
     expect(card.card.width).toBeGreaterThanOrEqual(390);
     expect(card.card.width).toBeLessThanOrEqual(400);
@@ -66,4 +72,22 @@ test("the desktop employer row uses the reference three-card media rhythm", asyn
     expect(card.titleSize).toBeGreaterThanOrEqual(17);
     expect(card.titleSize).toBeLessThanOrEqual(20);
   }
+});
+
+test("portfolio-focus controls filter truthfully on desktop and collapse to a selector on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/case-studies", { waitUntil: "domcontentloaded" });
+
+  const results = page.locator("[data-case-study-results]");
+  await page.getByRole("button", { name: /Financial services 1/ }).click();
+  await expect(results).toHaveAttribute("data-case-study-filter", "financial-services");
+  await expect(results.locator("[data-case-study-card]:visible")).toHaveCount(1);
+  await expect(results.locator("[data-case-study-card]:visible")).toContainText("Responsible AI operations for digital lending");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("combobox", { name: "Filter case studies" })).toBeVisible();
+  await page.getByRole("combobox", { name: "Filter case studies" }).selectOption("retail");
+  await expect(results).toHaveAttribute("data-case-study-filter", "retail");
+  await expect(results.locator("[data-case-study-card]:visible")).toHaveCount(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
