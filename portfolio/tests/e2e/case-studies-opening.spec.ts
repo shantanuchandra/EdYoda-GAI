@@ -37,6 +37,51 @@ test("case studies opens with the reference full-width centered introduction and
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
+test("case-study index and detail use the reference's compact system-sans editorial scale", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  await page.goto("/case-studies", { waitUntil: "domcontentloaded" });
+  const indexTypography = await page.evaluate(() => {
+    const heading = document.querySelector<HTMLElement>("[data-case-studies-intro] h1");
+    const cardTitle = document.querySelector<HTMLElement>("[data-case-study-card] h3");
+    const cardCopy = document.querySelector<HTMLElement>(".case-study-card__content p");
+    if (!heading || !cardTitle || !cardCopy) throw new Error("Case-study typography is incomplete");
+    const style = (element: HTMLElement) => getComputedStyle(element);
+    return {
+      heading: style(heading).fontFamily,
+      cardTitle: {
+        family: style(cardTitle).fontFamily,
+        size: Number.parseFloat(style(cardTitle).fontSize),
+        weight: Number.parseInt(style(cardTitle).fontWeight, 10),
+      },
+      cardCopy: Number.parseFloat(style(cardCopy).fontSize),
+    };
+  });
+
+  expect(indexTypography.heading).toMatch(/^ui-sans-serif/);
+  expect(indexTypography.cardTitle.family).toContain("ui-sans-serif");
+  expect(indexTypography.cardTitle.size).toBe(18);
+  expect(indexTypography.cardTitle.weight).toBe(600);
+  expect(indexTypography.cardCopy).toBe(14);
+
+  await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
+  const detailTypography = await page.evaluate(() => {
+    const heading = document.querySelector<HTMLElement>(".detail-page__header h1");
+    const body = document.querySelector<HTMLElement>(".case-study__body");
+    const outcomes = document.querySelector<HTMLElement>("#case-study-outcomes");
+    if (!heading || !body || !outcomes) throw new Error("Case-study detail typography is incomplete");
+    return {
+      heading: getComputedStyle(heading).fontFamily,
+      body: getComputedStyle(body).fontFamily,
+      outcomes: getComputedStyle(outcomes).fontFamily,
+    };
+  });
+
+  expect(detailTypography.heading).toContain("ui-sans-serif");
+  expect(detailTypography.body).toContain("ui-sans-serif");
+  expect(detailTypography.outcomes).toContain("ui-sans-serif");
+});
+
 test("the desktop employer row uses the reference three-card media rhythm", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/case-studies", { waitUntil: "domcontentloaded" });

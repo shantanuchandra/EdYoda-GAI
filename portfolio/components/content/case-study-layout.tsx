@@ -21,7 +21,7 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
   const company = publicCompanyName(metadata.company);
 
   return (
-    <article className="detail-page" data-portfolio-template>
+    <article className="detail-page case-study-layout" data-case-study-layout data-portfolio-template>
       <header className="detail-page__header border-b border-line bg-surface py-10 sm:py-14">
         <div className="container">
           <Breadcrumbs items={[{ label: "Work", href: "/work" }, { label: company }]} />

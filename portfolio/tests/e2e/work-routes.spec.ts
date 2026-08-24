@@ -28,7 +28,7 @@ const narrativeHeadings = ["Context", "Opportunity", "My role", "Approach", "Gov
 
 test("uses accessible card titles and 44px explicit case-study actions on the unified index", async ({ page }) => {
   await page.goto("/case-studies");
-  await page.getByRole("button", { name: /Employer transformations 4/ }).click();
+  await page.getByRole("button", { name: "Employer transformations" }).click();
 
   await expect(page.getByRole("article").getByRole("heading", { level: 3 })).toHaveCount(4);
   const actions = page.getByRole("link", { name: "Read case study" });
