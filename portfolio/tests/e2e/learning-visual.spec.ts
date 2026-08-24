@@ -24,6 +24,7 @@ test("Learning Lab uses the full-width heading and three-card portfolio grid", a
         return {
           card: { ...box(card), background: getComputedStyle(card).backgroundColor },
           media: { ...box(media), backgroundImage: getComputedStyle(media).backgroundImage },
+          mediaCode: media.querySelector(".learning-path-card__media-code")?.textContent,
           titleFamily: getComputedStyle(title).fontFamily,
         };
       }),
@@ -49,5 +50,6 @@ test("Learning Lab uses the full-width heading and three-card portfolio grid", a
     expect(card.media.backgroundImage).toBe("none");
     expect(card.titleFamily).toContain("ui-sans-serif");
   }
+  expect(geometry.cards.map((card) => card.mediaCode)).toEqual(["01", "02", "03"]);
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });

@@ -2062,7 +2062,8 @@ button {
 }
 
 .learning-path-card__media-label,
-.learning-path-card__media-index {
+.learning-path-card__media-index,
+.learning-path-card__media-code {
   position: absolute;
   z-index: 1;
   color: #525252;
@@ -2073,6 +2074,17 @@ button {
 
 .learning-path-card__media-label { top: 30px; left: 30px; }
 .learning-path-card__media-index { right: 30px; bottom: 30px; }
+
+.learning-path-card__media-code {
+  top: 50%;
+  left: 50%;
+  color: rgb(23 23 23 / 84%);
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 650;
+  letter-spacing: -0.07em;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
 
 .learning-path-card__media-orbit,
 .learning-path-card__media-line {
