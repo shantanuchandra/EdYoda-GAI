@@ -14,10 +14,18 @@ export function LearningPathCard({ headingLevel, item }: LearningPathCardProps) 
   const href = `/learning/${metadata.slug}`;
   const outcome = metadata.outcomes[0];
   const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
+  const subject = metadata.industry[1] ?? "Learning Lab";
 
   return (
     <article className="learning-path-card" data-learning-path-card>
-      <div aria-hidden="true" className="learning-path-card__signal"><span /><span /><span /><span /></div>
+      <div aria-hidden="true" className="learning-path-card__media" data-learning-card-media>
+        <span className="learning-path-card__media-label">{subject}</span>
+        <span className="learning-path-card__media-index">01—04</span>
+        <span className="learning-path-card__media-orbit learning-path-card__media-orbit--one" />
+        <span className="learning-path-card__media-orbit learning-path-card__media-orbit--two" />
+        <span className="learning-path-card__media-line learning-path-card__media-line--one" />
+        <span className="learning-path-card__media-line learning-path-card__media-line--two" />
+      </div>
       <p className="learning-path-card__eyebrow">Audience</p>
       <p className="learning-path-card__audience">{metadata.audience}</p>
       {headingLevel === 2 ? (

@@ -2043,27 +2043,63 @@ button {
 
 .learning-path-card > * { position: relative; z-index: 1; }
 
-.learning-path-card__signal {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  height: 48px;
+.learning-path-card__media {
+  position: relative;
+  height: 160px;
   margin: -24px -24px 24px;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, rgb(218 242 236 / 90%), rgb(246 239 222 / 82%));
+  overflow: hidden;
+  border-bottom: 1px solid rgb(11 23 20 / 8%);
+  background:
+    radial-gradient(circle at 73% 48%, rgb(211 236 229 / 92%) 0 10%, transparent 10.3%),
+    linear-gradient(135deg, #edf8f4, #f5eedf);
 }
 
-.learning-path-card__signal span {
-  display: block;
+.learning-path-card__media::before {
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  bottom: 22px;
+  left: 30px;
+  border: 1px solid rgb(15 107 93 / 18%);
   border-radius: 999px;
-  background: rgb(15 107 93 / 20%);
-  transform-origin: left center;
+  content: "";
+}
+
+.learning-path-card__media-label,
+.learning-path-card__media-index {
+  position: absolute;
+  z-index: 1;
+  color: var(--color-teal-dark);
+  font: 800 0.68rem/1.2 var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.learning-path-card__media-label { top: 30px; left: 30px; }
+.learning-path-card__media-index { right: 30px; bottom: 30px; }
+
+.learning-path-card__media-orbit,
+.learning-path-card__media-line {
+  position: absolute;
+  display: block;
+  background: rgb(15 107 93 / 23%);
   transition: transform 300ms var(--ease-out), background-color 300ms var(--ease-out);
 }
 
-.learning-path-card__signal span:nth-child(2) { transform: scaleX(.76); }
-.learning-path-card__signal span:nth-child(3) { transform: scaleX(.52); }
-.learning-path-card__signal span:nth-child(4) { transform: scaleX(.3); }
+.learning-path-card__media-orbit {
+  top: 50%;
+  left: 50%;
+  border: 1px solid rgb(15 107 93 / 34%);
+  border-radius: 999px;
+  background: transparent;
+  transform: translate(-50%, -50%);
+}
+
+.learning-path-card__media-orbit--one { width: 144px; height: 72px; }
+.learning-path-card__media-orbit--two { width: 72px; height: 144px; }
+.learning-path-card__media-line { height: 1px; transform-origin: center; }
+.learning-path-card__media-line--one { top: 50%; right: 40px; left: 40px; }
+.learning-path-card__media-line--two { top: 50%; left: 50%; width: 116px; transform: rotate(-42deg); }
 
 .learning-path-card__eyebrow,
 .learning-path-card__outcome > p:first-child,
@@ -2158,14 +2194,12 @@ button {
   transform: translateY(-4px);
 }
 
-.learning-path-card:hover .learning-path-card__signal span,
-.learning-path-card:focus-within .learning-path-card__signal span { background: rgb(15 107 93 / 45%); }
-.learning-path-card:hover .learning-path-card__signal span:nth-child(2),
-.learning-path-card:focus-within .learning-path-card__signal span:nth-child(2) { transform: scaleX(.9); }
-.learning-path-card:hover .learning-path-card__signal span:nth-child(3),
-.learning-path-card:focus-within .learning-path-card__signal span:nth-child(3) { transform: scaleX(.7); }
-.learning-path-card:hover .learning-path-card__signal span:nth-child(4),
-.learning-path-card:focus-within .learning-path-card__signal span:nth-child(4) { transform: scaleX(.48); }
+.learning-path-card:hover .learning-path-card__media-orbit--one,
+.learning-path-card:focus-within .learning-path-card__media-orbit--one { transform: translate(-50%, -50%) scale(1.08); }
+.learning-path-card:hover .learning-path-card__media-orbit--two,
+.learning-path-card:focus-within .learning-path-card__media-orbit--two { transform: translate(-50%, -50%) scale(.92); }
+.learning-path-card:hover .learning-path-card__media-line,
+.learning-path-card:focus-within .learning-path-card__media-line { background: rgb(15 107 93 / 48%); }
 .learning-path-card:hover .learning-path-card__title a,
 .learning-path-card:focus-within .learning-path-card__title a { color: var(--color-teal); }
 
@@ -2401,7 +2435,8 @@ button {
   .case-study-artwork .product-brand-mark,
   .case-study-card h3 a,
   .learning-path-card,
-  .learning-path-card__signal span,
+  .learning-path-card__media-orbit,
+  .learning-path-card__media-line,
   .learning-path-card__title a {
     transition: none;
   }
