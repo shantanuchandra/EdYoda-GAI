@@ -38,6 +38,38 @@ test("uses accessible card titles and 44px explicit case-study actions on the un
   }
 });
 
+test("case-study details use the reference's neutral, compact editorial surface", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
+
+  const design = await page.evaluate(() => {
+    const header = document.querySelector<HTMLElement>("[data-case-study-header]");
+    const heading = header?.querySelector<HTMLElement>("h1");
+    const meta = document.querySelector<HTMLElement>("[data-case-study-meta]");
+    const evidence = document.querySelector<HTMLElement>("[data-case-study-evidence]");
+    if (!header || !heading || !meta || !evidence) throw new Error("Case-study detail design landmarks are incomplete");
+    return {
+      headerImage: getComputedStyle(header).backgroundImage,
+      heading: {
+        family: getComputedStyle(heading).fontFamily,
+        size: Number.parseFloat(getComputedStyle(heading).fontSize),
+      },
+      metaColumns: getComputedStyle(meta).gridTemplateColumns.split(" ").length,
+      evidence: {
+        background: getComputedStyle(evidence.querySelector("li")!).backgroundColor,
+        valueFamily: getComputedStyle(evidence.querySelector("strong")!).fontFamily,
+      },
+    };
+  });
+
+  expect(design.headerImage).toBe("none");
+  expect(design.heading.family).toContain("ui-sans-serif");
+  expect(design.heading.size).toBe(48);
+  expect(design.metaColumns).toBe(4);
+  expect(design.evidence.background).toBe("rgb(255, 255, 255)");
+  expect(design.evidence.valueFamily).toContain("ui-sans-serif");
+});
+
 for (const caseStudy of caseStudies) {
   test(`renders the evidence-led ${caseStudy.slug} route`, async ({ page }) => {
     const response = await page.goto(`/work/${caseStudy.slug}`);

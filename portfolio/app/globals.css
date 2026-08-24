@@ -2418,6 +2418,193 @@ button {
   letter-spacing: -0.025em;
 }
 
+/* The case-study index uses a restrained, system-sans editorial language. Keep
+ * its detail pages in that same family instead of inheriting the broader
+ * portfolio template's gradient, serif display, and tinted evidence panels. */
+.case-study-layout .case-study-layout__header {
+  padding: 64px 16px 48px !important;
+  background: #fff !important;
+}
+
+.case-study-layout .case-study-layout__header h1,
+.case-study-layout .case-study-layout__title {
+  max-width: 920px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 48px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.045em !important;
+  line-height: 1 !important;
+}
+
+.case-study-layout__eyebrow {
+  color: rgb(36 36 36) !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.case-study-layout__description {
+  max-width: 680px;
+  color: #616161 !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem !important;
+  line-height: 1.5;
+}
+
+.case-study-layout__meta {
+  max-width: 960px !important;
+  gap: 24px !important;
+  border-color: rgb(0 0 0 / 12%) !important;
+}
+
+.case-study-layout__meta dt {
+  color: #737373 !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em !important;
+}
+
+.case-study-layout__meta dd {
+  color: #171717;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600 !important;
+  line-height: 1.4;
+}
+
+.case-study-layout__content {
+  gap: 56px !important;
+}
+
+.case-study-layout__section-title {
+  color: #171717;
+  font-family: ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 1.5rem !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+}
+
+.case-study-layout__evidence [aria-label="Case-study outcomes"] {
+  gap: 12px;
+}
+
+.case-study-layout__evidence [aria-label="Case-study outcomes"] > li {
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: none;
+  padding: 20px;
+}
+
+.case-study-layout__evidence [aria-label="Case-study outcomes"] strong {
+  color: #171717;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.case-study-layout__evidence [aria-label="Case-study outcomes"] span {
+  color: #242424;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.case-study-layout__evidence [aria-label="Case-study outcomes"] small {
+  color: #616161;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.case-study-layout__methods li {
+  border-color: rgb(0 0 0 / 9%) !important;
+  border-radius: 6px !important;
+  background: rgb(0 0 0 / 8%) !important;
+  color: #373737 !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  line-height: 1.35;
+}
+
+.case-study-layout__toc nav {
+  border-color: rgb(0 0 0 / 12%);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.case-study-layout__toc nav > p {
+  color: #737373;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.case-study-layout__toc nav a {
+  color: #373737;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  text-decoration-color: rgb(0 0 0 / 14%);
+}
+
+.case-study-layout__toc nav a:hover {
+  color: #171717;
+  text-decoration-color: #171717;
+}
+
+.case-study-layout__body {
+  color: #373737;
+}
+
+.case-study-layout__body h2,
+.case-study-layout__body h3 {
+  color: #171717;
+}
+
+.case-study-layout__next {
+  border-color: rgb(0 0 0 / 12%) !important;
+}
+
+.case-study-layout__next > p {
+  color: #737373 !important;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+}
+
+.case-study-layout__next a {
+  color: #171717 !important;
+  font-family: ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 1.5rem !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+  text-decoration-color: rgb(0 0 0 / 18%) !important;
+}
+
+.case-study-layout__next a:hover {
+  text-decoration-color: #171717 !important;
+}
+
+@media (max-width: 767px) {
+  .case-study-layout .case-study-layout__header {
+    padding-top: 44px !important;
+    padding-bottom: 40px !important;
+  }
+
+  .case-study-layout .case-study-layout__header h1,
+  .case-study-layout .case-study-layout__title {
+    font-size: clamp(2.25rem, 10vw, 3rem) !important;
+  }
+
+  .case-study-layout__content {
+    gap: 36px !important;
+  }
+}
+
 .not-found-template {
   width: 100%;
   min-height: calc(100vh - var(--header-height));
