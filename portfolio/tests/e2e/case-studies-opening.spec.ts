@@ -117,7 +117,28 @@ test("the desktop employer row uses the reference three-card media rhythm", asyn
     expect(card.titleSize).toBeGreaterThanOrEqual(17);
     expect(card.titleSize).toBeLessThanOrEqual(20);
   }
-  await expect(page.locator(".case-study-card__tags > span:not(.status-label)").first()).toHaveCSS("background-color", "rgb(244, 245, 245)");
+  await expect(page.locator(".case-study-card__tags > span:not(.status-label)").first()).toHaveCSS("background-color", "rgba(11, 23, 20, 0.1)");
+  await expect(page.locator(".case-study-artwork img").first()).toHaveCSS("mix-blend-mode", "multiply");
+});
+
+test("every case-study card routes readers through the story, evidence, and methods", async ({ page }) => {
+  await page.goto("/case-studies", { waitUntil: "domcontentloaded" });
+  const cards = page.locator("[data-case-study-card]");
+
+  await expect(cards).toHaveCount(6);
+  for (let index = 0; index < await cards.count(); index += 1) {
+    const card = cards.nth(index);
+    const actions = card.locator("[data-case-study-card-action]");
+    const kind = await card.getAttribute("data-case-study-kind");
+    const prefix = kind === "product" ? "/products/" : "/work/";
+
+    await expect(actions).toHaveCount(3);
+    await expect(actions.nth(0)).toHaveAttribute("href", new RegExp(`^${prefix}`));
+    await expect(actions.nth(1)).toHaveAttribute("href", /#(?:case-study|product)-outcomes$/);
+    await expect(actions.nth(2)).toHaveAttribute("href", /#(?:case-study|product)-methods$/);
+    expect((await actions.nth(0).boundingBox())?.height).toBeGreaterThanOrEqual(44);
+    await expect(card.locator(".case-study-card__footer strong")).toHaveCount(0);
+  }
 });
 
 test("portfolio-focus controls filter truthfully on desktop and collapse to a selector on mobile", async ({ page }) => {
