@@ -65,9 +65,33 @@ test("case-study details use the reference's neutral, compact editorial surface"
   expect(design.headerImage).toBe("none");
   expect(design.heading.family).toContain("ui-sans-serif");
   expect(design.heading.size).toBe(48);
-  expect(design.metaColumns).toBe(4);
+  expect(design.metaColumns).toBe(2);
   expect(design.evidence.background).toBe("rgb(255, 255, 255)");
   expect(design.evidence.valueFamily).toContain("ui-sans-serif");
+});
+
+test("case-study details open with a reference-style evidence case file", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
+
+  const hero = await page.evaluate(() => {
+    const brief = document.querySelector<HTMLElement>("[data-case-study-brief]");
+    const panel = document.querySelector<HTMLElement>("[data-case-study-brief-panel]");
+    const metadata = panel?.querySelector<HTMLElement>("[data-case-study-meta]");
+    const evidence = panel?.querySelectorAll<HTMLElement>("[data-case-study-brief-evidence] strong");
+    if (!brief || !panel || !metadata || !evidence) throw new Error("Case-study evidence brief is incomplete");
+    return {
+      columns: getComputedStyle(brief).gridTemplateColumns.split(" ").length,
+      panelBackground: getComputedStyle(panel).backgroundColor,
+      metadataCount: metadata.querySelectorAll(":scope > div").length,
+      evidenceValues: Array.from(evidence, (value) => value.textContent?.trim()),
+    };
+  });
+
+  expect(hero.columns).toBe(2);
+  expect(hero.panelBackground).toBe("rgb(23, 23, 23)");
+  expect(hero.metadataCount).toBe(4);
+  expect(hero.evidenceValues).toEqual(["200 stores", "95%"]);
 });
 
 for (const caseStudy of caseStudies) {

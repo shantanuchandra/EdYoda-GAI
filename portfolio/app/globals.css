@@ -2608,6 +2608,130 @@ button {
   }
 }
 
+/* The opening is an information panel, not a second document masthead. It
+ * mirrors the reference's most useful hierarchy: thesis at left, evidence at
+ * right, then the complete story below. */
+.case-study-layout__brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  align-items: stretch;
+  gap: clamp(36px, 6vw, 88px);
+  padding-top: 34px;
+}
+
+.case-study-layout__brief-copy {
+  align-self: center;
+  padding-bottom: 34px;
+}
+
+.case-study-layout__brief-copy .case-study-layout__eyebrow {
+  margin-top: 0;
+}
+
+.case-study-layout__brief-panel {
+  display: flex;
+  min-height: 390px;
+  flex-direction: column;
+  border-radius: 12px;
+  background: #171717;
+  box-shadow: 0 14px 28px rgb(0 0 0 / 14%);
+  color: #fff;
+  padding: clamp(28px, 3vw, 40px);
+}
+
+.case-study-layout__brief-label,
+.case-study-layout__brief-evidence > p {
+  margin: 0;
+  color: rgb(255 255 255 / 58%);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.case-study-layout__brief-company {
+  margin: 14px 0 0;
+  color: #fff;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.65rem, 2.8vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.case-study-layout__brief-panel .case-study-layout__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: none !important;
+  gap: 16px 20px !important;
+  margin: 28px 0 0;
+  border-color: rgb(255 255 255 / 16%) !important;
+  border-top: 1px solid rgb(255 255 255 / 16%);
+  padding-top: 20px;
+}
+
+.case-study-layout__brief-panel .case-study-layout__meta dt {
+  color: rgb(255 255 255 / 54%) !important;
+  font-size: 0.65rem !important;
+}
+
+.case-study-layout__brief-panel .case-study-layout__meta dd {
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 550 !important;
+}
+
+.case-study-layout__brief-evidence {
+  margin-top: auto;
+  border-top: 1px solid rgb(255 255 255 / 16%);
+  padding-top: 20px;
+}
+
+.case-study-layout__brief-evidence > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.case-study-layout__brief-evidence strong,
+.case-study-layout__brief-evidence span {
+  display: block;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.case-study-layout__brief-evidence strong {
+  color: #fff;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.case-study-layout__brief-evidence span {
+  margin-top: 6px;
+  color: rgb(255 255 255 / 66%);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 767px) {
+  .case-study-layout__brief {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding-top: 20px;
+  }
+
+  .case-study-layout__brief-copy {
+    padding-bottom: 0;
+  }
+
+  .case-study-layout__brief-panel {
+    min-height: 0;
+  }
+}
+
 .not-found-template {
   width: 100%;
   min-height: calc(100vh - var(--header-height));
