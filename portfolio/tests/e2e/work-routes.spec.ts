@@ -70,19 +70,16 @@ test("case-study details use the reference's neutral, compact editorial surface"
   expect(design.evidence.valueFamily).toContain("ui-sans-serif");
 });
 
-test("case-study details extend the reference's centered card language", async ({ page }) => {
+test("case-study details keep the reference's neutral card surfaces", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
 
   const design = await page.evaluate(() => {
     const header = document.querySelector<HTMLElement>("[data-case-study-header]");
-    const heading = header?.querySelector<HTMLElement>("h1");
     const facts = document.querySelector<HTMLElement>("[data-case-study-facts]");
     const story = document.querySelector<HTMLElement>("[data-case-study-story]");
-    if (!header || !heading || !facts || !story) throw new Error("Case-study card-language landmarks are incomplete");
+    if (!header || !facts || !story) throw new Error("Case-study card-language landmarks are incomplete");
     return {
-      headingAlign: getComputedStyle(heading).textAlign,
-      headingWidth: Math.round(heading.getBoundingClientRect().width),
       facts: {
         background: getComputedStyle(facts).backgroundColor,
         columns: getComputedStyle(facts).gridTemplateColumns.split(" ").length,
@@ -96,14 +93,85 @@ test("case-study details extend the reference's centered card language", async (
     };
   });
 
-  expect(design.headingAlign).toBe("center");
-  expect(design.headingWidth).toBeGreaterThan(900);
-  expect(design.facts.background).toBe("rgb(255, 255, 255)");
+  expect(design.facts.background).toBe("rgba(255, 255, 255, 0.88)");
   expect(design.facts.columns).toBe(4);
   expect(design.facts.count).toBe(4);
   expect(design.story.background).toBe("rgb(255, 255, 255)");
   expect(design.story.borderRadius).toBe(12);
-  expect(design.story.headingSize).toBe(28);
+  expect(design.story.headingSize).toBe(20);
+});
+
+test("case-study details scale the reference card into a visual cover and editorial story rows", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
+
+  const design = await page.evaluate(() => {
+    const cover = document.querySelector<HTMLElement>("[data-case-study-cover]");
+    const media = cover?.querySelector<HTMLElement>("[data-case-study-media]");
+    const heading = cover?.querySelector<HTMLElement>("h1");
+    const tags = cover?.querySelectorAll<HTMLElement>("[data-case-study-cover-tags] > span");
+    const facts = cover?.querySelector<HTMLElement>("[data-case-study-facts]");
+    const body = document.querySelector<HTMLElement>("[data-case-study-story] .case-study-layout__body");
+    const firstHeading = body?.querySelector<HTMLElement>("h2");
+    const firstParagraph = body?.querySelector<HTMLElement>("p");
+    if (!cover || !media || !heading || !tags || !facts || !body || !firstHeading || !firstParagraph) {
+      throw new Error("The enlarged case-study card or editorial story rows are incomplete");
+    }
+
+    return {
+      cover: {
+        columns: getComputedStyle(cover).gridTemplateColumns.split(" ").length,
+        radius: Number.parseFloat(getComputedStyle(cover).borderRadius),
+        shadow: getComputedStyle(cover).boxShadow,
+      },
+      mediaHeight: Math.round(media.getBoundingClientRect().height),
+      heading: {
+        align: getComputedStyle(heading).textAlign,
+        size: Number.parseFloat(getComputedStyle(heading).fontSize),
+      },
+      tags: {
+        count: tags.length,
+        size: Number.parseFloat(getComputedStyle(tags[0]).fontSize),
+        radius: Number.parseFloat(getComputedStyle(tags[0]).borderRadius),
+      },
+      factsColumns: getComputedStyle(facts).gridTemplateColumns.split(" ").length,
+      story: {
+        columns: getComputedStyle(body).gridTemplateColumns.split(" ").length,
+        headingSize: Number.parseFloat(getComputedStyle(firstHeading).fontSize),
+        pairedRow: Math.abs(firstHeading.getBoundingClientRect().top - firstParagraph.getBoundingClientRect().top) <= 2,
+      },
+      overflow: document.documentElement.scrollWidth - innerWidth,
+    };
+  });
+
+  expect(design.cover.columns).toBe(2);
+  expect(design.cover.radius).toBe(12);
+  expect(design.cover.shadow).not.toBe("none");
+  expect(design.mediaHeight).toBeGreaterThanOrEqual(360);
+  expect(design.heading).toEqual({ align: "left", size: 48 });
+  expect(design.tags.count).toBeGreaterThanOrEqual(2);
+  expect(design.tags.size).toBe(12);
+  expect(design.tags.radius).toBe(6);
+  expect(design.factsColumns).toBe(4);
+  expect(design.story.columns).toBe(2);
+  expect(design.story.headingSize).toBe(20);
+  expect(design.story.pairedRow).toBe(true);
+  expect(design.overflow).toBeLessThanOrEqual(0);
+});
+
+test("the enlarged case-study card keeps the reference's compact action footer", async ({ page }) => {
+  await page.goto("/work/lenskart-ai-retail", { waitUntil: "domcontentloaded" });
+
+  const actions = page.locator("[data-case-study-cover-actions] a");
+  await expect(actions).toHaveCount(3);
+  await expect(actions).toHaveText(["Outcomes", "Methods", "Full story"]);
+  await expect(actions.nth(0)).toHaveAttribute("href", "#case-study-outcomes");
+  await expect(actions.nth(1)).toHaveAttribute("href", "#case-study-methods");
+  await expect(actions.nth(2)).toHaveAttribute("href", "#context");
+
+  for (let index = 0; index < 3; index += 1) {
+    expect((await actions.nth(index).boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  }
 });
 
 for (const caseStudy of caseStudies) {

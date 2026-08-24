@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars, no-undef -- the inherited Babel parser does not recognize imports used by JSX or TypeScript. */
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { BarChart3, FileText, Layers3 } from "lucide-react";
+import { CaseStudyArtwork } from "@/components/case-studies/case-study-artwork";
 import { Breadcrumbs } from "@/components/content/breadcrumbs";
 import { OutcomeList } from "@/components/content/outcome-list";
 import { TableOfContents } from "@/components/content/table-of-contents";
@@ -25,19 +27,37 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
       <header className="detail-page__header case-study-layout__header border-b border-line bg-surface py-10 sm:py-14" data-case-study-header>
         <div className="container">
           <Breadcrumbs items={[{ label: "Work", href: "/work" }, { label: company }]} />
-          <div className="case-study-layout__intro">
-            <p className="case-study-layout__eyebrow mt-10 mb-0 text-xs font-extrabold tracking-[0.12em] text-teal uppercase">Employer transformation case study</p>
-            <h1 className="case-study-layout__title mt-3 mb-0 max-w-[1000px] font-display text-[clamp(3rem,7vw,6rem)] font-medium tracking-[-0.04em] leading-[0.96]">
-              {metadata.title}
-            </h1>
-            <p className="case-study-layout__description reading-measure mt-6 mb-0 text-[1.08rem] text-muted-ink">{metadata.description}</p>
-          </div>
-          <dl className="case-study-layout__facts" data-case-study-facts data-case-study-meta>
-            <div><dt>Company</dt><dd>{company}</dd></div>
-            <div><dt>Industry</dt><dd>{metadata.industry.join(" · ")}</dd></div>
-            {metadata.role ? <div><dt>Role</dt><dd>{metadata.role}</dd></div> : null}
-            {metadata.period ? <div><dt>Period</dt><dd>{metadata.period}</dd></div> : null}
-          </dl>
+          <section aria-labelledby="case-study-title" className="case-study-layout__cover" data-case-study-cover>
+            <div className="case-study-layout__cover-media">
+              <CaseStudyArtwork
+                company={metadata.company}
+                industry={metadata.industry.join(" · ")}
+                kind="employer"
+                slug={metadata.slug}
+              />
+            </div>
+            <div className="case-study-layout__cover-copy">
+              <div className="case-study-layout__cover-tags" data-case-study-cover-tags>
+                {metadata.industry.map((industry) => <span key={industry}>{industry}</span>)}
+              </div>
+              <p className="case-study-layout__eyebrow">Employer transformation case study</p>
+              <h1 className="case-study-layout__title" id="case-study-title">
+                {metadata.title}
+              </h1>
+              <p className="case-study-layout__description">{metadata.description}</p>
+              <nav aria-label="Case study shortcuts" className="case-study-layout__cover-actions" data-case-study-cover-actions>
+                <Link href="#case-study-outcomes"><BarChart3 aria-hidden="true" size={15} strokeWidth={1.8} /><span>Outcomes</span></Link>
+                <Link href="#case-study-methods"><Layers3 aria-hidden="true" size={15} strokeWidth={1.8} /><span>Methods</span></Link>
+                <Link href="#context"><FileText aria-hidden="true" size={15} strokeWidth={1.8} /><span>Full story</span></Link>
+              </nav>
+            </div>
+            <dl className="case-study-layout__facts" data-case-study-facts data-case-study-meta>
+              <div><dt>Company</dt><dd>{company}</dd></div>
+              <div><dt>Industry</dt><dd>{metadata.industry.join(" · ")}</dd></div>
+              {metadata.role ? <div><dt>Role</dt><dd>{metadata.role}</dd></div> : null}
+              {metadata.period ? <div><dt>Period</dt><dd>{metadata.period}</dd></div> : null}
+            </dl>
+          </section>
         </div>
       </header>
 
@@ -46,11 +66,11 @@ export function CaseStudyLayout({ children, item, nextItem }: CaseStudyLayoutPro
           <TableOfContents headings={item.headings} />
         </aside>
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
-          <section aria-labelledby="case-study-outcomes">
+          <section aria-labelledby="case-study-outcomes" className="case-study-layout__outcomes-section">
             <h2 id="case-study-outcomes" className="case-study-layout__section-title m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">Outcomes</h2>
             <div className="case-study-layout__evidence mt-5" data-case-study-evidence><OutcomeList ariaLabel="Case-study outcomes" outcomes={metadata.outcomes} /></div>
           </section>
-          <section aria-labelledby="case-study-methods" className="mt-10 border-t border-line pt-8">
+          <section aria-labelledby="case-study-methods" className="case-study-layout__methods-section mt-10 border-t border-line pt-8">
             <h2 id="case-study-methods" className="case-study-layout__section-title m-0 font-display text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.025em] leading-[1.02]">Methods used</h2>
             <ul className="case-study-layout__methods mt-5 flex list-none flex-wrap gap-2 p-0">
               {metadata.methods.map((method) => <li className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-semibold text-teal-dark" key={method}>{method}</li>)}
