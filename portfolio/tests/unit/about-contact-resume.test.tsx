@@ -50,6 +50,12 @@ it("offers direct contact and both resume paths without a form or JavaScript dep
   const { container } = render(<ContactPage />);
 
   expect(screen.getByRole("heading", { level: 1, name: "Get in touch" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 2, name: "Send the useful first note" })).toBeInTheDocument();
+  expect([...container.querySelectorAll("[data-contact-prompt]")].map((prompt) => prompt.textContent)).toEqual([
+    "01ContextWhat is changing, who is affected, and why it matters now.",
+    "02ConstraintWhat has made the problem difficult to solve so far.",
+    "03OutcomeWhat a useful first conversation should help clarify.",
+  ]);
   expect(screen.getByRole("link", { name: "shantanu.msp@gmail.com" })).toHaveAttribute(
     "href",
     "mailto:shantanu.msp@gmail.com",
@@ -63,7 +69,10 @@ it("offers direct contact and both resume paths without a form or JavaScript dep
     "href",
     "/shantanu-chandra-resume.pdf",
   );
-  expect(screen.getByText("The HTML version stays usable if the current PDF download is unavailable.")).toBeInTheDocument();
+  expect(screen.getByText("AI product leadership")).toBeInTheDocument();
+  expect(screen.getByText("Enterprise transformation")).toBeInTheDocument();
+  expect(screen.getByText("Applied AI education")).toBeInTheDocument();
+  expect(screen.queryByText(/respond within/i)).not.toBeInTheDocument();
   expect(screen.queryByText(/future downloadable PDF/i)).not.toBeInTheDocument();
   expect(container.querySelector("form")).toBeNull();
   expect(container.querySelector("script")).toBeNull();
