@@ -647,7 +647,7 @@ const slides = [
       "Deliver the close slowly. Let the last line sit.",
       "Drop the take-home block in chat before ending."
     ],
-    note: "Post-class within 24h: workbook · KB Design Sheet PDF · individual replies to the take-home · S5 calendar invite.  —  Written & facilitated by Shantanu Chandra · linkedin.com/in/chandrashantanu · Shantanu Chandra Learning Lab · GenAI & AI Agents for Non-Coders · S04"
+    note: "Post-class within 24h: workbook · KB Design Sheet PDF · individual replies to the take-home · S5 calendar invite.  —  Written & facilitated by Shantanu Chandra · linkedin.com/in/chandrashantanu · Shantanu Chandra AI Courses · GenAI & AI Agents for Non-Coders · S04"
   }
 ];
 
@@ -807,7 +807,7 @@ function exportLearnerPDF() {
   // Best-effort fallback: if no learner tab might be open, open one and resend after it loads.
   // We can't reliably detect "is the other tab open" — so we open a new window and resend.
   // If a learner tab already exists, the browser focuses it instead of duplicating in most setups.
-  const w = window.open('learner_deck.html', 'Shantanu Chandra Learning Lab_learner_deck');
+  const w = window.open('learner_deck.html', 'Shantanu Chandra AI Courses_learner_deck');
   if (w) {
     // Give the learner tab time to attach its storage listener and finish first render.
     setTimeout(() => { try { localStorage.setItem(PRINT_KEY, Date.now().toString()); } catch (e) {} }, 1500);

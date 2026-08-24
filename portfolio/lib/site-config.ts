@@ -9,7 +9,7 @@ export const siteConfig = {
     ["Home", "/"],
     ["Resume", "/resume"],
     ["Case Studies", "/case-studies"],
-    ["Learning", "/learning"],
+    ["AI Courses", "/learning"],
     ["Contact", "/contact"],
   ] as const,
   footerNavigation: [

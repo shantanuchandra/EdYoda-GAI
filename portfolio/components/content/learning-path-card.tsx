@@ -14,7 +14,7 @@ export function LearningPathCard({ headingLevel, item }: LearningPathCardProps) 
   const href = `/learning/${metadata.slug}`;
   const outcome = metadata.outcomes[0];
   const titleLink = <Link className="no-underline" href={href}>{metadata.title}</Link>;
-  const subject = metadata.industry[1] ?? "Learning Lab";
+  const subject = metadata.industry[1] ?? "AI Courses";
 
   return (
     <article className="learning-path-card" data-learning-path-card>

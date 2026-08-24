@@ -102,7 +102,7 @@ test("Learning details extend the approved visual language across the complete p
   expect(geometry.visibleMaterialLinks).toBe(3);
   expect(geometry.demoLinks).toBe(2);
   expect(geometry.links).toEqual([
-    expect.objectContaining({ href: "/learning", minHeight: 44, text: expect.stringContaining("All learning paths") }),
+    expect.objectContaining({ href: "/learning", minHeight: 44, text: expect.stringContaining("All AI courses") }),
     expect.objectContaining({ href: "/learning/ai-product-transformation", minHeight: 44, text: expect.stringContaining("AI product transformation") }),
   ]);
   expect(geometry.overflow).toBeLessThanOrEqual(0);

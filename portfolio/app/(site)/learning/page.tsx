@@ -7,8 +7,8 @@ import type { ContentItem } from "@/lib/content/schema";
 import { buildContentMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildContentMetadata({
-  title: "Shantanu Chandra Learning Lab",
-  description: "Shantanu Chandra Learning Lab offers three practical learning paths for operators, product leaders, founders, and emerging AI builders.",
+  title: "Shantanu Chandra AI Courses",
+  description: "Shantanu Chandra AI Courses offers three practical AI courses for operators, product leaders, founders, and emerging AI builders.",
   path: "/learning",
 });
 
@@ -17,8 +17,8 @@ export function LearningIndex({ items }: { items: ContentItem[] }) {
     <section className="learning-page" data-learning-canvas>
       <div className="learning-page__canvas">
         <header className="learning-page__intro" data-learning-intro>
-          <p>Learning</p>
-          <h1>Shantanu Chandra Learning Lab</h1>
+          <p>AI Courses</p>
+          <h1>Shantanu Chandra AI Courses</h1>
           <p>Three practical overviews for people turning AI ideas into useful workflows, governed products, and production-ready systems.</p>
         </header>
         {items.length > 0 ? (
@@ -27,8 +27,8 @@ export function LearningIndex({ items }: { items: ContentItem[] }) {
           </div>
         ) : (
           <EmptyState
-            title="Learning paths are being prepared."
-            description="There are no public Learning Lab paths available right now. The portfolio homepage is a useful place to start."
+            title="AI courses are being prepared."
+            description="There are no public AI courses available right now. The portfolio homepage is a useful place to start."
           />
         )}
       </div>

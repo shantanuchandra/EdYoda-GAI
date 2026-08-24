@@ -37,11 +37,11 @@ async function expectNoExcludedLearningClaims(page: Page) {
   expect(findExcludedLearningClaim(visibleCopy)).toBeNull();
 }
 
-test("lists exactly three complete Learning Lab paths without commerce or account controls", async ({ page }) => {
+test("lists exactly three complete AI courses without commerce or account controls", async ({ page }) => {
   const response = await page.goto("/learning");
 
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1, name: "Shantanu Chandra Learning Lab" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Shantanu Chandra AI Courses" })).toBeVisible();
   await expect(page.getByRole("article")).toHaveCount(3);
 
   for (const path of learningPaths) {
@@ -78,13 +78,15 @@ test("keeps the Lumiere demo on a working same-origin integration boundary", asy
 });
 
 for (const path of learningPaths) {
-  test(`renders the complete ${path.slug} Learning Lab overview`, async ({ page }) => {
+  test(`renders the complete ${path.slug} AI course overview`, async ({ page }) => {
     const response = await page.goto(`/learning/${path.slug}`);
 
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1, name: path.title })).toBeVisible();
     await expect(page.getByText(path.audience, { exact: true })).toBeVisible();
     await expect(page.getByText(path.outcome, { exact: true })).toBeVisible();
+    await expect(page.getByText("Shantanu Chandra AI Courses", { exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "AI course navigation" })).toBeVisible();
     const modules = page.getByRole("heading", { level: 2, name: "Launch modules" }).locator("+ ul > li");
     await expect(modules).toHaveText(path.modules);
     const curriculum = page.getByRole("region", { name: `${path.title} curriculum` });

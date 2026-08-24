@@ -76,10 +76,10 @@ const learningPaths = [
   },
 ] as const;
 
-it("lists exactly three Learning Lab paths with their exact audience, outcome and four launch modules", async () => {
+it("lists exactly three AI courses with their exact audience, outcome and four launch modules", async () => {
   render(await LearningIndexPage());
 
-  expect(screen.getByRole("heading", { level: 1, name: "Shantanu Chandra Learning Lab" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 1, name: "Shantanu Chandra AI Courses" })).toBeInTheDocument();
   const cards = screen.getAllByRole("article");
   expect(cards).toHaveLength(3);
   expect(screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent)).toEqual(
@@ -100,13 +100,13 @@ it("lists exactly three Learning Lab paths with their exact audience, outcome an
   });
 });
 
-it("renders each Learning Lab detail as a public overview with the exact audience, outcome and four modules", async () => {
+it("renders each AI course detail as a public overview with the exact audience, outcome and four modules", async () => {
   for (const [index, path] of learningPaths.entries()) {
     const view = render(await LearningDetailPage({ params: Promise.resolve({ slug: path.slug }) }));
 
     expect(screen.getByRole("article")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1, name: path.title })).toBeInTheDocument();
-    expect(screen.getByText("Shantanu Chandra Learning Lab", { exact: true })).toBeInTheDocument();
+    expect(screen.getByText("Shantanu Chandra AI Courses", { exact: true })).toBeInTheDocument();
     expect(screen.getByText(path.audience, { exact: true })).toBeInTheDocument();
     expect(screen.getByText(path.outcome, { exact: true })).toBeInTheDocument();
 
@@ -127,10 +127,10 @@ it("renders each Learning Lab detail as a public overview with the exact audienc
     if ("demo" in path) {
       expect(screen.getByRole("link", { name: "Open Lumiere Bakery demo" })).toHaveAttribute("href", path.demo);
     }
-    const navigation = screen.getByRole("navigation", { name: "Learning path navigation" });
-    expect(within(navigation).getByRole("link", { name: /all learning paths/i })).toHaveAttribute("href", "/learning");
+    const navigation = screen.getByRole("navigation", { name: "AI course navigation" });
+    expect(within(navigation).getByRole("link", { name: /all AI courses/i })).toHaveAttribute("href", "/learning");
     const nextPath = learningPaths[(index + 1) % learningPaths.length];
-    expect(within(navigation).getByRole("link", { name: `Next learning path: ${nextPath.title}` })).toHaveAttribute(
+    expect(within(navigation).getByRole("link", { name: `Next AI course: ${nextPath.title}` })).toHaveAttribute(
       "href",
       `/learning/${nextPath.slug}`,
     );
@@ -143,19 +143,19 @@ it("renders each Learning Lab detail as a public overview with the exact audienc
 it("publishes only the three approved learning routes with route and index metadata", async () => {
   await expect(generateLearningStaticParams()).resolves.toEqual(learningPaths.map(({ slug }) => ({ slug })));
   expect(learningMetadata).toMatchObject({
-    title: "Shantanu Chandra Learning Lab",
-    description: expect.stringContaining("three practical learning paths"),
+    title: "Shantanu Chandra AI Courses",
+    description: expect.stringContaining("three practical AI courses"),
   });
   await expect(generateLearningMetadata({ params: Promise.resolve({ slug: "ai-product-transformation" }) })).resolves.toMatchObject({
     title: "AI product transformation for product leaders",
-    description: "A Shantanu Chandra Learning Lab overview for teams turning AI opportunities into adopted, measurable operating change.",
+    description: "A Shantanu Chandra AI Courses overview for teams turning AI opportunities into adopted, measurable operating change.",
   });
 });
 
-it("provides a useful Learning Lab empty state", () => {
+it("provides a useful AI Courses empty state", () => {
   render(<LearningIndex items={[]} />);
-  expect(screen.getByRole("heading", { level: 2, name: "Learning paths are being prepared." })).toBeInTheDocument();
-  expect(screen.getByText(/no public Learning Lab paths/i)).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 2, name: "AI courses are being prepared." })).toBeInTheDocument();
+  expect(screen.getByText(/no public AI courses/i)).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
 });
 

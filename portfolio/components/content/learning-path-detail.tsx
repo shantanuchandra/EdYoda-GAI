@@ -23,7 +23,7 @@ export function LearningPathDetail({ children, item }: LearningPathDetailProps) 
   const outcome = metadata.outcomes[0];
   const pathIndex = Math.max(0, learningPaths.findIndex(({ slug }) => slug === metadata.slug));
   const nextPath = learningPaths[(pathIndex + 1) % learningPaths.length];
-  const subject = metadata.industry[1] ?? "Learning Lab";
+  const subject = metadata.industry[1] ?? "AI Courses";
   const pathNumber = String(pathIndex + 1).padStart(2, "0");
   const program = getLearningProgram(metadata.slug);
 
@@ -31,11 +31,11 @@ export function LearningPathDetail({ children, item }: LearningPathDetailProps) 
     <article className="learning-detail" data-learning-detail data-portfolio-template>
       <header className="learning-detail__hero">
         <div className="learning-detail__canvas" data-learning-detail-canvas>
-          <Breadcrumbs items={[{ label: "Learning", href: "/learning" }, { label: metadata.title }]} />
+          <Breadcrumbs items={[{ label: "AI Courses", href: "/learning" }, { label: metadata.title }]} />
 
           <div className="learning-detail__hero-grid">
             <div className="learning-detail__hero-copy">
-              <p className="learning-detail__eyebrow">Shantanu Chandra Learning Lab</p>
+              <p className="learning-detail__eyebrow">Shantanu Chandra AI Courses</p>
               <h1>{metadata.title}</h1>
               <p className="learning-detail__description">{metadata.description}</p>
             </div>
@@ -77,13 +77,13 @@ export function LearningPathDetail({ children, item }: LearningPathDetailProps) 
 
       {program ? <LearningCurriculum program={program} title={metadata.title} /> : null}
 
-      <nav aria-label="Learning path navigation" className="learning-detail__navigation" data-learning-path-navigation>
+      <nav aria-label="AI course navigation" className="learning-detail__navigation" data-learning-path-navigation>
         <Link className="learning-detail__navigation-card" href="/learning">
-          <span>Learning Lab</span>
-          <strong><ArrowLeft aria-hidden="true" size={18} strokeWidth={1.8} /> All learning paths</strong>
+          <span>AI Courses</span>
+          <strong><ArrowLeft aria-hidden="true" size={18} strokeWidth={1.8} /> All AI courses</strong>
         </Link>
-        <Link aria-label={`Next learning path: ${nextPath.title}`} className="learning-detail__navigation-card learning-detail__navigation-card--next" href={`/learning/${nextPath.slug}`}>
-          <span>Next learning path</span>
+        <Link aria-label={`Next AI course: ${nextPath.title}`} className="learning-detail__navigation-card learning-detail__navigation-card--next" href={`/learning/${nextPath.slug}`}>
+          <span>Next AI course</span>
           <strong>{nextPath.title} <ArrowRight aria-hidden="true" size={18} strokeWidth={1.8} /></strong>
         </Link>
       </nav>

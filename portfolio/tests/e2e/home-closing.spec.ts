@@ -43,7 +43,7 @@ test("desktop closing CTA and footer follow the reference conversion hierarchy",
   await expect(closing.getByRole("heading", { name: "Make the next AI decision count." })).toBeVisible();
   await expect(closing.getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
   await expect(footer.getByRole("navigation", { name: "Footer" })).toBeVisible();
-  await expect(footer.getByRole("link", { name: "Learning" })).toHaveAttribute("href", "/learning");
+  await expect(footer.getByRole("link", { name: "AI Courses" })).toHaveAttribute("href", "/learning");
   await expect(footer.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", "https://www.linkedin.com/in/chandrashantanu/");
   await expect(footer.getByRole("link", { name: "Download resume" })).toHaveAttribute("href", "/shantanu-chandra-resume.pdf");
 });

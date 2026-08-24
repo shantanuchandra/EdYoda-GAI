@@ -9,15 +9,15 @@ type LearningPreviewProps = { items: ContentItem[] };
 
 export function LearningPreview({ items }: LearningPreviewProps) {
   return (
-    <section aria-label="Learning Lab paths" className="pt-[var(--section-space)]">
+    <section aria-label="AI courses" className="pt-[var(--section-space)]">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
           <SectionHeading
             description="Practical overviews for people who need to make better AI product and operating decisions."
-            eyebrow="Shantanu Chandra Learning Lab"
+            eyebrow="Shantanu Chandra AI Courses"
             title="Make the work legible."
           />
-          <ActionLink href="/learning">Visit Learning Lab</ActionLink>
+          <ActionLink href="/learning">Explore AI Courses</ActionLink>
         </div>
         <div className="mt-12 grid gap-4 min-[900px]:grid-cols-3">
           {items.map((item) => <LearningPathCard headingLevel={3} item={item} key={item.metadata.slug} />)}

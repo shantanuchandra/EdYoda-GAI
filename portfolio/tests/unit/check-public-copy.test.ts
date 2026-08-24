@@ -47,3 +47,15 @@ it("detects forbidden PDF text without relying on the pdftotext executable", asy
     await rm(root, { force: true, recursive: true });
   }
 });
+
+it("rejects the retired Learning Lab brand from public website copy", async () => {
+  const root = await mkdtemp(join(tmpdir(), "public-copy-test-"));
+  try {
+    await mkdir(join(root, "public"));
+    await writeFile(join(root, "public", "course.html"), "Shantanu Chandra Learning Lab");
+
+    await expect(checkPublicCopy(root)).rejects.toThrow(/course\.html[\s\S]*Learning Lab/i);
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});

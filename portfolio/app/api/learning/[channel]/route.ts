@@ -36,7 +36,7 @@ export async function POST(
   const { channel } = await context.params;
 
   if (!isLumiereChannel(channel)) {
-    return NextResponse.json({ error: "Unknown learning integration." }, { status: 404, headers: noStoreHeaders });
+    return NextResponse.json({ error: "Unknown AI course integration." }, { status: 404, headers: noStoreHeaders });
   }
 
   const contentType = request.headers.get("content-type") ?? "";
@@ -79,7 +79,7 @@ export async function POST(
       return NextResponse.json({ fallback: true }, { status: 200, headers: noStoreHeaders });
     }
     return NextResponse.json(
-      { error: "The learning demo is temporarily unavailable." },
+      { error: "The AI course demo is temporarily unavailable." },
       { status: 502, headers: noStoreHeaders },
     );
   }

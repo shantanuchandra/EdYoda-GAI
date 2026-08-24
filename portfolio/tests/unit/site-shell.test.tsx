@@ -97,7 +97,7 @@ it("exposes the brand and complete primary navigation", () => {
     ["Home", "/"],
     ["Resume", "/resume"],
     ["Case Studies", "/case-studies"],
-    ["Learning", "/learning"],
+    ["AI Courses", "/learning"],
     ["Contact", "/contact"],
   ]) {
     expect(primaryNavigation.getByRole("link", { name })).toHaveAttribute("href", href);

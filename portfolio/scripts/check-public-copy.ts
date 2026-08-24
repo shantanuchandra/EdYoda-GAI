@@ -30,6 +30,7 @@ const dummyCopy = new RegExp(`lo${"rem"} ip${"sum"}`, "i");
 const sourceCvPath = "/Users/shantanuchandra/Documents/SC_Enterprise_AI_Product_Transformation_Resume_Dubai.pdf";
 const forbidden = [
   /edyoda/i,
+  /Shantanu Chandra Learning Lab/i,
   /80887\s*52191/,
   /SC_Enterprise_AI_Product_Transformation_Resume_Dubai/i,
   new RegExp(sourceCvPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
