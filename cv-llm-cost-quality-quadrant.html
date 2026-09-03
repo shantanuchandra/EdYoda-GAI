@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CV Rubric Scoring — LLM Cost vs Quality</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root { --ink:#15223a; --muted:#60708b; --line:#dfe6f2; --panel:#fff; --bg:#f6f8fc; --accent:#2563eb; }
+    * { box-sizing: border-box; }
+    body { margin:0; padding:28px; background:var(--bg); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    .wrap { max-width:1400px; margin:auto; }
+    h1 { font-size:26px; margin:0 0 8px; letter-spacing:-.4px; }
+    .sub { color:var(--muted); max-width:1000px; margin:0 0 22px; line-height:1.5; }
+    .controls { display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:14px; background:var(--panel); padding:16px; border:1px solid var(--line); border-radius:14px; box-shadow:0 4px 18px #1e3a5f0b; }
+    label { display:block; font-size:12px; color:var(--muted); font-weight:700; letter-spacing:.03em; text-transform:uppercase; }
+    input, select { margin-top:7px; width:100%; font:inherit; color:var(--ink); border:1px solid #cbd6e7; border-radius:8px; padding:9px 10px; background:#fff; }
+    input[type="range"] { padding:0; border:0; accent-color:var(--accent); }
+    .value { float:right; color:var(--accent); text-transform:none; letter-spacing:0; }
+    .chart { margin-top:18px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:8px; box-shadow:0 4px 18px #1e3a5f0b; }
+    #plot { height:650px; }
+    .notes { display:grid; grid-template-columns:2fr 1fr; gap:18px; margin-top:18px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; }
+    h2 { font-size:16px; margin:0 0 10px; }
+    p, li { color:#40506b; line-height:1.5; font-size:14px; }
+    ul { margin:8px 0 0; padding-left:19px; }
+    .tablewrap { overflow:auto; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+    th, td { padding:10px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+    .chip { display:inline-block; padding:3px 7px; border-radius:999px; font-size:11px; font-weight:700; }
+    .provisional { background:#fff3cd; color:#8a5a00; }
+    @media (max-width:850px) { body{padding:14px}.controls,.notes{grid-template-columns:1fr 1fr} #plot{height:560px} }
+    @media (max-width:520px) { .controls,.notes{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>LLM map for CV rubric scoring</h1>
+  <p class="sub">Models are positioned by estimated token cost for one compact CV assessment and an editable, provisional suitability score. The useful production zone is the upper-left: low cost, high recruiter-aligned scoring quality.</p>
+
+  <div class="controls">
+    <div><label>Budget line <span class="value" id="budgetV"></span></label><input id="budget" type="range" min="0.25" max="5" step="0.05" value="1"></div>
+    <div><label>Quality line <span class="value" id="qualityV"></span></label><input id="quality" type="range" min="5" max="9.5" step="0.1" value="7.5"></div>
+    <div><label>Monthly CV volume</label><select id="volume"><option value="1000">1,000 CVs</option><option value="10000" selected>10,000 CVs</option><option value="50000">50,000 CVs</option><option value="100000">100,000 CVs</option></select></div>
+    <div><label>Provider filter</label><select id="provider"><option value="All">All providers</option><option>Google</option><option>OpenAI</option><option>Z.ai / GLM</option><option>Moonshot / Kimi</option><option>Mistral</option><option>Anthropic</option><option>Open / Router</option></select></div>
+  </div>
+
+  <div class="chart"><div id="plot"></div></div>
+
+  <div class="notes">
+    <div class="card">
+      <h2>How to read it</h2>
+      <ul>
+        <li><strong>X-axis:</strong> estimated USD cost per 1,000 CVs, displayed on a logarithmic scale. Assumes 2,200 input and 300 output tokens per CV.</li>
+        <li><strong>Y-axis:</strong> provisional 0–10 suitability for evidence-grounded, rubric-based CV assessment. Replace these estimates with blind recruiter-benchmark results before any production decision.</li>
+        <li>Move the sliders to change the quadrant thresholds. Click a model marker to inspect its detail; use the legend to hide providers.</li>
+        <li>Costs exclude OCR, document parsing, retries, platform fees, storage, and any self-hosted compute.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Quadrant actions</h2>
+      <ul>
+        <li><strong>Top-left:</strong> Scale now</li>
+        <li><strong>Top-right:</strong> Selective upgrade</li>
+        <li><strong>Bottom-left:</strong> Test / extract only</li>
+        <li><strong>Bottom-right:</strong> Avoid or special case</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h2>Underlying model assumptions <span class="chip provisional">Provisional quality scores</span></h2>
+    <div class="tablewrap"><table><thead><tr><th>Model</th><th>Provider</th><th>Route</th><th>Input / 1M</th><th>Output / 1M</th><th>Cost / 1,000 CVs</th><th>Suitability / 10</th><th>Recommended role</th></tr></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+</div>
+<script>
+const models = [
+  {name:'OpenRouter free models', provider:'Open / Router', route:'Free tier / prototype', input:0, output:0, cost:0.02, score:5.5, role:'Prototype only; validate privacy and limits', color:'#94a3b8', symbol:'circle-open'},
+  {name:'Mistral Small 3.2', provider:'Mistral', route:'Hosted API', input:0.08, output:0.20, cost:0.236, score:7.0, role:'Low-cost bulk benchmark', color:'#f97316', symbol:'circle'},
+  {name:'Gemini 2.5 Flash-Lite', provider:'Google', route:'Google API', input:0.10, output:0.40, cost:0.34, score:7.7, role:'Bulk first-pass scorer', color:'#4285f4', symbol:'circle'},
+  {name:'GLM-5.3 Flash', provider:'Z.ai / GLM', route:'Z.ai direct API', input:0.15, output:0.50, cost:0.48, score:7.6, role:'Bulk first-pass alternative', color:'#16a34a', symbol:'diamond'},
+  {name:'Mistral Small 4', provider:'Mistral', route:'API / router', input:0.15, output:0.60, cost:0.51, score:7.3, role:'Bulk extraction and scoring', color:'#f97316', symbol:'circle'},
+  {name:'GPT-5 mini Batch', provider:'OpenAI', route:'Batch API', input:0.125, output:1.00, cost:0.575, score:8.1, role:'Async bulk scoring and audit', color:'#10a37f', symbol:'square'},
+  {name:'GPT-5 mini', provider:'OpenAI', route:'Standard API', input:0.25, output:2.00, cost:1.15, score:8.3, role:'Ambiguity resolution', color:'#10a37f', symbol:'square'},
+  {name:'Kimi K2.5', provider:'Moonshot / Kimi', route:'OpenRouter', input:0.45, output:2.25, cost:1.665, score:8.1, role:'Long / complex candidate packs', color:'#8b5cf6', symbol:'triangle-up'},
+  {name:'GLM-4.5', provider:'Z.ai / GLM', route:'OpenRouter', input:0.60, output:2.20, cost:1.98, score:7.9, role:'Complex scoring second opinion', color:'#16a34a', symbol:'diamond'},
+  {name:'Kimi K2.6', provider:'Moonshot / Kimi', route:'OpenRouter', input:0.53, output:3.39, cost:2.183, score:8.2, role:'Complex document sets', color:'#8b5cf6', symbol:'triangle-up'},
+  {name:'GLM-5.1', provider:'Z.ai / GLM', route:'OpenRouter', input:0.896, output:2.816, cost:2.816, score:8.2, role:'Higher-reasoning escalation', color:'#16a34a', symbol:'diamond'},
+  {name:'Claude Haiku 4.5', provider:'Anthropic', route:'Anthropic API', input:1.00, output:5.00, cost:3.70, score:8.0, role:'Narrative evidence review', color:'#d97706', symbol:'hexagon'},
+  {name:'GLM-5.2 / 5.3', provider:'Z.ai / GLM', route:'Z.ai direct API', input:1.40, output:4.40, cost:4.40, score:8.5, role:'Premium GLM escalation', color:'#16a34a', symbol:'diamond'}
+];
+function money(n){ return '$' + n.toFixed(n < 1 ? 3 : 2); }
+function updateTable(filtered){
+  document.getElementById('tbody').innerHTML = filtered.map(m => `<tr><td>${m.name}</td><td>${m.provider}</td><td>${m.route}</td><td>$${m.input.toFixed(3)}</td><td>$${m.output.toFixed(2)}</td><td>${money(m.cost)}</td><td>${m.score.toFixed(1)}</td><td>${m.role}</td></tr>`).join('');
+}
+function draw(){
+  const budget=+document.getElementById('budget').value, quality=+document.getElementById('quality').value;
+  const volume=+document.getElementById('volume').value, pf=document.getElementById('provider').value;
+  document.getElementById('budgetV').textContent=money(budget) + ' / 1k';
+  document.getElementById('qualityV').textContent=quality.toFixed(1) + ' / 10';
+  const shown=models.filter(m=>pf==='All'||m.provider===pf);
+  const groups=[...new Set(shown.map(m=>m.provider))];
+  const traces=groups.map(p=>{const arr=shown.filter(m=>m.provider===p); return {type:'scatter',mode:'markers+text',name:p,x:arr.map(m=>m.cost),y:arr.map(m=>m.score),text:arr.map(m=>m.name),textposition:'top center',textfont:{size:11,color:'#334155'},customdata:arr.map(m=>[m.route,m.input,m.output,m.cost*(volume/1000),m.role]),hovertemplate:'<b>%{text}</b><br>Provider: '+p+'<br>Route: %{customdata[0]}<br>Input: $%{customdata[1]:.3f}/M<br>Output: $%{customdata[2]:.2f}/M<br>Cost / 1,000 CVs: $%{x:.3f}<br>Cost at selected volume: $%{customdata[3]:.2f}<br>Suitability: %{y:.1f}/10<br>Role: %{customdata[4]}<extra></extra>',marker:{size:18,color:arr.map(m=>m.color),symbol:arr.map(m=>m.symbol),line:{width:1.4,color:'#fff'}}};});
+  const minX=0.015, maxX=7;
+  const layout={margin:{l:70,r:30,t:48,b:65},paper_bgcolor:'#fff',plot_bgcolor:'#fff',showlegend:true,legend:{orientation:'h',y:1.15,x:0},hoverlabel:{bgcolor:'#15223a',font:{color:'#fff'}},xaxis:{title:'Estimated USD cost per 1,000 CV assessments (log scale; lower is better)',type:'log',range:[Math.log10(minX),Math.log10(maxX)],gridcolor:'#e8edf5',zeroline:false},yaxis:{title:'Provisional CV-rubric suitability (0–10; higher is better)',range:[4.8,9.3],gridcolor:'#e8edf5',zeroline:false},shapes:[
+    {type:'rect',xref:'x',yref:'y',x0:minX,x1:budget,y0:quality,y1:9.3,fillcolor:'rgba(34,197,94,.10)',line:{width:0},layer:'below'},
+    {type:'rect',xref:'x',yref:'y',x0:budget,x1:maxX,y0:quality,y1:9.3,fillcolor:'rgba(59,130,246,.07)',line:{width:0},layer:'below'},
+    {type:'rect',xref:'x',yref:'y',x0:minX,x1:budget,y0:4.8,y1:quality,fillcolor:'rgba(245,158,11,.08)',line:{width:0},layer:'below'},
+    {type:'rect',xref:'x',yref:'y',x0:budget,x1:maxX,y0:4.8,y1:quality,fillcolor:'rgba(239,68,68,.07)',line:{width:0},layer:'below'},
+    {type:'line',xref:'x',yref:'paper',x0:budget,x1:budget,y0:0,y1:1,line:{color:'#475569',width:2,dash:'dash'}},
+    {type:'line',xref:'paper',yref:'y',x0:0,x1:1,y0:quality,y1:quality,line:{color:'#475569',width:2,dash:'dash'}}
+  ],annotations:[
+    {xref:'x',yref:'y',x:Math.sqrt(minX*budget),y:9.08,text:'<b>SCALE NOW</b><br>Low cost · High suitability',showarrow:false,font:{size:13,color:'#16713b'}},
+    {xref:'x',yref:'y',x:Math.sqrt(budget*maxX),y:9.08,text:'<b>SELECTIVE UPGRADE</b><br>Higher cost · High suitability',showarrow:false,font:{size:13,color:'#2563eb'}},
+    {xref:'x',yref:'y',x:Math.sqrt(minX*budget),y:5.03,text:'<b>TEST / EXTRACT ONLY</b>',showarrow:false,font:{size:12,color:'#a16207'}},
+    {xref:'x',yref:'y',x:Math.sqrt(budget*maxX),y:5.03,text:'<b>AVOID / SPECIAL CASE</b>',showarrow:false,font:{size:12,color:'#b91c1c'}}
+  ]};
+  Plotly.react('plot',traces,layout,{responsive:true,displaylogo:false}); updateTable(shown);
+}
+['budget','quality','volume','provider'].forEach(id=>document.getElementById(id).addEventListener('input',draw));
+draw();
+</script>
+</body>
+</html>
